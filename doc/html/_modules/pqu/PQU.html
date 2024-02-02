@@ -45,7 +45,7 @@
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
 <span class="c1"># Notes.</span>
-<span class="c1"># Need sphinx 1.1 or higher to use &quot;:private-members:&quot; parameter in PQU.rst. This is why :py:meth:`PQU._getOtherAsPQU` do not display properly.</span>
+<span class="c1"># Need sphinx 1.1 or higher to use &quot;:private-members:&quot; parameter in PQU.rst. This is why :py:func:`PQU._getOtherAsPQU` do not display properly.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">---------------------------</span>
@@ -191,7 +191,7 @@
 
 <span class="sd">The :py:class:`PQU` package has many defined units with prefixes (see `Defined prefixes and units`_). In general, the</span>
 <span class="sd">PQU methods that operate on :py:class:`PQU` objects do not attempt to simplify the units, even if the result is dimensionless.</span>
-<span class="sd">Note, to get rid of dimensionless units use the method :py:meth:`PQU.simplify`</span>
+<span class="sd">Note, to get rid of dimensionless units use the method :py:func:`PQU.simplify`</span>
 <span class="sd">For example, consider the division of &#39;3.2 m&#39; by 11.2 km:</span>
 
 <span class="sd">&gt;&gt;&gt; from pqu import PQU</span>
@@ -206,8 +206,8 @@
 <span class="sd">&gt;&gt;&gt; slope.simplify()</span>
 <span class="sd">PQU( &quot;2.9e-4&quot; )</span>
 
-<span class="sd">Here the method :py:meth:`PQU.copyToUnit` is used to convert the units into a dimensionless form. Here is another</span>
-<span class="sd">example showing the use of the :py:meth:`PQU.copyToUnit` method:</span>
+<span class="sd">Here the method :py:func:`PQU.copyToUnit` is used to convert the units into a dimensionless form. Here is another</span>
+<span class="sd">example showing the use of the :py:func:`PQU.copyToUnit` method:</span>
 
 <span class="sd">&gt;&gt;&gt; mass = PQU.PQU( &quot;4.321 g&quot; )</span>
 <span class="sd">&gt;&gt;&gt; speed = PQU.PQU( &quot;1.234 inch / mus&quot;  )  </span>
@@ -218,8 +218,8 @@
 <span class="sd">&gt;&gt;&gt; print(energy_joules)</span>
 <span class="sd">4.245e6 J</span>
 
-<span class="sd">The method :py:meth:`PQU.inUnitsOf` is useful for returning a physical quantity in units of descending compatible units. </span>
-<span class="sd">For example, :py:meth:`PQU.inUnitsOf` will convert &#39;3123452.12 s&#39; into days, hours, minutes and seconds, or just hours and seconds as:</span>
+<span class="sd">The method :py:func:`PQU.inUnitsOf` is useful for returning a physical quantity in units of descending compatible units. </span>
+<span class="sd">For example, :py:func:`PQU.inUnitsOf` will convert &#39;3123452.12 s&#39; into days, hours, minutes and seconds, or just hours and seconds as:</span>
 
 <span class="sd">&gt;&gt;&gt; t = PQU.PQU( &#39;3123452.12 s&#39; )</span>
 <span class="sd">&gt;&gt;&gt; t.inUnitsOf( &#39;d&#39;, &#39;h&#39;, &#39;min&#39;, &#39;s&#39; )</span>
@@ -227,7 +227,7 @@
 <span class="sd">&gt;&gt;&gt; t.inUnitsOf( &#39;h&#39;,  &#39;s&#39; )</span>
 <span class="sd">(PQU( &quot;867.000000 h&quot; ), PQU( &quot;2252.12 s&quot; ))</span>
 
-<span class="sd">Also see the methods :py:meth:`PQU.convertToUnit` and :py:meth:`PQU.getValueAs`.</span>
+<span class="sd">Also see the methods :py:func:`PQU.convertToUnit` and :py:func:`PQU.getValueAs`.</span>
 
 <span class="sd">------------------------------------------------------------------------------------------</span>
 <span class="sd">Changing non-hardwired constants</span>
@@ -353,8 +353,8 @@
 <span class="sd">This section classifies some of the methods in the :py:class:`PQU` class by their function.</span>
 
 <span class="sd">For :py:class:`PQU` methods that require a second operand (e.g., &#39;+&#39;, &#39;/&#39;), the second operand will be passed to the</span>
-<span class="sd">staticmethod :py:meth:`PQU._getOtherAsPQU` to determine if it is a suitable object. A suitable object includes any string that</span>
-<span class="sd">is a valid :py:class:`PQU`. For example: :py:meth:`PQU.toString`</span>
+<span class="sd">staticmethod :py:func:`PQU._getOtherAsPQU` to determine if it is a suitable object. A suitable object includes any string that</span>
+<span class="sd">is a valid :py:class:`PQU`. For example: :py:func:`PQU.toString`</span>
 
 <span class="sd">&gt;&gt;&gt; print(PQU.PQU( &#39;12.345&#39; ) + &quot;3.23&quot;)</span>
 <span class="sd">15.58</span>
@@ -389,13 +389,13 @@
 <span class="sd">**__add__, __radd__, __iadd__, __sub__, __rsub__, __isub__**</span>
 
 <span class="sd">    These are the standard binary operators for addition and subtraction. For these operators, the other</span>
-<span class="sd">    operand is passed to :py:meth:`PQU._getOtherAsPQU`. The other operand must have units compatible with *self*.</span>
+<span class="sd">    operand is passed to :py:func:`PQU._getOtherAsPQU`. The other operand must have units compatible with *self*.</span>
 <span class="sd">    As expected, the __iadd__ and __isub__ methods modify *self* and return it.</span>
 
 <span class="sd">**__mul__, __rmul__, __imul__, __div__, __rdiv__, __idiv__**</span>
 
 <span class="sd">    These are the standard binary operators for multiplication and division. For these operators, the other</span>
-<span class="sd">    operand is passed to :py:meth:`PQU._getOtherAsPQU`. Any unit for other is allowed.</span>
+<span class="sd">    operand is passed to :py:func:`PQU._getOtherAsPQU`. Any unit for other is allowed.</span>
 <span class="sd">    As expected, the __imul__ and __idiv__ methods modify *self* and</span>
 <span class="sd">    return it. All these methods call the __mul__ method; except, when a division happens, and &#39;*self* is other&#39;</span>
 <span class="sd">    and the denominator is not 0.</span>
@@ -415,7 +415,7 @@
 <span class="sd">**__eq__, __ne__, __lt__, __le__, __gt__, __ge__, compare, equivalent**</span>
 
 <span class="sd">    These methods compare *self* to another object. For these operators, the other</span>
-<span class="sd">    object is passed to :py:meth:`PQU._getOtherAsPQU` and must have the same unit</span>
+<span class="sd">    object is passed to :py:func:`PQU._getOtherAsPQU` and must have the same unit</span>
 <span class="sd">    as *self*. The first 6 methods all call the :py:func:`compare` method</span>
 <span class="sd">    with epsilonFactor = 5. All methods except &#39;equivalent&#39; compare </span>
 <span class="sd">    *self*&#39;s and other&#39;s values and units only. </span>
@@ -552,6 +552,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">fractions</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
 <span class="kn">from</span> <span class="nn">.NumberDict</span> <span class="kn">import</span> <span class="n">NumberDict</span>
 
@@ -627,7 +628,7 @@
 <span class="sd">        |float|None    |None  |None    |None    |float      |float                      |</span>
 <span class="sd">        +-----+--------+------+--------+--------+-----------+---------------------------+</span>
 <span class="sd">        |float|None    |string|None    |PU      |float in   |PQ in unitTo               |</span>
-<span class="sd">        |     |        |or PU |        |        |unitTo     |                          `|</span>
+<span class="sd">        |     |        |or PU |        |        |unitTo     |                           |</span>
 <span class="sd">        +-----+--------+------+--------+--------+-----------+---------------------------+</span>
 <span class="sd">        |float|string  |None  |PU      |None    |float in   |PQ in unitFrom             |</span>
 <span class="sd">        |     |or PU   |      |        |        |unitFrom   |                           |</span>
@@ -1256,7 +1257,7 @@
 <span class="sd">        Returns a string representation of *self* (i.e., &#39;+/- 1.2%&#39;).</span>
 
 <span class="sd">        :param str prefix: A prefix for the &#39;+/-&#39; style</span>
-<span class="sd">        :param significantDigits: Passed onto method :py:meth:`PQU_float.toString`</span>
+<span class="sd">        :param significantDigits: Passed onto method :py:func:`PQU_float.toString`</span>
 <span class="sd">        :rtype: `str`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1281,7 +1282,7 @@
 <div class="viewcode-block" id="PQU"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU">[docs]</a><span class="k">class</span> <span class="nc">PQU</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class supports a float value with an optional uncertainty and unit. Many basic math operations are supported </span>
-<span class="sd">    (e.g., +, -, *, /).  A :py:class:`PQU` is anything that the staticmethod :py:meth:`Parsers.parsePQUString` can parse.</span>
+<span class="sd">    (e.g., +, -, *, /).  A :py:class:`PQU` is anything that the staticmethod :py:func:`Parsers.parsePQUString` can parse.</span>
 
 <span class="sd">    In this section the following notations are used:</span>
 
@@ -1308,7 +1309,7 @@
 <span class="sd">        | unit = string_pu          | The unit argument must be a valid unit string (e.g., &quot;MeV&quot;, &quot;MeV/m&quot; but not       |</span>
 <span class="sd">        |                           | &quot;1 MeV&quot;) or a :py:class:`PhysicalUnit` object.                                    |</span>
 <span class="sd">        +---------------------------+-----------------------------------------------------------------------------------+</span>
-<span class="sd">        | string                    | String can be anything that the method :py:meth:`Parsers.parsePQUString` is       |</span>
+<span class="sd">        | string                    | String can be anything that the method :py:func:`Parsers.parsePQUString` is       |</span>
 <span class="sd">        |                           | capable of parsing (e.g., &#39;1.23&#39;, &#39;1.23 m&#39;, &#39;1.23%&#39;, &#39;1.23(12) m&#39;,                |</span>
 <span class="sd">        |                           | &#39;1.23 +/- 0.12m&#39;). If it contains a unit (uncertainty) then the unit              |</span>
 <span class="sd">        |                           | (uncertainty) argument must be None.                                              |</span>
@@ -1616,7 +1617,7 @@
 <span class="sd">        Compares *self*&#39;s value and unit to other&#39;s value and unit (other&#39;s value is first converted to unit of *self*) </span>
 <span class="sd">        using the :py:func:`compare` function.</span>
 
-<span class="sd">        Also see method :py:meth:`PQU.equivalent`.</span>
+<span class="sd">        Also see method :py:func:`PQU.equivalent`.</span>
 
 <span class="sd">        :param other: The :py:class:`PQU` instance to compare to *self*</span>
 <span class="sd">        :type other: A :py:class:`PQU` equivalent instance</span>
@@ -1665,7 +1666,7 @@
 <span class="sd">        values within &#39;factor times uncertainty&#39; of its value. That is, the band for *self* is the ranges from</span>
 <span class="sd">        &#39;value - factor * uncertainty&#39; to &#39;value + factor * uncertainty&#39;.</span>
 
-<span class="sd">        Note, this is different than the :py:meth:`compare` method which compares the values using sys.float_info.epsilon</span>
+<span class="sd">        Note, this is different than the :py:func:`compare` method which compares the values using sys.float_info.epsilon</span>
 <span class="sd">        to calculate a &#39;band&#39; and not their uncertainties.</span>
 
 <span class="sd">        :param other: The object to compare to *self*</span>
@@ -1941,10 +1942,10 @@
 <div class="viewcode-block" id="PQU.setPercentFlag"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.setPercentFlag">[docs]</a>    <span class="k">def</span> <span class="nf">setPercentFlag</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">isPercent</span><span class="p">,</span> <span class="n">scaleValue</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Changes the percent flag only when *self* is dimensionless and isPercent != *self*.isPercent( ).</span>
-<span class="sd">        Otherwise, a raise is executed.  For scaleValue argument see :py:meth:`PQU_float.setPercentFlag`.</span>
+<span class="sd">        Otherwise, a raise is executed.  For scaleValue argument see :py:func:`PQU_float.setPercentFlag`.</span>
 
-<span class="sd">        :param isPercent: See :py:meth:`PQU_float.setPercentFlag`</span>
-<span class="sd">        :param scaleValue: See :py:meth:`PQU_float.setPercentFlag`</span>
+<span class="sd">        :param isPercent: See :py:func:`PQU_float.setPercentFlag`</span>
+<span class="sd">        :param scaleValue: See :py:func:`PQU_float.setPercentFlag`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isDimensionless</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Can only set/unset percent on a dimensionless PQU: unit = &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span>
@@ -1970,8 +1971,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a string representation of *self* (e.g., &#39;35 +/- 1.2% J&#39;).</span>
 
-<span class="sd">        :param significantDigits: Passed onto the methods :py:meth:`PQU_float.toString` and :py:meth:`PQU_uncertainty.toString`</span>
-<span class="sd">        :param :param : Passed onto the method :py:meth:`PQU_float.toString`.</span>
+<span class="sd">        :param significantDigits: Passed onto the methods :py:func:`PQU_float.toString` and :py:func:`PQU_uncertainty.toString`</span>
+<span class="sd">        :param :param : Passed onto the method :py:func:`PQU_float.toString`.</span>
 
 <span class="sd">        :rtype: `str`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1997,8 +1998,8 @@
 <div class="viewcode-block" id="PQU.truncate"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.truncate">[docs]</a>    <span class="k">def</span> <span class="nf">truncate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If value is **True**, calls *self*.value&#39;s truncate method. If uncertainty is **True**, </span>
-<span class="sd">        calls *self*.uncertainty&#39;s truncate method.  See :py:meth:`PQU_float.truncate`</span>
-<span class="sd">        and :py:meth:`PQU_uncertainty.truncate`</span>
+<span class="sd">        calls *self*.uncertainty&#39;s truncate method.  See :py:func:`PQU_float.truncate`</span>
+<span class="sd">        and :py:func:`PQU_uncertainty.truncate`</span>
 
 <span class="sd">        :param value: If **True** *self*&#39;s value is truncated</span>
 <span class="sd">        :type value: `bool`</span>
@@ -2068,7 +2069,7 @@
 <div class="viewcode-block" id="Parsers"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.Parsers">[docs]</a><span class="k">class</span> <span class="nc">Parsers</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is use to parse the allowed **PQU** strings (e.g., &#39;1 m&#39;, &#39;1.32(3) kg).</span>
-<span class="sd">    See the table in the :py:meth:`parsePQUString.parsePQUString` doc string for allowed **PQU** strings.</span>
+<span class="sd">    See the table in the :py:func:`parsePQUString.parsePQUString` doc string for allowed **PQU** strings.</span>
 <span class="sd">    This class is mainly for internal use.</span>
 
 <span class="sd">    .. rubric:: Regular Expression Matching</span>
@@ -2371,77 +2372,72 @@
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Incompatible units&#39;</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="o">.</span><span class="fm">__ne__</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;cannot multiply units with non-zero offset&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Cannot multiply units with non-zero offset.&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">return</span><span class="p">(</span> <span class="n">PhysicalUnit</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span><span class="p">):</span>
+            <span class="n">pqu</span> <span class="o">=</span> <span class="n">PhysicalUnit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span><span class="p">)))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span><span class="p">(</span> <span class="n">PhysicalUnit</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">+</span> <span class="p">{</span> <span class="nb">str</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">pqu</span> <span class="o">=</span> <span class="n">PhysicalUnit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">+</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">):</span> <span class="mi">1</span><span class="p">},</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">)</span>
+        <span class="n">pqu</span><span class="o">.</span><span class="n">simplifyFractions</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">pqu</span>
 
     <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
 
-    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot; cannot divide units with non-zero offset&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Cannot divide units with non-zero offset.&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">return</span><span class="p">(</span> <span class="n">PhysicalUnit</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">/</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span><span class="p">):</span>
+            <span class="n">pqu</span> <span class="o">=</span> <span class="n">PhysicalUnit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">/</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span><span class="p">)))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span><span class="p">(</span> <span class="n">PhysicalUnit</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">+</span> <span class="p">{</span> <span class="nb">str</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">},</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">/</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">pqu</span> <span class="o">=</span> <span class="n">PhysicalUnit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">+</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">):</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">/</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">)</span>
+        <span class="n">pqu</span><span class="o">.</span><span class="n">simplifyFractions</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="n">pqu</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;cannot divide units with non-zero offset&quot;</span> <span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">return</span><span class="p">(</span> <span class="n">PhysicalUnit</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">symbols</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Cannot divide units with non-zero offset.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PhysicalUnit</span><span class="p">):</span>
+            <span class="n">pqu</span> <span class="o">=</span> <span class="n">PhysicalUnit</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">symbols</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">)))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span><span class="p">(</span> <span class="n">PhysicalUnit</span><span class="p">(</span> <span class="n">NumberDict</span><span class="p">(</span> <span class="p">{</span> <span class="nb">str</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="n">other</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="p">[</span> <span class="o">-</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">pqu</span> <span class="o">=</span> <span class="n">PhysicalUnit</span><span class="p">(</span><span class="n">NumberDict</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">):</span> <span class="mi">1</span><span class="p">})</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="n">other</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">])</span>
+        <span class="n">pqu</span><span class="o">.</span><span class="n">simplifyFractions</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">pqu</span>
 
     <span class="n">__div__</span> <span class="o">=</span> <span class="fm">__truediv__</span>   <span class="c1"># for python 2.x</span>
     <span class="n">__rdiv__</span> <span class="o">=</span> <span class="fm">__rtruediv__</span>
 
-    <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;cannot exponentiate units with non-zero offset&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Cannot exponentiate units with non-zero offset.&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                     <span class="c1"># See if very close to an integer.</span>
-            <span class="n">power</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
-            <span class="n">rounded</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span> <span class="n">power</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="p">)</span> <span class="p">)</span>
-            <span class="k">if</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">power</span> <span class="o">-</span> <span class="n">rounded</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.e-14</span> <span class="p">)</span> <span class="p">:</span> <span class="n">other</span> <span class="o">=</span> <span class="n">rounded</span> <span class="c1"># If not close, revert back to non-int so handled as inverse later.</span>
-        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">return</span><span class="p">(</span> <span class="n">PhysicalUnit</span><span class="p">(</span> <span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="nb">pow</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="n">other</span> <span class="p">),</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">other</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="n">limit_denominator</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">power</span><span class="o">.</span><span class="n">denominator</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="n">power</span><span class="o">.</span><span class="n">numerator</span>
+        <span class="n">floatOther</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">floatOther</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">power</span><span class="p">)</span> <span class="o">/</span> <span class="n">floatOther</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-14</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not convert &quot;</span><span class="si">%s</span><span class="s1">&quot; to a fraction (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">power</span><span class="p">))</span>
+        <span class="n">powers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">power</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">p1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">powers</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">p1</span><span class="o">.</span><span class="n">denominator</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">powers</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">numerator</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="nb">float</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c1"># See if inverse (e.g., 1. / 3.)</span>
-            <span class="n">inv_exp</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">other</span>
-            <span class="n">rounded</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span> <span class="n">inv_exp</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">pqu</span> <span class="o">=</span> <span class="n">PhysicalUnit</span><span class="p">(</span><span class="n">power</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="n">power</span><span class="p">),</span> <span class="n">powers</span><span class="p">)</span>
+        <span class="n">pqu</span><span class="o">.</span><span class="n">simplifyFractions</span><span class="p">()</span>
 
-            <span class="k">if</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">inv_exp</span><span class="o">-</span><span class="n">rounded</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.e-10</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="k">if</span> <span class="n">reduce</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="ow">and</span> <span class="n">b</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">rounded</span><span class="p">:</span> <span class="n">x</span> <span class="o">%</span> <span class="n">e</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-                    <span class="n">f</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span>
-                    <span class="n">p</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">rounded</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">)</span>
-
-                    <span class="k">if</span> <span class="n">reduce</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="ow">and</span> <span class="n">b</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">rounded</span><span class="p">:</span> <span class="n">x</span> <span class="o">%</span> <span class="n">e</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="o">.</span><span class="n">values</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-                        <span class="n">symbols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">/</span> <span class="n">rounded</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">symbols</span> <span class="o">=</span> <span class="n">NumberDict</span><span class="p">(</span> <span class="p">)</span>
-
-                        <span class="k">if</span> <span class="n">f</span> <span class="o">!=</span> <span class="mf">1.</span><span class="p">:</span>
-                            <span class="n">symbols</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span> <span class="n">f</span> <span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
-
-                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">p</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-                            <span class="n">symbols</span><span class="p">[</span><span class="n">_base_symbols</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-
-                    <span class="k">return</span> <span class="n">PhysicalUnit</span><span class="p">(</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">p</span> <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Illegal exponent&#39;</span> <span class="p">)</span>
-
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Only integer and inverse integer exponents are allowed&#39;</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">pqu</span>
 
 <div class="viewcode-block" id="PhysicalUnit.conversionFactorTo"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.conversionFactorTo">[docs]</a>    <span class="k">def</span> <span class="nf">conversionFactorTo</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">ignoreTemperatureOffsets</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2535,6 +2531,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="n">NumberDict</span><span class="p">(</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
 
+<div class="viewcode-block" id="PhysicalUnit.simplifyFractions"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.simplifyFractions">[docs]</a>    <span class="k">def</span> <span class="nf">simplifyFractions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method converts any part of self&#39;s symbols and powers that are a :py:class:`fractions.Fraction` instance with </span>
+<span class="sd">        denominator of 1 into an integer of the numerator.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">power</span><span class="p">,</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">power</span><span class="o">.</span><span class="n">denominator</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">power</span><span class="o">.</span><span class="n">numerator</span>
+        
+        <span class="n">symbols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span>
+        <span class="n">toDelete</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">denominator</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">numerator</span>
+                    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">numerator</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">toDelete</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">toDelete</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="PhysicalUnit.simplifyUnitsFactor"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PhysicalUnit.simplifyUnitsFactor">[docs]</a>    <span class="k">def</span> <span class="nf">simplifyUnitsFactor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns a :py:class:`PQU` instance that can be used to simplify *self*&#39;s units.</span>
@@ -2572,12 +2591,18 @@
         <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="p">:</span>
             <span class="n">power</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span>
 
+            <span class="n">leftBracket</span><span class="p">,</span> <span class="n">rightBracket</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">power</span><span class="p">,</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">):</span>
+                <span class="n">leftBracket</span><span class="p">,</span> <span class="n">rightBracket</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span>
+
             <span class="k">if</span><span class="p">(</span> <span class="n">power</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
                 <span class="n">denom</span> <span class="o">=</span> <span class="n">denom</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">unit</span>
-                <span class="k">if</span><span class="p">(</span> <span class="n">power</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="n">denom</span> <span class="o">=</span> <span class="n">denom</span> <span class="o">+</span> <span class="s1">&#39;**&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span> <span class="o">-</span><span class="n">power</span> <span class="p">)</span>
+                <span class="k">if</span> <span class="n">power</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">denom</span> <span class="o">=</span> <span class="n">denom</span> <span class="o">+</span> <span class="s1">&#39;**&#39;</span> <span class="o">+</span> <span class="n">leftBracket</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="o">-</span><span class="n">power</span><span class="p">)</span> <span class="o">+</span> <span class="n">rightBracket</span>
             <span class="k">elif</span><span class="p">(</span> <span class="n">power</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
                 <span class="n">num</span> <span class="o">=</span> <span class="n">num</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="n">unit</span>
-                <span class="k">if</span><span class="p">(</span> <span class="n">power</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="n">num</span> <span class="o">=</span> <span class="n">num</span> <span class="o">+</span> <span class="s1">&#39;**&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span> <span class="n">power</span> <span class="p">)</span>
+                <span class="k">if</span> <span class="n">power</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">num</span> <span class="o">=</span> <span class="n">num</span> <span class="o">+</span> <span class="s1">&#39;**&#39;</span> <span class="o">+</span> <span class="n">leftBracket</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">power</span><span class="p">)</span> <span class="o">+</span> <span class="n">rightBracket</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">num</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
             <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">denom</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">num</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>

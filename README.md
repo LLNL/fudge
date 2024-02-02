@@ -15,7 +15,7 @@ plus tools for testing, visualizing, and processing **GNDS** data.
 
 ## Getting Started:
 
-Installing **FUDGE** only requires Python (version 3.6 or higher) and NumPy (version 1.15 or higher).
+Installing **FUDGE** only requires Python (version 3.7 or higher) and NumPy (version 1.15 or higher).
 Optional packages matplotlib and PyQT5 are also recommended to support plotting. 
 
 ### The following installation options are currently supported:
@@ -25,10 +25,10 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
     - Create a new virtual environment if desired. For example, using Anaconda:
  
-          conda create --name fudge python=3.8 numpy matplotlib PyQT
+          conda create --name fudge python=3.9 numpy matplotlib PyQT5
           conda activate fudge
 
-      Some users have reported problems with installing PyQT with conda on Windows. It may be ommitted from the
+      Some users have reported problems with installing PyQT5 with conda on Windows. It may be ommitted from the
       above `conda create` command and, if required, be installed via `pip install`.
     
     - Ensure that NumPy (version 1.15 or higher) and wheels are present in the Python environment.
@@ -41,7 +41,7 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
     - Install FUDGE:
      
-          pip install git+https://github.com/LLNL/fudge.git@6.4.0
+          pip install git+https://github.com/LLNL/fudge.git@6.5.0
 
 
 - Installation by cloning the git repository and building with the unix `make` command: 

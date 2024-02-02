@@ -5,6 +5,15 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module contains all the ancestry classes. These classes allow a node in a hierarchy 
+to reference any other node in the hierarchy provided that each node of the hierarchy inherits
+from one of the ancestry classes and the method :py:func:`Ancestry.setAncestor` is called to
+contect a child node to its parent node.
+
+This module was mainly written to support linking and xpath referencing in a GNDS hierarchy.
+"""
+
 import sys
 import os
 import abc
@@ -32,11 +41,11 @@ class Ancestry(abc.ABC):
         +---------------------------+-----------------------------------------------------------------------------------------------------------+
         | moniker                   | The name associated with the class type.                                                                  |
         +---------------------------+-----------------------------------------------------------------------------------------------------------+
-        | ancestor                  | Instance which self is a child of.                                                                        |
+        | ancestor                  | Instance which *self* is a child of.                                                                      |
         +---------------------------+-----------------------------------------------------------------------------------------------------------+
         | keyName                   | The name of the key. The key's value is used by a suite to indentify an element of a suite.               |
         +---------------------------+-----------------------------------------------------------------------------------------------------------+
-        | ancestryMembers           | Tuple of names of  the members of *self* that inherit from **Ancestry**.                                  |
+        | ancestryMembers           | Tuple of names of the members of *self* that inherit from **Ancestry**.                                   |
         +---------------------------+-----------------------------------------------------------------------------------------------------------+
         | legacyMemberNameMapping   | A map whose keys are legacy member names and whose associated values are the current memeber names.       |
         +---------------------------+-----------------------------------------------------------------------------------------------------------+
@@ -44,13 +53,19 @@ class Ancestry(abc.ABC):
         |                           | key it the format version and its associated value is the moniker used for that format version.           |
         +---------------------------+-----------------------------------------------------------------------------------------------------------+
 
+    This class defines moniker to be abstract meaning that all classes that inherit from this class must define moniker.
     The main reason for the **keyName** is that is it used by a **Suite** instance to reference (i.e., uniquely identify) its children.
 
-    For an instance, the xlink is '/the/list/of/ancestors/of/self' if attribute is None or
-    '/the/list/of/ancestors/of/self[@attribute="value"]' if attribute is not None. For example,
-    for a hierarchy consisting of class A with moniker 'nameA' and member mB of class B, class B 
-    with moniker 'nameB' and member mC of class C and class C with moniker 'nameC', then the xlink 
-    for an instance of a C class in the hierarchy is '/nameA/nameB/nameC'. If the mC instance
+    An instance has the xlink '/the/list/of/ancestors/andSelf' if attribute is None or
+    '/the/list/of/ancestors/andSelf[@attribute="value"]' if attribute is not None where each string
+    part of the xpath the value of the moniker for that node. For example,
+    for a hierarchy consisting of::
+
+        class A with moniker 'nameA' and 
+            member mB of class B, class B with moniker 'nameB' and 
+                member mC of class C and class C with moniker 'nameC',
+
+    then the xlink for an instance of a C class in the hierarchy is '/nameA/nameB/nameC'. If the mC instance
     set attribute to be the member 'greeting' that, for this example as value 'Hi', then the
     xlink for the C class is '/nameA/nameB/nameC[@greeting="Hi"]'.
     """
@@ -65,6 +80,7 @@ class Ancestry(abc.ABC):
         self.__ancestor = None
 
     def __str__(self):
+        """Returns the xpath of *self*."""
 
         return self.toXLink()
 
@@ -89,15 +105,24 @@ class Ancestry(abc.ABC):
 
     @property
     def rootAncestor(self):
-        """Traverse up the ancestry tree to the root ancestor and return it. The root ancestor is the instance whose ancestor is None."""
+        """
+        Traverse up the ancestry tree to the root ancestor and returns a reference to it. 
+        The root ancestor is the instance whose ancestor is None.
+        """
 
         ancestor = self
         while(ancestor.__ancestor is not None): ancestor = ancestor.__ancestor
         return ancestor
 
     def checkAncestry(self, verbose = 0, level = 0):
+        """
+        This method checks that all ancestryMembers are properly set up. This method checks *self* and all its child nodes.
+        """
 
         def check(child):
+            """
+            For internal use only.
+            """
 
             if child is None: return
             if self.isChild(child):

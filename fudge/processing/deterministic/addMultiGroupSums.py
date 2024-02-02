@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-import sys
+import pathlib
 import numpy
 
 from xData import enums as xDataEnumsModule
@@ -264,7 +264,7 @@ def addMultiGroupSums(self, replace=False):
             try:
                 data = fissionFragmentData.multiGroupMultiplicity(MG_delayedNeutrons, temperatureInfo, IDsModule.neutron)
             except:
-                print('WARNING: Delayed neutron data not complete and will not be included.')
+                print('WARNING: from %s: fission delayed neutron data not complete and will not be included.' % pathlib.Path(__file__).name)
                 fissionFragmentData = None                      # Some delayed neutrons have unspecified multiplicities.
                 data = []
 

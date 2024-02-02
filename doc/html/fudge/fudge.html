@@ -672,6 +672,11 @@ and adds the members <strong>checksum</strong> and <strong>algorithm</strong>.</
 <dd><p>Return checksum for this map entry.</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="fudge.map.Base.path">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#fudge.map.Base.path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.map.Base.standardXML_attributes">
 <span class="sig-name descname"><span class="pre">standardXML_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkAncestor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#Base.standardXML_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.Base.standardXML_attributes" title="Permalink to this definition">¶</a></dt>
@@ -730,7 +735,7 @@ Otherwise, this method is the same as the propery methods <em>fileName</em>.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="fudge.map.EntryBase.fileName">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fileName</span></span><a class="headerlink" href="#fudge.map.EntryBase.fileName" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the file name for the location of <em>self</em>. Unlike the method <a class="reference internal" href="#fudge.map.EntryBase.path" title="fudge.map.EntryBase.path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">path()</span></code></a>, 
+<dd><p>Returns the file name for the location of <em>self</em>. Unlike the method <a class="reference internal" href="#fudge.map.EntryBase.path" title="fudge.map.EntryBase.path"><code class="xref py py-func docutils literal notranslate"><span class="pre">path()</span></code></a>,
 this will always be the absolute path.</p>
 </dd></dl>
 
@@ -763,7 +768,7 @@ will be removed. New map files should only be created with <strong>GNDS</strong>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.map.FormatVersion.check">
-<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#FormatVersion.check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.FormatVersion.check" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#FormatVersion.check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.FormatVersion.check" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods should be used to check that the format of a map file is valid. Also, the returned value is the format
 that should be used after calling this method.</p>
 <dl class="field-list simple">
@@ -832,7 +837,7 @@ location of the map file to read in.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.map.Import.find">
 <span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">library</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#Import.find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.Import.find" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls <a class="reference internal" href="#fudge.map.Map.find" title="fudge.map.Map.find"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Map.find()</span></code></a> on <em>self</em>.__map and returns its results.</p>
+<dd><p>Calls <a class="reference internal" href="#fudge.map.Map.find" title="fudge.map.Map.find"><code class="xref py py-func docutils literal notranslate"><span class="pre">Map.find()</span></code></a> on <em>self</em>.__map and returns its results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -851,7 +856,7 @@ location of the map file to read in.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.map.Import.findAllOf">
 <span class="sig-name descname"><span class="pre">findAllOf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">library</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#Import.findAllOf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.Import.findAllOf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls <a class="reference internal" href="#fudge.map.Map.findAllOf" title="fudge.map.Map.findAllOf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Map.findAllOf()</span></code></a> on <em>self</em>.__map and returns its results.
+<dd><p>Calls <a class="reference internal" href="#fudge.map.Map.findAllOf" title="fudge.map.Map.findAllOf"><code class="xref py py-func docutils literal notranslate"><span class="pre">Map.findAllOf()</span></code></a> on <em>self</em>.__map and returns its results.
 Arguments that are <strong>None</strong> match all values of their type. For example, if <em>projectile</em> is <strong>None</strong>,
 then all projectiles are a match.</p>
 <dl class="field-list simple">
@@ -935,7 +940,7 @@ No <a class="reference internal" href="#fudge.map.Import" title="fudge.map.Impor
 <dt class="sig sig-object py" id="fudge.map.Map">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.map.</span></span><span class="sig-name descname"><span class="pre">Map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">library</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parentsDir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2.0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checksum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#Map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.Map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.map.Base" title="fudge.map.Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a></p>
-<p>This class represents a <strong>GNDS</strong> <strong>map</strong> that is used to create a nuclear data library from a list 
+<p>This class represents a <strong>GNDS</strong> <strong>map</strong> that is used to create a nuclear data library from a list
 of <a class="reference internal" href="#fudge.map.Protare" title="fudge.map.Protare"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protare</span></code></a> <a class="reference internal" href="#fudge.map.TNSL" title="fudge.map.TNSL"><code class="xref py py-class docutils literal notranslate"><span class="pre">TNSL</span></code></a> and <a class="reference internal" href="#fudge.map.Import" title="fudge.map.Import"><code class="xref py py-class docutils literal notranslate"><span class="pre">Import</span></code></a> instances. Each instance in the list
 is called an entry.</p>
 <p>The following table list the primary members of this class:</p>
@@ -975,14 +980,14 @@ is called an entry.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="fudge.map.Map.fileName">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fileName</span></span><a class="headerlink" href="#fudge.map.Map.fileName" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the file name for the location of <em>self</em>. Unlike the method <a class="reference internal" href="#fudge.map.Map.path" title="fudge.map.Map.path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">path()</span></code></a>, 
+<dd><p>Returns the file name for the location of <em>self</em>. Unlike the method <a class="reference internal" href="#fudge.map.Map.path" title="fudge.map.Map.path"><code class="xref py py-func docutils literal notranslate"><span class="pre">path()</span></code></a>,
 this will always be the absolute path.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.map.Map.find">
 <span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">library</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#Map.find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.Map.find" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the first entry matching <em>projectile</em>, <em>target</em>, <em>library</em> and <em>evaluation</em>. 
+<dd><p>Returns the first entry matching <em>projectile</em>, <em>target</em>, <em>library</em> and <em>evaluation</em>.
 Searches each entry in the order they were appended and dives into imported maps.
 If <em>library</em> is <strong>None</strong>, then all libraries are treated as matched.
 If <em>evaluation</em> is <strong>None</strong>, then all evaluations are treated as matched.</p>
@@ -1004,7 +1009,7 @@ If <em>evaluation</em> is <strong>None</strong>, then all evaluations are treate
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.map.Map.findAllOf">
 <span class="sig-name descname"><span class="pre">findAllOf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">library</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#Map.findAllOf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.Map.findAllOf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of all entries matching <em>projectile</em>, <em>target</em>, <em>library</em> and <em>evaluation</em>. Searches 
+<dd><p>Returns a list of all entries matching <em>projectile</em>, <em>target</em>, <em>library</em> and <em>evaluation</em>. Searches
 all imported maps. If <em>library</em> is <strong>None</strong>, the all libraries are treated as matched.
 If <em>evaluation</em> is <strong>None</strong>, the all evaluations are treated as matched.</p>
 <dl class="field-list simple">
@@ -1037,7 +1042,7 @@ If <em>evaluation</em> is <strong>None</strong>, the all evaluations are treated
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.map.Map.iterate">
 <span class="sig-name descname"><span class="pre">iterate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#Map.iterate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.Map.iterate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Iterates over all protares and TNSLs in <em>self</em> including those in import entries. 
+<dd><p>Iterates over all protares and TNSLs in <em>self</em> including those in import entries.
 Ergo, unlike <code class="xref py py-class docutils literal notranslate"><span class="pre">__getitem__</span></code>, this method dives into import entries.
 That is, no <a class="reference internal" href="#fudge.map.Import" title="fudge.map.Import"><code class="xref py py-class docutils literal notranslate"><span class="pre">Import</span></code></a> instances is returned.</p>
 </dd></dl>
@@ -1075,7 +1080,7 @@ That is, no <a class="reference internal" href="#fudge.map.Import" title="fudge.
 <dl class="py property">
 <dt class="sig sig-object py" id="fudge.map.Map.path">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#fudge.map.Map.path" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the path this map was read from or may be written to. It may be absolote or relative, 
+<dd><p>Returns the path this map was read from or may be written to. It may be absolote or relative,
 depending on how it was initialize.</p>
 </dd></dl>
 
@@ -1137,7 +1142,7 @@ Ergo, produces a similar <a class="reference internal" href="#fudge.map.Map" tit
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.map.Map.updateChecksum">
 <span class="sig-name descname"><span class="pre">updateChecksum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sha1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#Map.updateChecksum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.Map.updateChecksum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes map file checksum by concatenating checksums for all entries of <em>self</em> into a string and compute the 
+<dd><p>Computes map file checksum by concatenating checksums for all entries of <em>self</em> into a string and compute the
 checksum of that string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1306,7 +1311,7 @@ checksum of that string.</p>
 <dt class="sig sig-object py" id="fudge.map.ProtareBase.isMatch">
 <span class="sig-name descname"><span class="pre">isMatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">library</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#ProtareBase.isMatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.ProtareBase.isMatch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns <strong>True</strong> is <em>self</em> matches projectile, target, library and evaluation, and <strong>False</strong> otherwise.
-If an argument has a value of <strong>None</strong>, that argument is a match.  
+If an argument has a value of <strong>None</strong>, that argument is a match.
 For example, isMatch( None, “O16”, None, None ) will match any entry with a target of “O16”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1327,6 +1332,21 @@ For example, isMatch( None, “O16”, None, None ) will match any entry with a 
 <dt class="sig sig-object py" id="fudge.map.ProtareBase.library">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">library</span></span><a class="headerlink" href="#fudge.map.ProtareBase.library" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the name of the library the protare resides in.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.map.ProtareBase.preview">
+<span class="sig-name descname"><span class="pre">preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">haltParsingMoniker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'styles'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#ProtareBase.preview"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.ProtareBase.preview" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method calls <code class="xref py py-func docutils literal notranslate"><span class="pre">GNDS_fileModule.preview</span> <span class="pre">with</span> <span class="pre">*haltParsingMoniker*()</span></code> with <em>self</em>’s <em>fileName</em> and returns
+its retults.  See :py:func:<a href="#id1"><span class="problematic" id="id2">`</span></a>GNDS_fileModule.preview for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>haltParsingMoniker</strong> – The child node of the protare to halt parsing on.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">reactionSuiteModule.ReactionSuite</span></code>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -1359,10 +1379,10 @@ For example, isMatch( None, “O16”, None, None ) will match any entry with a 
 <dt class="sig sig-object py" id="fudge.map.ProtareBase.standardXML_attributes">
 <span class="sig-name descname"><span class="pre">standardXML_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkAncestor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/map.html#ProtareBase.standardXML_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.map.ProtareBase.standardXML_attributes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the XML attribute string for protare, target, evalution and interaction as well that those
-returned by <a class="reference internal" href="#fudge.map.Base.standardXML_attributes" title="fudge.map.Base.standardXML_attributes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Base.standardXML_attributes()</span></code></a>.</p>
+returned by <a class="reference internal" href="#fudge.map.Base.standardXML_attributes" title="fudge.map.Base.standardXML_attributes"><code class="xref py py-func docutils literal notranslate"><span class="pre">Base.standardXML_attributes()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>checkAncestor</strong> – Passed to the method <a class="reference internal" href="#fudge.map.Base.standardXML_attributes" title="fudge.map.Base.standardXML_attributes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Base.standardXML_attributes()</span></code></a>.</p>
+<dd class="field-odd"><p><strong>checkAncestor</strong> – Passed to the method <a class="reference internal" href="#fudge.map.Base.standardXML_attributes" title="fudge.map.Base.standardXML_attributes"><code class="xref py py-func docutils literal notranslate"><span class="pre">Base.standardXML_attributes()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A XML attribute string.</p>
@@ -1617,8 +1637,19 @@ differential data for each product must be given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannel.OutputChannel.listOfProducts">
-<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannel.html#OutputChannel.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannel.OutputChannel.listOfProducts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns, as a set, the list of PoP’s ids for all products (i.e., outgoing particles) for <em>self</em>.</p>
+<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">finalOnly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeQualifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannel.html#OutputChannel.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannel.OutputChannel.listOfProducts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>finalOnly</strong> – If <cite>True</cite>, only final product ids are returned, otherwise, all are returned..</p></li>
+<li><p><strong>includeQualifier</strong> – If <cite>True</cite>, particle qualifiers are include in ids, otherwise, they are stripped from ids.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python set instance.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1673,14 +1704,14 @@ differential data for each product must be given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannel.OutputChannel.multiGroupProductArray">
-<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannel.html#OutputChannel.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannel.OutputChannel.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannel.html#OutputChannel.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannel.OutputChannel.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the full multi-group, total product array for the requested label for the requested product id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – MG instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 </ul>
 </dd>
@@ -1689,14 +1720,14 @@ differential data for each product must be given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannel.OutputChannel.multiGroupProductMatrix">
-<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannel.html#OutputChannel.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannel.OutputChannel.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannel.html#OutputChannel.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannel.OutputChannel.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 <li><p><strong>legendreOrder</strong> – Requested Legendre order.</p></li>
 </ul>
@@ -2022,8 +2053,19 @@ the resulting decay information is defined in the product outputChannel</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.product.Product.listOfProducts">
-<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/product.html#Product.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.product.Product.listOfProducts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns, as a set, the list of PoP’s ids for all products (i.e., outgoing particles) for <em>self</em>.</p>
+<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">finalOnly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeQualifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/product.html#Product.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.product.Product.listOfProducts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>finalOnly</strong> – If <cite>True</cite>, only final product ids are returned, otherwise, all are returned..</p></li>
+<li><p><strong>includeQualifier</strong> – If <cite>True</cite>, particle qualifiers are include in ids, otherwise, they are stripped from ids.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python set instance.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -2081,14 +2123,14 @@ the resulting decay information is defined in the product outputChannel</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.product.Product.multiGroupProductArray">
-<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/product.html#Product.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.product.Product.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/product.html#Product.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.product.Product.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the full multi-group, total product array for the requested label for the requested product id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – MG instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 </ul>
 </dd>
@@ -2097,14 +2139,14 @@ the resulting decay information is defined in the product outputChannel</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.product.Product.multiGroupProductMatrix">
-<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/product.html#Product.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.product.Product.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/product.html#Product.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.product.Product.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 <li><p><strong>legendreOrder</strong> – Requested Legendre order.</p></li>
 </ul>
@@ -2673,8 +2715,19 @@ the list of outgoing particles (‘n + Pu239’ for example).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactionSuite.ReactionSuite.listOfProducts">
-<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.listOfProducts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns, as a set, the list of PoP’s ids for all products (i.e., outgoing particles) for all reactions of <em>self</em>.</p>
+<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">finalOnly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeQualifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.listOfProducts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>finalOnly</strong> – If <cite>True</cite>, only final product ids are returned, otherwise, all are returned..</p></li>
+<li><p><strong>includeQualifier</strong> – If <cite>True</cite>, particle qualifiers are include in ids, otherwise, they are stripped from ids.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python set instance.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -2774,7 +2827,7 @@ the list of outgoing particles (‘n + Pu239’ for example).</p>
 <dd><p>Returns the multi-group, total deposition energy for the requested label.</p>
 <p>This is a cross section weighted deposition energy summed over all reactions. The deposition energy is calculated by subtracting 
 the average energy from each transportable particle from the available energy. The list of transportable particles is specified 
-via the list of particle specified in the multiGroupSettings argument.</p>
+via the list of particle specified in the <em>particleIDs</em> argument.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2792,7 +2845,7 @@ via the list of particle specified in the multiGroupSettings argument.</p>
 <dd><p>Returns the multi-group, total deposition momentum for the requested label.</p>
 <p>This is a cross section weighted deposition momentum summed over all reactions. The deposition momentum is calculated by 
 subtracting the average momentum from each transportable particle from the available momentum. The list of transportable 
-particles is specified via the list of particle specified in the multiGroupSettings argument.</p>
+particles is specified via the list of particle specified in the <em>particleIDs</em> argument.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2805,8 +2858,22 @@ particles is specified via the list of particle specified in the multiGroupSetti
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fudge.reactionSuite.ReactionSuite.multiGroupFissionGammaMultiplicity">
+<span class="sig-name descname"><span class="pre">multiGroupFissionGammaMultiplicity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.multiGroupFissionGammaMultiplicity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.multiGroupFissionGammaMultiplicity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the multi-group, total fission photon multiplicity for the requested label. This is a cross section weighted multiplicity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>multiGroupSettings</strong> – MG instance to instruct deterministic methods on what data are being requested.</p></li>
+<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactionSuite.ReactionSuite.multiGroupFissionMatrix">
-<span class="sig-name descname"><span class="pre">multiGroupFissionMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.multiGroupFissionMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.multiGroupFissionMatrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupFissionMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.multiGroupFissionMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.multiGroupFissionMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2884,14 +2951,14 @@ particles is specified via the list of particle specified in the multiGroupSetti
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactionSuite.ReactionSuite.multiGroupProductArray">
-<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the full multi-group, total product array for the requested label for the requested product id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – MG instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 </ul>
 </dd>
@@ -2900,14 +2967,14 @@ particles is specified via the list of particle specified in the multiGroupSetti
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactionSuite.ReactionSuite.multiGroupProductMatrix">
-<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the multi-group, total product matrix for the requested label for the requested product id for the requested Legendre order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – MG instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 <li><p><strong>legendreOrder</strong> – Requested Legendre order.</p></li>
 </ul>
@@ -2932,7 +2999,7 @@ particles is specified via the list of particle specified in the multiGroupSetti
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactionSuite.ReactionSuite.multiGroupTransportCorrection">
-<span class="sig-name descname"><span class="pre">multiGroupTransportCorrection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transportCorrectionType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TransportCorrectionType.none</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.multiGroupTransportCorrection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.multiGroupTransportCorrection" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupTransportCorrection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transportCorrectionType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TransportCorrectionType.none</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.multiGroupTransportCorrection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.multiGroupTransportCorrection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the multi-group transport correction for the requested label.</p>
 <p>The transport correction is calculated from the transfer matrix for the projectile id for the Legendre order of legendreOrder + 1.</p>
 <dl class="field-list simple">
@@ -2940,7 +3007,7 @@ particles is specified via the list of particle specified in the multiGroupSetti
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – MG instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>legendreOrder</strong> – Requested Legendre order.</p></li>
 <li><p><strong>temperature</strong> – The temperature of the flux to use when collapsing.</p></li>
 <li><p><strong>transportCorrectionType</strong> – Requested transport correction type.</p></li>
@@ -2989,7 +3056,7 @@ particles is specified via the list of particle specified in the multiGroupSetti
 <dd><p>For each isotope in <em>self.PoPs</em>, calls decaysMiscPoPsModule.photonBranchingData.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dictionary with keys being each isotope in <em>self.PoPs</em> and their values being that returned by 
+<dd class="field-odd"><p>Dictionary with keys being each isotope in <em>self.PoPs</em> and their values being that returned by
 decaysMiscPoPsModule.photonBranchingData.</p>
 </dd>
 </dl>
@@ -4351,7 +4418,8 @@ If newItem is not an allowed class, a TypeError is raised.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.suites.Suite.checkAncestry">
 <span class="sig-name descname"><span class="pre">checkAncestry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#Suite.checkAncestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.Suite.checkAncestry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This method checks that all ancestryMembers are properly set up. This method checks <em>self</em> and all its child nodes.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.suites.Suite.clear">
@@ -5278,7 +5346,7 @@ proper unitbase/correspondingPoints treatment is unclear. Distribution should en
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="fudge.warning.URRdomainMismatch">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">URRdomainMismatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Jval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#URRdomainMismatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.URRdomainMismatch" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">URRdomainMismatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Jval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#URRdomainMismatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.URRdomainMismatch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
 </dd></dl>
 

@@ -45,8 +45,13 @@ def toACE(self, styleLabel, cdf_style, fileName, evaluationId, productData, dela
     massUnit = 'eV/c**2'
     neutron = self.PoPs[IDsPoPsModule.neutron]
     target = self.PoPs[self.target]
+    metastable = 0
+    if hasattr(target, 'metaStableIndex'):
+        metastable = target.metaStableIndex
     if target.id in self.PoPs.aliases: target = self.PoPs[target.pid]
     targetZ, targetA, targetZA, level = miscPoPsModule.ZAInfo( target )
+    if metastable:
+        targetZA += 100 * (3 + metastable)
 
     neutronMass = neutron.getMass( massUnit )
     targetMass = target.getMass( massUnit )

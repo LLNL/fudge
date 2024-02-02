@@ -12,13 +12,11 @@ that do not have enough information to be used for transport but may still conta
 Originally designed to store sub-actinide fission and standards cross-sections
 """
 
-from . import base as baseModule
+from . import reaction as reactionModule
 
-class IncompleteReaction(baseModule.Base_reaction2):
+class IncompleteReaction(reactionModule.Reaction):
     """
     Similar to the base <reaction> class, except it generally does not contain
     a complete description of products, and cannot be used for transport. It must contain a crossSection
     and outputChannel, but the list of products may be empty.
     """
-
-    moniker = 'reaction'

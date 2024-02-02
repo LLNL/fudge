@@ -70,48 +70,55 @@
 <span class="sd">    plus a nested list of warnings or other context instances</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">warningList</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">warningList</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span> <span class="o">=</span> <span class="n">warningList</span> <span class="ow">or</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">idx</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">+</span> <span class="s2">&quot;: no problems encountered&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toStringList</span><span class="p">())</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toStringList</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">message</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">warningList</span>
 
-<div class="viewcode-block" id="Context.filter"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Context.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+<div class="viewcode-block" id="Context.filter"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Context.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter warning list to only include (or exclude) specific classes of warning. For example:</span>
 
-<span class="sd">        &gt;&gt;&gt; newWarnings = warnings.filter( exclude=[DiscreteLevelsOutOfOrder] )</span>
+<span class="sd">        &gt;&gt;&gt; newWarnings = warnings.filter(exclude=[DiscreteLevelsOutOfOrder])</span>
 
 <span class="sd">        Note that if both &#39;include&#39; and &#39;exclude&#39; lists are provided, exclude is ignored.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
         <span class="n">newWarningList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">screened</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">warning</span><span class="p">,</span> <span class="n">Context</span><span class="p">):</span>
-                <span class="n">newContext</span> <span class="o">=</span> <span class="n">warning</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">newContext</span><span class="p">:</span> <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newContext</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">warning</span><span class="p">,</span> <span class="ne">Warning</span><span class="p">):</span>
+                <span class="n">newContext</span><span class="p">,</span> <span class="n">newScreened</span> <span class="o">=</span> <span class="n">warning</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">newContext</span><span class="p">:</span>
+                    <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newContext</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">newScreened</span><span class="p">:</span>
+                    <span class="n">screened</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">screened</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">newScreened</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">pass</span>    <span class="c1"># FIXME implement thresholds for PoPs warnings!</span>
             <span class="k">elif</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">in</span> <span class="n">include</span><span class="p">:</span>
                     <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># exclude is not None:</span>
                 <span class="k">if</span> <span class="n">warning</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
                     <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">newWarningList</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">newWarningList</span><span class="p">),</span> <span class="n">screened</span></div>
 
-<div class="viewcode-block" id="Context.flatten"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Context.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="Context.flatten"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Context.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        From a nested hierarchy of warnings, get back a flat list for easier searching:</span>
 
@@ -129,9 +136,9 @@
                 <span class="n">List</span> <span class="o">+=</span> <span class="n">val</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">List</span></div>
 
-<div class="viewcode-block" id="Context.toStringList"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Context.toStringList">[docs]</a>    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">dIndent</span><span class="o">=</span><span class="s1">&#39;    &#39;</span> <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Format warnings for printing. Returns a list of warning strings with indentation. &quot;&quot;&quot;</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)]</span>
+<div class="viewcode-block" id="Context.toStringList"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.Context.toStringList">[docs]</a>    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">dIndent</span><span class="o">=</span><span class="s2">&quot;    &quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format warnings for printing. Returns a list of warning strings with indentation.&quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)]</span>
         <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">+=</span> <span class="n">warning</span><span class="o">.</span><span class="n">toStringList</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="n">dIndent</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">s</span></div></div>
@@ -144,25 +151,26 @@
 <span class="sd">    and information about the warning or error.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;toXLink&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;toXLink&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">toXLink</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Generic warning for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span>
 
-    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span> <span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">WARNING: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="p">)]</span></div>
+    <span class="k">def</span> <span class="nf">toStringList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">WARNING: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="p">)]</span></div>
 
 
 <span class="c1">#</span>
 <span class="c1"># specific warning classes:</span>
 <span class="c1">#</span>
+
 
 <div class="viewcode-block" id="NotImplemented"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.NotImplemented">[docs]</a><span class="k">class</span> <span class="nc">NotImplemented</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -177,13 +185,14 @@
 
 
 <div class="viewcode-block" id="UnknownEnergy"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.UnknownEnergy">[docs]</a><span class="k">class</span> <span class="nc">UnknownEnergy</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nucleus</span><span class="p">):</span>
         <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nucleus</span> <span class="o">=</span> <span class="n">nucleus</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Could not determine excitation energy for nucleus &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nucleus</span><span class="o">.</span><span class="n">id</span></div>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s2">&quot;Could not determine excitation energy for nucleus &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nucleus</span><span class="o">.</span><span class="n">id</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DiscreteLevelsOutOfOrder"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.DiscreteLevelsOutOfOrder">[docs]</a><span class="k">class</span> <span class="nc">DiscreteLevelsOutOfOrder</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
@@ -207,7 +216,7 @@
         <span class="k">return</span> <span class="s2">&quot;Sum of decay probabilities = </span><span class="si">%s</span><span class="s2">, should be 1.0!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">branchingSum</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">branchingSum</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">branchingSum</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">branchingSum</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">branchingSum</span></div>
 
 
 <div class="viewcode-block" id="AliasToNonExistentParticle"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.warning.AliasToNonExistentParticle">[docs]</a><span class="k">class</span> <span class="nc">AliasToNonExistentParticle</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>

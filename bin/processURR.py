@@ -35,6 +35,7 @@ parser.add_argument("-f", "--formatVersion", default=GNDS_formatVersionModule.de
                     help="GNDS format version to write out")
 parser.add_argument("--skipPDFs", action="store_true", help="Generate probability tables but not PDFs. A bit faster.")
 parser.add_argument("--hybrid", action="store_true", help="Write hybrid XML/HDF5 files.")
+parser.add_argument("--debug", help="Save realization details to specified file (pickle format).")
 parser.add_argument("-v", "--verbose", action="store_true", help="enable verbose output")
 args = parser.parse_args()
 
@@ -57,7 +58,8 @@ tableGenerator = makeUnresolvedProbabilityTables.ProbabilityTableGenerator(RS)
 
 timer = timesModule.Times()
 results = tableGenerator.generatePDFs(args.nSamples, temperatures, temperatureUnit=str(temperatureUnits[0]),
-                                      verbose=args.verbose, style=args.generator, makePDFs=(not args.skipPDFs))
+                                      verbose=args.verbose, style=args.generator, makePDFs=(not args.skipPDFs),
+                                      debugFile=args.debug)
 print(timer.toString())
 
 # package results into GNDS:
@@ -111,7 +113,4 @@ institution = institutionModule.Institution(probabilityTablesModule.LLNLProbabil
 institution.append(probabilityTables)
 RS.applicationData.add(institution)
 
-if args.hybrid:
-    RS.saveAllToFile(args.output, hybrid=True, formatVersion=args.formatVersion)
-else:
-    RS.saveToFile(args.output, formatVersion=args.formatVersion)
+RS.saveAllToFile(args.output, xs_pdf_cdf1d_singleLine=True, formatVersion=args.formatVersion, hybrid=args.hybrid)

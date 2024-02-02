@@ -61,7 +61,7 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.enums.</span></span><span class="sig-name descname"><span class="pre">Enum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/enums.html#Enum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.enums.Enum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>This is a base enum class used within <strong>FUDGE</strong>. If <code class="xref py py-func docutils literal notranslate"><span class="pre">enums.auto()</span></code> is called for a enum, 
-its value is assigned from its name per the <a href="#id1"><span class="problematic" id="id2">:py:method:`_generate_next_value_`</span></a> method.</p>
+its value is assigned from its name per the <code class="xref py py-func docutils literal notranslate"><span class="pre">_generate_next_value_()</span></code> method.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.enums.Enum.checkEnumOrString">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">checkEnumOrString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/enums.html#Enum.checkEnumOrString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.enums.Enum.checkEnumOrString" title="Permalink to this definition">¶</a></dt>
@@ -121,6 +121,11 @@ its value is assigned from its name per the <a href="#id1"><span class="problema
 </section>
 <section id="module-LUPY.ancestry">
 <span id="lupy-ancestry-module"></span><h2>LUPY.ancestry module<a class="headerlink" href="#module-LUPY.ancestry" title="Permalink to this heading">¶</a></h2>
+<p>This module contains all the ancestry classes. These classes allow a node in a hierarchy 
+to reference any other node in the hierarchy provided that each node of the hierarchy inherits
+from one of the ancestry classes and the method <a class="reference internal" href="#LUPY.ancestry.Ancestry.setAncestor" title="LUPY.ancestry.Ancestry.setAncestor"><code class="xref py py-func docutils literal notranslate"><span class="pre">Ancestry.setAncestor()</span></code></a> is called to
+contect a child node to its parent node.</p>
+<p>This module was mainly written to support linking and xpath referencing in a GNDS hierarchy.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.ancestry.</span></span><span class="sig-name descname"><span class="pre">Ancestry</span></span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry" title="Permalink to this definition">¶</a></dt>
@@ -138,13 +143,13 @@ position relative to another member in the hierarchy using xlinks.</p>
 <td><p>The name associated with the class type.</p></td>
 </tr>
 <tr class="row-even"><td><p>ancestor</p></td>
-<td><p>Instance which self is a child of.</p></td>
+<td><p>Instance which <em>self</em> is a child of.</p></td>
 </tr>
 <tr class="row-odd"><td><p>keyName</p></td>
 <td><p>The name of the key. The key’s value is used by a suite to indentify an element of a suite.</p></td>
 </tr>
 <tr class="row-even"><td><p>ancestryMembers</p></td>
-<td><p>Tuple of names of  the members of <em>self</em> that inherit from <strong>Ancestry</strong>.</p></td>
+<td><p>Tuple of names of the members of <em>self</em> that inherit from <strong>Ancestry</strong>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>legacyMemberNameMapping</p></td>
 <td><p>A map whose keys are legacy member names and whose associated values are the current memeber names.</p></td>
@@ -156,12 +161,18 @@ key it the format version and its associated value is the moniker used for that 
 </tbody>
 </table>
 </div></blockquote>
-<p>The main reason for the <strong>keyName</strong> is that is it used by a <strong>Suite</strong> instance to reference (i.e., uniquely identify) its children.</p>
-<p>For an instance, the xlink is ‘/the/list/of/ancestors/of/self’ if attribute is None or
-‘/the/list/of/ancestors/of/self[&#64;attribute=”value”]’ if attribute is not None. For example,
-for a hierarchy consisting of class A with moniker ‘nameA’ and member mB of class B, class B 
-with moniker ‘nameB’ and member mC of class C and class C with moniker ‘nameC’, then the xlink 
-for an instance of a C class in the hierarchy is ‘/nameA/nameB/nameC’. If the mC instance
+<p>This class defines moniker to be abstract meaning that all classes that inherit from this class must define moniker.
+The main reason for the <strong>keyName</strong> is that is it used by a <strong>Suite</strong> instance to reference (i.e., uniquely identify) its children.</p>
+<p>An instance has the xlink ‘/the/list/of/ancestors/andSelf’ if attribute is None or
+‘/the/list/of/ancestors/andSelf[&#64;attribute=”value”]’ if attribute is not None where each string
+part of the xpath the value of the moniker for that node. For example,
+for a hierarchy consisting of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">A</span> <span class="k">with</span> <span class="n">moniker</span> <span class="s1">&#39;nameA&#39;</span> <span class="ow">and</span> 
+    <span class="n">member</span> <span class="n">mB</span> <span class="n">of</span> <span class="k">class</span> <span class="nc">B</span><span class="p">,</span> <span class="k">class</span> <span class="nc">B</span> <span class="k">with</span> <span class="n">moniker</span> <span class="s1">&#39;nameB&#39;</span> <span class="ow">and</span> 
+        <span class="n">member</span> <span class="n">mC</span> <span class="n">of</span> <span class="k">class</span> <span class="nc">C</span> <span class="ow">and</span> <span class="k">class</span> <span class="nc">C</span> <span class="k">with</span> <span class="n">moniker</span> <span class="s1">&#39;nameC&#39;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>then the xlink for an instance of a C class in the hierarchy is ‘/nameA/nameB/nameC’. If the mC instance
 set attribute to be the member ‘greeting’ that, for this example as value ‘Hi’, then the
 xlink for the C class is ‘/nameA/nameB/nameC[&#64;greeting=”Hi”]’.</p>
 <dl class="py property">
@@ -178,7 +189,8 @@ xlink for the C class is ‘/nameA/nameB/nameC[&#64;greeting=”Hi”]’.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.checkAncestry">
 <span class="sig-name descname"><span class="pre">checkAncestry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.checkAncestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.checkAncestry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This method checks that all ancestryMembers are properly set up. This method checks <em>self</em> and all its child nodes.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.copy">
@@ -270,7 +282,8 @@ an entity is found, its moniker value must be entityName. If no entity is found,
 <dl class="py property">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.rootAncestor">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rootAncestor</span></span><a class="headerlink" href="#LUPY.ancestry.Ancestry.rootAncestor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Traverse up the ancestry tree to the root ancestor and return it. The root ancestor is the instance whose ancestor is None.</p>
+<dd><p>Traverse up the ancestry tree to the root ancestor and returns a reference to it. 
+The root ancestor is the instance whose ancestor is None.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -415,17 +428,43 @@ place the HDF file is the sub-directory ‘HDF’, set HDF_subDir=’HDF’. The
 </section>
 <section id="module-LUPY.argumentsForScripts">
 <span id="lupy-argumentsforscripts-module"></span><h2>LUPY.argumentsForScripts module<a class="headerlink" href="#module-LUPY.argumentsForScripts" title="Permalink to this heading">¶</a></h2>
-<p>This module contains common argparse options used by some of the FUDGE scripts.</p>
+<p>This module contains functions and/or classes that are used by some of the FUDGE scripts.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="LUPY.argumentsForScripts.SingleProtareArguments">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.argumentsForScripts.</span></span><span class="sig-name descname"><span class="pre">SingleProtareArguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/argumentsForScripts.html#SingleProtareArguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.argumentsForScripts.SingleProtareArguments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class adds a positional argument and two option arguments to an <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.ArgumentParser</span></code> instance 
+to give a common way to specify GNDS protare file to load as need by some of the FUDGE scripts.
+The positional argument can be a GNDS protare (i.e., reactionSuite) or map file path.
+If the positional argument is a map file path, then the optional argument “–pid” (”–tid”) is used to specified
+the projectile (target) of the protare using a GNDS id.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.argumentsForScripts.SingleProtareArguments.protare">
 <span class="sig-name descname"><span class="pre">protare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lazyParsing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/argumentsForScripts.html#SingleProtareArguments.protare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.argumentsForScripts.SingleProtareArguments.protare" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a protare (i.e., “reactionSuite”) instance that has been read per the “mapOrProtareFileName”, “–pid” and “–tid” parameters.</p>
+<dd><p>Returns a protare (i.e., reactionSuite) instance that has been loaded per the “mapOrProtareFileName”, “–pid” and “–tid” arguments.</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.argumentsForScripts.mapFromMapOrProtarePath">
+<span class="sig-prename descclassname"><span class="pre">LUPY.argumentsForScripts.</span></span><span class="sig-name descname"><span class="pre">mapFromMapOrProtarePath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/argumentsForScripts.html#mapFromMapOrProtarePath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.argumentsForScripts.mapFromMapOrProtarePath" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function takes as an argument a path that must point to a map file or a protare file or a list of protare file, and returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">mapModule.Map</span></code> instance.</p>
+<blockquote>
+<div><p>-) if path is a map file, it reads in the map file and returns the <code class="xref py py-class docutils literal notranslate"><span class="pre">mapModule.Map</span></code> instance, or
+-) if path is a protare file, creates a map file, adds the protare to it and returns the <code class="xref py py-class docutils literal notranslate"><span class="pre">mapModule.Map</span></code> instance.
+-) if path is a list of paths to protare files, creates a map file, adds the protares to it and returns the <code class="xref py py-class docutils literal notranslate"><span class="pre">mapModule.Map</span></code> instance.</p>
+</div></blockquote>
+<p>This function was written to aid in writing scripts that need to either loop over a map file and perform an action on each
+protare in the map file, or read in a protare and perform the same action on it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – Path to map or protare file, or a list of paths to protare files.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">mapModule.Map</span></code> instance.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -516,19 +555,23 @@ place the HDF file is the sub-directory ‘HDF’, set HDF_subDir=’HDF’. The
 </section>
 <section id="module-LUPY.commandlineArguments">
 <span id="lupy-commandlinearguments-module"></span><h2>LUPY.commandlineArguments module<a class="headerlink" href="#module-LUPY.commandlineArguments" title="Permalink to this heading">¶</a></h2>
+<p>This module contains a function for getting the list of arguments from a <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.ArgumentParser</span></code> instance
+and two functions for reading and writing data to the computerCodes member of a <code class="xref py py-class docutils literal notranslate"><span class="pre">documentationModule.Documentation</span></code> instance.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.commandlineArguments.commandLineArgumentsFromDocumentation">
 <span class="sig-prename descclassname"><span class="pre">LUPY.commandlineArguments.</span></span><span class="sig-name descname"><span class="pre">commandLineArgumentsFromDocumentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">codeName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documentation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/commandlineArguments.html#commandLineArgumentsFromDocumentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.commandlineArguments.commandLineArgumentsFromDocumentation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read command line arguments for computer code named <em>codeName</em> from documentation instance.</p>
+<dd><p>This function reads command line arguments for computer code named <em>codeName</em> from a <code class="xref py py-class docutils literal notranslate"><span class="pre">documentationModule.Documentation</span></code> instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>codeName</strong> – String representing the computer code’s name. Must also match the label of a <strong>ComputerCode</strong> instance in documentation.computerCodes.</p></li>
-<li><p><strong>documentation</strong> – An xData Documentation instance.</p></li>
+<li><p><strong>codeName</strong> – String representing the computer code’s name. Must also match the label of a <strong>ComputerCode</strong> 
+instance in documentation.computerCodes.</p></li>
+<li><p><strong>documentation</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">documentationModule.Documentation</span></code> instance.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The execution arguments for the code as a string. None is returned if <em>codeName</em> is not in documentation.computerCodes.</p>
+<dd class="field-even"><p>The execution arguments for the code as a string. None is returned if <em>codeName</em> is not 
+in documentation.computerCodes.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -536,16 +579,16 @@ place the HDF file is the sub-directory ‘HDF’, set HDF_subDir=’HDF’. The
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.commandlineArguments.commandLineArgumentsToDocumentation">
 <span class="sig-prename descclassname"><span class="pre">LUPY.commandlineArguments.</span></span><span class="sig-name descname"><span class="pre">commandLineArgumentsToDocumentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">codeName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commandLineArguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documentation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/commandlineArguments.html#commandLineArgumentsToDocumentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.commandlineArguments.commandLineArgumentsToDocumentation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a list of command line arguments and a note to a documentation instance’s computerCodes.</p>
+<dd><p>This function writes a list of command line arguments and a note to the computerCodes member 
+of a <code class="xref py py-class docutils literal notranslate"><span class="pre">documentationModule.Documentation</span></code> instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>codeName</strong> – String representing the computer code’s name.</p></li>
 <li><p><strong>currentArguments</strong> – List of command line arguments.</p></li>
-<li><p><strong>documentation</strong> – Documentation instance whose child nodes are populated.
-:type documentation:    xData.Documentation.documentation.Documentation</p></li>
-<li><p><strong>date</strong> – Date code was run.
-:type date:             xData.date.Date, optional</p></li>
+<li><p><strong>documentation</strong> – <a class="reference internal" href="../xData/index.html#xData.Documentation.documentation.Documentation" title="xData.Documentation.documentation.Documentation"><code class="xref py py-class docutils literal notranslate"><span class="pre">xData.Documentation.documentation.Documentation</span></code></a> instance whose child nodes are populated.</p></li>
+<li><p><strong>date</strong> – Date code was run which is added to the dates member of <em>documentation</em>.
+:type date:             <a class="reference internal" href="../xData/index.html#xData.date.Date" title="xData.date.Date"><code class="xref py py-class docutils literal notranslate"><span class="pre">xData.date.Date</span></code></a>, optional</p></li>
 </ul>
 </dd>
 </dl>
@@ -554,15 +597,15 @@ place the HDF file is the sub-directory ‘HDF’, set HDF_subDir=’HDF’. The
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.commandlineArguments.getArgparseArguments">
 <span class="sig-prename descclassname"><span class="pre">LUPY.commandlineArguments.</span></span><span class="sig-name descname"><span class="pre">getArgparseArguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excludeArguments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/commandlineArguments.html#getArgparseArguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.commandlineArguments.getArgparseArguments" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return command line arguments of an <strong>argparse.ArgumentParser</strong> as a list of positional arguments and a list of optional
-arguments, excluding any arguments listed in <em>excludeArguments</em>.</p>
+<dd><p>This function returns command line arguments of an <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.ArgumentParser</span></code> instance as a list of 
+positional arguments and a list of optional arguments, excluding any arguments listed in <em>excludeArguments</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parser</strong> – An instance of the argparse.ArgumentsParser class.</p></li>
-<li><p><strong>args</strong> – Populated namespace returned by the argparse.ArgumentParser.parse_args() method.
+<li><p><strong>parser</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.ArgumentsParser</span></code> instance.</p></li>
+<li><p><strong>args</strong> – Populated namespace returned by the <code class="xref py py-func docutils literal notranslate"><span class="pre">argparse.ArgumentParser.parse_args()</span></code> method.
 :type args:             argparse.Namespace</p></li>
-<li><p><strong>excludeArguments</strong> – List of command line arguments to ignore.</p></li>
+<li><p><strong>excludeArguments</strong> – List of names (i.e., arguments) in namespace <em>args</em> to ignore.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -682,30 +725,44 @@ The main thing is to call sys.exit with a status and to properly handle the stat
 </section>
 <section id="module-LUPY.subprocessing">
 <span id="lupy-subprocessing-module"></span><h2>LUPY.subprocessing module<a class="headerlink" href="#module-LUPY.subprocessing" title="Permalink to this heading">¶</a></h2>
+<p>This module contains several functions that are useful for creating sub-processes using <code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code>.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.subprocessing.deleteFilesUsingGlob">
 <span class="sig-prename descclassname"><span class="pre">LUPY.subprocessing.</span></span><span class="sig-name descname"><span class="pre">deleteFilesUsingGlob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patterns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/subprocessing.html#deleteFilesUsingGlob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.subprocessing.deleteFilesUsingGlob" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes file(s) matching patterns. Skips deleting directories.</p>
+<dd><p>Deletes file(s) matching patterns. Skips deleting directories.
+The function is currently not used anywhere in FUDGE so probably should be deleted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>patterns</strong> – Any objected that can be passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">glob.glob()</span></code>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.subprocessing.executeCommand">
 <span class="sig-prename descclassname"><span class="pre">LUPY.subprocessing.</span></span><span class="sig-name descname"><span class="pre">executeCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raiseOnError</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useExecutable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stderr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/subprocessing.html#executeCommand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.subprocessing.executeCommand" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executes a command using subprocess. Supports redirecting stdout / stderr to files (or to each other).
-If stdout / stderr are strings, they will be treated as file names and output written to them.
+<dd><p>This function executes a command using <code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code>. It supports redirecting stdout / stderr 
+to files (or to each other).  If stdout / stderr are strings, they will be treated as file paths. These
+paths are opened and output written to them.
 If they are pipes (default option), they will be returned as lists of strings along with the exit code.</p>
 <p>&#64;param args: list of arguments to be executed, e.g. [‘echo’, ‘Hello World!’]
 &#64;param raiseOnError: if True, raise Exception if the subprocess returns a non-zero exit code.
 &#64;param useExecutable: if True, replace the executable with absolute path before running.
 &#64;param stdout: where to send standard out. Options include file name, PIPE, or None (like sending to /dev/null).
-&#64;param stderr: where to send standard error. Same options as stdout.
-&#64;return: (return code, stdout, stderr)</p>
+&#64;param stderr: where to send standard error. Same options as stdout.</p>
+<p>&#64;return: (return code, stdout, stderr)</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.subprocessing.spawn">
 <span class="sig-prename descclassname"><span class="pre">LUPY.subprocessing.</span></span><span class="sig-name descname"><span class="pre">spawn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/subprocessing.html#spawn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.subprocessing.spawn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Shortcut for launching a process with PYTHONPATH set. Returns process id.</p>
+<dd><p>Shortcut for launching a process with PYTHONPATH set from the current sys.path. Calls <code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code> and 
+returns the id of the created process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> – Argument passed to <code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -727,7 +784,7 @@ to measure time information. Five components of time are measured. They are:</p>
 <li><p>wall:         wall time.</p></li>
 </ul>
 </div></blockquote>
-<p>All times are since <a class="reference internal" href="#LUPY.times.Times.reset" title="LUPY.times.Times.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Times.reset()</span></code></a> was called with the <a href="#id3"><span class="problematic" id="id4">:py:method:`Times.reset`</span></a> method calls.</p>
+<p>All times are since <a class="reference internal" href="#LUPY.times.Times.reset" title="LUPY.times.Times.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">Times.reset()</span></code></a> was called with the <a class="reference internal" href="#LUPY.times.Times.reset" title="LUPY.times.Times.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">Times.reset()</span></code></a> method calls.</p>
 <p>Example usage is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">times</span> <span class="k">as</span> <span class="n">timesModule</span>
 
@@ -752,11 +809,11 @@ to measure time information. Five components of time are measured. They are:</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.times.Times.delta">
 <span class="sig-name descname"><span class="pre">delta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/times.html#Times.delta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.times.Times.delta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns time information since the last time <a href="#id5"><span class="problematic" id="id6">:py:method:`Times.reset`</span></a> was called as a dictionary.
+<dd><p>Returns time information since the last time <a class="reference internal" href="#LUPY.times.Times.reset" title="LUPY.times.Times.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">Times.reset()</span></code></a> was called as a dictionary.
 The dictionary as the keys ‘user’, ‘sys’, ‘children’, ‘childrenSys’ and ‘wall’.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>reset</strong> – If <strong>True</strong>, <a href="#id7"><span class="problematic" id="id8">:py:method:`Times.reset`</span></a> is called after the delta time is determined.</p>
+<dd class="field-odd"><p><strong>reset</strong> – If <strong>True</strong>, <a class="reference internal" href="#LUPY.times.Times.reset" title="LUPY.times.Times.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">Times.reset()</span></code></a> is called after the delta time is determined.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A directory containing time components and their times.</p>
@@ -772,7 +829,7 @@ are include in the cpu time. If <em>includeSystem</em> is <strong>True</strong> 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>reset</strong> – If <strong>True</strong>, <a href="#id9"><span class="problematic" id="id10">:py:method:`Times.reset`</span></a> is called after the delta time is determined.</p></li>
+<li><p><strong>reset</strong> – If <strong>True</strong>, <a class="reference internal" href="#LUPY.times.Times.reset" title="LUPY.times.Times.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">Times.reset()</span></code></a> is called after the delta time is determined.</p></li>
 <li><p><strong>includeChildren</strong> – If <strong>True</strong> the cpu time of the child processes are include.</p></li>
 <li><p><strong>includeSystem</strong> – If <strong>True</strong> the system time is include.</p></li>
 </ul>
@@ -789,7 +846,7 @@ are include in the cpu time. If <em>includeSystem</em> is <strong>True</strong> 
 <dd><p>Return the wall component of the time for <em>self</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>reset</strong> – If <strong>True</strong>, <a href="#id11"><span class="problematic" id="id12">:py:method:`Times.reset`</span></a> is called after the delta time is determined.</p>
+<dd class="field-odd"><p><strong>reset</strong> – If <strong>True</strong>, <a class="reference internal" href="#LUPY.times.Times.reset" title="LUPY.times.Times.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">Times.reset()</span></code></a> is called after the delta time is determined.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The wall time as a float.</p>
@@ -811,7 +868,7 @@ are include in the cpu time. If <em>includeSystem</em> is <strong>True</strong> 
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prefix</strong> – A prefix string to add to the returned string.</p></li>
-<li><p><strong>reset</strong> – If <strong>True</strong>, <a href="#id13"><span class="problematic" id="id14">:py:method:`Times.reset`</span></a> is called after the delta time is determined.</p></li>
+<li><p><strong>reset</strong> – If <strong>True</strong>, <a class="reference internal" href="#LUPY.times.Times.reset" title="LUPY.times.Times.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">Times.reset()</span></code></a> is called after the delta time is determined.</p></li>
 <li><p><strong>includeChildren</strong> – If <strong>True</strong> the cpu time of the child processes are include.</p></li>
 <li><p><strong>includeSystem</strong> – If <strong>True</strong> the system time is include.</p></li>
 <li><p><strong>current</strong> – If <strong>True</strong>, the current date/time information is added to the returned string.</p></li>
@@ -824,6 +881,26 @@ are include in the cpu time. If <em>includeSystem</em> is <strong>True</strong> 
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="LUPY.times.timeCode">
+<span class="sig-prename descclassname"><span class="pre">LUPY.times.</span></span><span class="sig-name descname"><span class="pre">timeCode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locals</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/times.html#timeCode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.times.timeCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function uses a <a class="reference internal" href="#LUPY.times.Times" title="LUPY.times.Times"><code class="xref py py-class docutils literal notranslate"><span class="pre">Times</span></code></a> instance to time how long <em>command</em> takes to execute.</p>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="n">timesModule</span><span class="o">.</span><span class="n">timeCode</span><span class="p">(</span><span class="s2">&quot;z = math.sqrt( 3**2 + 4**2 ); print(z)&quot;</span><span class="p">,</span> <span class="nb">globals</span><span class="p">(),</span> <span class="nb">locals</span><span class="p">())</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> – A string of the python code to execute.</p></li>
+<li><p><strong>globals</strong> – A global disctionary to pass to the exec function, normally should be globals().</p></li>
+<li><p><strong>locals</strong> – A local disctionary to pass to the exec function, normally should be locals().</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

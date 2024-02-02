@@ -11,7 +11,7 @@ compareCrossSections.py: compare the cross section for given MT number from two 
 """
 import sys, traceback
 
-def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", legend2="second file",
+def compare_plot( xsc1, xsc2, title="comparison plot", projectile="n", legend1="first file", legend2="second file",
         saveFile=None, legendXY = (0.05, 0.95) ):
     """ starting with XYs data for xsc1 and xsc2, draw a comparison plot """
     from fudge.vis.matplotlib import plot2d
@@ -52,7 +52,7 @@ def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", leg
 
     # also plot the relative difference (needs different y-axis):
     xUnit = args.xUnit or 'eV'
-    xAxisSettings = plot2d.AxisSettings( label="$E_n$ (%s)" % xUnit, isLog=True )
+    xAxisSettings = plot2d.AxisSettings( label=f"$E_{{{projectile}}}$ ({xUnit})", isLog=True )
     yAxisSettings = plot2d.AxisSettings( label="% diff" )
 
     ax2 = plt.subplot2grid((4,1), (3,0), sharex=ax1)
@@ -92,6 +92,7 @@ def process_args():
     parser.add_argument( "--yUnit", type=str, help="Convert y-axes to this unit (e.g. mb)" )
     parser.add_argument( "-S", "--summed", action='store_true', default=False,
             help="For a single evaluation, compare a summed cross section (e.g. total, inelastic) with the sum of its parts. Only one input file needed" )
+    parser.add_argument( "--style", help="Label of style to compare. Style must exist in both files" )
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -128,7 +129,9 @@ if __name__ == '__main__':
         if len(reac) != 1:
             print("Couldn't find unique reaction for MT%d in %s" % (MT, reactionSuite.originalFile))
         xsc = reac[0].crossSection
-        if isinstance( xsc.evaluated, crossSection.ResonancesWithBackground ):
+        if args.style:
+            pwxs = xsc[args.style].toPointwise_withLinearXYs(accuracy=1e-3, lowerEps=1e-8)
+        elif isinstance( xsc.evaluated, crossSection.ResonancesWithBackground ):
             evalStyle = reactionSuite.styles.getEvaluatedStyle()
             reconstructedStyle = stylesModule.CrossSectionReconstructed( reconstructedStyleName, derivedFrom=evalStyle.label )
             reactionSuite.reconstructResonances( reconstructedStyle, accuracy=args.tolerance )
@@ -139,6 +142,7 @@ if __name__ == '__main__':
 
     if args.summed:
         RS = getReactionSuite( args.file1 )
+        projectile = RS.projectile
         xs1 = getXS(RS, args.mt, sumsOnly = True)
         summedReac = [r for r in (RS.sums.crossSectionSums) if int( r.ENDF_MT ) == args.mt]
         if len(summedReac) != 1:
@@ -160,8 +164,11 @@ if __name__ == '__main__':
         l1,l2 = ('tabulated sum','calculated sum')
     else:
         rs1 = getReactionSuite(args.file1, singleMTOnly=args.mt)
+        projectile = rs1.projectile
         xs1 = getXS( rs1, args.mt )
         rs2 = getReactionSuite(args.file2, singleMTOnly=args.mt)
+        if rs2.projectile != projectile or rs2.target != rs1.target:
+            print("WARNING: comparing different projectile / target!")
         xs2 = getXS( rs2, args.mt )
         l1,l2 = args.file1, args.file2
 
@@ -179,4 +186,4 @@ if __name__ == '__main__':
     legendXY = {'ul': (0.05, 0.95), 'ur': (0.75, 0.95),
             'll': (0.05, 0.2), 'lr': (0.75, 0.2)}.get( args.legendLocation )
 
-    compare_plot( xs1, xs2, title=title, legend1=l1, legend2=l2, legendXY=legendXY, saveFile=args.outfile )
+    compare_plot( xs1, xs2, title=title, projectile=projectile, legend1=l1, legend2=l2, legendXY=legendXY, saveFile=args.outfile )

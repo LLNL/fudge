@@ -5,7 +5,29 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""Energy/angular double differential distribution classes."""
+"""
+Energy/angular double differential distribution classes.
+
+This module contains the following classes:
+         
+    +---------------+-----------------------------------------------------------------------+
+    | Class         | Description                                                           |
+    +===============+=======================================================================+
+    | XYs1d         | Class used to store f(mu) at a specified E'.                          |
+    +---------------+-----------------------------------------------------------------------+
+    | Legendre      | Class used to store f(mu) at a specified E' as a Legendre series.     |
+    +---------------+-----------------------------------------------------------------------+
+    | XYs2d         | Class used to store P(mu,E') at a specified E.                        |
+    +---------------+-----------------------------------------------------------------------+
+    | Subform       | Base class for :py:class:`XYs3d` and :py:class:`Regions3d`.           |
+    +---------------+-----------------------------------------------------------------------+
+    | XYs3d         | Class used to store P(E',mu|E).                                       |
+    +---------------+-----------------------------------------------------------------------+
+    | Regions3d     | Class used to store P(E',mu|E) with multiple regions.                 |
+    +---------------+-----------------------------------------------------------------------+
+    | Form          | Class representing GNDS eneary/angular data (i.e., P(E',mu|E)).       |
+    +---------------+-----------------------------------------------------------------------+
+"""
 
 import math
 
@@ -24,6 +46,13 @@ from . import miscellaneous as miscellaneousModule
 
 
 def defaultAxes( energyUnit ) :
+    """
+    Returns an :py:class:`axesModule.Axes` instance for energy, angular data (i.e., P(E',mu|E)).
+
+    :param energyUnit:  Unit for the energy data.
+
+    :return:            An :py:class:`Axes` instance.
+    """
 
     axes = axesModule.Axes(4)
     axes[0] = axesModule.Axis( 'P(energy_out,mu|energy_in)', 0, '1/' + energyUnit )
@@ -33,56 +62,102 @@ def defaultAxes( energyUnit ) :
     return( axes )
 
 class XYs1d( XYs1dModule.XYs1d ) :    # FIXME: BRB, Should this class inherit from angular.XYs1d?
+    """
+    Class used to store a tabulated f(mu) at a specified E'.
+    """
 
     def averageMu( self ) :
+        """
+        This method returns the average value of mu for *self*.
+        """
 
         allowedInterpolations = [xDataEnumsModule.Interpolation.linlin, xDataEnumsModule.Interpolation.flat]
         xys = self.changeInterpolationIfNeeded( allowedInterpolations, XYs1dModule.defaultAccuracy )
         return( xys.integrateWithWeight_x( ) )
 
     def toLinearXYsClass( self ) :
+        """
+        This method returns the class for representing linear point-wise 1-d data of *self*.
+
+        :return:            Reference to the :py:class`XYs1d`.
+        """
 
         return( XYs1d )
 
 class Legendre( series1dModule.LegendreSeries ) :
+    """
+    Class used to store a f(mu) at a specified E' as a Legendre series.
+    """
 
     def averageMu( self ) :
+        """
+        This function returns the average value of mu for *self*.
+        """
 
         return( self.getCoefficientSafely( 1 ) )
 
     def toLinearXYsClass( self ) :
+        """
+        This method returns the class for representing linear point-wise 1-d data of *self*.
+
+        :return:            Reference to the :py:class`XYs1d`.
+        """
 
         return( XYs1d )
 
 class XYs2d( multiD_XYsModule.XYs2d ) :
+    """
+    Class used to store a P(E',mu) at a specified E.
+    """
 
     def averageEnergy( self ) :
+        """
+        The method calculates the average outgoing energy of *self*.
+        """
 
         integralOfMu = [ [ pdfOfMuAtEp.outerDomainValue, pdfOfMuAtEp.integrate() ] for pdfOfMuAtEp in self ]
 
         return XYs1dModule.XYs1d(integralOfMu, interpolation = self.interpolation, axes=self.axes).integrateWithWeight_x()
 
     def averageForwardMomentum( self, sqrt_2_ProductMass ) :
+        """
+        The method calculates the average outgoing momentem of *self* in the direction of the projectile.
+
+        :param sqrt_2_ProductMass:      Twice the mass of the produce in units of energy per c**2.
+
+        :return:                        A float.
+        """
 
         averageMu = [ [ pdfOfMuAtEp.outerDomainValue, pdfOfMuAtEp.averageMu( ) ] for pdfOfMuAtEp in self ]
 
         return sqrt_2_ProductMass * XYs1dModule.XYs1d(averageMu, interpolation = self.interpolation, axes=self.axes).integrateWithWeight_sqrt_x()
 
     def toLinearXYsClass( self ) :
+        """
+        This method returns the class for representing linear point-wise 2-d data of *self*.
+
+        :return:            Reference to the :py:class`XYs2d`.
+        """
 
         return( XYs2d )
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns the list of classes that can be sub-nodes (i.e., 1-d function) of an :py:class:`XYs2d` instance.
+        """
 
         return( ( XYs1d, Legendre ) )
 
 class Subform( baseModule.Subform ) :
-    """Abstract base class for energyAngular subforms."""
+    """Abstract base class for :py:class`Form` subforms."""
 
     pass
 
 class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
+    """
+    Class used to store a P(E',mu|E).
+    """
 
     def __init__( self, **kwargs ) :
 
@@ -90,6 +165,14 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
         Subform.__init__( self )
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+        """         
+        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+        Average means over all outgoing angle and energy.
+        
+        :param style:   The style instance which the calculated data will belong to.
+        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.
+        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+        """
 
         verbosity = kwargs.get( 'verbosity', 0 )
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
@@ -137,6 +220,12 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
         return( [ aveEnergy ], [ aveMomentum ] )
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
+
         from fudge import warning
         from pqu import PQU
         warnings = []
@@ -168,6 +257,14 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
         return warnings
 
     def energySpectrumAtEnergy(self, energyIn, **kwargs):
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn* for frame *frame*,
+
+        :param energyIn:            Energy of the projectile.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+        
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         muMin = kwargs.get('muMin', -1.0)
         muMax = kwargs.get('muMax',  1.0)
@@ -194,6 +291,13 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
         return functional1d
 
     def normalize( self, insitu = True ) :
+        """
+        This methods returns a renormalized copy (or *self) of *self*.
+
+        :param insitu:      If True, normalizes *self*, else copies *self* and return the normalized copy.
+
+        :return:            Returns the normalzied function which can be *self* if *insitu* is True.
+        """
 
         n = self
         if( not( insitu ) ) : n = self.copy( )
@@ -203,6 +307,15 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
         return( n )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
+        """
+        Returns a multi-group representation of *self*.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                A multi-group representation of *self*.
+        """
 
         from fudge.processing import group as groupModule
         from fudge.processing.deterministic import transferMatrices as transferMatricesModule
@@ -217,10 +330,29 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
         return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs3d` instance.
+        """
 
         return( multiD_XYsModule.XYs3d.toPointwise_withLinearXYs( self, cls = XYs3d, **kwargs ) )
 
     def to_xs_pdf_cdf1d(self, style, tempInfo, indent):
+        """
+        This method returns a copy of *self* as an :py:class:`energyAngularMCModule.Energy` representation
+        and an :py:class:`energyAngularMCModule.EnergyAngular` representation. This is, P(E',mu|E) becomes
+        P(E'|E) * P(mu|E,E') with the E' data in P(E'|E) and the mu data in P(mu|E,E') being represented with
+        :py:class:`energyAngularMCModule.Energy` and :py:class:`energyAngularMCModule.EnergyAngular` instances, respectively.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                :py:class:`energyAngularMCModule.Energy` and :py:class:`energyAngularMCModule.EnergyAngular` instances.
+        """
 
         from . import energyAngularMC as energyAngularMCModule
 
@@ -248,10 +380,16 @@ class XYs3d( Subform, multiD_XYsModule.XYs3d ) :
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns the list of classes that can be sub-nodes (i.e., 1-d function) of an :py:class:`XYs3d` instance.
+        """
 
         return( ( XYs2d, ) )
 
 class Regions3d( Subform, regionsModule.Regions3d ) :
+    """
+    Class used to store a P(E',mu|E).
+    """
 
     def __init__( self, **kwargs ) :
 
@@ -259,6 +397,14 @@ class Regions3d( Subform, regionsModule.Regions3d ) :
         Subform.__init__( self )
 
     def calculateAverageProductData(self, style, indent='', **kwargs):
+        """         
+        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+        Average means over all outgoing angle and energy.
+        
+        :param style:   The style instance which the calculated data will belong to.
+        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.
+        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+        """
 
         aveEnergies = []
         aveMomenta = []
@@ -271,10 +417,22 @@ class Regions3d( Subform, regionsModule.Regions3d ) :
         return aveEnergies, aveMomenta
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         raise Exception( 'Not implemented' )
 
     def normalize( self, insitu = True ) :
+        """
+        This methods returns a renormalized copy (or *self) of *self*.
+
+        :param insitu:      If True, normalizes *self*, else copies *self* and return the normalized copy.
+
+        :return:            Returns the normalzied function which can be *self* if *insitu* is True.
+        """
 
         n = self
         if( not( insitu ) ) : n = self.copy( )
@@ -282,15 +440,39 @@ class Regions3d( Subform, regionsModule.Regions3d ) :
         return( n )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Currently not implemented so executes a raise.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`energyAngularModule.XYs3d` instance.
+        """
 
         raise Exception( 'Not implemented' )
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns the list of classes that can be sub-nodes (i.e., 1-d function) of an :py:class:`Regions3d` instance.
+        """
 
         return( ( XYs3d, ) )
 
 class Form( baseModule.Form ) :
+    """
+    This class stores a P(E',mu|E) distribution.
+    The following table list the primary members of this class:
+
+    +-----------------------+-----------------------------------------------------------+
+    | Member                | Description                                               |
+    +=======================+===========================================================+
+    | energyAngularSubform  | This member stores the actual data as a 3d function.      |
+    +-----------------------+-----------------------------------------------------------+
+        
+    :param label:                   The label for this form.
+    :param productFrame:            The frame the product data are specified in.
+    :param energyAngularSubform:    A :py:class:`Subform` instance.
+    """
 
     moniker = 'energyAngular'
     subformAttributes = ( 'energyAngularSubform', )
@@ -303,25 +485,51 @@ class Form( baseModule.Form ) :
 
     @property
     def domainMin( self ) :
+        """
+        Returns the minimum projectile energy given in the P(E',mu|E) data.
+        """
 
         return( self.energyAngularSubform.domainMin )
 
     @property
     def domainMax( self ) :
+        """
+        Returns the maximum projectile energy given in the P(E',mu|E) data.
+        """
 
         return( self.energyAngularSubform.domainMax )
 
     @property
     def domainUnit( self ) :
+        """
+        Returns the energy unit of the projectile for the data.
+        """
 
         return( self.energyAngularSubform.domainUnit )
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+        """         
+        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+        Average means over all outgoing angle and energy.
+        
+        :param style:   The style instance which the calculated data will belong to.
+        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.
+        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+        """
 
         kwargs['productFrame'] = self.productFrame
         return( self.energyAngularSubform.calculateAverageProductData( style, indent = indent, **kwargs ) )
 
     def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn* for frame *frame*,
+
+        :param energy_in:           Energy of the projectile.
+        :param frame:               The frame to calculate the energy spectrum in. 
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+        
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         if self.product.pid == PoPsIDsModule.photon:
             frame = self.productFrame       # Kludge for now.
@@ -345,6 +553,20 @@ class Form( baseModule.Form ) :
         return self.energyAngularSubform.fixDomains(energyMin, energyMax, domainToFix, tweakLower=True, epsilon=2e-2)
         
     def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = xDataEnumsModule.Frame.product, LegendreOrder = 0 ) :
+        """
+        This meethod integrates the distribution at projectile energy over the specified outgoing energy, mu and phi ranges.
+        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*, *muOut* and *phiOut*.
+        
+        :param reaction_suite:      The :py:class:`ReactionSuite` instance for this distribution.
+        :param energyIn:            The energy of the projectile.
+        :param energyOut:           The outgoing energy range to integrate over.
+        :param muOut:               The outgoing mu range to integrate over.
+        :param phiOut:              The outgoing phi range to integrate over.
+        :param frame:               The frame the outgoing energy, mu and phi range specify.
+        :param LegendreOrder:       The parameter is not used.
+
+        :return:                    A float representing the value of the integration.
+        """
 
 # Need to check frame.
 
@@ -374,6 +596,16 @@ class Form( baseModule.Form ) :
         return( phiEvaluate * energyOutMuEvaluate )
 
     def processMC_cdf(self, style, tempInfo, indent):
+        """
+        This methods returns an :py:class:`energyAngularMCModule.Form` instance representing *self*.
+
+    
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+    
+        :return:                An instance of self.
+        """     
 
         from . import energyAngularMC as energyAngularMCModule
 
@@ -381,11 +613,28 @@ class Form( baseModule.Form ) :
         return( energyAngularMCModule.Form( style.label, self.productFrame, energy, energyAngular ) )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
+        """
+        Returns a multi-group representation of *self*.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                A multi-group representation of *self*.
+        """
 
         tempInfo['productFrame'] = self.productFrame
         return( self.energyAngularSubform.processMultiGroup( style, tempInfo, indent ) )
 
     def spectrum( self, frame, **kwargs ) :
+        """
+        Returns an XYs3d instance representing *self*'s P(E',mu|E) in the requested frame.
+        
+        :param frame:               The frame the spectrum is returned in.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    A XYs3d instance.
+        """
 
         if( not( isinstance( self.energyAngularSubform, XYs3d ) ) ) : raise TypeError( 'Form "%s" is not supported' % self.energyAngularSubform.moniker )
 
@@ -399,8 +648,21 @@ class Form( baseModule.Form ) :
         return( xys3d )
 
     def spectrumAtEnergy( self, energyIn, frame ) :
+        """
+        Returns an XYs2d instance representing *self*'s P(E',mu|E=energyIn) at prjojectile energy *energyIn* and 
+        in the requested frame.
+
+        :param energyIn:            Energy of the projectile.
+        :param frame:               The frame the spectrum is returned in.
+
+        :return:                    A XYs2d instance.
+        """
 
         class AngualarAtEnergyCOM :
+            """
+            The class needed by the function energyAngularSpectrumFromCOMSpectrumToLabAtEnergy to store data and evaluate the
+            angular distribution in the center-of-mass.
+            """
 
             def __init__( self, probability ) :
 
@@ -423,7 +685,17 @@ class Form( baseModule.Form ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
-        """Translate <energyAngular> element from xml."""
+        """
+        Parse *element* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
         subformElement = element[0]

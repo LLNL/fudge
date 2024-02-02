@@ -267,16 +267,20 @@ def toENDF6( self, styleLabel, flags, verbosityIndent = '', covarianceSuite = No
     else:
         LFI = False
     LRP = -1
-    if( evaluatedStyle is not style ) :
+    if evaluatedStyle is not style:
         LRP = 2
-    else :
-        if( self.resonances is not None ) :
-            LRP = 0
-            if( self.resonances.reconstructCrossSection ) :
+    else:
+        if self.resonances is not None:
+            if self.resonances.resolved is None and self.resonances.unresolved is None:
+                LRP = 0                                                 # scattering radius only
+            elif self.resonances.reconstructCrossSection:
                 LRP = 1
-            elif( self.resonances.unresolved is not None ) :
+            elif self.resonances.unresolved is not None:
                 LRP = 1                                                 # Self-shielding only.
-                if( self.resonances.resolved is not None ) : LRP = 2
+                if self.resonances.resolved is not None:
+                    LRP = 2
+            else:
+                LRP = 2                                                 # Resonances provided for info only
 
     temperature = style.temperature.getValueAs('K')
     library = evaluatedStyle.library

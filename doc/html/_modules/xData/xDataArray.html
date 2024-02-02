@@ -158,7 +158,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">secondIndex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">secondIndex</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">),</span> <span class="s1">&#39;The method constructVector requires the first argument to be an integer.&#39;</span>
+            <span class="k">assert</span> <span class="n">secondIndex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">secondIndex</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;The method constructVector requires the first argument to be an integer.&#39;</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">secondIndex</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">vectorModule</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
@@ -183,7 +183,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The method constructMatrix is only defined for 3D arrays&#39;</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">thirdIndex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thirdIndex</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">),</span> <span class="s1">&#39;The method constructMatrix requires the first argument to be an integer.&#39;</span>
+        <span class="k">assert</span> <span class="n">thirdIndex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thirdIndex</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;The method constructMatrix requires the first argument to be an integer.&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thirdIndex</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">matrixModule</span><span class="o">.</span><span class="n">Matrix</span><span class="p">()</span>
 

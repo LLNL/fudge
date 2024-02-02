@@ -19,15 +19,10 @@ from .. import intId as intIdModule
 
 from . import particle as particleModule
 
-class Alias( particleModule.Alias ) :
-
-    moniker = 'unorthodoxAlias'
-
 class Particle( particleModule.Particle ) :
 
     moniker = 'unorthodox'
     familyOrder = 5
-    alias = Alias
 
     def __lt__( self, other ) :
 

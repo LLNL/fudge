@@ -6,25 +6,33 @@
 # <<END-copyright>>
 
 """
-This module contains common argparse options used by some of the FUDGE scripts.
+This module contains functions and/or classes that are used by some of the FUDGE scripts.
 """
 
 import os
-
-from argparse import ArgumentParser
+import argparse
+import pathlib
 
 from PoPs import IDs as IDsModule
 
+from fudge import enums as enumsModule
 from fudge import map as mapModule
 from fudge import GNDS_file as GNDS_fileModule
 from fudge import reactionSuite as reactionSuiteModule
 
-
 class SingleProtareArguments :
+    """
+    This class adds a positional argument and two option arguments to an :py:class:`argparse.ArgumentParser` instance 
+    to give a common way to specify GNDS protare file to load as need by some of the FUDGE scripts.
+    The positional argument can be a GNDS protare (i.e., reactionSuite) or map file path.
+    If the positional argument is a map file path, then the optional argument "--pid" ("--tid") is used to specified
+    the projectile (target) of the protare using a GNDS id.
+    """
 
     def __init__( self, parser ) :
         """
-        :param parser:      An argparse.ArgumentParser instance which will be updated with parameters for accessing a profile from a file.
+        :param parser:      An :py:class:`argparse.ArgumentParser` instance which will be updated with 
+                            parameters for accessing a profile from a file.
         """
 
         self.__parser = parser
@@ -38,7 +46,7 @@ class SingleProtareArguments :
 
     def protare(self, args, verbosity=0, lazyParsing=True):
         """
-        Returns a protare (i.e., "reactionSuite") instance that has been read per the "mapOrProtareFileName", "--pid" and "--tid" parameters.
+        Returns a protare (i.e., reactionSuite) instance that has been loaded per the "mapOrProtareFileName", "--pid" and "--tid" arguments.
         """
 
         lazyParsing = lazyParsing and not args.noLazyParse
@@ -56,3 +64,47 @@ class SingleProtareArguments :
             return(mapProtare.protare(verbosity=verbosity, lazyParsing=lazyParsing))
         else :
             raise TypeError( 'File "%s" is not a map or protare file.' % mapOrProtare )
+
+def mapFromMapOrProtarePath(path):
+    """
+    This function takes as an argument a path that must point to a map file or a protare file or a list of protare file, and returns a :py:class:`mapModule.Map` instance.
+
+        -) if path is a map file, it reads in the map file and returns the :py:class:`mapModule.Map` instance, or
+        -) if path is a protare file, creates a map file, adds the protare to it and returns the :py:class:`mapModule.Map` instance.
+        -) if path is a list of paths to protare files, creates a map file, adds the protares to it and returns the :py:class:`mapModule.Map` instance.
+
+    This function was written to aid in writing scripts that need to either loop over a map file and perform an action on each
+    protare in the map file, or read in a protare and perform the same action on it.
+
+    :param path:            Path to map or protare file, or a list of paths to protare files.
+
+    :return:                A :py:class:`mapModule.Map` instance.
+    """
+
+    if not isinstance(path, str):           # Support path being list with one map file (i.e., ['/path/to/map/file']).
+        if len(path) == 1:
+            path = [p for p in path][0]
+
+    if isinstance(path, (str, pathlib.Path)):
+        name, data = GNDS_fileModule.type(path)
+
+        if name == reactionSuiteModule.ReactionSuite.moniker:
+            map1 = mapModule.Map('Dummy', 'dummy.map')
+            interaction = enumsModule.Interaction.fromString(data['interaction'])
+            map1.append(mapModule.Protare(data['projectile'], data['target'], data['evaluation'], path, interaction))
+            return map1
+        elif name == mapModule.Map.moniker:
+            return mapModule.read(path)
+        else :
+            raise TypeError('File "%s" is not a map or protare file.' % mapOrProtare)
+    else:                               # Must be a list of protare files.
+        map1 = mapModule.Map('Dummy', 'dummy.map')
+        for file in path:
+            name, data = GNDS_fileModule.type(file)
+            if name == reactionSuiteModule.ReactionSuite.moniker:
+                interaction = enumsModule.Interaction.fromString(data['interaction'])
+                map1.append(mapModule.Protare(data['projectile'], data['target'], data['evaluation'], file, interaction))
+            else:
+                raise TypeError('Path is not a protare (i.e., reactionSuite) file: %s' % file)
+
+        return map1

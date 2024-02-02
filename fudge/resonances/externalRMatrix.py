@@ -121,6 +121,16 @@ class Froehner(ExternalRMatrix):
         imaginaryTerm = (Gamma * I / 4) / (I**2 / 4 - (energies - Ebar)**2)
         return realTerm, imaginaryTerm
 
+    def convertUnits(self, unitMap):
+        energyUnit = str(self.terms['singularityEnergyBelow'].unit)
+        if energyUnit not in unitMap:
+            return
+
+        newUnit = unitMap[energyUnit]
+        for key in ('singularityEnergyBelow', 'singularityEnergyAbove', 'averageRadiationWidth'):
+            value = self.terms[key]
+            self.terms[key] = quantityModule.Double(key, value.float(newUnit), newUnit)
+
 
 class SAMMY(ExternalRMatrix):
     """
@@ -156,4 +166,17 @@ class SAMMY(ExternalRMatrix):
         Eup = self.getTerm('singularityEnergyAbove', 'eV')
         logTerm = numpy.log((Eup - energies) / (energies - Edown))
         realTerm = Rcon + Rlin * energies + Rquad * energies**2 - slin * (Eup - Edown) - (scon + slin * energies) * logTerm
-        return realTerm, 0
+        return realTerm, numpy.zeros_like(energies)
+
+    def convertUnits(self, unitMap):
+        energyUnit = str(self.terms['singularityEnergyBelow'].unit)
+        if energyUnit not in unitMap:
+            return
+
+        newUnit = unitMap[energyUnit]
+        inverse = f"1/{newUnit}"
+        inverseSq = f"1/{newUnit}**2"
+        for key, unit in zip(self.ancestryMembers,
+                             ('', inverse, inverseSq, '', inverse, newUnit, newUnit)):
+            value = self.terms[key]
+            self.terms[key] = quantityModule.Double(key, value.float(unit), unit)

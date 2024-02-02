@@ -18,6 +18,7 @@ from xData import enums as xDataEnumsModule
 
 from PoPs import specialNuclearParticleID as specialNuclearParticleIDPoPsModule
 from PoPs import IDs as IDsPoPsModule
+from PoPs import alias as aliasPoPsModule
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
 from PoPs.quantities import spin as spinModule
@@ -411,6 +412,7 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                 product = toGNDSMiscModule.newGNDSParticle(info, productID, crossSection)
                 product.distribution.add(unspecifiedModule.Form(info.style, xDataEnumsModule.Frame.lab))
                 outputChannel.products.add(product)
+                info.ENDFconversionFlags.add(product, 'implicitProduct')
             if len(MFKeys) > 0:
                 warningList.append('For reaction MT = %d, the following MFs were not converted: %s\n' % (MT, MFKeys))
             if LRProducts is not None:
@@ -819,9 +821,9 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
 
             pops = PoPsDatabaseModule.Database("resolved resonances", version="1.0", formatVersion=info.formatVersion)
             target = info.PoPs[info.target]
-            if isinstance(target, PoPsNuclideModule.Alias):
+            if isinstance(target, aliasPoPsModule.MetaStable):
                 # metastable target. Mass goes with GS (adjusted for excitation energy), spin goes with actual level
-                target = info.PoPs[target.pid]
+                target = info.PoPs.final(target.pid)
                 AWRI -= target.energy.float('amu*c**2') / info.massTracker.neutronMass
                 groundState = target.isotope[0].copy()
                 target = target.copy()
@@ -900,7 +902,8 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
             particle.parity.add(parityModule.Integer(info.PoPsLabel, parity, parityModule.baseUnit))
 
     for reaction in reactionSuite.reactions:                                       # For two-body reactions, this sections decays an excited state
-        if reaction.label == reactionSuite.elasticReactionLabel(): continue        # to the group state if missing and not a meta-stable.
+        if reaction.ENDF_MT == 2:
+            continue
         if reaction.outputChannel.genre == enumsModule.Genre.twoBody:
             residual = reaction.outputChannel[1]
             if residual.outputChannel is None:

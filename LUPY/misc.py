@@ -5,12 +5,12 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-'''
+"""
 This module contains general miscellaneous functions that do not fit in other LUPY modules.
-'''
+"""
 
 def isString(value, message):
-    '''
+    """
     This function check if *value* is of type python str instance. If it is, *value* is returned. Otherwise, a TypeError raise
     is execute with message *message*.
 
@@ -20,7 +20,7 @@ def isString(value, message):
     :returns:               *value*.
 
     :raises TypeError:      If *value* is not a python str instance.
-    '''
+    """
 
     if isinstance(value, str):
         return value

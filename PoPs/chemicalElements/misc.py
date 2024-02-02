@@ -109,7 +109,8 @@ def checkIndex( index ) :
 
 def chemicalElementALevelIDsAndAnti( id, qualifierAllowed = False ) :
     """
-    Parse a particle id to extract the following information:
+    Parse a particle id to extract the following information::
+
         baseId: particle id with any qualifiers removed
         chemicalElementSymbol: symbol if id is a chemical element, isotope, nuclide or nucleus. None otherwise
         A: total nucleon number (as integer) if id is for an isotope, nuclide or nucleus. None otherwise
@@ -177,6 +178,8 @@ def ZAInfo( particle ) :
     """
 
     from .. import IDs as IDsModule
+    from .. import alias as aliasModule
+    from .. import database as databaseModule
     from ..families import nuclide as nuclideModule
     from ..families import nucleus as nucleusModule
     from ..families import baryon as baryonModule
@@ -186,36 +189,32 @@ def ZAInfo( particle ) :
     level = 0
     Z = 0
     A = 0
-    if( isinstance( particle, ( isotopeModule.Isotope, ) ) ) :
+    if isinstance(particle, (isotopeModule.Isotope, nuclideModule.Particle, nucleusModule.Particle)):
         Z = particle.Z
         A = particle.A
-    elif( isinstance( particle, ( nuclideModule.Particle, nuclideModule.Alias ) ) ) :
-        Z = particle.Z
-        A = particle.A
-        level = particle.index
-    elif( isinstance( particle, ( nucleusModule.Particle, nucleusModule.Alias ) ) ) :
-        Z = particle.Z
-        A = particle.A
-        level = particle.index
-    elif( isinstance( particle, ( baryonModule.Particle, ) ) ) :
-        if( particle.id == IDsModule.neutron ) :
+        if isinstance(particle, (nuclideModule.Particle, nucleusModule.Particle)):
+            level = particle.index
+    elif isinstance(particle, aliasModule.BaseAlias):
+        return ZAInfo(particle.findClassInAncestry(databaseModule.Database).final(particle.pid))
+    elif isinstance(particle, baryonModule.Particle):
+        if particle.id == IDsModule.neutron:
             A = 1
-        if( particle.id == IDsModule.proton ) :
+        if particle.id == IDsModule.proton:
             Z = 1
             A = 1
-    elif( isinstance( particle, ( unorthodoxModule.Particle, ) ) ) :
-        if( particle.id == IDsModule.FissionProductENDL99120 ) :
+    elif isinstance(particle, unorthodoxModule.Particle):
+        if particle.id == IDsModule.FissionProductENDL99120:
             Z = 99
             A = 120
-        elif( particle.id == IDsModule.FissionProductENDL99125 ) :
+        elif particle.id == IDsModule.FissionProductENDL99125:
             Z = 99
             A = 125
         elif len(particle.charge) > 0:
             Z = particle.charge[0].value
 
-    try :
-        return( Z, A, 1000 * Z + A, level )     # FIXME raise if it didn't match anything?
-    except :
+    try:
+        return Z, A, 1000 * Z + A, level            # FIXME raise if it didn't match anything?
+    except:
         raise
 
 def ZAInfo_fromString( particleName ):
@@ -244,9 +243,9 @@ def ZAInfo_fromString( particleName ):
     if( len( particleName ) > 1 ) : particleName = particleName.capitalize( )
 
     try :
-        return( {   'n' : ( 0, 1, 1, 0 ), 
-                    'p' : ( 1, 1, 1001, 0 ), 'd' : ( 1, 2, 1002, 0 ), 't' : ( 1, 3, 1003, 0 ),
-                    'h' : ( 2, 3, 2003, 0 ), 'a' : ( 2, 4, 2004, 0 )                            }[particleName] )
+        return {IDsModule.neutron: (0, 1, 1, 0),                IDsModule.proton: (1, 1, 1001, 0),
+                IDsModule.familiarDeuteron: (1, 2, 1002, 0),    IDsModule.familiarTriton: (1, 3, 1003, 0),
+                IDsModule.familiarHelion: (2, 3, 2003, 0),      IDsModule.familiarAlpha: (2, 4, 2004, 0)   }[particleName]
     except :
         pass
 
@@ -284,33 +283,48 @@ def ZA( particle ) :
 
     return( ZAInfo( particle )[2] )
 
-def idFromZAndA( Z, A ) :
-    """
-    Compute the PoPs id for a particle given Z and A
-    :param Z: atomic number (int)
-    :param A: nucleon number (int)
-    :return: string particle id
-    """
+def idFromZAndA(Z, A, allowNeutron=True):
+    '''
+    Compute the PoPs id for a particle given Z and A.
+
+    :param Z:               Atomic number of the particle.
+    :param A:               Atomic mass number of the particle.
+    :param allowNeutron:    If True, Z = 0 and A = 1 will return the neutron id, otherwise a raise is executed.
+
+    :return:                String particle id
+    '''
 
     from .. import IDs as IDsModule
 
-    if( ( Z == 0 ) and ( A == 1 ) ) : return( IDsModule.neutron )
-    return( isotopeSymbolFromChemicalElementIDAndA( symbolFromZ[Z], A ) )
+    if Z == 0 and A == 1 and allowNeutron:
+        return IDsModule.neutron
 
-def idFromZA( ZA ) :
-    """
-    Compute the PoPs id for a particle given ZA
-    :param ZA: 1000 * Z + A  (int)
-    :return: string particle id
-    """
+    return isotopeSymbolFromChemicalElementIDAndA(symbolFromZ[Z], A)
 
-    return( idFromZAndA( ZA // 1000, ZA % 1000 ) )
+def idFromZA(ZA, allowNeutron=True):
+    '''
+    Computes the PoPs id for a particle given its ZA.
 
-def nucleusIDFromZAndA( Z, A ) :
-    """ Equivalent to calling nucleusIDFromNuclideID( idFromZAndA( Z, A ) ) """
+    :param ZA:              1000 * Z + A where Z and N are the particle's atomic number and mass number, respectively.
+    :param allowNeutron:    If True, Z = 0 and A = 1 will return the neutron id, otherwise a raise is executed.
 
-    nucleusID = idFromZAndA( Z, A )
-    return( nucleusID[0].lower( ) + nucleusID[1:] )
+    :return:                Particle's PoPs id.
+    '''
+
+    return idFromZAndA(ZA // 1000, ZA % 1000, allowNeutron)
+
+def nucleusIDFromZAndA(Z, A, allowNeutron=True):
+    '''
+    Equivalent to calling nucleusIDFromNuclideID(idFromZAndA(Z, A, allowNeutron)).
+
+    :param Z:               Atomic number of the particle.
+    :param A:               Atomic mass number of the particle.
+    :param allowNeutron:    If True, Z = 0 and A = 1 will return the neutron id, otherwise a raise is executed.
+
+    :return:                String particle id
+    '''
+
+    return nucleusIDFromNuclideID(idFromZAndA(Z, A, allowNeutron))
 
 def hasNucleus( particle, nucleusReturnsTrue = False ) :
     """
@@ -339,10 +353,17 @@ def nuclideIDFromIsotopeSymbolAndIndex( isotopeSymbol, index ) :
     if( index == 0 ) : return( isotopeSymbol )
     return( "%s_e%s" % ( isotopeSymbol, index ) )
 
-def nucleusIDFromNuclideID( nuclideID ) :
-    """ The nucleus id is computed from nuclide id by converting 1st letter to lower case """
+def nucleusIDFromNuclideID(nuclideID):
+    '''
+    Returns the nucleus PoPs id from a nuclide PoPs id by converting 1st letter to lower case.
+    No check is performed on the validity of *nuclideID* as a nuclide PoPs id.
 
-    return( nuclideID[0].lower( ) + nuclideID[1:] )
+    :param nuclideID:       PoPs id for a nuclide.
+
+    :return:                The nucleus PoPs id for the specified nuclide PoPs id.
+    '''
+
+    return nuclideID[0].lower() + nuclideID[1:]
 
 def nuclideIDFromNucleusID( nucleusID ) :
     """ The nuclide id is computed from nucleus id by converting 1st letter to upper case """

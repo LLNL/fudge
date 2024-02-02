@@ -47,11 +47,12 @@ class Processes :
     continuum = 'continuum'
     inclusive = 'inclusive'
 
+
 class OutputChannel( ancestryModule.AncestryIO ) :
     """This is the GNDS outputChannel which is a Q value and a list of products (i.e., product objects)."""
 
     moniker = 'outputChannel'
-    ancestryMembers = ( 'Q', 'products', 'fissionFragmentData' )
+    ancestryMembers = ('Q', 'products', 'fissionFragmentData')
 
     def __init__( self, genre, process = None ) :
         """Constructor for outputChannel."""
@@ -79,67 +80,53 @@ class OutputChannel( ancestryModule.AncestryIO ) :
             if( ancestryMember in ( 'fissionFragmentData' ) ) : continue
             getattr( self, ancestryMember ).findLinks( links )
 
-    def __getitem__( self, i ) :
+    def __getitem__(self, i):
         """Returns the i^th product in the channel."""
 
-        return( self.__products[i] )
+        return self.__products[i]
 
-    def __len__( self ) :
+    def __len__(self):
         """Returns the number of products for this channel."""
 
-        return( len( self.__products ) )
+        return len(self.__products)
 
-    def __str__( self ) :
+    def __str__(self):
         """Converts channel object to a string representation."""
 
-        return( self.toString( simpleString = False ) )
-
-    def __cmp__( self, other ) :
-        """Compares self to other."""
-
-        if( other is None ) : return( -1 )
-        n1 = len( self )
-        n2 = len( other )
-        n = min( n1, n2 )
-        for i1 in range( n ) :
-            if( self[i1] < other[i1] ) : return( -1 )
-            if( self[i1] > other[i1] ) : return(  1 )
-        if( n1 < n2 ) : return( -1 )
-        if( n1 > n2 ) : return(  1 )
-        return( 0 )
+        return self.toString(simpleString=False)
 
     @property
-    def Q( self ) :
+    def Q(self):
 
-        return( self.__Q )
-
-    @property
-    def products( self ) :
-
-        return( self.__products )
+        return self.__Q
 
     @property
-    def fissionFragmentData( self ) :
+    def products(self):
 
-        return( self.__fissionFragmentData )
+        return self.__products
 
     @property
-    def genre( self ) :
+    def fissionFragmentData(self):
 
-        return( self.__genre )
+        return self.__fissionFragmentData
+
+    @property
+    def genre(self):
+
+        return self.__genre
 
     @genre.setter
-    def genre( self, value ) :
+    def genre(self, value):
 
         self.__genre = enumsModule.Genre.checkEnumOrString(value)
 
     @property
-    def process( self ) :
+    def process(self):
 
-        return( self.__process )
+        return self.__process
 
     @process.setter
-    def process( self, value ) :
+    def process(self, value):
 
         self.__process = value
 
@@ -265,12 +252,20 @@ class OutputChannel( ancestryModule.AncestryIO ) :
 
         return numberOfFixes
 
-    def listOfProducts(self):
-        """Returns, as a set, the list of PoP's ids for all products (i.e., outgoing particles) for *self*."""
+    def listOfProducts(self, finalOnly=False, includeQualifier=True):
+        '''
+        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.
+
+        :param finalOnly:           If `True`, only final product ids are returned, otherwise, all are returned..
+        :param includeQualifier:    If `True`, particle qualifiers are include in ids, otherwise, they are stripped from ids.
+
+        :return:                    A python set instance.
+        '''
 
         products = set()
-        for product in self.__products: products.update(product.listOfProducts())
-        products.update(self.__fissionFragmentData.listOfProducts())
+        for product in self.__products:
+            products.update(product.listOfProducts(finalOnly=finalOnly, includeQualifier=includeQualifier))
+        products.update(self.__fissionFragmentData.listOfProducts(finalOnly=finalOnly, includeQualifier=includeQualifier))
 
         return products
 
@@ -433,41 +428,41 @@ class OutputChannel( ancestryModule.AncestryIO ) :
 
         return averageMomentum
 
-    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particles, productID, legendreOrder):
+    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder):
         """
         Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.
 
         :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles: The list of particles to be transported.
+        :param particleIDs: The list of particles to be transported.
         :param productID: Particle id for the requested product.
         :param legendreOrder: Requested Legendre order.
         """
 
         productMatrix = matrixModule.Matrix()
         for product in self.products:
-            productMatrix += product.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, productID, legendreOrder)
+            productMatrix += product.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder)
 
-        productMatrix += self.fissionFragmentData.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, productID, legendreOrder)
+        productMatrix += self.fissionFragmentData.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder)
 
         return productMatrix
 
-    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particles, productID):
+    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particleIDs, productID):
         """
         Returns the full multi-group, total product array for the requested label for the requested product id.
 
         :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles: The list of particles to be transported.
+        :param particleIDs: The list of particles to be transported.
         :param productID: Particle id for the requested product.
         """
 
         productArray = productArrayModule.ProductArray()
 
         for product in self.products:
-            productArray += product.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
+            productArray += product.multiGroupProductArray(multiGroupSettings, temperatureInfo, particleIDs, productID)
 
-        productArray += self.fissionFragmentData.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
+        productArray += self.fissionFragmentData.multiGroupProductArray(multiGroupSettings, temperatureInfo, particleIDs, productID)
 
         return productArray
 

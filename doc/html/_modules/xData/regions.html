@@ -444,6 +444,17 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;regions1d&#39;</span>
     <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
 
+    <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns self with all regions negated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">regions1d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">regions1d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">region</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">regions1d</span>
+
     <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="n">_self</span><span class="p">,</span> <span class="n">_other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copyToCommonRegions</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
@@ -466,6 +477,22 @@
 
         <span class="n">self2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">other2</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">self2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+               <span class="k">return</span> <span class="n">self2</span><span class="p">,</span> <span class="n">other2</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="n">other2</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="n">other2</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]]</span>
+            <span class="n">xys1d</span> <span class="o">=</span> <span class="n">self2</span><span class="o">.</span><span class="n">toLinearXYsClass</span><span class="p">()(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">self2</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">self2</span><span class="p">,</span> <span class="n">Regions1d</span><span class="p">):</span>
+                <span class="n">self2</span> <span class="o">=</span> <span class="n">Regions1d</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">self2</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
+            <span class="n">self2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xys1d</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">other2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="n">self2</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="n">self2</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]]</span>
+            <span class="n">xys1d</span> <span class="o">=</span> <span class="n">other2</span><span class="o">.</span><span class="n">toLinearXYsClass</span><span class="p">()(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">other2</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other2</span><span class="p">,</span> <span class="n">Regions1d</span><span class="p">):</span>
+                <span class="n">other2</span> <span class="o">=</span> <span class="n">Regions1d</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">other2</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
+            <span class="n">other2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xys1d</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other2</span><span class="p">,</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">):</span>
             <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">()</span>
@@ -563,6 +590,13 @@
 
         <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">copy</span> <span class="p">:</span> <span class="n">region</span> <span class="o">*=</span> <span class="n">factor</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">copy</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Regions1d.plot"><a class="viewcode-back" href="../../xData/index.html#xData.regions.Regions1d.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Calls multiPlot with only *self* as a curve.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiPlot</span><span class="p">([</span><span class="bp">self</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Regions1d.toPointwiseLinear"><a class="viewcode-back" href="../../xData/index.html#xData.regions.Regions1d.toPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

@@ -1,0 +1,44 @@
+
+10 b * MeV**(-1/2)
+10. b/MeV**(1/2)
+to_eV:
+    quantity:   10. b/MeV**(1/2)
+    unit in eV: b/eV**(1/2)
+    in eV:      0.01 b/eV**(1/2)
+to_eV:
+    quantity:   3.16227766017 b**(1/2)/MeV**(1/4)
+    unit in eV: b**(1/2)/eV**(1/4)
+    in eV:      0.1 b**(1/2)/eV**(1/4)
+
+10 (b * MeV**(-1/2))**(1/3)
+10. b**(1/3)/MeV**(1/6)
+to_eV:
+    quantity:   10. b**(1/3)/MeV**(1/6)
+    unit in eV: b**(1/3)/eV**(1/6)
+    in eV:      1. b**(1/3)/eV**(1/6)
+to_eV:
+    quantity:   3.16227766017 b**(1/6)/MeV**(1/12)
+    unit in eV: b**(1/6)/eV**(1/12)
+    in eV:      1. b**(1/6)/eV**(1/12)
+
+10 b * MeV**(1/2)
+10. b*MeV**(1/2)
+to_eV:
+    quantity:   10. b*MeV**(1/2)
+    unit in eV: b*eV**(1/2)
+    in eV:      1.e4 b*eV**(1/2)
+to_eV:
+    quantity:   3.16227766017 b**(1/2)*MeV**(1/4)
+    unit in eV: b**(1/2)*eV**(1/4)
+    in eV:      1.e2 b**(1/2)*eV**(1/4)
+
+10 b * MeV**2
+10. b*MeV**2
+to_eV:
+    quantity:   10. b*MeV**2
+    unit in eV: b*eV**2
+    in eV:      1.e13 b*eV**2
+to_eV:
+    quantity:   3.16227766017 b**(1/2)*MeV
+    unit in eV: b**(1/2)*eV
+    in eV:      3162277.66017 b**(1/2)*eV

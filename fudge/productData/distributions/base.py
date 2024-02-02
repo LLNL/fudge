@@ -5,7 +5,19 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""Base classes for distributions."""
+"""
+This module contains abstract base classes for distribution forms and sub-forms.
+
+This module contains the following classes:
+        
+    +---------------+-----------------------------------------------------------------------+
+    | Class         | Description                                                           |
+    +===============+=======================================================================+ 
+    | Form          | Abstract base class for all forms.                                    |
+    +---------------+-----------------------------------------------------------------------+
+    | Subform       | Abstract base class for all sub-forms.                                |
+    +---------------+-----------------------------------------------------------------------+
+"""
 
 from LUPY import ancestry as ancestryModule
 from xData import enums as xDataEnumsModule
@@ -15,6 +27,25 @@ from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 from fudge import abstractClasses as abstractClassesModule
 
 class Form( abstractClassesModule.Form ) :
+    """
+    Abstract base class for all forms.
+
+    The following table list the primary members of this class:
+
+    +---------------+---------------------------------------------------------------+
+    | Member        | Description                                                   |
+    +===============+===============================================================+
+    | label         | Unique label for the form within the distribution instance.   |
+    +---------------+---------------------------------------------------------------+
+    | productFrame  | The frame the product data are in.                            |
+    +---------------+---------------------------------------------------------------+
+    | subForms      | The list of sub-forms for the form.                           |
+    +---------------+---------------------------------------------------------------+
+
+    :param label:               The label for this form.
+    :param productFrame:        The frame the product data are specified in.
+    :param subForms:            The list of sub-forms for the form. 
+    """
 
     keyName = 'label'
 
@@ -33,11 +64,19 @@ class Form( abstractClassesModule.Form ) :
 
     @property
     def label( self ) :
+        """
+        Returns the label for *self*.
+        """
 
         return( self.__label )
 
     @label.setter
     def label( self, value ) :
+        """
+        Sets the label of *self* to *value*.
+
+        :param value:   The value of the new label for *self*.
+        """
 
         if( value is not None ) :
             if( not( isinstance( value, str ) ) ) : raise TypeError( 'value must be a string' )
@@ -45,6 +84,11 @@ class Form( abstractClassesModule.Form ) :
 
     @property
     def product( self ) :
+        """
+        Returns the :py:class:`productModule.Product` instance that *self* is in.
+
+        :return:    A :py:class:`productModule.Product` instance.
+        """
 
         from fudge import product as productModule
 
@@ -52,17 +96,26 @@ class Form( abstractClassesModule.Form ) :
 
     @property
     def productFrame( self ) :
+        """Returns the frame the product data are specified in."""
 
         return( self.__productFrame )
 
     @productFrame.setter
     def productFrame(self, frame):
-        """Set the distribution's product frame."""
+        """
+        Sets the frame the product data are specified in.
+
+        :param frame:       The frame for the product.
+        """
 
         self.__productFrame = xDataEnumsModule.Frame.checkEnumOrString(frame)
 
     def convertUnits( self, unitMap ) :
-        """See documentation for reactionSuite.convertUnits."""
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         if( hasattr( self, 'subforms' ) ) :
             for subform_ in self.subforms :
@@ -71,7 +124,13 @@ class Form( abstractClassesModule.Form ) :
 
     def findEntity( self, entityName, attribute = None, value = None ):
         """
-        Find specific subform within the form. Overrides ancestry.findEntity.
+        Overrides :py:meth:`ancestryModule.Ancestry.findEntity`.
+
+        :param entityName:  Name is the desired entry in *self*.
+        :param attribute:   Name of an attribute in *self*.
+        :param value:       Value of the named attribute.
+
+        :return:            The entry matching *entityName* or *attribute*/*value*.
         """
 
         for subform_ in self.subforms :
@@ -79,14 +138,37 @@ class Form( abstractClassesModule.Form ) :
         return( ancestryModule.Ancestry.findEntity( self, entityName, attribute, value ) )
 
     def isTwoBody( self ) :
+        """
+        Returns True if the form represents a two-body interaction and False otherwise.
+
+        :return:    Boolean.
+        """
 
         return( False )
 
     def isSpecified( self ) :
+        """
+        This method returns *True*. However, this method is overwritten in the :py:class:`Unspecified` class and that
+        method returns False.  That is, for all distribution classes except the :py:class:`Unspecified`, the 
+        **isSpecified** method return True.
+
+        :return:                Boolean.
+        """
 
         return( True )
 
     def residualMass( self, PoPs, residualZA, massUnit, compoundMass, product = None, verbose = 1 ) :
+        """
+        Calculates the mass of the residual from the specified data. If the residual is not in the
+        is not in *PoPs*, the residual mass is estimated.
+
+        :param PoPs:            A GNDS PoPs instance.
+        :param residualZA:      The ZA of the residual.
+        :param massUnit:        The unit of the mass value returned.
+        :param compoundMass:    The mass of the compound.
+        :param product:         The :py:class:`productModule.Product` other than *self* is desired.
+        :param verbose:         If greater than 0, a warning message if residual is not in *PoPs*.
+        """
 
         residual = None
         residualSymbol = chemicalElementMiscPoPsModule.symbolFromZ[residualZA//1000]
@@ -104,10 +186,25 @@ class Form( abstractClassesModule.Form ) :
         return( _residualMass )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    ?
+        """
 
         return( self.subforms[0].toPointwise_withLinearXYs( **kwargs ) )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -124,6 +221,9 @@ class Form( abstractClassesModule.Form ) :
         return( xmlString )
 
 class Subform( ancestryModule.AncestryIO ) :
+    """
+    Abstract base class for all distribution sub-forms.
+    """
 
     def __init__( self ) :
 
@@ -131,6 +231,11 @@ class Subform( ancestryModule.AncestryIO ) :
         self.label = None
 
     def XMLStartTagString( self, indent = '', extraAttributesAsStrings = '', emptyTag = False ) :
+        """
+        Returns the XML start tag of *self*.
+
+        :return:        Python str instance for the XML start tag of *self*.
+        """
 
         emptyTagStr = ''
         if( emptyTag ) : emptyTagStr = '/'

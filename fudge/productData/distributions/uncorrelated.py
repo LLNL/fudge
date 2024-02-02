@@ -5,7 +5,26 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""Uncorrelated double differential distribution classes."""
+"""             
+This module contains classes and functions supporting uncorrelated double differential distribution.
+                
+    This module contains the following classes: 
+            
+    +-------------------+-----------------------------------------------------------------------+
+    | Class             | Description                                                           |
+    +===================+=======================================================================+
+    | Subform           | Base class for :py:class:`AngularSubform` and                         |
+    |                   | :py:class:`EnergySubform` classes.                                    |
+    +-------------------+-----------------------------------------------------------------------+
+    | AngularSubform    | This class represents the angular part of the distribution.           |
+    +-------------------+-----------------------------------------------------------------------+
+    | EnergySubform     | This class represents the energy part of the distribution.            |
+    +-------------------+-----------------------------------------------------------------------+
+    | Form              | Class representing the **GNDS** uncorrelated distribution. This       |
+    |                   | distribution has 2 child nodes. One representing the angular part     |
+    |                   | and one representing the energy part of the distribution.             |
+    +-------------------+-----------------------------------------------------------------------+
+"""
 
 import math
 from fudge.core.math import fudgemath
@@ -27,6 +46,20 @@ from . import miscellaneous as miscellaneousModule
 
 
 class Subform( ancestryModule.AncestryIO ) :
+    """
+    Base class for the :py:class:`AngularSubform` and :py:class:`EnergySubform` classes.
+
+    The following table list the primary members of this class:
+
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | data      | This member stores the actual data as a 2d function.      |
+    +-----------+-----------------------------------------------------------+
+
+    :param data:            2d function representing the angular or energy data.
+    :param dataSubform:     Allowed class for *data*.
+    """
 
     ancestryMembers = ( 'data', )
 
@@ -40,15 +73,25 @@ class Subform( ancestryModule.AncestryIO ) :
 
     @property
     def productFrame( self ) :
+        """Returns the frame the product data are specified in."""
 
         return( self.ancestor.productFrame )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.data.convertUnits( unitMap )
 
     def copy( self ) :
+        """
+        Returns a copy of *self*.
+
+        :return:        An instance that is the same class as *self*.
+        """
 
         return self.__class__(self.data.copy())
 
@@ -60,6 +103,14 @@ class Subform( ancestryModule.AncestryIO ) :
         return self.data.fixDomains(energyMin, energyMax, domainsToFix)
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -69,6 +120,13 @@ class Subform( ancestryModule.AncestryIO ) :
         return( xmlStringList )
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+        """
+        This method returns a copy of *self* in a representation suitable for Monte Carlo transport.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+        """
 
         data = self.data.to_xs_pdf_cdf1d( style, tempInfo, indent )
         if( data is None ) : return( None )
@@ -76,7 +134,7 @@ class Subform( ancestryModule.AncestryIO ) :
 
     def findEntity(self, entityName, attribute=None, value=None):
         """
-        Override ancestry.findEntity for angularSubform and energySubform
+        Overrides :py:meth:`ancestryModule.Ancestry.findEntity`.
         """
 
         if self.data.moniker == entityName:
@@ -85,10 +143,34 @@ class Subform( ancestryModule.AncestryIO ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        This method does nothing.
+
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *element*.
+        """
 
         pass
 
 class AngularSubform( Subform ) :
+    """
+    Class representing the angular data for an uncorrelated distribution.
+
+    The following table list the primary members of this class:
+
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | data      | This member stores the actual data as a 2d function.      |
+    +-----------+-----------------------------------------------------------+
+    
+    :param data:            2d function representing the angular data.
+    """
 
     moniker = 'angular'
 
@@ -97,6 +179,19 @@ class AngularSubform( Subform ) :
         Subform.__init__( self, data, angularModule.Subform )
 
 class EnergySubform( Subform ) :
+    """
+    Class representing the energy data for an uncorrelated distribution.
+
+    The following table list the primary members of this class:
+
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | data      | This member stores the actual data as a 2d function.      |
+    +-----------+-----------------------------------------------------------+
+    
+    :param data:            2d function representing the angular data.
+    """
 
     moniker = 'energy'
 
@@ -108,6 +203,21 @@ class Form( baseModule.Form ) :
     """
     Contains uncorrelated distributions for outgoing angle and outgoing energy. Use when the correlations
     between angle and energy are unknown.
+
+    The following table list the primary members of this class:
+
+    +-------------------+-----------------------------------------------------------+
+    | Member            | Description                                               |
+    +===================+===========================================================+
+    | angularSubform    | Angular data.                                             |
+    +-------------------+-----------------------------------------------------------+
+    | energySubform     | Energy data.                                              |
+    +-------------------+-----------------------------------------------------------+
+    
+    :param label:               The label for this form.
+    :param productFrame:        The frame the product data are specified in.
+    :param _angularSubform:     An :py:class:`AngularSubform` representing the energy data.
+    :param _energySubform:      An :py:class:`EnergySubform` representing the energy data.
     """
 
     moniker = 'uncorrelated'
@@ -123,10 +233,21 @@ class Form( baseModule.Form ) :
 
     @property
     def domainUnit( self ) :
+        """
+        Returns the energy unit of the projectile.
+        """
 
         return( self.angularSubform.data.domainUnit )
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+        """         
+        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+        Average means over all outgoing angle and energy.
+        
+        :param style:   The style instance which the calculated data will belong to.
+        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.
+        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+        """
 
         if( isinstance( self.angularSubform.data, angularModule.Regions2d ) ) :
             raise Exception( 'Regions2d angular is currently not supported' )
@@ -149,12 +270,18 @@ class Form( baseModule.Form ) :
         return( [ aveEnergy ], [ aveMomentum ] )
 
     def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
-        '''
-        Returns the energy spectrum at projectile energy *energyIn* in frame *frame*. Currently,
-        if frame='lab' and the product is a photon then its data are treated as being in the lab frame.
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn* for frame *frame*,
+        Currently, if frame='lab' and the product is a photon then its data are treated as being in the lab frame.
         The domain of angular integration can be set with the muMin and muMax keys in *kwargs*. Default angular integration
         is from -1 to 1.
-        '''
+
+        :param energy_in:           Energy of the projectile.
+        :param frame:               The frame to calculate the energy spectrum in. 
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+        
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         class AngualarAtEnergyCOM:
 
@@ -192,16 +319,17 @@ class Form( baseModule.Form ) :
             return energySpectrum
 
     def getSpectrumAtEnergy(self, energy):
-        '''
+        """
         This method is deprecated, please use energySpectrumAtEnergy instead.
         Returns the energy spectrum for self at projectile energy in the lab frame.
-        '''
+        """
 
         return self.energySpectrumAtEnergy(energy, xDataEnumsModule.Frame.lab)
 
     def findEntity( self, entityName, attribute = None, value = None ):
         """
-        Overrides ancestry.findEntity. uncorrelated contains both energy and angular form,
+        Overrides :py:func:`ancestryModule.Ancestry.findEntity`.
+        Uncorrelated contains both energy and angular form,
         need to check both to find desired entity
         """
 
@@ -220,6 +348,20 @@ class Form( baseModule.Form ) :
         return numberOfFixes
 
     def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = xDataEnumsModule.Frame.product, LegendreOrder = 0 ) :
+        """
+        This meethod integrates the distribution at projectile energy over the specified outgoing energy, mu and phi ranges.
+        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*, *muOut* and *phiOut*.
+        
+        :param reaction_suite:      The :py:class:`ReactionSuite` instance for this distribution.
+        :param energyIn:            The energy of the projectile.
+        :param energyOut:           The outgoing energy range to integrate over.
+        :param muOut:               The outgoing mu range to integrate over.
+        :param phiOut:              The outgoing phi range to integrate over.
+        :param frame:               The frame the outgoing energy, mu and phi range specify.
+        :param LegendreOrder:       The parameter is not used.
+
+        :return:                    A float representing the value of the integration.
+        """
 
         angularEvaluate = 1.0
         angularData = self.angularSubform.data
@@ -258,6 +400,16 @@ class Form( baseModule.Form ) :
         return( phiEvaluate * angularEvaluate * energyPartialIntegral )
 
     def processMC_cdf( self, style, tempInfo, indent ) :
+        """
+        This methods returns an :py:class:`Form` instance representing *self* with (xs, pdf, cdf) data 
+        for P(E') and P(mu).
+    
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+    
+        :return:                An instance of self.
+        """     
 
         _angularSubform = self.angularSubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
         _energySubform = self.energySubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
@@ -270,6 +422,15 @@ class Form( baseModule.Form ) :
         return( _form )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
+        """
+        Returns a multi-group representation of *self*.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                A multi-group representation of *self*.
+        """
 
         from fudge.processing import group as groupModule
         from fudge.processing.deterministic import transferMatrices as transferMatricesModule
@@ -310,6 +471,12 @@ class Form( baseModule.Form ) :
         return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
     def spectrum( self, frame, **kwargs ) :
+        """
+        Returns an :py:class:`energyAngularModule.XYs3d` instance of *self*.
+
+        :param frame:       The desired frame the distribution is to represent.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted
+        """
 
         if( frame == self.productFrame ) : return( self.toPointwise_withLinearXYs( **kwargs ) )
 
@@ -324,6 +491,12 @@ class Form( baseModule.Form ) :
         return( xys3d )
 
     def spectrumAtEnergy( self, energyIn, frame ) :
+        """
+        Returns a XYs2d instance of *self* evaluated at *energyIn*.
+
+        :param energyIn:    The energy of the projectile that the distribution is evaluated at.
+        :param frame:       The desired frame the distribution is to represent.
+        """
 
         class AngualarAtEnergyCOM :
 
@@ -355,6 +528,13 @@ class Form( baseModule.Form ) :
         return( miscellaneousModule.energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energyProbability, AngualarAtEnergyCOM( angularProbability ) ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`angularEnergyModule.XYs3d` instance.
+        """
 
         angularSubform = self.angularSubform.data.toPointwise_withLinearXYs( **kwargs )
         energySubform = self.energySubform.data.toPointwise_withLinearXYs( **kwargs )
@@ -377,6 +557,14 @@ class Form( baseModule.Form ) :
         return( f_E_mu_Ep )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -393,8 +581,18 @@ class Form( baseModule.Form ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
-        """Translate <uncorrelated> element from xml. Must contain one <angular> and one <energy> component."""
-        
+        """
+        Parse *element* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *element*.
+        """
+
         xPath.append( element.tag )
         for child in element :
             if( child.tag == angularModule.Form.moniker ) :
@@ -408,6 +606,17 @@ class Form( baseModule.Form ) :
         return( uncorrelated )
 
 def calculateAverageProductData( productFrame, angularSubform, energySubform, style, indent, **kwargs ) :
+    """         
+    This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+    Average means over all outgoing angle and energy.
+
+    :param productFrame:    The frame the product data are specified in.
+    :param angularSubform:  2d function of the angular data.
+    :param energySubform:   2d function of the energy data.
+    :param style:           The style instance which the calculated data will belong to.
+    :param indent:          If this method does any printing, this is the amount of indentation of the printed line.
+    :param kwargs:          A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+    """
 
     def fixLimits( EMin, EMax, Es ) :
 

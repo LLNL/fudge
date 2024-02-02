@@ -33,8 +33,6 @@ def xsdir_entry(ace_file, relative=True):
     tableName = header[0][:10]
     atomicMassRatio = header[0][10:22]
     ZAID = header[1].split( )[0]
-    if '_e' in ZAID:
-        raise NotImplementedError('Meta-stable targets not currently supported!')
 
     ZA, evaluationID = tableName.strip().split('.')
     aceType = evaluationID[-1]     # e.g. 'c' for neutrons, 't' for tnsl, 'h' for protons, etc.

@@ -128,7 +128,7 @@ for path partcile.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="PoPs.specialNuclearParticleID.sortLightParticle">
 <span class="sig-prename descclassname"><span class="pre">PoPs.specialNuclearParticleID.</span></span><span class="sig-name descname"><span class="pre">sortLightParticle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ids</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/specialNuclearParticleID.html#sortLightParticle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.specialNuclearParticleID.sortLightParticle" title="Permalink to this definition">¶</a></dt>
-<dd><p>From a list of particle <em>ids</em>, this function returns the ids sorted. The sorting order is ‘n’, ‘p’, ‘d’, ‘t’, ‘a’, ‘g’, 
+<dd><p>From a list of particle <em>ids</em>, this function returns the ids sorted. The sorting order is ‘n’, ‘p’, ‘d’, ‘t’, ‘h’, ‘a’, ‘g’, 
 (i.e., ‘photon’). Other ids in the list are return after the ones mentioned and in the order they appear in the list.
 Note, an id will only appear once in the list even it appears more than once in <em>ids</em>.</p>
 <dl class="field-list simple">
@@ -465,6 +465,20 @@ based on item’s key appended with ‘__’ and one or more lower case letters 
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="PoPs.alias.BaseAlias.getMass">
+<span class="sig-name descname"><span class="pre">getMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/alias.html#BaseAlias.getMass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.alias.BaseAlias.getMass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mass of the final particle referenced by pid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>unit</strong> – The unit of the returned mass.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Float.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="PoPs.alias.BaseAlias.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/alias.html#BaseAlias.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.alias.BaseAlias.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
@@ -575,6 +589,34 @@ return ( ‘O16’, 0 ), name = ‘Am242_m1’ will return ( ‘Am242_m1’, 1 )
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="PoPs.misc.baseAntiFromID">
+<span class="sig-prename descclassname"><span class="pre">PoPs.misc.</span></span><span class="sig-name descname"><span class="pre">baseAntiFromID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/misc.html#baseAntiFromID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.misc.baseAntiFromID" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the base and anti parts of a PoPs GNDS id for <em>pid</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pid</strong> – A PoPs GNDS id.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python tuple of two str instances.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PoPs.misc.idWithQualifierRemoved">
+<span class="sig-prename descclassname"><span class="pre">PoPs.misc.</span></span><span class="sig-name descname"><span class="pre">idWithQualifierRemoved</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/misc.html#idWithQualifierRemoved"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.misc.idWithQualifierRemoved" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the PoPs GNDS id for <em>pid</em> with the qualifer part removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pid</strong> – A PoPs GNDS id.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python str instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="PoPs.misc.parseParticleList">
 <span class="sig-prename descclassname"><span class="pre">PoPs.misc.</span></span><span class="sig-name descname"><span class="pre">parseParticleList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particleList</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/misc.html#parseParticleList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.misc.parseParticleList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Breaks a particle list where each particle id can have a leading integer multiplicity into an equivalen list of 
@@ -620,9 +662,9 @@ filter() returns a new context instance:</p>
 plus a nested list of warnings or other context instances</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.warning.Context.filter">
-<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/warning.html#Context.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.warning.Context.filter" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/warning.html#Context.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.warning.Context.filter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter warning list to only include (or exclude) specific classes of warning. For example:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newWarnings</span> <span class="o">=</span> <span class="n">warnings</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="n">DiscreteLevelsOutOfOrder</span><span class="p">]</span> <span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newWarnings</span> <span class="o">=</span> <span class="n">warnings</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="n">DiscreteLevelsOutOfOrder</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>Note that if both ‘include’ and ‘exclude’ lists are provided, exclude is ignored.</p>

@@ -85,8 +85,8 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         LRU = 1  # resolved
         if isinstance(region.evaluated, resolvedModule.BreitWigner):
             LRF = {
-                resolvedModule.BreitWigner.Approximation.singleLevel: 1,
-                resolvedModule.BreitWigner.Approximation.multiLevel: 2
+                resolvedModule.BreitWigner.Approximation.SingleLevel: 1,
+                resolvedModule.BreitWigner.Approximation.MultiLevel: 2
             }[region.evaluated.approximation]
         elif isinstance(region.evaluated, resolvedModule.RMatrix):
             LRF = 7
@@ -100,6 +100,8 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         else:
             NRO = region.evaluated.getScatteringRadius().isEnergyDependent()
         NAPS = not region.evaluated.calculateChannelRadius
+        if LRF == 7:
+            NAPS = 0    # NAPS is unused for LRF=7
         endf.append(endfFormatsModule.endfHeadLine(EL, EH, LRU, LRF, NRO, NAPS))
         endf += region.evaluated.toENDF6(flags, targetInfo, verbosityIndent)
     if unresolvedCount != 0:

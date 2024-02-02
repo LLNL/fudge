@@ -43,6 +43,12 @@
   <h1>Source code for LUPY.commandlineArguments</h1><div class="highlight"><pre>
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a function for getting the list of arguments from a :py:class:`argparse.ArgumentParser` instance</span>
+<span class="sd">and two functions for reading and writing data to the computerCodes member of a :py:class:`documentationModule.Documentation` instance.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">socket</span>
@@ -58,17 +64,17 @@
 <span class="kn">from</span> <span class="nn">xData.Documentation</span> <span class="kn">import</span> <span class="n">dates</span> <span class="k">as</span> <span class="n">datesModule</span>
 
 <div class="viewcode-block" id="getArgparseArguments"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.commandlineArguments.getArgparseArguments">[docs]</a><span class="k">def</span> <span class="nf">getArgparseArguments</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">excludeArguments</span><span class="o">=</span><span class="p">[]):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Return command line arguments of an **argparse.ArgumentParser** as a list of positional arguments and a list of optional</span>
-<span class="sd">    arguments, excluding any arguments listed in *excludeArguments*.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns command line arguments of an :py:class:`argparse.ArgumentParser` instance as a list of </span>
+<span class="sd">    positional arguments and a list of optional arguments, excluding any arguments listed in *excludeArguments*.</span>
 
-<span class="sd">    :param parser:              An instance of the argparse.ArgumentsParser class.</span>
-<span class="sd">    :param args:                Populated namespace returned by the argparse.ArgumentParser.parse_args() method.</span>
+<span class="sd">    :param parser:              A :py:class:`argparse.ArgumentsParser` instance.</span>
+<span class="sd">    :param args:                Populated namespace returned by the :py:func:`argparse.ArgumentParser.parse_args` method.</span>
 <span class="sd">        :type args:             argparse.Namespace</span>
-<span class="sd">    :param excludeArguments:    List of command line arguments to ignore.</span>
+<span class="sd">    :param excludeArguments:    List of names (i.e., arguments) in namespace *args* to ignore.</span>
 
 <span class="sd">    :return:                    The tuple (positionalArguments, optionalArguments).</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;First argument expected to be of type </span><span class="si">{</span><span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -125,16 +131,16 @@
     <span class="k">return</span> <span class="n">positionalArguments</span><span class="p">,</span> <span class="n">optionalArguments</span></div>
 
 <div class="viewcode-block" id="commandLineArgumentsToDocumentation"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.commandlineArguments.commandLineArgumentsToDocumentation">[docs]</a><span class="k">def</span> <span class="nf">commandLineArgumentsToDocumentation</span><span class="p">(</span><span class="n">codeName</span><span class="p">,</span> <span class="n">commandLineArguments</span><span class="p">,</span> <span class="n">documentation</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Write a list of command line arguments and a note to a documentation instance&#39;s computerCodes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function writes a list of command line arguments and a note to the computerCodes member </span>
+<span class="sd">    of a :py:class:`documentationModule.Documentation` instance.</span>
 
 <span class="sd">    :param codeName:            String representing the computer code&#39;s name.</span>
 <span class="sd">    :param currentArguments:    List of command line arguments.</span>
-<span class="sd">    :param documentation:       Documentation instance whose child nodes are populated.</span>
-<span class="sd">        :type documentation:    xData.Documentation.documentation.Documentation</span>
-<span class="sd">    :param date:                Date code was run.</span>
-<span class="sd">        :type date:             xData.date.Date, optional</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    :param documentation:       :py:class:`xData.Documentation.documentation.Documentation` instance whose child nodes are populated.</span>
+<span class="sd">    :param date:                Date code was run which is added to the dates member of *documentation*.</span>
+<span class="sd">        :type date:             :py:class:`xData.date.Date`, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">commandLineArguments</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;First argument expected to be a list of command line arguments.&#39;</span><span class="p">)</span>
@@ -160,14 +166,16 @@
     <span class="n">documentation</span><span class="o">.</span><span class="n">computerCodes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">computerCode</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="commandLineArgumentsFromDocumentation"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.commandlineArguments.commandLineArgumentsFromDocumentation">[docs]</a><span class="k">def</span> <span class="nf">commandLineArgumentsFromDocumentation</span><span class="p">(</span><span class="n">codeName</span><span class="p">,</span> <span class="n">documentation</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Read command line arguments for computer code named *codeName* from documentation instance.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function reads command line arguments for computer code named *codeName* from a :py:class:`documentationModule.Documentation` instance.</span>
 
-<span class="sd">    :param codeName:            String representing the computer code&#39;s name. Must also match the label of a **ComputerCode** instance in documentation.computerCodes.</span>
-<span class="sd">    :param documentation:       An xData Documentation instance.</span>
+<span class="sd">    :param codeName:            String representing the computer code&#39;s name. Must also match the label of a **ComputerCode** </span>
+<span class="sd">                                instance in documentation.computerCodes.</span>
+<span class="sd">    :param documentation:       A :py:class:`documentationModule.Documentation` instance.</span>
 
-<span class="sd">    :return:                    The execution arguments for the code as a string. None is returned if *codeName* is not in documentation.computerCodes.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    :return:                    The execution arguments for the code as a string. None is returned if *codeName* is not </span>
+<span class="sd">                                in documentation.computerCodes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">computerCode</span> <span class="o">=</span> <span class="n">documentation</span><span class="o">.</span><span class="n">computerCodes</span><span class="p">[</span><span class="n">codeName</span><span class="p">]</span>

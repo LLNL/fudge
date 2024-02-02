@@ -8,7 +8,6 @@
 from xml.etree import cElementTree
 
 from PoPs import database as databaseModule
-from PoPs import alias as aliasModule
 
 from PoPs import misc as miscModule
 

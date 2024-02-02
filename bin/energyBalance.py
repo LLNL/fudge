@@ -18,7 +18,10 @@ from PoPs import IDs as PoPsIDsModule
 from PoPs import specialNuclearParticleID as PoPsSpecialNuclearParticleIDModule
 
 from xData import XYs1d as XYs1dModule
+from xData import regions as regionsModule
 from fudge import styles as stylesModule
+
+from fudge import enums as enumsModule
 from fudge.reactionData import crossSection as crossSectionModule
 from fudge.productData import averageProductEnergy as averageProductEnergyModule
 
@@ -26,9 +29,13 @@ summaryDocStringFUDGE = '''For each reaction of a protare, writes available ener
 
 description = '''
 This script calculates, for each reaction, the available energy, the energy to each product and the energy balance. The results are
-written into files.  Information (e.g., index, MT and label) about each reaction is written to the "energyBalance.log" file
+written into files.  Information (e.g., index, MT and label) about each reaction is written to the "index" file
 in the output directory.  All files for a reaction are written into its own sub-directory under the output directory. The name 
-of a reaction's sub-directory is its index.
+of a reaction's sub-directory starts with its index in the index file.
+
+In addition, within each reaction's directory, the directory CrossSectionWeighted is create and the data in the reaction's directory
+are also written to the directory CrossSectionWeighted but with the data weighted by the reaction's cross section to the total
+cross section.
 '''
 
 apdLabel = 'apd'
@@ -42,6 +49,7 @@ singleProtareArguments = argumentsForScriptsModule.SingleProtareArguments(parser
 parser.add_argument('outputDir', type=pathlib.Path,                         help='Director where all output files are written.')
 parser.add_argument('-o', '--output', type=pathlib.Path, default = '',      help='If present, file name to write the protare which contains the added energy data.')
 parser.add_argument('--plot', action='store_true',                          help='If present, the energy balance by reaction curves are plotted.')
+parser.add_argument('-d', '--dump', action='store', default=None,           help='If present, the protare is written the specified file after average product data are calculated.')
 parser.add_argument('-v', '--verbose', action='count', default=0,           help='If present, prints infomation.')
 args = parser.parse_args()
 
@@ -84,7 +92,22 @@ def addCurves1d(curve1, curve2):
 
     return curve1 + curve2
 
-def output(reactionOutputDir, fileName, curve):
+def evaluateCurve(curve, domainValue):
+    '''
+    Returns the value of *curve* evaluated at *domainValue*. If the evaluated value is None or a raise
+    is execute, the value is returned as 0.0.
+    '''
+
+    try:
+        value = curve.evaluate(domainValue)
+        if value is None:
+            value = 0.0
+    except:
+        value = 0.0
+
+    return value
+
+def output(reactionOutputDir, fileName, curve, crossSection=None):
     '''
     This function writes XYs1d data to a file.
     '''
@@ -93,7 +116,31 @@ def output(reactionOutputDir, fileName, curve):
     with outputName.open('w') as fOut:
         print(curve.toString(), file=fOut, end='')
 
-def outputProductData(reactionOutputDir, outputChannel, productSums, level):
+    if crossSection is not None:
+        if isinstance(curve, regionsModule.Regions1d):
+            curve = curve.toPointwise_withLinearXYs(lowerEps=1e-6)
+
+        if fileName == 'availableEnergy.dat' and len(curve) == 2 and evaluateCurve(crossSection, curve.domainMin) == 0.0:
+            priorEnergy = None                              # Add a point at the first non-zero cross section point.
+            for energy, xSec in crossSection:
+                if xSec != 0.0:
+                    curve = curve.copy()
+                    curve.setValue(energy, curve.evaluate(energy))
+                    break
+                priorEnergy = energy
+            if priorEnergy is not None:                     # Add a point at the last zero cross section point.
+                curve.setValue(priorEnergy, curve.evaluate(priorEnergy))
+
+        weighted = []
+        for index, (xValue, yValue) in enumerate(curve):
+            weighted.append([xValue, evaluateCurve(crossSection, xValue) * yValue])
+        weighted = XYs1dModule.XYs1d(data=weighted)
+        outputName = reactionOutputDir / 'CrossSectionWeighted' / fileName
+        outputName.parent.mkdir(exist_ok=True)
+        with outputName.open('w') as fOut:
+            print(weighted.toString(), file=fOut, end='')
+
+def outputProductData(reactionOutputDir, crossSection, outputChannel, productSums, level):
     '''
     This function loops over all products of *outputChannel*, outputting each products energy data and summing by product pid.
     '''
@@ -106,17 +153,39 @@ def outputProductData(reactionOutputDir, outputChannel, productSums, level):
             else:
                 averageProductEnergy = XYs1dModule.XYs1d(axes=averageProductEnergyAxes)
             fileName = 'averageProductEnergy_%.2d_%.2d_%s.dat' % (level, productIndex, product.pid)
-            output(reactionOutputDir, fileName, averageProductEnergy)
+            output(reactionOutputDir, fileName, averageProductEnergy, crossSection)
             if product.pid not in productSums:
                 productSums[product.pid] = XYs1dModule.XYs1d(axes=averageProductEnergyAxes)
             productSums[product.pid] = addCurves1d(productSums[product.pid], averageProductEnergy)
         else:
-            outputProductData(reactionOutputDir, product.outputChannel, productSums, level + 1)
+            outputProductData(reactionOutputDir, crossSection, product.outputChannel, productSums, level + 1)
+
+def checkTwoBody(reactionOutputDir, crossSection, outputChannel):
+    """
+    If the reaction is a two-body reaction, This function writes out energy balance data for the two two-body particles.
+    """
+
+    if outputChannel.genre == enumsModule.Genre.twoBody:
+        product1, product2 = outputChannel.products[0], outputChannel.products[1]
+
+        output(reactionOutputDir, 'twoBodyAverageProductEnergy_%s.dat' % product1.label, product1.averageProductEnergy[apdLabel], crossSection)
+        output(reactionOutputDir, 'twoBodyAverageProductEnergy_%s.dat' % product2.label, product2.averageProductEnergy[apdLabel], crossSection)
+
+        averageProductEnergy = product1.averageProductEnergy[apdLabel] + product2.averageProductEnergy[apdLabel]
+        output(reactionOutputDir, 'twoBodyAverageProductEnergy.dat', averageProductEnergy, crossSection)
+
+        Q = outputChannel.Q[0].value
+
+        domainMin = averageProductEnergy.domainMin
+        domainMax = averageProductEnergy.domainMax
+        availableEnergy = XYs1dModule.XYs1d(data=[[domainMin, domainMin + Q], [domainMax, domainMax + Q]], axes=averageProductEnergy.axes)
+        energyBalance = addCurves1d(availableEnergy, -averageProductEnergy)
+        output(reactionOutputDir, 'twoBodyEnergyBalance.dat', energyBalance, crossSection)
 
 def process(reaction, isReaction):
-    '''
+    """
     This function processes energy data for one reaction.
-    '''
+    """
 
     global reactionIndex
 
@@ -128,25 +197,32 @@ def process(reaction, isReaction):
     reactionOutputDir = outputDir / ('%.4d_%.3d' % (reactionIndex, reaction.ENDF_MT))
     reactionOutputDir.mkdir()
 
+    if reaction.isCoulombReaction():
+        reactionIndex += 1
+        print('        INFO: Skipping Coulomb scattering reaction.')
+        return
+
     crossSection = reaction.crossSection.toPointwise_withLinearXYs(lowerEps=1e-6)
     output(reactionOutputDir, 'crossSection.dat', crossSection)
 
     if isReaction:
         availableEnergy = reaction.availableEnergy[apdLabel]
-        output(reactionOutputDir, 'availableEnergy.dat', availableEnergy)
+        output(reactionOutputDir, 'availableEnergy.dat', availableEnergy, crossSection)
+
+        checkTwoBody(reactionOutputDir, crossSection, reaction.outputChannel)
 
     productSums = {}
-    outputProductData(reactionOutputDir, reaction.outputChannel, productSums, 0)
+    outputProductData(reactionOutputDir, crossSection, reaction.outputChannel, productSums, 0)
 
     totalProductEnergy = XYs1dModule.XYs1d(axes=averageProductEnergyAxes)
     for pid in productSums:
         totalProductEnergy = addCurves1d(totalProductEnergy, productSums[pid])
-        output(reactionOutputDir, '_%s_averageProductEnergy.dat' % pid, productSums[pid])
-    output(reactionOutputDir, 'totalProductEnergy.dat', totalProductEnergy)
+        output(reactionOutputDir, '_%s_averageProductEnergy.dat' % pid, productSums[pid], crossSection)
+    output(reactionOutputDir, 'totalProductEnergy.dat', totalProductEnergy, crossSection)
 
     if isReaction:
         energyBalance = addCurves1d(availableEnergy, -totalProductEnergy)
-        output(reactionOutputDir, 'energyBalance.dat', energyBalance)
+        output(reactionOutputDir, 'energyBalance.dat', energyBalance, crossSection)
 
         for sumMT in sums:
             indices = sums[sumMT]['indices']
@@ -156,7 +232,12 @@ def process(reaction, isReaction):
                 for pid in productSums:
                     if pid not in sums[sumMT]['crossSection_energy']:
                         sums[sumMT]['crossSection_energy'][pid] = XYs1dModule.XYs1d(axes=crossSectionEnergyAxes)
-                    sums[sumMT]['crossSection_energy'][pid] = addCurves1d(sums[sumMT]['crossSection_energy'][pid], crossSection * productSums[pid])
+
+                    crossSection2 = crossSection
+                    productSum = productSums[pid]
+                    if not crossSection2.areDomainsMutual(productSum):
+                        crossSection2, productSum = crossSection2.mutualify(lowerUpperEpsilon, lowerUpperEpsilon, True, productSum, lowerUpperEpsilon, lowerUpperEpsilon, True)
+                    sums[sumMT]['crossSection_energy'][pid] = addCurves1d(sums[sumMT]['crossSection_energy'][pid], crossSection2 * productSum)
     else:
         energyBalance = totalProductEnergy
     energyBalance.plotLabel = str(reaction)
@@ -184,7 +265,9 @@ if __name__=='__main__':
         doPrint(1, 'Calculating average product data:')
         AEPStyle = stylesModule.AverageProductData(apdLabel, rootStyle.label)
         protare.styles.add(AEPStyle)
-        protare.calculateAverageProductData(AEPStyle, indent='  ')
+        protare.calculateAverageProductData(AEPStyle, indent='  ', skipCoulombPlusNuclearElasticError=True)
+        if args.dump is not None:
+            protare.saveToFile(args.dump)
 
     outputDir = args.outputDir / ('%s+%s' % (protare.projectile, protare.target))
     if outputDir.exists():
@@ -218,7 +301,7 @@ if __name__=='__main__':
             crossSection_availableEnergy = sums[sumMT]['crossSection_availableEnergy']
             if len(crossSection_availableEnergy) > 0:
                 availableEnergy = crossSection_availableEnergy / crossSection
-                output(sumOutputDir, 'availableEnergy.dat', availableEnergy.thin(thinDefault))
+                output(sumOutputDir, 'availableEnergy.dat', availableEnergy.thin(thinDefault), crossSection)
 
                 totalProductEnergy = XYs1dModule.XYs1d(axes=averageProductEnergyAxes)
                 crossSection_energies = sums[sumMT]['crossSection_energy']
@@ -227,14 +310,18 @@ if __name__=='__main__':
                     if len(productEnergy) == 0:
                         productEnergy = XYs1dModule.XYs1d(axes=averageProductEnergyAxes)
                     else:
-                        productEnergy = productEnergy / crossSection
+                        try:
+                            productEnergy = productEnergy / crossSection
+                        except:
+                            print('WARNING: for MT %s and product %s, division of product energy by cross section failed: continuing anyway.' % (sumMT, pid))
+                            continue
                         totalProductEnergy = addCurves1d(totalProductEnergy, productEnergy)
-                    output(sumOutputDir, '_%s_averageProductEnergy.dat' % pid, productEnergy.thin(thinDefault))
+                    output(sumOutputDir, '_%s_averageProductEnergy.dat' % pid, productEnergy.thin(thinDefault), crossSection)
 
-                output(sumOutputDir, 'totalProductEnergy.dat', totalProductEnergy)
+                output(sumOutputDir, 'totalProductEnergy.dat', totalProductEnergy, crossSection)
 
                 energyBalance = addCurves1d(availableEnergy, -totalProductEnergy)
-                output(sumOutputDir, 'energyBalance.dat', energyBalance.thin(thinDefault))
+                output(sumOutputDir, 'energyBalance.dat', energyBalance.thin(thinDefault), crossSection)
 
     if args.plot:
         XYs1dModule.XYs1d.multiPlot(energyBalanceCurves, title='Energy balance per reaction')

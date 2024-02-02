@@ -32,12 +32,16 @@ parser.add_argument('mt', type=int, nargs='+', help='MT number(s) to plot')
 parser.add_argument('--title', help="Plot title")
 parser.add_argument('--temp', default=False, help="""Optional temperature for heating.
 Temperature should be given as a string with units. Possible values are '1200 K' or '0.1 eV/k' (quotes are required)""")
+parser.add_argument('-s', '--style', help="Style label to plot, e.g. 'recon' or 'heated_000'")
 parser.add_argument('--legendLabel', action='store_true', help="Use reaction label (instead of MT#) in legend")
+parser.add_argument('--energyUnit', help="Unit for x-axis")
 args = parser.parse_args()
 
 filename = args.file
 try:
     RS = reactionSuite.ReactionSuite.readXML_file( filename )
+    if args.energyUnit:
+        RS.convertUnits({RS.domainUnit: args.energyUnit})
 except Exception:
     # doesn't appear to be GNDS, try converting from ENDF-6
     from brownies.legacy.converting import endfFileToGNDS
@@ -52,7 +56,9 @@ for MT in args.mt:
         continue
     reac = reac[0]
 
-    if args.temp:
+    if args.style:
+        data[(MT, reac.label)] = reac.crossSection[args.style].toPointwise_withLinearXYs(accuracy=1e-3, lowerEps=1e-8)
+    elif args.temp:
         from pqu import PQU
         temp = PQU.PQU(args.temp)
         heatedStyle = stylesModule.Heated('heated', derivedFrom=RS.styles.getEvaluatedStyle().label,

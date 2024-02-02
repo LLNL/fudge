@@ -6,7 +6,7 @@
 # <<END-copyright>>
 
 # Notes.
-# Need sphinx 1.1 or higher to use ":private-members:" parameter in PQU.rst. This is why :py:meth:`PQU._getOtherAsPQU` do not display properly.
+# Need sphinx 1.1 or higher to use ":private-members:" parameter in PQU.rst. This is why :py:func:`PQU._getOtherAsPQU` do not display properly.
 
 """
 ---------------------------
@@ -152,7 +152,7 @@ with Joule ('J') and Watt-second ('W * s') but not Watt ('W').
 
 The :py:class:`PQU` package has many defined units with prefixes (see `Defined prefixes and units`_). In general, the
 PQU methods that operate on :py:class:`PQU` objects do not attempt to simplify the units, even if the result is dimensionless.
-Note, to get rid of dimensionless units use the method :py:meth:`PQU.simplify`
+Note, to get rid of dimensionless units use the method :py:func:`PQU.simplify`
 For example, consider the division of '3.2 m' by 11.2 km:
 
 >>> from pqu import PQU
@@ -167,8 +167,8 @@ For example, consider the division of '3.2 m' by 11.2 km:
 >>> slope.simplify()
 PQU( "2.9e-4" )
 
-Here the method :py:meth:`PQU.copyToUnit` is used to convert the units into a dimensionless form. Here is another
-example showing the use of the :py:meth:`PQU.copyToUnit` method:
+Here the method :py:func:`PQU.copyToUnit` is used to convert the units into a dimensionless form. Here is another
+example showing the use of the :py:func:`PQU.copyToUnit` method:
 
 >>> mass = PQU.PQU( "4.321 g" )
 >>> speed = PQU.PQU( "1.234 inch / mus"  )  
@@ -179,8 +179,8 @@ example showing the use of the :py:meth:`PQU.copyToUnit` method:
 >>> print(energy_joules)
 4.245e6 J
 
-The method :py:meth:`PQU.inUnitsOf` is useful for returning a physical quantity in units of descending compatible units. 
-For example, :py:meth:`PQU.inUnitsOf` will convert '3123452.12 s' into days, hours, minutes and seconds, or just hours and seconds as:
+The method :py:func:`PQU.inUnitsOf` is useful for returning a physical quantity in units of descending compatible units. 
+For example, :py:func:`PQU.inUnitsOf` will convert '3123452.12 s' into days, hours, minutes and seconds, or just hours and seconds as:
 
 >>> t = PQU.PQU( '3123452.12 s' )
 >>> t.inUnitsOf( 'd', 'h', 'min', 's' )
@@ -188,7 +188,7 @@ For example, :py:meth:`PQU.inUnitsOf` will convert '3123452.12 s' into days, hou
 >>> t.inUnitsOf( 'h',  's' )
 (PQU( "867.000000 h" ), PQU( "2252.12 s" ))
 
-Also see the methods :py:meth:`PQU.convertToUnit` and :py:meth:`PQU.getValueAs`.
+Also see the methods :py:func:`PQU.convertToUnit` and :py:func:`PQU.getValueAs`.
 
 ------------------------------------------------------------------------------------------
 Changing non-hardwired constants
@@ -314,8 +314,8 @@ PQU methods by functionality
 This section classifies some of the methods in the :py:class:`PQU` class by their function.
 
 For :py:class:`PQU` methods that require a second operand (e.g., '+', '/'), the second operand will be passed to the
-staticmethod :py:meth:`PQU._getOtherAsPQU` to determine if it is a suitable object. A suitable object includes any string that
-is a valid :py:class:`PQU`. For example: :py:meth:`PQU.toString`
+staticmethod :py:func:`PQU._getOtherAsPQU` to determine if it is a suitable object. A suitable object includes any string that
+is a valid :py:class:`PQU`. For example: :py:func:`PQU.toString`
 
 >>> print(PQU.PQU( '12.345' ) + "3.23")
 15.58
@@ -350,13 +350,13 @@ The :py:class:`PQU` class has methods for the following arithmetic operations. U
 **__add__, __radd__, __iadd__, __sub__, __rsub__, __isub__**
 
     These are the standard binary operators for addition and subtraction. For these operators, the other
-    operand is passed to :py:meth:`PQU._getOtherAsPQU`. The other operand must have units compatible with *self*.
+    operand is passed to :py:func:`PQU._getOtherAsPQU`. The other operand must have units compatible with *self*.
     As expected, the __iadd__ and __isub__ methods modify *self* and return it.
 
 **__mul__, __rmul__, __imul__, __div__, __rdiv__, __idiv__**
 
     These are the standard binary operators for multiplication and division. For these operators, the other
-    operand is passed to :py:meth:`PQU._getOtherAsPQU`. Any unit for other is allowed.
+    operand is passed to :py:func:`PQU._getOtherAsPQU`. Any unit for other is allowed.
     As expected, the __imul__ and __idiv__ methods modify *self* and
     return it. All these methods call the __mul__ method; except, when a division happens, and '*self* is other'
     and the denominator is not 0.
@@ -376,7 +376,7 @@ The :py:class:`PQU` class has methods for the following arithmetic operations. U
 **__eq__, __ne__, __lt__, __le__, __gt__, __ge__, compare, equivalent**
 
     These methods compare *self* to another object. For these operators, the other
-    object is passed to :py:meth:`PQU._getOtherAsPQU` and must have the same unit
+    object is passed to :py:func:`PQU._getOtherAsPQU` and must have the same unit
     as *self*. The first 6 methods all call the :py:func:`compare` method
     with epsilonFactor = 5. All methods except 'equivalent' compare 
     *self*'s and other's values and units only. 
@@ -513,6 +513,7 @@ Future plans
 """
 
 import sys, math, re, copy
+import fractions
 from functools import reduce
 from .NumberDict import NumberDict
 
@@ -588,7 +589,7 @@ def valueOrPQ( value, unitFrom = None, unitTo = None, asPQU = False, checkOrder 
         |float|None    |None  |None    |None    |float      |float                      |
         +-----+--------+------+--------+--------+-----------+---------------------------+
         |float|None    |string|None    |PU      |float in   |PQ in unitTo               |
-        |     |        |or PU |        |        |unitTo     |                          `|
+        |     |        |or PU |        |        |unitTo     |                           |
         +-----+--------+------+--------+--------+-----------+---------------------------+
         |float|string  |None  |PU      |None    |float in   |PQ in unitFrom             |
         |     |or PU   |      |        |        |unitFrom   |                           |
@@ -1217,7 +1218,7 @@ class PQU_uncertainty :
         Returns a string representation of *self* (i.e., '+/- 1.2%').
 
         :param str prefix: A prefix for the '+/-' style
-        :param significantDigits: Passed onto method :py:meth:`PQU_float.toString`
+        :param significantDigits: Passed onto method :py:func:`PQU_float.toString`
         :rtype: `str`
         """
 
@@ -1242,7 +1243,7 @@ class PQU_uncertainty :
 class PQU :
     """
     This class supports a float value with an optional uncertainty and unit. Many basic math operations are supported 
-    (e.g., +, -, *, /).  A :py:class:`PQU` is anything that the staticmethod :py:meth:`Parsers.parsePQUString` can parse.
+    (e.g., +, -, *, /).  A :py:class:`PQU` is anything that the staticmethod :py:func:`Parsers.parsePQUString` can parse.
 
     In this section the following notations are used:
 
@@ -1269,7 +1270,7 @@ class PQU :
         | unit = string_pu          | The unit argument must be a valid unit string (e.g., "MeV", "MeV/m" but not       |
         |                           | "1 MeV") or a :py:class:`PhysicalUnit` object.                                    |
         +---------------------------+-----------------------------------------------------------------------------------+
-        | string                    | String can be anything that the method :py:meth:`Parsers.parsePQUString` is       |
+        | string                    | String can be anything that the method :py:func:`Parsers.parsePQUString` is       |
         |                           | capable of parsing (e.g., '1.23', '1.23 m', '1.23%', '1.23(12) m',                |
         |                           | '1.23 +/- 0.12m'). If it contains a unit (uncertainty) then the unit              |
         |                           | (uncertainty) argument must be None.                                              |
@@ -1577,7 +1578,7 @@ class PQU :
         Compares *self*'s value and unit to other's value and unit (other's value is first converted to unit of *self*) 
         using the :py:func:`compare` function.
 
-        Also see method :py:meth:`PQU.equivalent`.
+        Also see method :py:func:`PQU.equivalent`.
 
         :param other: The :py:class:`PQU` instance to compare to *self*
         :type other: A :py:class:`PQU` equivalent instance
@@ -1626,7 +1627,7 @@ class PQU :
         values within 'factor times uncertainty' of its value. That is, the band for *self* is the ranges from
         'value - factor * uncertainty' to 'value + factor * uncertainty'.
 
-        Note, this is different than the :py:meth:`compare` method which compares the values using sys.float_info.epsilon
+        Note, this is different than the :py:func:`compare` method which compares the values using sys.float_info.epsilon
         to calculate a 'band' and not their uncertainties.
 
         :param other: The object to compare to *self*
@@ -1902,10 +1903,10 @@ class PQU :
     def setPercentFlag( self, isPercent, scaleValue = False ) :
         """
         Changes the percent flag only when *self* is dimensionless and isPercent != *self*.isPercent( ).
-        Otherwise, a raise is executed.  For scaleValue argument see :py:meth:`PQU_float.setPercentFlag`.
+        Otherwise, a raise is executed.  For scaleValue argument see :py:func:`PQU_float.setPercentFlag`.
 
-        :param isPercent: See :py:meth:`PQU_float.setPercentFlag`
-        :param scaleValue: See :py:meth:`PQU_float.setPercentFlag`
+        :param isPercent: See :py:func:`PQU_float.setPercentFlag`
+        :param scaleValue: See :py:func:`PQU_float.setPercentFlag`
         """
 
         if( not( self.isDimensionless( ) ) ) : raise Exception( 'Can only set/unset percent on a dimensionless PQU: unit = "%s"' % self.unit )
@@ -1931,8 +1932,8 @@ class PQU :
         """
         Returns a string representation of *self* (e.g., '35 +/- 1.2% J').
 
-        :param significantDigits: Passed onto the methods :py:meth:`PQU_float.toString` and :py:meth:`PQU_uncertainty.toString`
-        :param :param : Passed onto the method :py:meth:`PQU_float.toString`.
+        :param significantDigits: Passed onto the methods :py:func:`PQU_float.toString` and :py:func:`PQU_uncertainty.toString`
+        :param :param : Passed onto the method :py:func:`PQU_float.toString`.
 
         :rtype: `str`
         """
@@ -1958,8 +1959,8 @@ class PQU :
     def truncate( self, value = False, uncertainty = True ) :
         """
         If value is **True**, calls *self*.value's truncate method. If uncertainty is **True**, 
-        calls *self*.uncertainty's truncate method.  See :py:meth:`PQU_float.truncate`
-        and :py:meth:`PQU_uncertainty.truncate`
+        calls *self*.uncertainty's truncate method.  See :py:func:`PQU_float.truncate`
+        and :py:func:`PQU_uncertainty.truncate`
 
         :param value: If **True** *self*'s value is truncated
         :type value: `bool`
@@ -2029,7 +2030,7 @@ PhysicalQuantityWithUncertainty = PQU           # This is deprecated.
 class Parsers :
     """
     This is use to parse the allowed **PQU** strings (e.g., '1 m', '1.32(3) kg).
-    See the table in the :py:meth:`parsePQUString.parsePQUString` doc string for allowed **PQU** strings.
+    See the table in the :py:func:`parsePQUString.parsePQUString` doc string for allowed **PQU** strings.
     This class is mainly for internal use.
 
     .. rubric:: Regular Expression Matching
@@ -2332,77 +2333,72 @@ class PhysicalUnit :
         if( self.powers != other.powers ) : raise TypeError( 'Incompatible units' )
         return( self.factor.__ne__( other.factor ) )
 
-    def __mul__( self, other ) :
+    def __mul__(self, other):
 
-        if( ( self.offset != 0 ) or ( isinstance( other, PhysicalUnit ) and ( other.offset != 0 ) ) ) :
-            raise TypeError( "cannot multiply units with non-zero offset" )
+        if self.offset != 0 or (isinstance(other, PhysicalUnit) and other.offset != 0):
+            raise TypeError('Cannot multiply units with non-zero offset.')
 
-        if( isinstance( other, PhysicalUnit ) ) :
-            return( PhysicalUnit( self.symbols + other.symbols, self.factor * other.factor, list( map( lambda a, b: a + b, self.powers, other.powers ) ) ) )
+        if isinstance(other, PhysicalUnit):
+            pqu = PhysicalUnit(self.symbols + other.symbols, self.factor * other.factor, list(map(lambda a, b: a + b, self.powers, other.powers)))
         else:
-            return( PhysicalUnit( self.symbols + { str( other ) : 1 }, self.factor * other, self.powers ) )
+            pqu = PhysicalUnit(self.symbols + {str(other): 1}, self.factor * other, self.powers)
+        pqu.simplifyFractions()
+
+        return pqu
 
     __rmul__ = __mul__
 
-    def __truediv__( self, other ) :
+    def __truediv__(self, other):
 
-        if( ( self.offset != 0 ) or ( isinstance( other, PhysicalUnit ) and ( other.offset != 0 ) ) ) :
-            raise TypeError( " cannot divide units with non-zero offset" )
+        if self.offset != 0 or (isinstance(other, PhysicalUnit) and other.offset != 0):
+            raise TypeError('Cannot divide units with non-zero offset.')
 
-        if( isinstance( other, PhysicalUnit ) ) :
-            return( PhysicalUnit( self.symbols - other.symbols, self.factor / other.factor, list( map( lambda a, b: a - b, self.powers, other.powers ) ) ) )
+        if isinstance(other, PhysicalUnit):
+            pqu = PhysicalUnit(self.symbols - other.symbols, self.factor / other.factor, list(map(lambda a, b: a - b, self.powers, other.powers)))
         else:
-            return( PhysicalUnit( self.symbols + { str( other ) : -1 }, self.factor / other, self.powers ) )
+            pqu = PhysicalUnit(self.symbols + {str(other): -1}, self.factor / other, self.powers)
+        pqu.simplifyFractions()
 
-    def __rtruediv__( self, other ) :
+        return pqu
 
-        if( ( self.offset != 0 ) or ( isinstance( other, PhysicalUnit ) and ( other.offset != 0 ) ) ) :
-            raise TypeError( "cannot divide units with non-zero offset" )
+    def __rtruediv__(self, other):
 
-        if( isinstance( other, PhysicalUnit ) ) :
-            return( PhysicalUnit( other.symbols - self.symbols, other.factor / self.factor, list( map( lambda a, b: a - b, other.powers, self.powers ) ) ) )
+        if self.offset != 0 or (isinstance(other, PhysicalUnit) and other.offset != 0):
+            raise TypeError('Cannot divide units with non-zero offset.')
+
+        if isinstance(other, PhysicalUnit):
+            pqu = PhysicalUnit(other.symbols - self.symbols, other.factor / self.factor, list(map(lambda a, b: a - b, other.powers, self.powers)))
         else:
-            return( PhysicalUnit( NumberDict( { str( other ) : 1 } ) - self.symbols, other / self.factor, [ -x for x in self.powers ] ) )
+            pqu = PhysicalUnit(NumberDict({str(other): 1}) - self.symbols, other / self.factor, [-x for x in self.powers])
+        pqu.simplifyFractions()
+
+        return pqu
 
     __div__ = __truediv__   # for python 2.x
     __rdiv__ = __rtruediv__
 
-    def __pow__( self, other ) :
+    def __pow__(self, other):
 
-        if( self.offset != 0 ) : raise TypeError( "cannot exponentiate units with non-zero offset" )
+        if self.offset != 0:
+            raise TypeError('Cannot exponentiate units with non-zero offset.')
 
-        if( not( isinstance( other, int ) ) ) :                     # See if very close to an integer.
-            power = float( other )
-            rounded = int( math.floor( power + 0.5 ) )
-            if( abs( power - rounded ) < 1.e-14 ) : other = rounded # If not close, revert back to non-int so handled as inverse later.
-        if( isinstance( other, int ) ) :
-            return( PhysicalUnit( other * self.symbols, pow( self.factor, other ), list( map( lambda x, p = other: x * p, self.powers ) ) ) )
+        power = fractions.Fraction(other).limit_denominator(10000)
+        if power.denominator == 1:
+            power = power.numerator
+        floatOther = float(other)
+        if floatOther != 0.0:
+            if abs(float(power) / floatOther - 1) > 1e-14:
+                raise ValueError('Could not convert "%s" to a fraction (%s)' % (other, power))
+        powers = list(map(lambda x, p = power: x * p, self.powers))
+        for index, p1 in enumerate(powers):
+            if isinstance(p1, fractions.Fraction):
+                if p1.denominator == 1:
+                    powers[index] = p1.numerator
 
-        if( isinstance( other, float ) ) :                          # See if inverse (e.g., 1. / 3.)
-            inv_exp = 1. / other
-            rounded = int( math.floor( inv_exp + 0.5 ) )
+        pqu = PhysicalUnit(power * self.symbols, pow(self.factor, power), powers)
+        pqu.simplifyFractions()
 
-            if( abs( inv_exp-rounded ) < 1.e-10 ) :
-                if reduce( lambda a, b: a and b, list( map( lambda x, e = rounded: x % e == 0, self.powers ) ) ) :
-                    f = pow( self.factor, other )
-                    p = list( map( lambda x, p = rounded: x / p, self.powers ) )
-
-                    if reduce( lambda a, b: a and b, list( map( lambda x, e = rounded: x % e == 0, list( self.symbols.values( ) ) ) ) ) :
-                        symbols = self.symbols / rounded
-                    else:
-                        symbols = NumberDict( )
-
-                        if f != 1.:
-                            symbols[str( f )] = 1
-
-                        for i in range( len( p ) ) :
-                            symbols[_base_symbols[i]] = p[i]
-
-                    return PhysicalUnit( symbols, f, p )
-                else:
-                    raise TypeError( 'Illegal exponent' )
-
-        raise TypeError( 'Only integer and inverse integer exponents are allowed' )
+        return pqu
 
     def conversionFactorTo( self, other, ignoreTemperatureOffsets = False ) :
         """
@@ -2496,6 +2492,29 @@ class PhysicalUnit :
         self.symbols = NumberDict( )
         self.symbols[symbol] = 1
 
+    def simplifyFractions(self):
+        '''
+        This method converts any part of self's symbols and powers that are a :py:class:`fractions.Fraction` instance with 
+        denominator of 1 into an integer of the numerator.
+        '''
+
+        for index, power in enumerate(self.powers):
+            if isinstance(power, fractions.Fraction):
+                if power.denominator == 1:
+                    self.powers[index] = power.numerator
+        
+        symbols = self.symbols
+        toDelete = []
+        for symbol in symbols:
+            value = self.symbols[symbol]
+            if isinstance(value, fractions.Fraction):
+                if value.denominator == 1:
+                    self.symbols[symbol] = value.numerator
+                    if value.numerator == 0:
+                        toDelete.append(symbol)
+        for symbol in toDelete:
+            del self.symbols[symbol]
+
     def simplifyUnitsFactor( self ) :
         """
         This method returns a :py:class:`PQU` instance that can be used to simplify *self*'s units.
@@ -2533,12 +2552,18 @@ class PhysicalUnit :
         for unit in self.symbols :
             power = self.symbols[unit]
 
+            leftBracket, rightBracket = '', ''
+            if isinstance(power, fractions.Fraction):
+                leftBracket, rightBracket = '(', ')'
+
             if( power < 0 ) :
                 denom = denom + '/' + unit
-                if( power < -1 ) : denom = denom + '**' + str( -power )
+                if power != -1:
+                    denom = denom + '**' + leftBracket + str(-power) + rightBracket
             elif( power > 0 ) :
                 num = num + '*' + unit
-                if( power > 1 ) : num = num + '**' + str( power )
+                if power != 1:
+                    num = num + '**' + leftBracket + str(power) + rightBracket
 
         if( len( num ) == 0 ) :
             if( len( denom ) > 0 ) : num = '1'

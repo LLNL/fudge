@@ -13,6 +13,7 @@ Leptons include electrons, neutrinos, etc.
 from LUPY import enums as enumsModule
 
 from .. import misc as miscModule
+from .. import IDs as IDsModule
 from .. import intId as intIdModule
 from . import particle as particleModule
 
@@ -22,15 +23,10 @@ class Generation(enumsModule.Enum):
     muonic = enumsModule.auto()
     tauonic = enumsModule.auto()
 
-class Alias( particleModule.Alias ) :
-
-    moniker = 'leptonAlias'
-
 class Particle( particleModule.Particle ) :
 
     moniker = 'lepton'
     familyOrder = 1
-    alias = Alias
     generations = { Generation.electronic : 0, Generation.muonic : 1,  Generation.tauonic: 2 }  # Only used for sorting particles.
     chargeOrder = { -1 : 0, 1 : 1, 0 : 2 }                                                      # Only used for sorting particles.
 
@@ -72,7 +68,7 @@ class Particle( particleModule.Particle ) :
     def intid(self, intidDB={}):
 
         base, anti, qualifier = miscModule.baseAntiQualifierFromID(self.id)
-        leptonIndex = {'e-': 0}.get(base)
+        leptonIndex = {IDsModule.electron: 0}.get(base)
         if leptonIndex is None:
             raise ValueError('Baryon "%s" does not have a defined intid.' % (self.id))
 

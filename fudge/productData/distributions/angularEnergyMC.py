@@ -5,7 +5,14 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""Angular/Energy double differential distribution classes for Monte Carlo with xs, pdf, and cdf 1d distribtions."""
+"""
+This module contains Angular/Energy double differential distribution classes used for storing
+distribution data that have been pre-processed for use in Monte Carlo transport codes.
+The distribution is a product of an angular probability P(mu|E) and an energy  probability P(E'|E,mu) where
+E is the projectile's energy, and mu and E' are the product's angular and energy variables. The inter most
+1d functions P(mu) for P(mu|E) and P(E') for P(E'|E,mu) are stored with an xs, pdf, and cdf
+(i.e., :py:class:`Xs_pdf_cdf1d`) function.
+"""
 
 from xData import xs_pdf_cdf as xs_pdf_cdfModule
 from xData import multiD_XYs as multiD_XYsModule
@@ -15,10 +22,16 @@ from . import angular as angularModule
 
 
 class Xs_pdf_cdf1d( xs_pdf_cdfModule.Xs_pdf_cdf1d ) :
+    """
+    Class for storing the inter most of P(E'|E,mu) for each mu.
+    """
 
     pass
 
 class XYs2d( multiD_XYsModule.XYs2d ) :
+    """
+    Class for storing a list of :py:class:`Xs_pdf_cdf1d` instances for each projectile energy E.
+    """
 
     def __init__( self, **kwargs ) :
 
@@ -26,10 +39,16 @@ class XYs2d( multiD_XYsModule.XYs2d ) :
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns the list of classes that can be sub-nodes (i.e., a 1d function) of an :py:class:`XYs2d` instance.
+        """
 
         return( ( Xs_pdf_cdf1d, ) )
 
 class XYs3d( multiD_XYsModule.XYs3d ) :
+    """
+    Class for storing a list of :py:class:`XYs2d` instances (i.e., the P(E'|E,mu)).
+    """
 
     def __init__( self, **kwargs ) :
 
@@ -37,11 +56,26 @@ class XYs3d( multiD_XYsModule.XYs3d ) :
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns the list of classes that can be sub-nodes (i.e., 2d function) of an :py:class:`XYs3d` instance.
+        """
 
         return( ( XYs2d, ) )
 
 class Subform( baseModule.Subform ) :
-    """Abstract base class for angularEnergyMC subforms."""
+    """
+    Abstract base class for angular and energy sub-nodes of an AngularEnergyMC instance.
+
+    The following table list the primary members of this class:
+
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | data      | This member stores the data (i.e., function).             |
+    +-----------+-----------------------------------------------------------+
+
+    :param data:    Data (i.e, function) for the angular and energy sub-nodes of an AngularEnergyMC instance.
+    """
 
     moniker = 'dummy'                   # This is not used but added to stop lylint from reporting.
 
@@ -53,11 +87,23 @@ class Subform( baseModule.Subform ) :
         self.data.setAncestor( self )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.data.convertUnits( unitMap )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -67,6 +113,9 @@ class Subform( baseModule.Subform ) :
         return( XMLStringList )
 
 class Angular( Subform ) :
+    """
+    Class for storing the angular data (i.e., P(mu|E)).
+    """
 
     moniker = 'angular'
     allowedSubElements = ( angularModule.XYs2d, )
@@ -74,6 +123,17 @@ class Angular( Subform ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         xPath.append(node.tag)
 
@@ -88,6 +148,9 @@ class Angular( Subform ) :
         return( _angular )
 
 class AngularEnergy( Subform ) :
+    """
+    Class for storing the energy data (i.e., P(E'|E,mu)).
+    """
 
     moniker = 'angularEnergy'
     allowedSubElements = ( XYs3d, )
@@ -95,6 +158,17 @@ class AngularEnergy( Subform ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         xPath.append(node.tag)
 
@@ -109,6 +183,29 @@ class AngularEnergy( Subform ) :
         return( _angularEnergy )
 
 class Form( baseModule.Form ) :
+    """
+    Class for storing the distribution that is a product of an angular probability P(mu|E) and an energy 
+    probability P(E'|E,mu) where E is the projectile's energy, and mu and E' are the product's angular and energy variables.
+
+    The following table list the primary members of this class:
+
+    +---------------+---------------------------------------------------------------+
+    | Member        | Description                                                   |
+    +===============+===============================================================+
+    | label         | Unique label for the form within the distribution instance.   |
+    +---------------+---------------------------------------------------------------+
+    | productFrame  | The frame the product data are in.                            |
+    +---------------+---------------------------------------------------------------+
+    | _angular      | The angular child node containing P(mu|E).                    |
+    +---------------+---------------------------------------------------------------+
+    | _angularEnergy| The energy child node containing P(E'|E,mu).                  |
+    +---------------+---------------------------------------------------------------+
+
+    :param label:           Unique label for the form within the distribution instance.
+    :param productFrame:    The frame the product data are in.
+    :param _angular:        The angular child node containing P(mu|E).
+    :param _angularEnergy:  The energy child node containing P(E'|E,mu).
+    """
 
     moniker = 'angularEnergyMC'
     subformAttributes = ( 'angular', 'angularEnergy' )
@@ -121,14 +218,28 @@ class Form( baseModule.Form ) :
         baseModule.Form.__init__( self, label, productFrame, ( _angular, _angularEnergy ) )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.angular.convertUnits( unitMap )
         self.angularEnergy.convertUnits( unitMap )
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
-        """Translate a GNDS angularEnergyMC node."""
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         xPath.append(node.tag)
 

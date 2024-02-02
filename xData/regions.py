@@ -405,6 +405,17 @@ class Regions1d( Regions ) :
     moniker = 'regions1d'
     dimension = 1
 
+    def __neg__(self):
+        """
+        This method returns self with all regions negated.
+        """
+
+        regions1d = self.__class__(axes=self.axes)
+        for region in self:
+            regions1d.append(-region)
+
+        return regions1d
+
     def __mul__( self, other ) :
 
         _self, _other = self.copyToCommonRegions( other )
@@ -427,6 +438,22 @@ class Regions1d( Regions ) :
 
         self2 = self.copy()
         other2 = other.copy()
+
+        if len(self2) == 0:
+            if len(other2) == 0:
+               return self2, other2
+
+            data = [[other2.domainMin, 0.0], [other2.domainMax, 0.0]]
+            xys1d = self2.toLinearXYsClass()(data=data, axes=self2.axes)
+            if not isinstance(self2, Regions1d):
+                self2 = Regions1d(axes=self2.axes)
+            self2.append(xys1d)
+        elif len(other2) == 0:
+            data = [[self2.domainMin, 0.0], [self2.domainMax, 0.0]]
+            xys1d = other2.toLinearXYsClass()(data=data, axes=other2.axes)
+            if not isinstance(other2, Regions1d):
+                other2 = Regions1d(axes=other2.axes)
+            other2.append(xys1d)
 
         if isinstance(other2, XYs1dModule.XYs1d):
             temp = self.__class__()
@@ -524,6 +551,13 @@ class Regions1d( Regions ) :
 
         for region in copy : region *= factor
         return( copy )
+
+    def plot(self, **kwargs):
+        '''
+        Calls multiPlot with only *self* as a curve.
+        '''
+
+        self.multiPlot([self], **kwargs)
 
     def toPointwiseLinear( self, **kwargs ) :
         """

@@ -62,10 +62,30 @@ def baseAntiQualifierFromID( id, qualifierAllowed = False ) :
     return( base, anti, qualifier )
 
 def baseAntiFromID( id ) :
+    '''
+    This function returns the base and anti parts of a PoPs GNDS id for *pid*.
 
-    base, anti, qualifier = baseAntiQualifierFromID( id )
+    :param pid:     A PoPs GNDS id.
+
+    :return:        A python tuple of two str instances.
+    '''
+
+    base, anti, qualifier = baseAntiQualifierFromID(id, qualifierAllowed=True)
 
     return( base, anti )
+
+def idWithQualifierRemoved(pid):
+    '''
+    This function returns the PoPs GNDS id for *pid* with the qualifer part removed.
+
+    :param pid:     A PoPs GNDS id.
+
+    :return:        A python str instance.
+    '''
+
+    base, anti, qualifier = baseAntiQualifierFromID(pid, qualifierAllowed=True)
+
+    return base + anti
 
 def buildParticleFromRawData( cls, ID, mass = None, spin = None, parity = None, charge = None, halflife = None,
         nucleus = None, index = None, energy = None, generation = None, label = 'default' ) :

@@ -44,6 +44,15 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains all the ancestry classes. These classes allow a node in a hierarchy </span>
+<span class="sd">to reference any other node in the hierarchy provided that each node of the hierarchy inherits</span>
+<span class="sd">from one of the ancestry classes and the method :py:func:`Ancestry.setAncestor` is called to</span>
+<span class="sd">contect a child node to its parent node.</span>
+
+<span class="sd">This module was mainly written to support linking and xpath referencing in a GNDS hierarchy.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">abc</span>
@@ -71,11 +80,11 @@
 <span class="sd">        +---------------------------+-----------------------------------------------------------------------------------------------------------+</span>
 <span class="sd">        | moniker                   | The name associated with the class type.                                                                  |</span>
 <span class="sd">        +---------------------------+-----------------------------------------------------------------------------------------------------------+</span>
-<span class="sd">        | ancestor                  | Instance which self is a child of.                                                                        |</span>
+<span class="sd">        | ancestor                  | Instance which *self* is a child of.                                                                      |</span>
 <span class="sd">        +---------------------------+-----------------------------------------------------------------------------------------------------------+</span>
 <span class="sd">        | keyName                   | The name of the key. The key&#39;s value is used by a suite to indentify an element of a suite.               |</span>
 <span class="sd">        +---------------------------+-----------------------------------------------------------------------------------------------------------+</span>
-<span class="sd">        | ancestryMembers           | Tuple of names of  the members of *self* that inherit from **Ancestry**.                                  |</span>
+<span class="sd">        | ancestryMembers           | Tuple of names of the members of *self* that inherit from **Ancestry**.                                   |</span>
 <span class="sd">        +---------------------------+-----------------------------------------------------------------------------------------------------------+</span>
 <span class="sd">        | legacyMemberNameMapping   | A map whose keys are legacy member names and whose associated values are the current memeber names.       |</span>
 <span class="sd">        +---------------------------+-----------------------------------------------------------------------------------------------------------+</span>
@@ -83,13 +92,19 @@
 <span class="sd">        |                           | key it the format version and its associated value is the moniker used for that format version.           |</span>
 <span class="sd">        +---------------------------+-----------------------------------------------------------------------------------------------------------+</span>
 
+<span class="sd">    This class defines moniker to be abstract meaning that all classes that inherit from this class must define moniker.</span>
 <span class="sd">    The main reason for the **keyName** is that is it used by a **Suite** instance to reference (i.e., uniquely identify) its children.</span>
 
-<span class="sd">    For an instance, the xlink is &#39;/the/list/of/ancestors/of/self&#39; if attribute is None or</span>
-<span class="sd">    &#39;/the/list/of/ancestors/of/self[@attribute=&quot;value&quot;]&#39; if attribute is not None. For example,</span>
-<span class="sd">    for a hierarchy consisting of class A with moniker &#39;nameA&#39; and member mB of class B, class B </span>
-<span class="sd">    with moniker &#39;nameB&#39; and member mC of class C and class C with moniker &#39;nameC&#39;, then the xlink </span>
-<span class="sd">    for an instance of a C class in the hierarchy is &#39;/nameA/nameB/nameC&#39;. If the mC instance</span>
+<span class="sd">    An instance has the xlink &#39;/the/list/of/ancestors/andSelf&#39; if attribute is None or</span>
+<span class="sd">    &#39;/the/list/of/ancestors/andSelf[@attribute=&quot;value&quot;]&#39; if attribute is not None where each string</span>
+<span class="sd">    part of the xpath the value of the moniker for that node. For example,</span>
+<span class="sd">    for a hierarchy consisting of::</span>
+
+<span class="sd">        class A with moniker &#39;nameA&#39; and </span>
+<span class="sd">            member mB of class B, class B with moniker &#39;nameB&#39; and </span>
+<span class="sd">                member mC of class C and class C with moniker &#39;nameC&#39;,</span>
+
+<span class="sd">    then the xlink for an instance of a C class in the hierarchy is &#39;/nameA/nameB/nameC&#39;. If the mC instance</span>
 <span class="sd">    set attribute to be the member &#39;greeting&#39; that, for this example as value &#39;Hi&#39;, then the</span>
 <span class="sd">    xlink for the C class is &#39;/nameA/nameB/nameC[@greeting=&quot;Hi&quot;]&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -104,6 +119,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__ancestor</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the xpath of *self*.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXLink</span><span class="p">()</span>
 
@@ -128,15 +144,24 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rootAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Traverse up the ancestry tree to the root ancestor and return it. The root ancestor is the instance whose ancestor is None.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Traverse up the ancestry tree to the root ancestor and returns a reference to it. </span>
+<span class="sd">        The root ancestor is the instance whose ancestor is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestor</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">while</span><span class="p">(</span><span class="n">ancestor</span><span class="o">.</span><span class="n">__ancestor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span> <span class="n">ancestor</span> <span class="o">=</span> <span class="n">ancestor</span><span class="o">.</span><span class="n">__ancestor</span>
         <span class="k">return</span> <span class="n">ancestor</span>
 
 <div class="viewcode-block" id="Ancestry.checkAncestry"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.checkAncestry">[docs]</a>    <span class="k">def</span> <span class="nf">checkAncestry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method checks that all ancestryMembers are properly set up. This method checks *self* and all its child nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">child</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            For internal use only.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
 
             <span class="k">if</span> <span class="n">child</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isChild</span><span class="p">(</span><span class="n">child</span><span class="p">):</span>

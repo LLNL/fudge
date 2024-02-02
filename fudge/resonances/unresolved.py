@@ -70,13 +70,13 @@ class Unresolved(abstractClassesModule.Component):
         for L in self.evaluated.Ls:
             for J in L.Js:
                 if J.levelSpacing.data.domainMin > self.__domainMin or J.levelSpacing.data.domainMax < self.__domainMax:
-                    warnings.append(warning.URRdomainMismatch(L.L, J.J, J.levelSpacing))
+                    warnings.append(warning.URRdomainMismatch(L.L, J.J, 'level spacing', J.levelSpacing))
                 if J.levelSpacing.data.rangeMin <= 0 or J.levelSpacing.data.rangeMax > 5e+5:
                     warnings.append(warning.URRunphysicalLevelSpacing(L.L, J.J, J.levelSpacing))
 
                 for width in J.widths:
                     if width.data.domainMin > self.__domainMin or width.data.domainMax < self.__domainMax:
-                        warnings.append(warning.URRdomainMismatch(L.L, J.J, width))
+                        warnings.append(warning.URRdomainMismatch(L.L, J.J, f"{width.resonanceReaction} width", width))
                     if width.data.rangeMin <= 0:
                         if width.data.rangeMin == 0 and width.resonanceReaction == 'competitive':
                             continue  # competitive may include threshold reactions

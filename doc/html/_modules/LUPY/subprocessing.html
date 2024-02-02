@@ -44,6 +44,10 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains several functions that are useful for creating sub-processes using :py:class:`subprocess.Popen`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
@@ -51,8 +55,10 @@
 
 <span class="k">def</span> <span class="nf">_getSTDStreamOpen</span><span class="p">(</span><span class="n">stdStream</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    If stdStream is a string, open file of that name and return file handle.</span>
-<span class="sd">    Otherwise check that it&#39;s an allowed type (int, buffer or None) and return as-is.</span>
+<span class="sd">    If *stdStream* is a string, a file is create for writing with that path *stdStream* and its file handle</span>
+<span class="sd">    is returned.  Otherwise check that it&#39;s an allowed type (int, buffer or None) and return as-is. For internal use only.</span>
+
+<span class="sd">    :param stdStream:   Any file handle type supported by :py:class:`subprocess.Popen` or a Python str.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">stdStream</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -69,7 +75,13 @@
 
 <span class="k">def</span> <span class="nf">_getSTDStreamClose</span><span class="p">(</span><span class="n">stdStream</span><span class="p">,</span> <span class="n">stdStream2</span><span class="p">,</span> <span class="n">processStd</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Close stream. If output is a file, write results and close the file. If output is a pipe, get result and decode to list of strings.</span>
+<span class="sd">    If stream is a file, write results to the file and close the file. </span>
+<span class="sd">    If stream is a pipe, get result and decode them to a list of strings.</span>
+<span class="sd">    For internal use only.</span>
+
+<span class="sd">    :param stdStream:       Instance passed to :py:func:`_getSTDStreamOpen`.</span>
+<span class="sd">    :param stdStream2:      Instance returned by :py:func:`_getSTDStreamOpen` that is associated with *stdStream*.</span>
+<span class="sd">    :param processStd:      A stdout or stderr instance associated with a :py:class:`subprocess.Popen` instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">stdStream</span> <span class="o">==</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">:</span>
@@ -82,8 +94,9 @@
 
 <div class="viewcode-block" id="executeCommand"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.subprocessing.executeCommand">[docs]</a><span class="k">def</span> <span class="nf">executeCommand</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">raiseOnError</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">useExecutable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Executes a command using subprocess. Supports redirecting stdout / stderr to files (or to each other).</span>
-<span class="sd">    If stdout / stderr are strings, they will be treated as file names and output written to them.</span>
+<span class="sd">    This function executes a command using :py:class:`subprocess.Popen`. It supports redirecting stdout / stderr </span>
+<span class="sd">    to files (or to each other).  If stdout / stderr are strings, they will be treated as file paths. These</span>
+<span class="sd">    paths are opened and output written to them.</span>
 <span class="sd">    If they are pipes (default option), they will be returned as lists of strings along with the exit code.</span>
 
 <span class="sd">    @param args: list of arguments to be executed, e.g. [&#39;echo&#39;, &#39;Hello World!&#39;]</span>
@@ -91,6 +104,7 @@
 <span class="sd">    @param useExecutable: if True, replace the executable with absolute path before running.</span>
 <span class="sd">    @param stdout: where to send standard out. Options include file name, PIPE, or None (like sending to /dev/null).</span>
 <span class="sd">    @param stderr: where to send standard error. Same options as stdout.</span>
+
 <span class="sd">    @return: (return code, stdout, stderr)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -124,7 +138,10 @@
 
 <div class="viewcode-block" id="spawn"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.subprocessing.spawn">[docs]</a><span class="k">def</span> <span class="nf">spawn</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Shortcut for launching a process with PYTHONPATH set. Returns process id.</span>
+<span class="sd">    Shortcut for launching a process with PYTHONPATH set from the current sys.path. Calls :py:class:`subprocess.Popen` and </span>
+<span class="sd">    returns the id of the created process.</span>
+
+<span class="sd">    :param args:        Argument passed to :py:class:`subprocess.Popen`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;PYTHONPATH&#39;</span><span class="p">:</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">)})</span>
@@ -134,6 +151,9 @@
 <div class="viewcode-block" id="deleteFilesUsingGlob"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.subprocessing.deleteFilesUsingGlob">[docs]</a><span class="k">def</span> <span class="nf">deleteFilesUsingGlob</span><span class="p">(</span><span class="n">patterns</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Deletes file(s) matching patterns. Skips deleting directories.</span>
+<span class="sd">    The function is currently not used anywhere in FUDGE so probably should be deleted.</span>
+
+<span class="sd">    :param patterns:        Any objected that can be passed to :py:func:`glob.glob`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">patterns</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>

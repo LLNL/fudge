@@ -476,7 +476,8 @@ added to an suite instance. The <strong>allowedClasses</strong> is a required ar
 <dl class="py method">
 <dt class="sig sig-object py" id="xData.suite.Suite.checkAncestry">
 <span class="sig-name descname"><span class="pre">checkAncestry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/suite.html#Suite.checkAncestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.suite.Suite.checkAncestry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This method checks that all ancestryMembers are properly set up. This method checks <em>self</em> and all its child nodes.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="xData.suite.Suite.clear">
@@ -3509,6 +3510,12 @@ needed so that each has the same number of regions and the region boundaries ali
 <dt class="sig sig-object py" id="xData.regions.Regions1d.normalize">
 <span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">insitu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/regions.html#Regions1d.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.regions.Regions1d.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>The dimension argument is currently ignored, but kept to be compatible with calling from XYsnd.normalize.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xData.regions.Regions1d.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/regions.html#Regions1d.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.regions.Regions1d.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls multiPlot with only <em>self</em> as a curve.</p>
 </dd></dl>
 
 <dl class="py method">

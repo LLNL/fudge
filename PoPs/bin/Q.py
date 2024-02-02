@@ -68,7 +68,7 @@ if __name__ == '__main__':
         Z = Zi - Zo
         A = Ai - Ao
         if Z > 0:
-            outgoingParticles.append(chemicalElementsMiscModule.idFromZAndA(Z, A))
+            outgoingParticles.append(chemicalElementsMiscModule.idFromZAndA(Z, A, False))
 
     if not outgoingParticles:
         comment = '# mass energy for particle(s) %s.' % ' + '.join(ingoingParticles)

@@ -68,7 +68,7 @@
 <span class="sd">In the example above, &#39;Al26_m1&#39; and &#39;Na24_m1&#39; are aliases pointing to excited nuclides.</span>
 
 <span class="sd">&gt;&gt;&gt; type( pops[&#39;Na24_m1&#39;] )</span>
-<span class="sd">&lt;class &#39;PoPs.families.nuclide.alias&#39;&gt;</span>
+<span class="sd">&lt;class &#39;PoPs.alias.MetaStable&#39;&gt;</span>
 
 <span class="sd">Each alias has a &#39;pid&#39; field with the id of the actual particle it points to:</span>
 
@@ -177,25 +177,23 @@
         <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;{&#39;</span> <span class="ow">in</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span> <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s1">&#39;{&#39;</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getitem</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getitem</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">level</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;key must be a str&#39;</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aliases</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="n">alias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aliases</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getitem</span><span class="p">(</span> <span class="n">alias</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">level</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span>
-            <span class="k">if</span><span class="p">(</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
-            <span class="k">return</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
-        <span class="k">for</span> <span class="n">suite</span> <span class="ow">in</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gaugeBosons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__leptons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__baryons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__chemicalElements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unorthodoxes</span> <span class="p">]</span> <span class="p">:</span>
-            <span class="k">try</span> <span class="p">:</span>
-                <span class="k">return</span><span class="p">(</span> <span class="n">suite</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
-            <span class="k">except</span> <span class="ne">KeyError</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;key must be a str&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aliases</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aliases</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">suite</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__gaugeBosons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__leptons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__baryons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__chemicalElements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unorthodoxes</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">suite</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">except</span> <span class="p">:</span>
+            <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span>
         <span class="n">parentDB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parentDatabase</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">parentDB</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">parentDB</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;id = &quot;</span><span class="si">%s</span><span class="s1">&quot; not found&#39;</span> <span class="o">%</span> <span class="n">key</span> <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;id = &quot;</span><span class="si">%s</span><span class="s1">&quot; not found&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -462,14 +460,17 @@
 
         <span class="k">return</span> <span class="n">mass</span></div>
 
-<div class="viewcode-block" id="Database.final"><a class="viewcode-back" href="../../PoPs/database.html#PoPs.database.Database.final">[docs]</a>    <span class="k">def</span> <span class="nf">final</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Database.final"><a class="viewcode-back" href="../../PoPs/database.html#PoPs.database.Database.final">[docs]</a>    <span class="k">def</span> <span class="nf">final</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">returnAtMetaStableAlias</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the particle matching id. If id is an alias, will follow the alias pid until a non-alias particle is found and that particle is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">particle</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
-        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">Alias</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">particle</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">particle</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)</span></div>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">aliasModule</span><span class="o">.</span><span class="n">BaseAlias</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">aliasModule</span><span class="o">.</span><span class="n">MetaStable</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">returnAtMetaStableAlias</span><span class="p">:</span>
+                <span class="n">particle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">returnAtMetaStableAlias</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">particle</span></div>
 
     <span class="k">def</span> <span class="nf">hasAlias</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span> <span class="p">)</span> <span class="p">:</span>
 

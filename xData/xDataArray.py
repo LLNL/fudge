@@ -119,7 +119,7 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
         """
 
         if self.dimension == 2:
-            assert secondIndex is not None and isinstance(secondIndex, numpy.int), 'The method constructVector requires the first argument to be an integer.'
+            assert secondIndex is not None and isinstance(secondIndex, int), 'The method constructVector requires the first argument to be an integer.'
 
             if self.shape[1] <= secondIndex:
                 return vectorModule.Vector()
@@ -144,7 +144,7 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
         if self.dimension != 3:
             raise TypeError(f'The method constructMatrix is only defined for 3D arrays')
 
-        assert thirdIndex is not None and isinstance(thirdIndex, numpy.int), 'The method constructMatrix requires the first argument to be an integer.'
+        assert thirdIndex is not None and isinstance(thirdIndex, int), 'The method constructMatrix requires the first argument to be an integer.'
         if self.shape[2] <= thirdIndex:
             return matrixModule.Matrix()
 

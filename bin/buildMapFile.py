@@ -204,6 +204,10 @@ for file in args.files :
         if args.verbose > 2: print('    WARNING: Invalid file "%s".' % file)
         continue
     if( name == reactionSuiteModule.ReactionSuite.moniker ) :
+        if data['interaction'] is None:
+            if data['projectile'] == PoPsIDsModule.photon:
+                raise Exception('File %s does not have interaction attribute.' % file)
+            data['interaction'] = enumsModule.Interaction.nuclear
         pass
     elif( name == mapModule.Map.moniker ) :
         pass

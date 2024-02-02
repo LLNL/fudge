@@ -71,7 +71,7 @@ contains a particle with id ‘Al27’,</p>
 For example, the id for the electron is normally “e-”, but could also be aliased to ‘e’ or ‘electron’.
 In the example above, ‘Al26_m1’ and ‘Na24_m1’ are aliases pointing to excited nuclides.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span> <span class="n">pops</span><span class="p">[</span><span class="s1">&#39;Na24_m1&#39;</span><span class="p">]</span> <span class="p">)</span>
-<span class="go">&lt;class &#39;PoPs.families.nuclide.alias&#39;&gt;</span>
+<span class="go">&lt;class &#39;PoPs.alias.MetaStable&#39;&gt;</span>
 </pre></div>
 </div>
 <p>Each alias has a ‘pid’ field with the id of the actual particle it points to:</p>
@@ -197,7 +197,7 @@ specifies a nuclear level, the level information is ignored.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.database.Database.final">
-<span class="sig-name descname"><span class="pre">final</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.final"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.final" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">final</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returnAtMetaStableAlias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/database.html#Database.final"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.database.Database.final" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the particle matching id. If id is an alias, will follow the alias pid until a non-alias particle is found and that particle is returned.</p>
 </dd></dl>
 

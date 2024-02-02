@@ -100,11 +100,31 @@
 
     <span class="k">return</span><span class="p">(</span> <span class="n">base</span><span class="p">,</span> <span class="n">anti</span><span class="p">,</span> <span class="n">qualifier</span> <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">baseAntiFromID</span><span class="p">(</span> <span class="nb">id</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="baseAntiFromID"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.misc.baseAntiFromID">[docs]</a><span class="k">def</span> <span class="nf">baseAntiFromID</span><span class="p">(</span> <span class="nb">id</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function returns the base and anti parts of a PoPs GNDS id for *pid*.</span>
 
-    <span class="n">base</span><span class="p">,</span> <span class="n">anti</span><span class="p">,</span> <span class="n">qualifier</span> <span class="o">=</span> <span class="n">baseAntiQualifierFromID</span><span class="p">(</span> <span class="nb">id</span> <span class="p">)</span>
+<span class="sd">    :param pid:     A PoPs GNDS id.</span>
 
-    <span class="k">return</span><span class="p">(</span> <span class="n">base</span><span class="p">,</span> <span class="n">anti</span> <span class="p">)</span>
+<span class="sd">    :return:        A python tuple of two str instances.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">base</span><span class="p">,</span> <span class="n">anti</span><span class="p">,</span> <span class="n">qualifier</span> <span class="o">=</span> <span class="n">baseAntiQualifierFromID</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">qualifierAllowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">base</span><span class="p">,</span> <span class="n">anti</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="idWithQualifierRemoved"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.misc.idWithQualifierRemoved">[docs]</a><span class="k">def</span> <span class="nf">idWithQualifierRemoved</span><span class="p">(</span><span class="n">pid</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function returns the PoPs GNDS id for *pid* with the qualifer part removed.</span>
+
+<span class="sd">    :param pid:     A PoPs GNDS id.</span>
+
+<span class="sd">    :return:        A python str instance.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">base</span><span class="p">,</span> <span class="n">anti</span><span class="p">,</span> <span class="n">qualifier</span> <span class="o">=</span> <span class="n">baseAntiQualifierFromID</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">qualifierAllowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">base</span> <span class="o">+</span> <span class="n">anti</span></div>
 
 <span class="k">def</span> <span class="nf">buildParticleFromRawData</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">mass</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">spin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">parity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">charge</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">halflife</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">nucleus</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">generation</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span> <span class="p">)</span> <span class="p">:</span>

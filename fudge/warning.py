@@ -499,13 +499,14 @@ class RRmultipleRegions(Warning):
 
 class URRdomainMismatch(Warning):
 
-    def __init__(self, Lval, Jval, obj=None):
+    def __init__(self, Lval, Jval, name, obj=None):
         Warning.__init__(self, Level.Fatal, obj)
         self.Lval = Lval
         self.Jval = Jval
+        self.name = name
 
     def __str__(self):
-        return "Unresolved L=%i / J=%.1f widths don't span URR energy limits" % (self.Lval, self.Jval)
+        return "Unresolved L=%i / J=%.1f %s doesn't span URR energy limits" % (self.Lval, self.Jval, self.name)
 
     def __eq__(self, other):
         return self.Lval == other.Lval and self.Jval == other.Jval

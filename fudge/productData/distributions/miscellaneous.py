@@ -5,6 +5,33 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module contains various functions that do common calculations.
+
+This module contains the following functions:
+        
+    +-------------------------------------------------------+-----------------------------------------------------------------------+
+    | Function                                              | Description                                                           | 
+    +=======================================================+=======================================================================+
+    | energyAngularSpectrumFromCOMSpectrumToLabAtEnergy     | This function converts a center-of-mass (COM) P(E') and P(E',mu) into |
+    |                                                       | a lab frame.                                                          |
+    +-------------------------------------------------------+-----------------------------------------------------------------------+
+    | calculateDepositionEnergyFromEpP                      |                                                                       |
+    +-------------------------------------------------------+-----------------------------------------------------------------------+
+    | calculateDepositionEnergyFromAngular_angularEnergy    |                                                                       |
+    +-------------------------------------------------------+-----------------------------------------------------------------------+
+    | GaussQuadrature2                                      |                                                                       |
+    +-------------------------------------------------------+-----------------------------------------------------------------------+
+    | GnG_adaptiveQuadrature                                |                                                                       |
+    +-------------------------------------------------------+-----------------------------------------------------------------------+
+    | domainLimits                                          |                                                                       |
+    +-------------------------------------------------------+-----------------------------------------------------------------------+
+    | integratePhi                                          |                                                                       |
+    +-------------------------------------------------------+-----------------------------------------------------------------------+
+    | muPhiEvaluate                                         |                                                                       |
+    +-------------------------------------------------------+-----------------------------------------------------------------------+
+"""
+
 import sys
 import math
 
@@ -15,7 +42,6 @@ from PoPs.chemicalElements import misc as chemicalElementMiscPoPsModule
 
 from fudge.productData import averageProductEnergy as averageProductEnergyModule
 
-
 def energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energySpectrumAtEnergyCOM, energyAngualarAtEnergyCOM, angularIsNormalized = True ) :
     """
     This function converts a center-of-mass (COM) P(E') and P(E',mu) into a lab frame. 
@@ -25,7 +51,7 @@ def energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energySpe
     :param energyAngualarAtEnergyCOM:       P(E',mu) or P(mu|E') in the center-of-mass frame.
     :param angularIsNormalized:             If True, energyAngualarAtEnergyCOM is P(E',mu) otherwise it is P(mu|E').
 
-    :return:                                An XYs2d representing P(E,mu) in the lab frame.
+    :return:                                An XYs2d instance representing P(E',mu) in the lab frame.
     """
 
     from . import energyAngular as energyAngularModule
@@ -33,6 +59,16 @@ def energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energySpe
     domainMin, domainMax = energySpectrumAtEnergyCOM.domainMin, energySpectrumAtEnergyCOM.domainMax
 
     def probabilityLab( energyPrimeLab, muLab, energyPrimeCOM, muCOM ) :
+        """
+        Calculates the probability in the lab frame for the specified inputs. For internal use only.
+
+        :param energyPrimeLab:  The energy of the product in the lab frame.
+        :param muLab:           The mu of the product in the lab frame.
+        :energyPrimeCOM:        The energy of the product in the center-of-mass frame.
+        :param muCOM:           The mu of the product in the center-of-mass frame.
+
+        :return:                The list [muLab, P(muLab)].
+        """
 
         if( energyPrimeCOM == 0.0 ) : energyPrimeCOM = domainMin + 1e-6 * ( domainMax - domainMin )
         PAtEnergyPrime = 1.0
@@ -130,7 +166,12 @@ def energyAngularSpectrumFromCOMSpectrumToLabAtEnergy( self, energyIn, energySpe
     return( spectrum )
 
 def calculateDepositionEnergyFromEpP( E, EpP ) :
-    "EpP is a list of [ E', P(E') ]"
+    """
+`    Calculates the average product energy given P(E') in the lab frame.
+
+    :param E:       Energy of the projectile.
+    :param EpP:     List of [ E', P(E') ]
+    """
 
     axes = axesModule.Axes(2)
     axes[0] = axesModule.Axis( 'a', 0, EpP.axes[0].unit )
@@ -139,6 +180,18 @@ def calculateDepositionEnergyFromEpP( E, EpP ) :
     return EpP.integrateTwoFunctions(Ep)
 
 def calculateDepositionEnergyFromAngular_angularEnergy( label, angular, energy, multiplicity, doingGammaMomentum = False, accuracy = 1e-6 ) :
+    """
+    This function calculates the average product energy (or average phton as product momentum if *doingGammaMomentum*
+    is True) for angular distribution P(mu|E) and energy distribution P(E'|E,mu) in the lab frame. The distribution
+    P(muy,E'|E) is the product P(mu|E) * P(E'|E,mu).
+
+    :param label:               The label for the returned average product energy (momentum) form.
+    :param angular:             The angular distribution P(mu|E).
+    :param energy:              The energy distribution P(E'|E,mu).
+    :param multiplicity:        The multiplicity of the product as a function of projectile energy.
+    :param doingGammaMomentum:  If True, the product is a photon and its average momentum is to be calculated.
+    :param accuracy:            The accuracy of the returned average energy (momentum) as a function of projectile energy.
+    """
 
     energyUnit = energy.axes[0].unit
     energyPrimeUnit = energy.axes[2].unit
@@ -177,6 +230,14 @@ def calculateDepositionEnergyFromAngular_angularEnergy( label, angular, energy, 
     return( averageProductEnergyModule.XYs1d( data = depEnergy, axes = axes, label = label ) )
 
 def GaussQuadrature2( function, parameters, a, b ) :
+    """
+    Returns the integral of *function* from *a* to *b*.
+
+    :param function:    The function to integrate.
+    :param parameters:  Paramters to pass to *function*.
+    :param a:           Lower limit of the integral.
+    :param b:           Upper limit of the integral.
+    """
 
     if( a == b ) : return( 0. )
     xp, m, width = 0.57735026918962576451, 0.5 * ( a + b ), b - a                 # sqrt( 1. / 3. ), mid-point, width
@@ -184,6 +245,17 @@ def GaussQuadrature2( function, parameters, a, b ) :
     return( 0.5 * width * ( function( x1, parameters ) + function( x2, parameters ) ) )
 
 def GnG_adaptiveQuadrature( function, a, b, parameters, quadrature, tolerance, maxEvaluations = 1000 ) :
+    """
+    This function uses adaptive quadrature to integrate *function* form *a* to *b*.
+
+    :param function:            The function to integrate.
+    :param a:                   The lower limit of the intrgral.
+    :param b:                   The upper limit of the intrgral.
+    :param parameters:          Parameters to pass to *function*.
+    :param quadrature:          The integration quadrature to use.
+    :param tolerance:           The requested accuracy of the integral.
+    :param maxEvaluations:      The maximum number of evaluations to perform.
+    """
 
     class QuadratureInfo :
 
@@ -238,13 +310,17 @@ def GnG_adaptiveQuadrature( function, a, b, parameters, quadrature, tolerance, m
 
 def domainLimits( domain, domainMin, domainMax ) :
     """
-    Provides the domain minimum and maximum given a domain.
+    Returns the domain minimum and maximum given a domain.
     This is used to determine the limits of integration or, if the returned maximum is None, then the returned
     minimum is the point to evaluate a function at.
     Domain can be None, a number (int or float) or a list (or tuple) of length 1 or 2. All values of the 
     list must be a number.  If domain is None, domainMin and domainMax are returned. 
     If domain is a number or a list of length 1, the number and None are returned.
     Otherwise, domain is a list of length 2 with the first being the domain minimum and maximum.
+
+    :param domain:      User specified domain limits.
+    :param domainMin:   Minimum domain limit.
+    :param domainMax:   Maximum domain limit.
     """
 
     if( domain is None ) : return( domainMin, domainMax )
@@ -255,6 +331,12 @@ def domainLimits( domain, domainMin, domainMax ) :
     return( domain[0], domain[1] )
 
 def integratePhi( phiDomain ) :
+    """
+    Returns the integral of phi over the domain specified by *phiDomain*. The funtion :py:func:`domainLimits` is used to
+    determine the phi domain from *phiDomain*. The full phi varies from 0 to 2 pi.
+
+    :param phiDomain:   The phi domain.
+    """
 
     twoPi = 2.0 * math.pi
     phiMin, phiMax = domainLimits( phiDomain, 0.0, twoPi )
@@ -262,6 +344,12 @@ def integratePhi( phiDomain ) :
     return( ( phiMax - phiMin ) / twoPi )
 
 def muPhiEvaluate( muOut = None, phiOut = None ) :
+    """
+    Returns the integral over mu and phi over the limits specified by *muOut* and *phiOut*.
+
+    :param muOut:   The mu domain.
+    :param phiOut:  The phi domain.
+    """
 
     muOutFactor = 1.0
     if( muOut is not None ) : muOutFactor = 0.5

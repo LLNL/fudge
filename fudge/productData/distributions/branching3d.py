@@ -7,6 +7,17 @@
 
 """This module contains the 'branching3d' form for distribution."""
 
+"""
+This module contains class and functions needed for storing and processing a GNDS *branching3d* distribution. It
+contains the following classes:
+
+    +---------------+-----------------------------------------------------------------------+
+    | Class         | Description                                                           |
+    +===============+=======================================================================+
+    | Form          | Class representing GNDS unspecified distribution.                     |
+    +---------------+-----------------------------------------------------------------------+
+"""
+
 from PoPs import IDs as IDsPoPsModule
 
 from xData import enums as xDataEnumsModule
@@ -15,6 +26,12 @@ from fudge.processing import group as groupModule
 from . import base as baseModule
 
 class Form( baseModule.Form ) :
+    """
+    Class representing a GNDS unspecified distribution form.
+
+    :param label:                   The label for this form.
+    :param productFrame:            The frame the product data are specified in.
+    """
 
     moniker = 'branching3d'
     subformAttributes = [ ]
@@ -24,11 +41,23 @@ class Form( baseModule.Form ) :
         baseModule.Form.__init__( self, label, productFrame, [] )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         pass
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+        """         
+        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+        Average means over all outgoing angle and energy.
+        
+        :param style:   The style instance which the calculated data will belong to.
+        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.
+        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+        """
 
         energyUnit = kwargs['incidentEnergyUnit']
         momentumUnit = kwargs['momentumUnit']
@@ -51,10 +80,28 @@ class Form( baseModule.Form ) :
         return 0
 
     def processMC_cdf( self, style, tempInfo, indent ) :
+        """
+        This methods returns does nothing and returns None.
+    
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+    
+        :return:                None
+        """     
 
         return( None )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
+        """
+        Returns a multi-group representation of *self*.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                A multi-group representation of *self*.
+        """
 
         from .. import multiplicity as multiplicityModule
         from fudge.processing.deterministic import transferMatrices as transferMatricesModule
@@ -112,6 +159,14 @@ class Form( baseModule.Form ) :
         return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of self.
+    
+        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -125,6 +180,17 @@ class Form( baseModule.Form ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into :py:class:`Form` instance.
+
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
 

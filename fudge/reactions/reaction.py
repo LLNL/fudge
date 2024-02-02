@@ -10,7 +10,6 @@ This module contains the reaction class.
 """
 
 from xData import enums as xDataEnumsModule
-from xData import matrix as matrixModule
 
 from PoPs import IDs as popsIDsModule
 from PoPs import database as PoPsDatabaseModule
@@ -61,19 +60,6 @@ class Reaction(baseModule.Base_reaction2):
         return( ( selfParent.projectile == otherParent.projectile ) and ( selfParent.target == otherParent.target ) 
             and ( self.outputChannel == other.outputChannel ) )
     
-    def __cmp__( self, other ) :
-        """Test if self is <, == or > other."""
-
-        if( not baseModule.isGNDSReaction( other ) ) : raise fudgeExceptions.FUDGE_Exception( "Other not an reaction object." )
-        selfParent, otherParent = self.getReactionSuite( ), other.getReactionSuite( )
-        if( selfParent.projectile < otherParent.projectile ) : return( -1 )
-        if( selfParent.projectile > otherParent.projectile ) : return(  1 )
-        if( selfParent.target < otherParent.target ) : return( -1 )
-        if( selfParent.target > otherParent.target ) : return(  1 )
-        if( self.outputChannel < other.outputChannel ) : return( -1 )
-        if( self.outputChannel > other.outputChannel ) : return(  1 )
-        return( 0 )
-
     def getThreshold(self, unit):
 
         Q = self.getQ(unit = unit, final = False)
@@ -171,71 +157,3 @@ class Reaction(baseModule.Base_reaction2):
         for doubleDifferentialCrossSection in self.doubleDifferentialCrossSection :
             if( isinstance( doubleDifferentialCrossSection, thermalNeutronScatteringLawBaseModule.Form ) ) :
                 doubleDifferentialCrossSection.temperatures( temperatures )
-
-    def multiGroupQ(self, multiGroupSettings, temperatureInfo, includeFinalProducts):
-        """
-        Returns the multi-group, total Q for the requested label. This is a cross section weighted Q summed over all reactions.
-
-        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
-        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param includeFinalProducts: Boolean value indicating whether to include the contriibution from the final fission product data.
-        """
-        
-        return self.outputChannel.multiGroupQ(multiGroupSettings, temperatureInfo, includeFinalProducts)
-
-    def multiGroupAvailableEnergy(self, multiGroupSettings, temperatureInfo):
-        """
-        Returns the multi-group, total available energy for the requested label. This is a cross section weighted available energy.
-
-        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
-        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        """
-
-        return  multiGroupSettings.formAsVector(self.availableEnergy, temperatureInfo)
-
-    def multiGroupAvailableMomentum(self, multiGroupSettings, temperatureInfo):
-        """
-        Returns the multi-group, total available momentum for the requested label. This is a cross section weighted available momentum.
-
-        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
-        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        """
-
-        return  multiGroupSettings.formAsVector(self.availableMomentum, temperatureInfo)
-
-    def multiGroupGain(self, multiGroupSettings, temperatureInfo, productID, projectileID):
-        """
-        Returns multi-group, gain for the requested particle and label.
-
-        This is a cross section weighted gain summed over all reactions. If productID and projectileID are the same, then the multi-group 
-        cross section is subtracted for the returned value to indicate that the projectileID as been absorted.
-
-        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
-        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param producID: The particle PoPs' id for the whose gain is to be calculated.
-        :param projectileID: The particle PoPs' id for the projectile.
-        """
-        
-        particleGain = self.multiGroupMultiplicity(multiGroupSettings, temperatureInfo, productID)
-        if productID == projectileID:
-            particleGain -= self.multiGroupCrossSection(multiGroupSettings, temperatureInfo)
-
-        return particleGain
-
-    def multiGroupFissionMatrix(self, multiGroupSettings, temperatureInfo, particles, legendreOrder):
-        """
-        Returns the multi-group, fission neutron transfer matrix for the requested label for the requested Legendre order.
-
-        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
-        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles:  The list of particles to be transported.
-        :param legendreOrder: Requested Legendre order.
-        """
-
-        if self.isFission():
-            fissionMatrix = self.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, popsIDsModule.neutron, legendreOrder)
-    
-        else:
-            fissionMatrix = matrixModule.Matrix()
-
-        return fissionMatrix

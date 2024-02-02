@@ -15,47 +15,10 @@ from ..fissionFragmentData import fissionFragmentData as fissionFragmentDataModu
 from . import particle as particleModule
 from . import nucleus as nucleusModule
 
-class Alias( particleModule.Alias ) :
-
-    moniker = 'nuclideAlias'
-
-    @property
-    def chemicalElement( self ) :
-
-        return( self.__particle.chemicalElement )
-
-    @property
-    def Z( self ) :
-
-        return( self.__particle.Z )
-
-    @property
-    def A( self ) :
-
-        return( self.__particle.A )
-
-    @property
-    def index( self ) :
-
-        return( self.__particle.index )
-
-    @property
-    def energy( self ) :
-
-        return( self.__particle.energy )
-
-    def intid(self, intidDB={}):
-        '''
-        Converts the particle id into a unique integer dubbed an INTeger ID (INTID).
-        '''
-
-        return self.__particle.intid()
-
 class Particle( particleModule.Particle ) :
 
     moniker = 'nuclide'
     familyOrder = 4
-    alias = Alias
 
     def __init__( self, id ) :
 

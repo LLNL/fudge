@@ -172,7 +172,12 @@ def reactionPeek(self, prefix, index, indent, reactionIndex):
             crossSectionStr = ': %s' % crossSectionSum.label
         except:
             pass
-    print('%s%-32s (%4d): domainMin = %s, domainMax = %s %s%s' % (indent, prefix % str(self), index, self.domainMin, self.domainMax, self.domainUnit, crossSectionStr))
+    try:
+        QStr = 'Q_threshold = %11s' % self.outputChannel.Q[0].evaluate(self.domainMin)
+    except:
+        QStr = '"Q_threshold issue, please report to FUDGE developers"'
+    print('%s%-36s (%4d): %s domainMin = %11s domainMax = %10s %s%s' %
+            (indent, prefix % str(self), index, QStr, self.domainMin, self.domainMax, self.domainUnit, crossSectionStr))
     productPath = [str(index)]
     if not args.doNotShowProducts:
         self.outputChannel.__peek(indent + indentIncrement, [str(reactionIndex)])

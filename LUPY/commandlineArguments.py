@@ -4,6 +4,12 @@
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
+
+"""
+This module contains a function for getting the list of arguments from a :py:class:`argparse.ArgumentParser` instance
+and two functions for reading and writing data to the computerCodes member of a :py:class:`documentationModule.Documentation` instance.
+"""
+
 import argparse
 import os
 import socket
@@ -19,17 +25,17 @@ from xData.Documentation import computerCode as computerCodeModule
 from xData.Documentation import dates as datesModule
 
 def getArgparseArguments(parser, args, excludeArguments=[]):
-    '''
-    Return command line arguments of an **argparse.ArgumentParser** as a list of positional arguments and a list of optional
-    arguments, excluding any arguments listed in *excludeArguments*.
+    """
+    This function returns command line arguments of an :py:class:`argparse.ArgumentParser` instance as a list of 
+    positional arguments and a list of optional arguments, excluding any arguments listed in *excludeArguments*.
 
-    :param parser:              An instance of the argparse.ArgumentsParser class.
-    :param args:                Populated namespace returned by the argparse.ArgumentParser.parse_args() method.
+    :param parser:              A :py:class:`argparse.ArgumentsParser` instance.
+    :param args:                Populated namespace returned by the :py:func:`argparse.ArgumentParser.parse_args` method.
         :type args:             argparse.Namespace
-    :param excludeArguments:    List of command line arguments to ignore.
+    :param excludeArguments:    List of names (i.e., arguments) in namespace *args* to ignore.
 
     :return:                    The tuple (positionalArguments, optionalArguments).
-    '''
+    """
 
     if not isinstance(parser, argparse.ArgumentParser):
         raise RuntimeError(f'First argument expected to be of type {argparse.ArgumentParser}')
@@ -86,16 +92,16 @@ def getArgparseArguments(parser, args, excludeArguments=[]):
     return positionalArguments, optionalArguments
 
 def commandLineArgumentsToDocumentation(codeName, commandLineArguments, documentation, date=None):
-    '''
-    Write a list of command line arguments and a note to a documentation instance's computerCodes.
+    """
+    This function writes a list of command line arguments and a note to the computerCodes member 
+    of a :py:class:`documentationModule.Documentation` instance.
 
     :param codeName:            String representing the computer code's name.
     :param currentArguments:    List of command line arguments.
-    :param documentation:       Documentation instance whose child nodes are populated.
-        :type documentation:    xData.Documentation.documentation.Documentation
-    :param date:                Date code was run.
-        :type date:             xData.date.Date, optional
-    '''
+    :param documentation:       :py:class:`xData.Documentation.documentation.Documentation` instance whose child nodes are populated.
+    :param date:                Date code was run which is added to the dates member of *documentation*.
+        :type date:             :py:class:`xData.date.Date`, optional
+    """
 
     if not isinstance(commandLineArguments, (tuple, list)):
         raise TypeError('First argument expected to be a list of command line arguments.')
@@ -121,14 +127,16 @@ def commandLineArgumentsToDocumentation(codeName, commandLineArguments, document
     documentation.computerCodes.add(computerCode)
 
 def commandLineArgumentsFromDocumentation(codeName, documentation):
-    '''
-    Read command line arguments for computer code named *codeName* from documentation instance.
+    """
+    This function reads command line arguments for computer code named *codeName* from a :py:class:`documentationModule.Documentation` instance.
 
-    :param codeName:            String representing the computer code's name. Must also match the label of a **ComputerCode** instance in documentation.computerCodes.
-    :param documentation:       An xData Documentation instance.
+    :param codeName:            String representing the computer code's name. Must also match the label of a **ComputerCode** 
+                                instance in documentation.computerCodes.
+    :param documentation:       A :py:class:`documentationModule.Documentation` instance.
 
-    :return:                    The execution arguments for the code as a string. None is returned if *codeName* is not in documentation.computerCodes.
-    '''
+    :return:                    The execution arguments for the code as a string. None is returned if *codeName* is not 
+                                in documentation.computerCodes.
+    """
 
     try:
         computerCode = documentation.computerCodes[codeName]

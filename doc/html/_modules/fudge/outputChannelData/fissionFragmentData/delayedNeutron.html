@@ -130,10 +130,16 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__product</span><span class="o">.</span><span class="n">fixDomains</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DelayedNeutron.listOfProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for all reactions of *self*.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DelayedNeutron.listOfProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">finalOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__product</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">()</span></div>
+<span class="sd">        :param includeQualifier:    If `True`, particle qualifiers are include in ids, otherwise, they are stripped from ids.</span>
+
+<span class="sd">        :return:                    A python set instance.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__product</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">(</span><span class="n">finalOnly</span><span class="o">=</span><span class="n">finalOnly</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="n">includeQualifier</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.processMC_cdf"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -184,30 +190,30 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">multiGroupAverageMomentum</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DelayedNeutron.multiGroupProductMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">):</span>
+<div class="viewcode-block" id="DelayedNeutron.multiGroupProductMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
 <span class="sd">        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</span>
-<span class="sd">        :param particles: The list of particles to be transported.</span>
+<span class="sd">        :param particleIDs: The list of particles to be transported.</span>
 <span class="sd">        :param productID: Particle id for the requested product.</span>
 <span class="sd">        :param legendreOrder: Requested Legendre order.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">multiGroupProductMatrix</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">multiGroupProductMatrix</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DelayedNeutron.multiGroupProductArray"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductArray">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
+<div class="viewcode-block" id="DelayedNeutron.multiGroupProductArray"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductArray">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the full multi-group, total product array for the requested label for the requested product id.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
 <span class="sd">        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</span>
-<span class="sd">        :param particles: The list of particles to be transported.</span>
+<span class="sd">        :param particleIDs: The list of particles to be transported.</span>
 <span class="sd">        :param productID: Particle id for the requested product.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">multiGroupProductArray</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">multiGroupProductArray</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayedNeutron.removeStyles"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.removeStyles">[docs]</a>    <span class="k">def</span> <span class="nf">removeStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleLabels</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -274,11 +280,19 @@
 
         <span class="k">for</span> <span class="n">delayedNeutron1</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">delayedNeutron1</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="DelayedNeutrons.listOfProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutrons.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for all reactions of *self*.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DelayedNeutrons.listOfProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutrons.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">finalOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.</span>
+
+<span class="sd">        :param finalOnly:           If `True`, only final product ids are returned, otherwise, all are returned..</span>
+<span class="sd">        :param includeQualifier:    If `True`, particle qualifiers are include in ids, otherwise, they are stripped from ids.</span>
+
+<span class="sd">        :return:                    A python set instance.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">products</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">delayedNeutron1</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">products</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">delayedNeutron1</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">delayedNeutron1</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">products</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">delayedNeutron1</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">(</span><span class="n">finalOnly</span><span class="o">=</span><span class="n">finalOnly</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="n">includeQualifier</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">products</span></div>
 

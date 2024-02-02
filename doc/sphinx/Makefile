@@ -13,7 +13,6 @@ SHELL = /bin/bash
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-# SPHINXBUILD   = /System/Volumes/Data/Users/bretbeck/Library/Python/3.9/bin/sphinx-build
 PAPER         =
 BUILDDIR      = _build
 

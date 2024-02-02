@@ -143,8 +143,17 @@ class BreitWigner(ancestryModule.AncestryIO):
     class Approximation(enumsModule.Enum):
         """Defines the allowed approximations for a BreitWigner instance."""
 
-        singleLevel = enumsModule.auto()
-        multiLevel = enumsModule.auto()
+        SingleLevel = enumsModule.auto()
+        MultiLevel = enumsModule.auto()
+
+        @classmethod
+        def checkEnumOrString(cls, value):
+            """Some GNDS-2.0 files were published with incorrect 'approximation' strings. Support reading those."""
+            value = {
+                'singleLevel': cls.SingleLevel,
+                'multiLevel': cls.MultiLevel
+            }.get(value, value)
+            return super().checkEnumOrString(value)
 
     def __init__(self, label, approximation, resonanceParameters=None, scatteringRadius=None,
                  hardSphereRadius=None, PoPs=None, **kwargs):
@@ -152,7 +161,7 @@ class BreitWigner(ancestryModule.AncestryIO):
         Container for resonance parameters using Single-Level or Multi-Level Breit-Wigner approximation
 
         :param label: corresponds to a style (i.e. 'eval')
-        :param approximation: 'singleLevel' or 'multiLevel'
+        :param approximation: 'SingleLevel' or 'MultiLevel'
         :param resonanceParameters: optional ResonanceParameters instance
         :param scatteringRadius: optional ScatteringRadius instance
         :param hardSphereRadius: optional hardSphereRadius instance
@@ -371,10 +380,19 @@ class RMatrix(ancestryModule.AncestryIO):
     _writeIfDefault = ('boundaryCondition',)
 
     class Approximation(enumsModule.Enum):
-        """Defines the allowed approximations for a BreitWigner instance."""
+        """Defines the allowed approximations for an RMatrix instance."""
 
-        ReichMoore = 'Reich_Moore'
-        RMatrix = 'Full R-Matrix'
+        ReichMoore = 'ReichMoore'
+        RMatrix = 'FullRMatrix'
+
+        @classmethod
+        def checkEnumOrString(cls, value):
+            """Some GNDS-2.0 files were published with incorrect 'approximation' strings. Support reading those."""
+            value = {
+                'Reich_Moore': cls.ReichMoore,
+                'Full R-Matrix': cls.RMatrix
+            }.get(value, value)
+            return super().checkEnumOrString(value)
 
     def __init__(self, label, approximation, resonanceReactions, spinGroups, PoPs=None, **kwargs):
         """

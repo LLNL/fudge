@@ -105,6 +105,14 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         return( False )
 
+    def isCoulombReaction(self):
+        '''Returns **True** if *self* is a Coulomb reaction and **False** otherwise.'''
+
+        if len(self.crossSection) > 0:
+            return isinstance(self.crossSection[0], crossSectionModule.CoulombPlusNuclearElastic)
+
+        return False
+
     def isFission( self ):
 
         if not hasattr(self, 'fissionGenre'):
@@ -125,7 +133,7 @@ class Base_reaction(ancestryModule.AncestryIO):
         Return a boolean indicating whether the reaction is pair production. 
         """
 
-        return self.ENDF_MT in [515, 517]
+        return self.ENDF_MT in [515, 516, 517]
 
     def check( self, info ):
         """
@@ -142,7 +150,7 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         from fudge import warning
         from . import production as productionModule, orphanProduct as orphanProductModule, \
-            incompleteReaction as incompleteReactionModule
+            incompleteReaction as incompleteReactionModule, fissionComponent as fissionComponentModule
         from fudge.reactionData.doubleDifferentialCrossSection.chargedParticleElastic.CoulombPlusNuclearElastic \
             import CoulombDepositionNotSupported
         warnings = []
@@ -163,14 +171,14 @@ class Base_reaction(ancestryModule.AncestryIO):
             pass
         cpcount = sum( [ ( particleZA( prod.pid ) // 1000 ) > 0 for prod in self.__outputChannel ] )
         info['CoulombOutputChannel'] = cpcount > 1
-        info['ContinuumOutputChannel'] = self.outputChannel.process is outputChannelModule.Processes.continuum
+        info['ContinuumOutputChannel'] = self.outputChannel.process == outputChannelModule.Processes.continuum
 
         if hasattr(self, 'doubleDifferentialCrossSection'):
             differentialCrossSectionWarnings = self.doubleDifferentialCrossSection.check(info)
             if differentialCrossSectionWarnings:
                 warnings.append(warning.Context('doubleDifferentialCrossSection:', differentialCrossSectionWarnings))
 
-        crossSectionWarnings = self.crossSection.check( info )
+        crossSectionWarnings = self.crossSection.check(info)
         if crossSectionWarnings:
             warnings.append( warning.Context("Cross section:", crossSectionWarnings) )
 
@@ -182,7 +190,8 @@ class Base_reaction(ancestryModule.AncestryIO):
             return warnings             # otherwise continue to check outputs
 
         # compare calculated and listed Q-values:
-        if not isinstance(self, productionModule.Production): # can't reliably compute Q for production reactions
+        if not isinstance(self, (productionModule.Production, fissionComponentModule.FissionComponent,
+                                 incompleteReactionModule.IncompleteReaction)):
             try:
                 Q = self.getQ('eV', final=False)
                 Qcalc = info['availableEnergy_eV']
@@ -197,19 +206,21 @@ class Base_reaction(ancestryModule.AncestryIO):
                     try:
                         productMultiplicity = prod.multiplicity.getConstant()
                     except Exception:   # multiplicity is not constant
-                        if( prod.pid == IDsPoPsModule.photon ) : continue
+                        if prod.pid == IDsPoPsModule.photon: continue
                         raise ValueError("Non-constant multiplicity")
 
                     Qcalc -= productMass * productMultiplicity
 
                 if abs(Q-Qcalc) > PQUModule.PQU(info['dQ']).getValueAs('eV'):
                     if self.__outputChannel.process != outputChannelModule.Processes.continuum:
-                        warnings.append( warning.Q_mismatch( PQUModule.PQU(Qcalc,'eV'), PQUModule.PQU(Q,'eV'), self ) )
+                        warnings.append(
+                            warning.Q_mismatch(PQUModule.PQU(Qcalc,'eV'), PQUModule.PQU(Q,'eV'), self))
             except ValueError:
                 pass    # this test only works if multiplicity and Q are both constant for all non-gamma products
 
         if not (self.__outputChannel.genre == enumsModule.Genre.sumOfRemainingOutputChannels or self.isFission() or
-                isinstance(self, (productionModule.Production, orphanProductModule.OrphanProduct, incompleteReactionModule.IncompleteReaction))):
+                isinstance(self, (productionModule.Production, orphanProductModule.OrphanProduct,
+                                  incompleteReactionModule.IncompleteReaction))):
             # check that ZA balances:
             ZAsum = 0
             for product in self.__outputChannel:
@@ -250,21 +261,23 @@ class Base_reaction(ancestryModule.AncestryIO):
         del info['crossSectionDomain']
         del info['isTwoBody']
 
-        if info['checkEnergyBalance'] and not isinstance( self, productionModule.Production ):
+        if (info['checkEnergyBalance']
+                and not isinstance(self, productionModule.Production)
+                and self.__outputChannel.genre is not enumsModule.Genre.sumOfRemainingOutputChannels):
             # Calculate energy deposition data for all products, and for decay products.
             # Then recursively check the product list for energy balance at each step of the reaction/decay
             # At each step, if we have energy deposition for *every* product in the list, we can rigorously check
             # energy balance. Otherwise, can only check that we don't exceed available energy.
             try:
-                self.calculateAverageProductData( style=info['averageProductDataStyle'], **info['averageProductDataArgs'] )
+                self.calculateAverageProductData(style=info['averageProductDataStyle'], **info['averageProductDataArgs'])
             except CoulombDepositionNotSupported:
-                warnings.append( warning.SkippedCoulombElasticEnergyDeposition( self ) )
+                warnings.append(warning.SkippedCoulombElasticEnergyDeposition(self))
             except Exception as e:
-                warnings.append( warning.EnergyDepositionExceptionRaised( str(e), self ) )
+                warnings.append(warning.EnergyDepositionExceptionRaised(str(e), self))
                 if info['failOnException']: raise
                 return warnings
 
-            def checkProductsForEnergyBalance( products, Qs, fission = False, decay = False ):
+            def checkProductsForEnergyBalance(products, Qs, fission=False, decay=False):
                 # sample usage: for the reaction n + F19 -> n + (F19_c -> F19 + gamma), this function
                 # should be called twice, to test energy balance at each step of the reaction.
                 # First call: products = [n, F19_c] and Qs = [Q_reaction],
@@ -275,20 +288,20 @@ class Base_reaction(ancestryModule.AncestryIO):
                 energyDep = []
                 for prod in products:
                     if averageProductDataLabel in prod.averageProductEnergy:
-                        energyDep.append( [ prod.label, prod.averageProductEnergy[ averageProductDataLabel ] ] )
+                        energyDep.append([prod.label, prod.averageProductEnergy[averageProductDataLabel]])
                 if energyDep:
                     totalEDep = energyDep[0][1]
-                    for idx in range(1,len(energyDep)):
-                        if(     ( totalEDep.domainMin != energyDep[idx][1].domainMin ) or
-                                ( totalEDep.domainMax != energyDep[idx][1].domainMax ) ) :
+                    for idx in range(1, len(energyDep)):
+                        if (totalEDep.domainMin != energyDep[idx][1].domainMin
+                                or totalEDep.domainMax != energyDep[idx][1].domainMax):
                             upperEps = 0
                             if totalEDep.domainMax != energyDep[idx][1].domainMax:
                                 upperEps = 1e-8
                             try:
                                 totalEDep, energyDep[idx][1] = totalEDep.mutualify(
-                                        1e-8,upperEps,0, energyDep[idx][1], 1e-8,upperEps,0)
+                                        1e-8, upperEps, 0, energyDep[idx][1], 1e-8, upperEps, 0)
                             except Exception as e:
-                                edepWarnings.append( warning.EnergyDepositionExceptionRaised( str(e), self ) )
+                                edepWarnings.append(warning.EnergyDepositionExceptionRaised(str(e), self))
                                 if info['failOnException']: raise
                                 return warnings
                         totalEDep = totalEDep + energyDep[idx][1]
@@ -310,26 +323,27 @@ class Base_reaction(ancestryModule.AncestryIO):
                 # a few special cases to consider:
                 if fission:
                     # fission products aren't listed (so far, anyway), so about 85% of available energy should be missing:
-                    for i,(ein,edep) in enumerate(totalEDep):
+                    for i, (ein, edep) in enumerate(totalEDep):
                         if edep > abs((ein + Qsum) * info['fissionEnergyBalanceLimit']):
-                            edepWarnings.append( warning.FissionEnergyImbalance( PQUModule.PQU(ein, totalEDep.axes[0].unit),
-                                i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self ) )
+                            edepWarnings.append(warning.FissionEnergyImbalance(PQUModule.PQU(ein, totalEDep.axes[0].unit),
+                                i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self))
                 elif len(products) == len(energyDep):
                     # have full energy dep. data for all products, so we can rigorously check energy balance:
-                    for i,(ein,edep) in enumerate(totalEDep):
-                        if ( abs(edep - (ein+Qsum)) > abs((ein+Qsum) * info['dEnergyBalanceRelative'])
-                                and abs(edep - (ein+Qsum)) > PQUModule.PQU( info['dEnergyBalanceAbsolute'] )
-                                    .getValueAs(totalEDep.axes[0].unit) ):
-                            edepWarnings.append( warning.EnergyImbalance( PQUModule.PQU(ein, totalEDep.axes[0].unit),
-                                i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self ) )
+                    for i, (ein, edep) in enumerate(totalEDep):
+                        if (abs(edep - (ein+Qsum)) > abs((ein+Qsum) * info['dEnergyBalanceRelative'])
+                                and abs(edep - (ein+Qsum)) > PQUModule.PQU( info['dEnergyBalanceAbsolute'])
+                                        .getValueAs(totalEDep.axes[0].unit)):
+                            edepWarnings.append(warning.EnergyImbalance(PQUModule.PQU(ein, totalEDep.axes[0].unit),
+                                i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self))
                 else:
                     # missing some products, so just check that outgoing energy doesn't exceed incoming:
-                    for i,(ein,edep) in enumerate(totalEDep):
-                        if ( (edep - (ein+Qsum)) > ((ein+Qsum) * info['dEnergyBalanceRelative'])
-                                and (edep - (ein+Qsum)) > PQUModule.PQU( info['dEnergyBalanceAbsolute'] )
-                                    .getValueAs(totalEDep.axes[0].unit) ):
-                            edepWarnings.append( warning.EnergyImbalance( PQUModule.PQU(ein, totalEDep.axes[0].unit),
-                                i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self ) )
+                    for i, (ein, edep) in enumerate(totalEDep):
+                        if ((edep - (ein+Qsum)) > ((ein+Qsum) * info['dEnergyBalanceRelative'])
+                                and (edep - (ein+Qsum)) > PQUModule.PQU(info['dEnergyBalanceAbsolute'])
+                                        .getValueAs(totalEDep.axes[0].unit)):
+                            edepWarnings.append(
+                                warning.EnergyImbalance(PQUModule.PQU(ein, totalEDep.axes[0].unit),
+                                                        i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self))
 
                 if edepWarnings:
                     productList = [prod.pid for prod in products]
@@ -350,14 +364,14 @@ class Base_reaction(ancestryModule.AncestryIO):
                         checkProductsForEnergyBalance(
                                 products[:pidx] + [p for p in currentProd.outputChannel] + products[pidx+1:],
                                 Qs + [currentProd.outputChannel.Q.getConstant()],
-                                decay = True, fission = False        # FIXME what about spontaneous fission decay?
+                                decay=True, fission=False        # FIXME what about spontaneous fission decay?
                                 )
                 # end of helper function checkProductsForEnergyBalance
 
             try:
                 Q = self.__outputChannel.Q.getConstant()
-                checkProductsForEnergyBalance( products = [p1 for p1 in self.__outputChannel], Qs = [Q],
-                        fission = self.isFission(), decay=False )
+                checkProductsForEnergyBalance(products=[p1 for p1 in self.__outputChannel], Qs=[Q],
+                                              fission=self.isFission(), decay=False)
             except ValueError:
                 pass    # FIXME this test currently disabled when Q non-constant
 
@@ -477,7 +491,7 @@ class Base_reaction(ancestryModule.AncestryIO):
             self.availableEnergy.cullStyles( styleList )
             self.availableMomentum.cullStyles( styleList )
 
-    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+    def calculateAverageProductData(self, style, indent='', **kwargs):
         """
         Calculate average product data.
 
@@ -490,31 +504,43 @@ class Base_reaction(ancestryModule.AncestryIO):
         verbosity = kwargs['verbosity']
         indent2 = indent + kwargs['incrementalIndent']
 
-        if( verbosity > 0 ) : print( '%s%s' % (indent, self.__outputChannel.toString( simpleString = True, MT = self.ENDF_MT ) ) )
+        if verbosity > 0:
+            print('%s%s' % (indent, self.__outputChannel.toString(simpleString=True, MT=self.ENDF_MT)))
 
         kwargs['reaction'] = self
         kwargs['EMin'] = self.domainMin
         kwargs['EMax'] = self.domainMax
-        self.__outputChannel.calculateAverageProductData( style, indent2, **kwargs )
+        self.__outputChannel.calculateAverageProductData(style, indent2, **kwargs)
+        if hasattr(self, 'availableEnergy'):
+            axes = availableEnergyModule.defaultAxes(self.domainUnit)
+            QToPointwiseLinear = self.__outputChannel.QToPointwiseLinear(final=True)
+            domainMin = QToPointwiseLinear.domainMin
+            if self.isCoulombReaction():
+                domainMin = min(self.domainMin, domainMin, PQUModule.PQU(1e-4, 'MeV').getValueAs(self.domainUnit))
+                QToPointwiseLinear.setData([[domainMin, 0.0], [QToPointwiseLinear.domainMax, 0.0]])
 
-        if( hasattr( self, 'availableEnergy' ) ) :
-            axes = availableEnergyModule.defaultAxes( self.domainUnit )
-            QToPointwiseLinear = self.__outputChannel.QToPointwiseLinear( final = True )
-            availableEnergy = availableEnergyModule.XYs1d( data = [ [ QToPointwiseLinear.domainMin, QToPointwiseLinear.domainMin ], [ self.domainMax, self.domainMax ] ], axes = axes )
+            availableEnergy = availableEnergyModule.XYs1d(data=[[domainMin, QToPointwiseLinear.domainMin], [self.domainMax, self.domainMax]], axes=axes)
             availableEnergy += QToPointwiseLinear
-            self.availableEnergy.add( availableEnergyModule.XYs1d( data = availableEnergy, axes = axes, label = style.label ) )
-        if( hasattr( self, 'availableMomentum' ) ) :
-            massInE = kwargs['projectileMass']
-            availableMomentum = availableMomentumModule.calculateMomentumPoints( style, massInE, self.domainMin, self.domainMax, self.domainUnit )
-            self.availableMomentum.add( availableMomentum )
+            self.availableEnergy.add(availableEnergyModule.XYs1d(data=availableEnergy, axes=axes, label=style.label))
 
-    def listOfProducts(self):
-        """Returns, as a set, the list of PoP's ids for all products (i.e., outgoing particles) for *self*."""
+            massInE = kwargs['projectileMass']
+            availableMomentum = availableMomentumModule.calculateMomentumPoints(style, massInE, domainMin, QToPointwiseLinear.domainMax, self.domainUnit)
+            self.availableMomentum.add(availableMomentum)
+
+    def listOfProducts(self, finalOnly=False, includeQualifier=True):
+        '''
+        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.
+
+        :param finalOnly:           If `True`, only final product ids are returned, otherwise, all are returned..
+        :param includeQualifier:    If `True`, particle qualifiers are include in ids, otherwise, they are stripped from ids.
+
+        :return:                    A python set instance.
+        '''
 
         products = set()
         if hasattr(self, 'doubleDifferentialCrossSection'):
-            products.update(self.doubleDifferentialCrossSection.listOfProducts())
-        products.update(self.__outputChannel.listOfProducts())
+            products.update(self.doubleDifferentialCrossSection.listOfProducts(finalOnly=finalOnly, includeQualifier=includeQualifier))
+        products.update(self.__outputChannel.listOfProducts(finalOnly=finalOnly, includeQualifier=includeQualifier))
 
         return products
 
@@ -599,6 +625,17 @@ class Base_reaction(ancestryModule.AncestryIO):
         
         return crossSection
 
+    def multiGroupQ(self, multiGroupSettings, temperatureInfo, includeFinalProducts):
+        """
+        Returns the multi-group, total Q for the requested label. This is a cross section weighted Q summed over all reactions.
+
+        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param includeFinalProducts: Boolean value indicating whether to include the contriibution from the final fission product data.
+        """
+        
+        return self.outputChannel.multiGroupQ(multiGroupSettings, temperatureInfo, includeFinalProducts)
+
     def multiGroupMultiplicity(self, multiGroupSettings, temperatureInfo, productID):
         """
         Returns the multi-group, total multiplicity for the requested label for the requested product.
@@ -620,6 +657,21 @@ class Base_reaction(ancestryModule.AncestryIO):
             multiplicity += self.outputChannel.multiGroupMultiplicity(multiGroupSettings, temperatureInfo, productID)
 
         return multiplicity
+
+    def multiGroupAvailableEnergy(self, multiGroupSettings, temperatureInfo):
+        """
+        Returns the multi-group, total available energy for the requested label. This is a cross section weighted available energy.
+
+        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        """
+
+        from . import reaction as reactionModule
+
+        if not isinstance(self, reactionModule.Reaction):
+            return vectorModule.Vector()
+
+        return  multiGroupSettings.formAsVector(self.availableEnergy, temperatureInfo)
 
     def multiGroupAverageEnergy(self, multiGroupSettings, temperatureInfo, productID):
         """
@@ -643,6 +695,45 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         return averageEnergy
 
+    def multiGroupDepositionEnergy(self, multiGroupSettings, temperatureInfo, particleIDs):
+        '''
+        Returns the multi-group, deposition energy for the requested label.
+
+        This is a cross section weighted deposition energy for the reaction. The deposition energy is calculated by subtracting
+        the average energy from each transportable particle from the available energy. The list of transportable particles is specified
+        via the list of particle specified in the *particleIDs* argument.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param particleIDs: The list of particles to be transported.
+        '''
+
+        from . import reaction as reactionModule
+
+        if not isinstance(self, reactionModule.Reaction):
+            return vectorModule.Vector()
+
+        depositionEnergy = self.multiGroupAvailableEnergy(multiGroupSettings, temperatureInfo)
+        for particleID in particleIDs:
+            depositionEnergy -= self.multiGroupAverageEnergy(multiGroupSettings, temperatureInfo, particleID)
+
+        return depositionEnergy
+
+    def multiGroupAvailableMomentum(self, multiGroupSettings, temperatureInfo):
+        """
+        Returns the multi-group, total available momentum for the requested label. This is a cross section weighted available momentum.
+
+        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        """
+
+        from . import reaction as reactionModule
+
+        if not isinstance(self, reactionModule.Reaction):
+            return vectorModule.Vector()
+
+        return  multiGroupSettings.formAsVector(self.availableMomentum, temperatureInfo)
+
     def multiGroupAverageMomentum(self, multiGroupSettings, temperatureInfo, productID):
         """
         Returns the multi-group, total average momentum for the requested label for the requested product.
@@ -661,13 +752,56 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         return averageMomentum
 
-    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particles, productID, legendreOrder):
+    def multiGroupDepositionMomentum(self, multiGroupSettings, temperatureInfo, particleIDs):
+        '''
+        Returns the multi-group, total deposition momentum for the requested label.
+
+        This is a cross section weighted deposition momentum for the reaction. The deposition momentum is calculated by
+        subtracting the average momentum from each transportable particle from the available momentum. The list of transportable
+        particles is specified via the list of particle specified in the *particleIDs* argument.
+
+        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param particleIDs: The list of particles to be transported.
+        '''
+
+        from . import reaction as reactionModule
+
+        if not isinstance(self, reactionModule.Reaction):
+            return vectorModule.Vector()
+
+        depositionMomentum = self.multiGroupAvailableMomentum(multiGroupSettings, temperatureInfo)
+        for particleID in particleIDs:
+            depositionMomentum -= self.multiGroupAverageMomentum(multiGroupSettings, temperatureInfo, particleID)
+
+        return depositionMomentum 
+
+    def multiGroupGain(self, multiGroupSettings, temperatureInfo, productID, projectileID):
+        '''
+        Returns multi-group, gain for the requested particle and label.
+
+        This is a cross section weighted gain summed over all reactions. If productID and projectileID are the same, then the multi-group 
+        cross section is subtracted for the returned value to indicate that the projectileID as been absorted.
+
+        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param producID: The particle PoPs' id for the whose gain is to be calculated.
+        :param projectileID: The particle PoPs' id for the projectile.
+        '''
+
+        particleGain = self.multiGroupMultiplicity(multiGroupSettings, temperatureInfo, productID)
+        if productID == projectileID:
+            particleGain -= self.multiGroupCrossSection(multiGroupSettings, temperatureInfo)
+
+        return particleGain
+
+    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder):
         """
         Returns the multi-group, product matrix for the requested label for the requested productID for the requested Legendre order.
 
         :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles: The list of particles to be transported.
+        :param particleIDs: The list of particles to be transported.
         :param productID: Particle id for the requested product.
         :param legendreOrder: Requested Legendre order.
         """
@@ -675,7 +809,7 @@ class Base_reaction(ancestryModule.AncestryIO):
         if self.isPairProduction():
             if productID == IDsPoPsModule.photon and legendreOrder == 0:
                 productCrossSection = 2 * self.multiGroupCrossSection(multiGroupSettings, temperatureInfo)
-                photonParticle = particles[IDsPoPsModule.photon]
+                photonParticle = particleIDs[IDsPoPsModule.photon]
                 electronMass = PQUModule.PQU(1, 'me * c**2').getValueAs(self.domainUnit)
                 multiGroupIndexFromEnergy = photonParticle.multiGroupIndexFromEnergy(electronMass, True)
                 productMatrix = matrixModule.Matrix(productCrossSection.size, productCrossSection.size)
@@ -686,17 +820,35 @@ class Base_reaction(ancestryModule.AncestryIO):
                 productMatrix = matrixModule.Matrix()
             
         else:
-            productMatrix = self.outputChannel.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, productID, legendreOrder)
+            productMatrix = self.outputChannel.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder)
 
         return productMatrix
 
-    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particles, productID):
+    def multiGroupFissionMatrix(self, multiGroupSettings, temperatureInfo, particleIDs, legendreOrder):
+        """
+        Returns the multi-group, fission neutron transfer matrix for the requested label for the requested Legendre order.
+
+        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
+        :param particleIDs:  The list of particles to be transported.
+        :param legendreOrder: Requested Legendre order.
+        """
+
+        if self.isFission():
+            fissionMatrix = self.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, popsIDsModule.neutron, legendreOrder)
+    
+        else:
+            fissionMatrix = matrixModule.Matrix()
+
+        return fissionMatrix
+
+    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particleIDs, productID):
         """
         Returns the full multi-group, total product array for the requested label for the requested product id.
 
         :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles: The list of particles to be transported.
+        :param particleIDs: The list of particles to be transported.
         :param productID: Particle id for the requested product.
         """
 
@@ -704,10 +856,10 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         if self.isPairProduction():
             if productID == IDsPoPsModule.photon:
-                matrix = self.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, productID, 0)
+                matrix = self.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, productID, 0)
                 productArray = productArray.Array(matrix)
         else:
-            productArray = self.outputChannel.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
+            productArray = self.outputChannel.multiGroupProductArray(multiGroupSettings, temperatureInfo, particleIDs, productID)
 
         return productArray
 

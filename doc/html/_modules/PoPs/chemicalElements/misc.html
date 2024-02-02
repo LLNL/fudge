@@ -148,7 +148,8 @@
 
 <div class="viewcode-block" id="chemicalElementALevelIDsAndAnti"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.chemicalElementALevelIDsAndAnti">[docs]</a><span class="k">def</span> <span class="nf">chemicalElementALevelIDsAndAnti</span><span class="p">(</span> <span class="nb">id</span><span class="p">,</span> <span class="n">qualifierAllowed</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parse a particle id to extract the following information:</span>
+<span class="sd">    Parse a particle id to extract the following information::</span>
+
 <span class="sd">        baseId: particle id with any qualifiers removed</span>
 <span class="sd">        chemicalElementSymbol: symbol if id is a chemical element, isotope, nuclide or nucleus. None otherwise</span>
 <span class="sd">        A: total nucleon number (as integer) if id is for an isotope, nuclide or nucleus. None otherwise</span>
@@ -216,6 +217,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsModule</span>
+    <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">alias</span> <span class="k">as</span> <span class="n">aliasModule</span>
+    <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">database</span> <span class="k">as</span> <span class="n">databaseModule</span>
     <span class="kn">from</span> <span class="nn">..families</span> <span class="kn">import</span> <span class="n">nuclide</span> <span class="k">as</span> <span class="n">nuclideModule</span>
     <span class="kn">from</span> <span class="nn">..families</span> <span class="kn">import</span> <span class="n">nucleus</span> <span class="k">as</span> <span class="n">nucleusModule</span>
     <span class="kn">from</span> <span class="nn">..families</span> <span class="kn">import</span> <span class="n">baryon</span> <span class="k">as</span> <span class="n">baryonModule</span>
@@ -225,36 +228,32 @@
     <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">Z</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">A</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="p">(</span> <span class="n">isotopeModule</span><span class="o">.</span><span class="n">Isotope</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="p">(</span><span class="n">isotopeModule</span><span class="o">.</span><span class="n">Isotope</span><span class="p">,</span> <span class="n">nuclideModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">,</span> <span class="n">nucleusModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">)):</span>
         <span class="n">Z</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">Z</span>
         <span class="n">A</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">A</span>
-    <span class="k">elif</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="p">(</span> <span class="n">nuclideModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">,</span> <span class="n">nuclideModule</span><span class="o">.</span><span class="n">Alias</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="n">Z</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">Z</span>
-        <span class="n">A</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">A</span>
-        <span class="n">level</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">index</span>
-    <span class="k">elif</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="p">(</span> <span class="n">nucleusModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">,</span> <span class="n">nucleusModule</span><span class="o">.</span><span class="n">Alias</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="n">Z</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">Z</span>
-        <span class="n">A</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">A</span>
-        <span class="n">level</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">index</span>
-    <span class="k">elif</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="p">(</span> <span class="n">baryonModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">neutron</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="p">(</span><span class="n">nuclideModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">,</span> <span class="n">nucleusModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">)):</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">index</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">aliasModule</span><span class="o">.</span><span class="n">BaseAlias</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ZAInfo</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">databaseModule</span><span class="o">.</span><span class="n">Database</span><span class="p">)</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">pid</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">baryonModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">neutron</span><span class="p">:</span>
             <span class="n">A</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">proton</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">proton</span><span class="p">:</span>
             <span class="n">Z</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">A</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">elif</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="p">(</span> <span class="n">unorthodoxModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">FissionProductENDL99120</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">unorthodoxModule</span><span class="o">.</span><span class="n">Particle</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">FissionProductENDL99120</span><span class="p">:</span>
             <span class="n">Z</span> <span class="o">=</span> <span class="mi">99</span>
             <span class="n">A</span> <span class="o">=</span> <span class="mi">120</span>
-        <span class="k">elif</span><span class="p">(</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">FissionProductENDL99125</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">elif</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">FissionProductENDL99125</span><span class="p">:</span>
             <span class="n">Z</span> <span class="o">=</span> <span class="mi">99</span>
             <span class="n">A</span> <span class="o">=</span> <span class="mi">125</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">charge</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">Z</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">charge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
-    <span class="k">try</span> <span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">Z</span> <span class="o">+</span> <span class="n">A</span><span class="p">,</span> <span class="n">level</span> <span class="p">)</span>     <span class="c1"># FIXME raise if it didn&#39;t match anything?</span>
-    <span class="k">except</span> <span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">Z</span> <span class="o">+</span> <span class="n">A</span><span class="p">,</span> <span class="n">level</span>            <span class="c1"># FIXME raise if it didn&#39;t match anything?</span>
+    <span class="k">except</span><span class="p">:</span>
         <span class="k">raise</span></div>
 
 <div class="viewcode-block" id="ZAInfo_fromString"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.ZAInfo_fromString">[docs]</a><span class="k">def</span> <span class="nf">ZAInfo_fromString</span><span class="p">(</span> <span class="n">particleName</span> <span class="p">):</span>
@@ -283,9 +282,9 @@
     <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">particleName</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="n">particleName</span> <span class="o">=</span> <span class="n">particleName</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(</span> <span class="p">)</span>
 
     <span class="k">try</span> <span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span> <span class="p">{</span>   <span class="s1">&#39;n&#39;</span> <span class="p">:</span> <span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span> <span class="p">),</span> 
-                    <span class="s1">&#39;p&#39;</span> <span class="p">:</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">0</span> <span class="p">),</span> <span class="s1">&#39;d&#39;</span> <span class="p">:</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1002</span><span class="p">,</span> <span class="mi">0</span> <span class="p">),</span> <span class="s1">&#39;t&#39;</span> <span class="p">:</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1003</span><span class="p">,</span> <span class="mi">0</span> <span class="p">),</span>
-                    <span class="s1">&#39;h&#39;</span> <span class="p">:</span> <span class="p">(</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2003</span><span class="p">,</span> <span class="mi">0</span> <span class="p">),</span> <span class="s1">&#39;a&#39;</span> <span class="p">:</span> <span class="p">(</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2004</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span>                            <span class="p">}[</span><span class="n">particleName</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">IDsModule</span><span class="o">.</span><span class="n">neutron</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>                <span class="n">IDsModule</span><span class="o">.</span><span class="n">proton</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="n">IDsModule</span><span class="o">.</span><span class="n">familiarDeuteron</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1002</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>    <span class="n">IDsModule</span><span class="o">.</span><span class="n">familiarTriton</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1003</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="n">IDsModule</span><span class="o">.</span><span class="n">familiarHelion</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2003</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>      <span class="n">IDsModule</span><span class="o">.</span><span class="n">familiarAlpha</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2004</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>   <span class="p">}[</span><span class="n">particleName</span><span class="p">]</span>
     <span class="k">except</span> <span class="p">:</span>
         <span class="k">pass</span>
 
@@ -323,33 +322,48 @@
 
     <span class="k">return</span><span class="p">(</span> <span class="n">ZAInfo</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="idFromZAndA"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.idFromZAndA">[docs]</a><span class="k">def</span> <span class="nf">idFromZAndA</span><span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the PoPs id for a particle given Z and A</span>
-<span class="sd">    :param Z: atomic number (int)</span>
-<span class="sd">    :param A: nucleon number (int)</span>
-<span class="sd">    :return: string particle id</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="idFromZAndA"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.idFromZAndA">[docs]</a><span class="k">def</span> <span class="nf">idFromZAndA</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">allowNeutron</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Compute the PoPs id for a particle given Z and A.</span>
+
+<span class="sd">    :param Z:               Atomic number of the particle.</span>
+<span class="sd">    :param A:               Atomic mass number of the particle.</span>
+<span class="sd">    :param allowNeutron:    If True, Z = 0 and A = 1 will return the neutron id, otherwise a raise is executed.</span>
+
+<span class="sd">    :return:                String particle id</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsModule</span>
 
-    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">Z</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">A</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">neutron</span> <span class="p">)</span>
-    <span class="k">return</span><span class="p">(</span> <span class="n">isotopeSymbolFromChemicalElementIDAndA</span><span class="p">(</span> <span class="n">symbolFromZ</span><span class="p">[</span><span class="n">Z</span><span class="p">],</span> <span class="n">A</span> <span class="p">)</span> <span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">Z</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">A</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">allowNeutron</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">IDsModule</span><span class="o">.</span><span class="n">neutron</span>
 
-<div class="viewcode-block" id="idFromZA"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.idFromZA">[docs]</a><span class="k">def</span> <span class="nf">idFromZA</span><span class="p">(</span> <span class="n">ZA</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the PoPs id for a particle given ZA</span>
-<span class="sd">    :param ZA: 1000 * Z + A  (int)</span>
-<span class="sd">    :return: string particle id</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">isotopeSymbolFromChemicalElementIDAndA</span><span class="p">(</span><span class="n">symbolFromZ</span><span class="p">[</span><span class="n">Z</span><span class="p">],</span> <span class="n">A</span><span class="p">)</span></div>
 
-    <span class="k">return</span><span class="p">(</span> <span class="n">idFromZAndA</span><span class="p">(</span> <span class="n">ZA</span> <span class="o">//</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">ZA</span> <span class="o">%</span> <span class="mi">1000</span> <span class="p">)</span> <span class="p">)</span></div>
+<div class="viewcode-block" id="idFromZA"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.idFromZA">[docs]</a><span class="k">def</span> <span class="nf">idFromZA</span><span class="p">(</span><span class="n">ZA</span><span class="p">,</span> <span class="n">allowNeutron</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Computes the PoPs id for a particle given its ZA.</span>
 
-<div class="viewcode-block" id="nucleusIDFromZAndA"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nucleusIDFromZAndA">[docs]</a><span class="k">def</span> <span class="nf">nucleusIDFromZAndA</span><span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Equivalent to calling nucleusIDFromNuclideID( idFromZAndA( Z, A ) ) &quot;&quot;&quot;</span>
+<span class="sd">    :param ZA:              1000 * Z + A where Z and N are the particle&#39;s atomic number and mass number, respectively.</span>
+<span class="sd">    :param allowNeutron:    If True, Z = 0 and A = 1 will return the neutron id, otherwise a raise is executed.</span>
 
-    <span class="n">nucleusID</span> <span class="o">=</span> <span class="n">idFromZAndA</span><span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span> <span class="p">)</span>
-    <span class="k">return</span><span class="p">(</span> <span class="n">nucleusID</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">(</span> <span class="p">)</span> <span class="o">+</span> <span class="n">nucleusID</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">)</span></div>
+<span class="sd">    :return:                Particle&#39;s PoPs id.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">return</span> <span class="n">idFromZAndA</span><span class="p">(</span><span class="n">ZA</span> <span class="o">//</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">ZA</span> <span class="o">%</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">allowNeutron</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="nucleusIDFromZAndA"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nucleusIDFromZAndA">[docs]</a><span class="k">def</span> <span class="nf">nucleusIDFromZAndA</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">allowNeutron</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Equivalent to calling nucleusIDFromNuclideID(idFromZAndA(Z, A, allowNeutron)).</span>
+
+<span class="sd">    :param Z:               Atomic number of the particle.</span>
+<span class="sd">    :param A:               Atomic mass number of the particle.</span>
+<span class="sd">    :param allowNeutron:    If True, Z = 0 and A = 1 will return the neutron id, otherwise a raise is executed.</span>
+
+<span class="sd">    :return:                String particle id</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">return</span> <span class="n">nucleusIDFromNuclideID</span><span class="p">(</span><span class="n">idFromZAndA</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">allowNeutron</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="hasNucleus"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.hasNucleus">[docs]</a><span class="k">def</span> <span class="nf">hasNucleus</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="n">nucleusReturnsTrue</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -378,10 +392,17 @@
     <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">isotopeSymbol</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_e</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">isotopeSymbol</span><span class="p">,</span> <span class="n">index</span> <span class="p">)</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="nucleusIDFromNuclideID"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nucleusIDFromNuclideID">[docs]</a><span class="k">def</span> <span class="nf">nucleusIDFromNuclideID</span><span class="p">(</span> <span class="n">nuclideID</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The nucleus id is computed from nuclide id by converting 1st letter to lower case &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="nucleusIDFromNuclideID"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nucleusIDFromNuclideID">[docs]</a><span class="k">def</span> <span class="nf">nucleusIDFromNuclideID</span><span class="p">(</span><span class="n">nuclideID</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Returns the nucleus PoPs id from a nuclide PoPs id by converting 1st letter to lower case.</span>
+<span class="sd">    No check is performed on the validity of *nuclideID* as a nuclide PoPs id.</span>
 
-    <span class="k">return</span><span class="p">(</span> <span class="n">nuclideID</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">(</span> <span class="p">)</span> <span class="o">+</span> <span class="n">nuclideID</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">)</span></div>
+<span class="sd">    :param nuclideID:       PoPs id for a nuclide.</span>
+
+<span class="sd">    :return:                The nucleus PoPs id for the specified nuclide PoPs id.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">return</span> <span class="n">nuclideID</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="n">nuclideID</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span></div>
 
 <div class="viewcode-block" id="nuclideIDFromNucleusID"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nuclideIDFromNucleusID">[docs]</a><span class="k">def</span> <span class="nf">nuclideIDFromNucleusID</span><span class="p">(</span> <span class="n">nucleusID</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; The nuclide id is computed from nucleus id by converting 1st letter to upper case &quot;&quot;&quot;</span>

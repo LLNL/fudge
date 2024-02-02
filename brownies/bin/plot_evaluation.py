@@ -7,15 +7,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+import argparse
 import collections
 import os.path
 import sys
 import traceback
-
-try:
-    import argparse
-except ImportError:
-    from fudge.core.utilities import argparse
 
 sys.path.append(os.path.split(__file__)[0] + os.sep + '..')
 

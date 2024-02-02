@@ -86,7 +86,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
             interaction = enumsModule.Interaction.TNSL
         self.interaction = interaction
 
-        self.__sourcePath = sourcePath
+        self.sourcePath = sourcePath
 
         self.__externalFiles = suitesModule.ExternalFiles()
         self.__externalFiles.setAncestor( self )
@@ -107,6 +107,20 @@ class CovarianceSuite(ancestryModule.AncestryIO):
         """Returns the sourcePath member which is the path to the covarianceSuite file for self if self is from a file."""
 
         return( self.__sourcePath )
+
+    @sourcePath.setter
+    def sourcePath(self, path):
+        """
+        This method sets *self*'s *sourcePath* to *path*.
+
+        :param path:        The new *sourcePath*.
+        """
+
+        if path is not None:
+            if not isinstance(path, str):
+                raise ValueError('Path must be a str or None, got "%s"' % type(path))
+
+        self.__sourcePath = path
     
     @property
     def styles(self):

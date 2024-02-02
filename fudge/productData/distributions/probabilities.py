@@ -16,10 +16,13 @@ from . import miscellaneous as miscellaneousModule
 
 class PofX1GivenX2( multiD_XYsModule.XYs2d ) :
     """
-    Class for the probability function P(x1|x2).
+    Abstract base class for a 2d probability function of the form P(x1|x2).
     """
 
     def integrate( self, x2, x1Domain ) :
+        """
+        This method returns the integral over x1 for *self* evaluated at *x2*.
+        """
 
         try :
             PofX1AtX2 = self.evaluate( x2 )

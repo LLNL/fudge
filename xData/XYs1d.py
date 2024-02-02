@@ -1417,7 +1417,7 @@ class XYs1d(baseModule.XDataFunctional):
             else :
                 plotLabel = 'curve %d' % index
             if not hasattr(curve1d, 'copyDataToXsAndYs'):
-                raise TypeError('Curve does not have a "copyDataToXsAndYs" method. Curve type is %s.' % type(curve1))
+                raise TypeError('Curve does not have a "copyDataToXsAndYs" method. Curve type is %s.' % type(curve1d))
             plotData[plotLabel] = curve1d.copyDataToXsAndYs( )
             domainMin.append( curve1d.domainMin )
             domainMax.append( curve1d.domainMax )

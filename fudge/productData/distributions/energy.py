@@ -5,7 +5,95 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""Energy distribution classes."""
+r"""
+This module containes the energuy distribution classes for storing :math:`P(E')` and :math:`P(E'|E)` distributions
+for uncorrelated distributions, as well as the :math:`P(E'|E)` when the
+correlated distribution is represented as :math:`P(E'|E)` * :math:`P(\mu|E,E')`.
+    
+This module contains the following classes:
+
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | XYs1d                             | Class to Store :math:`P(E')` as a list of :math:`Ei'_i`, :math:`P_i`. |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Regions1d                         | Stores :math:`P(E')` as a list of other 1d energy distribuitions      |
+    |                                   | that abut in :math:`E'` and are contiguous.                           |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Xs_pdf_cdf1d                      | Stores :math:`P(E')` (i.e., :math:`pdf(E')`) and :math:`cdf(E')`      |
+    |                                   | as a list of :math:`E'_i`, :math:`pdf_i` and :math:`cdf_i`.           |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Subform                           | Base class for all 2d energuy distributions.                          |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | DiscretePrimaryGamma              | Base class for :py:class:`DiscreteGamma` and :py:class:`PrimaryGamma`.|
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | DiscreteGamma                     | Specifies that the product is a discrete (i.e., secondary) photon.    |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | PrimaryGamma                      | Specifies that the product is a capture primary photon.               |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | XYs2d                             | Stores :math:`P(E'|E)` as a list of :math:`E`, :math:`P(E')`.         |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Regions2d                         | Stores :math:`P(E'|E)` as a list of other 2d energy distributions,    |
+    |                                   | that abut to form a contiguous distribution in E.                     |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | EnergyFunctionalData              | Abstract class for some parameters in many of the 2d energy           |
+    |                                   | functionals.                                                          |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | A                                 | Class for storing the A function for the :py:class:`Watt` energy      |
+    |                                   | functional.                                                           |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | B                                 | Class for storing the B function for the :py:class:`Watt` energy      |
+    |                                   | functional.                                                           |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Theta                             | Class for storing the :math:`\theta` function used in several         |
+    |                                   | 2d energy functionals.                                                |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | G                                 | Class for storing the G function for the                              |
+    |                                   | :py:class:`GeneralEvaporation` functional.                            |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | T_M                               | Class for storing the :math:`T_M` function for the                    |
+    |                                   | :py:class:`MadlandNix` functional.                                    |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | FunctionalBase                    | Abstract base class for the 2d energy functional distributions.       |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | GeneralEvaporation                | Class for storing the 2d general evaporation energy distribution.     |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | SimpleMaxwellianFission1d         | Class for storing the 1d simple Maxwellian fission energy             |
+    |                                   | distribution.                                                         |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | SimpleMaxwellianFission           | Class for storing the 2d simple Maxwellian fission distribution.      |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Evaporation1d                     | Class for storing the 1d evaporation energy distribution.             |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Evaporation                       | Class for storing the 2d evaporation energy distribution.             |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Watt                              | Class for storing the 2d Watt energy distribution.                    |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | MadlandNix                        | Class for storing the Madland/Nix energy distribution.                |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | NBodyPhaseSpace                   | Class for storing the 2d N-body phase space energy distribution.      |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Weighted1d                        | Class for storing an instance of a :py:class:`Weighted1d`             |
+    |                                   | at a specific projectile energy.                                      |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | WeightedFunctionals1d             | Class for storing an instance of a :py:class:`WeightedFunctionals`    |
+    |                                   | at a specific projectile energy (this is a 1d energy functional).     |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Weighted                          | Class for storing one 2d energy distribution in the                   |
+    |                                   | :py:class: WeightedFunctionals instance.                              |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | WeightedFunctionals               | Class for storing a list of 2d energy functional distributions as     |
+    |                                   | :py:class:`Weighted` instances that are weighted to form a            |
+    |                                   | complete 2d energy distribution.                                      |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | EnergyFunctionalDataToPointwise   | For internal use. This class is used by the methods                   |
+    |                                   | toPointwise_withLinearXYs of the 2d functional energy distribution    |
+    |                                   | to convert the functional into an :py:class:`XYs2d` instance.         |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Form                              | This class stores the enegy distribution part (i.e., :math:`P(E'|E)`) |
+    |                                   | for an uncorrelated distribution.                                     |
+    +-----------------------------------+-----------------------------------------------------------------------+
+"""
 
 import math
 
@@ -29,6 +117,13 @@ from . import probabilities as probabilitiesModule
 from . import miscellaneous as miscellaneousModule
 
 def defaultAxes( energyUnit ) :
+    """
+    Returns an :py:class:`Axes` instance for energy data (i.e., :math:`P(E'|E)`.
+
+    :param energyUnit:  Unit for the energy data.
+
+    :return:            An :py:class:`Axes` instance.
+    """
 
     axes = axesModule.Axes(3)
     axes[2] = axesModule.Axis( 'energy_in',  2, energyUnit )
@@ -37,54 +132,105 @@ def defaultAxes( energyUnit ) :
     return( axes )
 
 class XYs1d( XYs1dModule.XYs1d ) :
+    """
+    Class to Store :math:`P(E')` as a list of pairs of :math:`Ei'_i`, :math:`P_i`.
+    """
 
     def averageEnergy( self ) :
+        """
+        The method calculates the average outgoing energy of *self*.
+        """
 
         allowedInterpolations = [xDataEnumsModule.Interpolation.linlin, xDataEnumsModule.Interpolation.flat]
         xys = self.changeInterpolationIfNeeded( allowedInterpolations, XYs1dModule.defaultAccuracy )
         return( xys.integrateWithWeight_x( ) )
 
     def toLinearXYsClass( self ) :
+        """
+        This method returns the class for representing linear point-wise 1-d data of *self*.
+        """
 
         return( XYs1d )
 
 class Regions1d( regionsModule.Regions1d ) :
+    """
+    Stores :math:`P(E')` as a list of other 1d energy distribuitions that abut in :math:`E'` and are contiguous. 
+    """
 
     def averageEnergy( self ) :
+        """
+        The method calculates the average outgoing energy of *self*.
+        """
 
         averageEnergy = 0
         for region in self : averageEnergy += region.averageEnergy( )
         return( averageEnergy )
 
     def integrateWithWeight_x( self ) :
+        """
+        Returns the value of the integral :math:`\int dE' E' P(E').
+
+        :return:        A float.
+        """
 
         sum = 0
         for region in self : sum += region.integrateWithWeight_x( )
         return( sum )
 
     def toLinearXYsClass( self ) :
+        """
+        This method returns the class for representing linear point-wise 1-d data of *self*.
+        """
 
         return( XYs1d )
 
     @staticmethod
     def allowedSubElements():
+        """
+        This method returns the list of classes that can be sub-nodes (i.e., 2-d function) of an :py:class:`Regions1d` instance.
+        """
 
         return( XYs1d, )
 
 class Xs_pdf_cdf1d( xs_pdf_cdfModule.Xs_pdf_cdf1d ) :
+    """
+    This class stores both the :math:`P(E'|E)` (i.e., pdf) and its cumlative distribution function cdf as three lists: one list
+    for the :math:`E'` values, and one list for the associated pdf value and one list for the associated cdf value for each :math:`E'` value,
+    """
 
     def toLinearXYsClass( self ) :
+        """
+        This method returns the class for representing linear point-wise 1-d data of *self*.
+        """
 
         return( XYs1d )
 
 class Subform( baseModule.Subform ) :
-    """Abstract base class for energy forms."""
+    """Abstract base class for 2d energy subforms."""
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+        """
+        This method returns None.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                None.
+        """
+
 
         return( None )
 
 class DiscretePrimaryGamma( Subform ) :
+    """
+    Abstract base class for classes :py:class:`DiscreteGamma` and :py:class:`PrimaryGamma`.
+
+    :param value:       Discrete photon energy or nuclear binding energy needed to calcualte the ergy for a primary photon.
+    :param domainMin:   Minimum projectile energy for which the photon is emitted.
+    :param domainMax:   Maximum projectile energy for which the photon is emitted.
+    :param axes:        Axes instance for the data.
+    """
 
     dimension = 2
 
@@ -114,26 +260,40 @@ class DiscretePrimaryGamma( Subform ) :
 
     @property
     def axes( self ) :
+        """Returns a return to the axes of *self*."""
 
         return( self.__axes )
 
     @property
     def domainMin( self ) :
+        """
+        Returns the minimum projectile energy for *self*.
+        """
 
         return( self.__domainMin )
 
     @property
     def domainMax( self ) :
+        """
+        Returns the maximum projectile energy for *self*.
+        """
 
         return( self.__domainMax )
 
     @property
     def domainUnit( self ) :
+        """
+        Returns the energy unit of the projectile.
+        """
 
         return( self.__axes[-1].unit )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         factors = self.axes.convertUnits( unitMap )
         self.value *= factors[1]
@@ -141,13 +301,23 @@ class DiscretePrimaryGamma( Subform ) :
         self.__domainMax *= factors[2]
 
     def copy( self ):
+        """
+        Returns a copy of *self*.
+        """
 
         return self.__class__( self.value, self.__domainMin, self.__domainMax, self.axes )
 
     __copy__ = copy
 
     def energySpectrumAtEnergy( self, energy, discreteGammaResolution = 1e-2 ) :
-        """Returns the energy spectrum in the lab frame for the specified incident energy."""
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energy*,
+
+        :param energyIn:                    Energy of the projectile.
+        :param discreteGammaResolution:     Relative width of triangle presenting the energy spectrum.
+
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         if( ( self.__domainMin > energy ) or ( self.__domainMax < energy ) ) : return( XYs1d( axes = defaultAxes( self.domainUnit ) ) )
 
@@ -179,6 +349,14 @@ class DiscretePrimaryGamma( Subform ) :
         return 1
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -201,6 +379,17 @@ class DiscretePrimaryGamma( Subform ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         value = float(node.get('value'))
         domainMin = float(node.get('domainMin'))
@@ -219,16 +408,32 @@ class DiscretePrimaryGamma( Subform ) :
         else:
             return cls(value, domainMin, domainMax, axes=axes)
 
-    def getEnergyArray(self, Emin=None, EMax=None):
+    def getEnergyArray(self, EMin=None, EMax=None):
+        """
+        This method returns the list of projectile energies that *self* is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         return [self.domainMin, self.domainMax]
 
-
 class DiscreteGamma(DiscretePrimaryGamma):
+    """
+    This class stores the data for a discrete (i.e., secondary) gamma that results from the decay of a nucleus
+    from one nuclear energy level to a lower nuclear energy level,
+    """
 
     moniker = 'discreteGamma'
 
     def check(self, info):
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
 
@@ -237,16 +442,39 @@ class DiscreteGamma(DiscretePrimaryGamma):
         return warnings
 
     def averageEp(self, E):
+        """
+        Calculated the average energy of the outgoing photon which is just its energy.
+
+        :param E:       The energy of the projectile energy. This is not needed for a discrete photon.
+
+        :return:                Python float.
+        """
 
         return self.energyAtEnergy(E)
 
     def energyAtEnergy(self, energyIn):
+        """
+        Returns the energy of the outgoing photon which is just its energy.
+
+        :param energyIn:        The energy of the projectile energy. This is not needed for a discrete photon.
+
+        :return:                Python float.
+        """
 
         if energyIn < self.domainMin:
             return 0
         return self.value
 
     def integrate(self, energyIn, energyOut):
+        """
+        This meethod integrates the energu distribution at projectile energy over the specified outgoing energy range.
+        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*.
+        
+        :param energyIn:            The energy of the projectile.
+        :param energyOut:           The outgoing energy range to integrate over.
+
+        :return:                    A float representing the value of the integration.
+        """
 
         if self.domainMin <= energyIn <= self.domainMax:
             domainMin, domainMax = miscellaneousModule.domainLimits(energyOut, self.value, self.value)
@@ -282,6 +510,11 @@ class PrimaryGamma(DiscretePrimaryGamma):
 
     @finalState.setter
     def finalState(self, value):
+        """
+        Set the final state member to *value*.
+
+        :param value:   The value to set finalState to.
+        """
 
         if not isinstance(value, (str, type(None))):
             raise TypeError('Invalid finalState type: got "%s".' % type(value))
@@ -290,12 +523,22 @@ class PrimaryGamma(DiscretePrimaryGamma):
 
     @property
     def massRatio(self):
+        """
+        Returns the ratio of the target mass to the sum of the projectile and target masses.
+
+        :return:        Python float.
+        """
 
         if self.__massRatio is None:
             self.__massRatio = self.findAttributeInAncestry("getMassRatio")()
         return self.__massRatio
 
     def check(self, info):
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
 
@@ -310,16 +553,39 @@ class PrimaryGamma(DiscretePrimaryGamma):
         return warnings
 
     def averageEp(self, energyIn):
+        """
+        Calculated the average energy of the outgoing photon at projectile energy *energyIn*.
+
+        :param energyIn:       The energy of the projectile energy.
+
+        :return:                Python float.
+        """
 
         return self.energyAtEnergy(energyIn)
 
     def energyAtEnergy(self, energyIn):
+        """
+        Returns the energy of the outgoing photon for projectile energy *energyIn*.
+
+        :param energyIn:        The energy of the projectile energy.
+
+        :return:                Python float.
+        """
 
         if energyIn < self.domainMin:
             return 0
         return float(self.value) + self.massRatio * energyIn
 
     def integrate(self, energyIn, energyOut):
+        """
+        This meethod integrates the energu distribution at projectile energy over the specified outgoing energy range.
+        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*.
+        
+        :param energyIn:            The energy of the projectile.
+        :param energyOut:           The outgoing energy range to integrate over.
+
+        :return:                    Python float.
+        """
 
         gammaEnergy = float(self.value) + self.massRatio * energyIn
         if self.domainMin <= energyIn <= self.domainMax:
@@ -330,21 +596,27 @@ class PrimaryGamma(DiscretePrimaryGamma):
 
 
 class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
+    """
+    Class to store :math:`P(E'|E)` as a list of pairs of :math:`E`, :math:`P(E')`. The :math:`P(E')` can be any of the
+    1d energy distributions.
+
+    :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+    """
 
     def __init__( self, **kwargs ):
-        """
-        >pointwise = XYs2d( )
-        followed by:
-        >pointwise[ 0 ] = XYs_data_1
-        >pointwise[ 1 ] = XYs_data_2
-        > ...
-        >pointwise[ n-1 ] = XYs_data_n
-        """
 
         probabilitiesModule.PofX1GivenX2.__init__( self, **kwargs )
         Subform.__init__( self )
 
-    def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none, epsilon = 0, **kwargs ) :
+    def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none, epsilon = 0, **kwargs):
+        """
+        Returns a :math:`P(E')` at projectile energy *domainValue*.
+
+        :param domainValue:     The energy of the projectile.
+        :param extrapolation:   Specifies how to extrapolate *self* for *domainValue* outside the domain of the projectile's energy.
+
+        :return:                A 1d energy distribution.
+        """
 
         # FIXME silently converting InterpolationQualifier.none to unitbase.
         interpolationQualifier = self.interpolationQualifier
@@ -361,18 +633,32 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         return( self.getSpectrumAtEnergy( energy ) )
 
     def energySpectrumAtEnergy( self, energy ) :
-        """Returns the energy spectrum in the lab frame for the specified incident energy."""
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energy*,
+
+        :param energy:              Energy of the projectile.
+
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         spectrum = self.evaluate(energy, extrapolation=xDataEnumsModule.Extrapolation.flat)
         if( isinstance( spectrum, Regions1d ) ) : spectrum = spectrum.toPointwise_withLinearXYs( lowerEps = 1e-6, upperEps = 1e-6 )
         return( spectrum )
 
     def getSpectrumAtEnergy( self, energy ) :
-        """Returns the energy spectrum for self at projectile energy."""
+        """Returns the results of calling **energySpectrumAtEnergy**. This method is deprecated."""
 
         return( self.energySpectrumAtEnergy( energy ) )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method returns the list of projectile energies that *self* is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         Es = [ data.outerDomainValue for data in self ]
         if( EMin is not None ) :
@@ -382,6 +668,13 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         return( Es )
 
     def averageEp( self, energy ) :
+        """
+        Calculated the average energy of the outgoing photon at projectile energy *energy*.
+
+        :param energy:       The energy of the projectile energy.
+
+        :return:                Python float.
+        """
 
         code, lower, upper, frac, interpolation, interpolationQualifier = self.getBoundingSubFunctions( energy )
         if( code is None ) :
@@ -399,37 +692,70 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         else :
             return( lower.integrateWithWeight_x( ) )
 
-    def check( self, info ) :
+    def check(self, info):
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
 
         warnings = []
 
         if self.interpolation is xDataEnumsModule.Interpolation.flat:
-            warnings.append( warning.FlatIncidentEnergyInterpolation( ) )
+            warnings.append(warning.FlatIncidentEnergyInterpolation())
 
         if self.interpolationQualifier is xDataEnumsModule.InterpolationQualifier.none:
-            warnings.append( warning.MissingInterpolationQualifier( ) )
+            domains = set([(xys1d.domainMin, xys1d.domainMax) for xys1d in self])
+            if len(domains) != 1:
+                warnings.append(warning.MissingInterpolationQualifier())
 
         for idx in range(len(self)):
             integral = self[idx].integrate()
             if abs(integral - 1.0) > info['normTolerance']:
-                warnings.append(warning.UnnormalizedDistribution(PQUModule.PQU(self[idx].outerDomainValue, self.axes[-1].unit), idx, integral, self[idx]))
+                incidentEnergy = PQUModule.PQU(self[idx].outerDomainValue, self.axes[-1].unit)
+                warnings.append(warning.UnnormalizedDistribution(incidentEnergy, idx, integral, self[idx]))
 
-            if( self[idx].rangeMin < 0.0 ) :
-                warnings.append(warning.NegativeProbability(self[idx].rangeMin, PQUModule.PQU(self[idx].outerDomainValue, self.axes[-1].unit), obj=self[idx]))
+            if self[idx].rangeMin < 0.0:
+                incidentEnergy = PQUModule.PQU(self[idx].outerDomainValue, self.axes[-1].unit)
+                warnings.append(warning.NegativeProbability(self[idx].rangeMin, incidentEnergy, obj=self[idx]))
 
         return warnings
 
     def sqrtEp_AverageAtE( self, E ) :
+        """
+        This method returns the value of the integral :math:`\int dE' \sqrt{E'} P(E') at projectile energy *E*.
+
+        :param E:   Energy of the projectile.
+
+        :return:    Python float.
+        """
 
         return( self.energySpectrumAtEnergy( E ).integrateWithWeight_sqrt_x( ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         return( multiD_XYsModule.XYs2d.toPointwise_withLinearXYs( self, cls = XYs2d, **kwargs ) )
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+        """
+        This method returns a copy of *self* as a :py:class:`XYs2d` representation with the
+        P(E') data as :py:class:`Xs_pdf_cdf1d` instances.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+                    
+        :return:                :py:class:`XYs2d`
+        """     
 
         linear = self
         for xys in self :
@@ -449,10 +775,18 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns the list of classes that can be sub-nodes (i.e., 2-d function) of an :py:class:`XYs2d` instance.
+        """
 
         return( ( XYs1d, Regions1d, Xs_pdf_cdf1d ) )
 
 class Regions2d( Subform, regionsModule.Regions2d ) :
+    """
+    Stores :math:`P(E'|E)` as a list of other 2d energy distributions, that abut to form a contiguous distribution in E. 
+
+    :param kwargs:              A dictionary that contains data to control the way this method acts.
+    """
 
     def __init__( self, **kwargs ):
 
@@ -460,6 +794,11 @@ class Regions2d( Subform, regionsModule.Regions2d ) :
         Subform.__init__( self )
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
 
@@ -471,10 +810,27 @@ class Regions2d( Subform, regionsModule.Regions2d ) :
         return warnings
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         return( regionsModule.Regions2d.toPointwise_withLinearXYs( self, cls = XYs2d, **kwargs ) )
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+        """
+        This method returns a copy of *self* as a :py:class:`Regions2d` representation with the
+        P(E') data as :py:class:`Xs_pdf_cdf1d` instances.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+                    
+        :return:                :py:class:`Regions2d`
+        """     
 
         _regions2d = Regions2d( axes = self.axes )
         for region in self : _regions2d.append( region.to_xs_pdf_cdf1d( style, tempInfo, indent ) )
@@ -482,10 +838,26 @@ class Regions2d( Subform, regionsModule.Regions2d ) :
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns the list of classes that can be sub-nodes (i.e., 2-d function) of an :py:class:`Regions2d` instance.
+        """
 
         return( ( XYs2d, ) )
 
 class EnergyFunctionalData( ancestryModule.AncestryIO ) :
+    """
+    Abstract class for some parameters in many of the 2d energy functionals.
+
+    The following table list the primary members of this class:
+    
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | data      | This member stores the actual data.                       |           
+    +-----------+-----------------------------------------------------------+
+
+    :param data:    The data for the function.
+    """
 
     ancestryMembers = ( 'data', )
 
@@ -496,17 +868,32 @@ class EnergyFunctionalData( ancestryModule.AncestryIO ) :
         self.data.setAncestor( self )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.data.convertUnits( unitMap )
 
     def copy( self ):
+        """
+        Returns a copy of *self*.
+        """
 
         return self.__class__( self.data.copy( ) )
 
     __copy__ = copy
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         xml = ['%s<%s>' % (indent, self.moniker)]
         xml += self.data.toXML_strList( indent + '  ', **kwargs )
@@ -515,6 +902,17 @@ class EnergyFunctionalData( ancestryModule.AncestryIO ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
         subClass = {
@@ -528,26 +926,68 @@ class EnergyFunctionalData( ancestryModule.AncestryIO ) :
         return EFD
 
 class A( EnergyFunctionalData ) :
+    """
+    Class for storing the A function for the :py:class:`Watt` energy functional. 
+    """
 
     moniker = 'a'
 
 class B( EnergyFunctionalData ) :
+    """
+    Class for storing the B function for the :py:class:`Watt` energy functional. 
+    """
 
     moniker = 'b'
 
 class Theta( EnergyFunctionalData ) :
+    """
+    Class for storing the :math:`\theta` function for several of the energy functionals.
+    """
 
     moniker = 'theta'
 
 class G( EnergyFunctionalData ) :
+    """
+    Class for storing the G function for the :py:class:`GeneralEvaporation` functional.  
+    """
 
     moniker = 'g'
 
 class T_M( EnergyFunctionalData ) :
+    """
+    Class for storing the :math:`T_M` function for the :py:class:`MadlandNix` functional.
+    """
 
     moniker = 'T_M'
 
 class FunctionalBase( Subform ) :
+    """
+    Abstract base class for the 2d energy functional distributions.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | LF            | This member is the ENDF-6 LF flag.                                |
+    +---------------+-------------------------------------------------------------------+
+    | U             | Constant that defines the upper energy limit for the              |
+    |               | secondary particle so that 0 ≤ E' ≤ E - U.                        |
+    +---------------+-------------------------------------------------------------------+
+    | parameter1    | 1d function needed by most functionals.                           |
+    +---------------+-------------------------------------------------------------------+
+    | parameter2    | Addition 1d function needed by :py:class:`GeneralEvaporation`     |
+    |               | and :py:class:`MadlandNix` instances.                             |
+    +---------------+-------------------------------------------------------------------+
+
+    :param LF:              The data for the function.
+    :param U:               Constant that defines the upper energy limit for the secondary particle so that 0 ≤ E' ≤ E - U.
+    :param parameter1:      For a :py:class:`GeneralEvaporation`, :py:class:`SimpleMaxwellianFission` or :py:class:`Evaporation` 
+                            instance this is the :math:`\theta(E)` function. For a :py:class:`Watt` instance this is the :py:class:`A`
+                            function and for a :py:class:`MadlandNix` instance this is the :py:class:`T_M` function.
+    :param parameter2:      For a :py:class:`GeneralEvaporation` instance this is the :py:class:`B` function and for a :py:class:`Watt` 
+                            instance this is the :py:class:`B` function.
+    """
 
     ancestryMembers = ( 'parameter1', 'parameter2' )
 
@@ -567,13 +1007,20 @@ class FunctionalBase( Subform ) :
         if( parameter2 is not None ) : self.parameter2.setAncestor( self )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         if( self.U is not None ) : self.U.convertUnits( unitMap )
         self.parameter1.convertUnits( unitMap )
         if( self.parameter2 is not None ) : self.parameter2.convertUnits( unitMap )
 
     def copy( self ):
+        """
+        Returns a copy of *self*.
+        """
 
         U = self.U
         if U is not None: U = self.U.copy()
@@ -585,6 +1032,11 @@ class FunctionalBase( Subform ) :
     __copy__ = copy
 
     def check( self, info ):
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
 
@@ -595,20 +1047,37 @@ class FunctionalBase( Subform ) :
 
     @property
     def domainMin( self ) :
+        """
+        Returns the minimum projectile energy for *self*.
+        """
 
         return( self.parameter1.data.domainMin )
 
     @property
     def domainMax( self ) :
+        """
+        Returns the maximum projectile energy for *self*.
+        """
 
         return( self.parameter1.data.domainMax )
 
     @property
     def domainUnit(self):
+        """
+        Returns the energy unit of the projectile.
+        """
 
         return self.parameter1.data.axes[0].unit
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method returns the list of projectile energies that *self* is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         if( isinstance( self.parameter1.data, regionsModule.Regions1d ) ) :
             Es = []
@@ -624,7 +1093,7 @@ class FunctionalBase( Subform ) :
 
     def fixDomains(self, energyMin, energyMax, domainToFix):
         """
-        Calls the **fixDomains** for the **parameter1** member and if *self* is a **Watt** spectrum the **parameter2** member.
+        Calls the *fixDomains* for the **parameter1** member and if *self* is a **Watt** spectrum the **parameter2** member.
         """
 
         numberOfFixes = self.parameter1.data.fixDomains(energyMin, energyMax, domainToFix)
@@ -633,7 +1102,14 @@ class FunctionalBase( Subform ) :
         return numberOfFixes
 
     def toXML_strList( self, indent = '', **kwargs ) :
-        """Returns the xml string representation of self."""
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -649,6 +1125,28 @@ class FunctionalBase( Subform ) :
         return( xmlString )
 
 class GeneralEvaporation( FunctionalBase ) :
+    """
+    Class for storing the 2d general evaporation energy distribution. The distribution is of the form
+    :math:`g(E' / theta(E))`.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | U             | Constant that defines the upper energy limit for the              |
+    |               | secondary particle so that 0 ≤ E' ≤ E - U.                        |
+    +---------------+-------------------------------------------------------------------+
+    | thetas        | The :math:`theta(E)` function.                                    |
+    +---------------+-------------------------------------------------------------------+
+    | gs            | The :math:`g(x)` function.                                        |
+    +---------------+-------------------------------------------------------------------+
+
+    :param U:               Constant that defines the upper energy limit for the secondary particle so that 0 ≤ E' ≤ E - U.
+                            This is not used/needed so should be removed.
+    :param thetas:          The :math:`theta(E)` function.
+    :param gs:              The :math:`g(x)` function.
+    """
 
     moniker = 'generalEvaporation'
 
@@ -669,14 +1167,35 @@ class GeneralEvaporation( FunctionalBase ) :
         #if( self.parameter2 is not None ) : self.parameter2.convertUnits( unitMap )
 
     def averageEp( self, E ) :
+        """
+        Calculated the average energy of the outgoing photon at projectile energy *E*.
+
+        :param E:       The energy of the projectile energy.
+
+        :return:                Python float.
+        """
 
         return( self.parameter1.data.evaluate( E ) * self.parameter2.data.integrateWithWeight_x( ) )
 
     def sqrtEp_AverageAtE( self, E ) :
+        """
+        This method returns the value of the integral :math:`\int dE' \sqrt{E'} P(E') at projectile energy *E*.
+
+        :param E:   Energy of the projectile.
+
+        :return:    Python float.
+        """
 
         return( math.sqrt( self.parameter1.data.evaluate( E ) ) * self.parameter2.data ).integrateWithWeight_sqrt_x( )
 
     def energySpectrumAtEnergy( self, energyIn ) :
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn*,
+
+        :param energyIn:            Energy of the projectile.
+
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         theta = self.parameter1.data.evaluate(energyIn)
         spectrum = self.parameter2.data.toPointwise_withLinearXYs( accuracy = 1e-5, lowerEps = 1e-6, upperEps = 1e-6 )
@@ -684,13 +1203,22 @@ class GeneralEvaporation( FunctionalBase ) :
         return( XYs1d( spectrum, axes = defaultAxes( energyUnit = self.domainUnit ) ) )
 
     def isLinear( self, qualifierOk = False, flatIsOk = False ) :
-        """
-        Returns the results of isLinear called on the axes of g(E'|E).
+        r"""
+        Returns the results of isLinear called on the axes of :math:`g(E'|E)`.
         """
 
         return( self.parameter2.axes.isLinear( qualifierOk = qualifierOk, flatIsOk = flatIsOk ) )
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+        """
+        This method returns a copy of *self* with its g data as a :py:class:`Xs_pdf_cdf1d` instance.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+    
+        :return:                :py:class:`GeneralEvaporation`
+        """
 
         _gs = G(Xs_pdf_cdf1d.fromXYs(self.parameter2.data, thinEpsilon=1e-14))
         _gs.data.axes = self.parameter2.data.axes.copy()
@@ -698,6 +1226,13 @@ class GeneralEvaporation( FunctionalBase ) :
         return( _form )
 
     def toPointwise_withLinearXYs( self, **kwargs  ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         pwl = XYs2d( axes = defaultAxes( self.parameter1.data.domainUnit ) )
         thetas = self.parameter1.data.toPointwise_withLinearXYs( **kwargs )
@@ -711,7 +1246,17 @@ class GeneralEvaporation( FunctionalBase ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
-        """Translate <generalEvaporation> element from xml."""
+        """
+        Parse *element* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
         theta_ = Theta.parseNodeUsingClass(element.find(Theta.moniker), xPath, linkData, **kwargs)
@@ -722,6 +1267,29 @@ class GeneralEvaporation( FunctionalBase ) :
         return GES
 
 class SimpleMaxwellianFission1d:       # FIXME, needs units
+    """
+    This class represents a :py:class:`SimpleMaxwellianFission` instance evaluated at the specified projectile energy.
+    The 1d function is :math:`P(E') = \sqrt{E'} \, \exp(-E' /  \theta) / I` with :math:`\theta = \theta(E)` where E is the projectile energy
+    for this function.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | energy        | The projectile energy this function is evaluated at.              |
+    +---------------+-------------------------------------------------------------------+
+    | U             | Constant that defines the upper energy limit for the              |
+    |               | secondary particle so that 0 ≤ E' ≤ E - U.                        |
+    +---------------+-------------------------------------------------------------------+
+    | theta         | The value of :math:`theta(E)` at E = *energy*.                    |
+    +---------------+-------------------------------------------------------------------+
+
+    :param energy:          The projectile energy which :math:`theta = theta(E)` is evaluated at.
+    :param U:               Constant that defines the upper energy limit for the secondary particle so that 0 ≤ E' ≤ E - U.
+                            This is not used/needed so should be removed.
+    :param theta:           The value of :math:`theta = theta(E)` evaluated for E = energy.
+    """
 
     def __init__( self, energy, theta, U ) :
 
@@ -733,25 +1301,54 @@ class SimpleMaxwellianFission1d:       # FIXME, needs units
 
     @property
     def domainMin( self ) :
+        """
+        Returns the minimum projectile energy for *self*.
+        """
 
         return( 0.0 )
 
     @property
     def domainMax( self ) :
+        """
+        Returns the maximum projectile energy for *self*.
+        """
 
         return( self.U )
 
     def evaluate( self, energy ) :
+        """
+        Returns the value of *self* evaluated at outgoing particle energy *energy*.
+
+        :param energy:      The energy of the outgoing particle.
+
+        :return:            Python float.
+        """
 
         return( math.sqrt( energy ) * math.exp( -energy / self.theta ) / self.norm )
 
     def evaluateIndefiniteIntegral( self, energy ) :
+        """
+        Returns the value of the integral of *self* from E' = 0 to E' = *energy*.
+
+        :param energy:      The energy of the outgoing particle.
+
+        :return:            Python float.
+        """
 
         X = energy / self.theta
         sqrtX = math.sqrt( X )
         return( self.theta**1.5 * ( 0.5 * math.sqrt( math.pi ) * math.erf( sqrtX ) - sqrtX * math.exp( -X ) ) )
 
     def integrate( self, energyMin, energyMax ) :
+        """
+        This meethod integrates the distribution at projectile energy over the specified outgoing energy, mu and phi ranges.
+        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*, *muOut* and *phiOut*.
+        
+        :param energyMin:           The minimum value for the outgoing energy range.
+        :param energyMax:           The maximum value for the outgoing energy range.
+
+        :return:                    A float representing the value of the integration.
+        """
 
         energyMin = max( 0.0, min( energyMin, self.U ) ) / self.theta
         energyMax = max( 0.0, min( energyMax, self.U ) ) / self.theta
@@ -759,6 +1356,25 @@ class SimpleMaxwellianFission1d:       # FIXME, needs units
         return( ( self.evaluateIndefiniteIntegral( energyMax ) - self.evaluateIndefiniteIntegral( energyMin ) ) / self.norm )
 
 class SimpleMaxwellianFission( FunctionalBase ) :
+    """
+    Class for storing the 2d simple Maxwellian fission distribution. The distribution is defined as
+    :math:`P(E') = \sqrt{E'} \, \exp(-E' /  \theta(E)) / I`.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | U             | Constant that defines the upper energy limit for the              |
+    |               | secondary particle so that 0 ≤ E' ≤ E - U.                        |
+    +---------------+-------------------------------------------------------------------+
+    | thetas        | The :math:`theta(E)` function.                                    |
+    +---------------+-------------------------------------------------------------------+
+
+    :param U:               Constant that defines the upper energy limit for the secondary particle so that 0 ≤ E' ≤ E - U.
+                            This is not used/needed so should be removed.
+    :param thetas:          The :math:`theta(E)` function.
+    """
 
     moniker = 'simpleMaxwellianFission'
 
@@ -768,10 +1384,18 @@ class SimpleMaxwellianFission( FunctionalBase ) :
 
     @property
     def theta( self ) :
+        """Returns a reference to the 1d :math:`\theta(E)` function."""
 
         return( self.parameter1 )
 
     def averageEp( self, E ) :
+        """
+        Calculated the average energy of the outgoing photon at projectile energy *E*.
+
+        :param E:       The energy of the projectile energy.
+
+        :return:                Python float.
+        """
 
         theta = self.parameter1.data.evaluate( E )
         a = ( E - self.U.value ) / theta
@@ -782,6 +1406,13 @@ class SimpleMaxwellianFission( FunctionalBase ) :
         return( theta * ( 0.75 * erf_sqrt_a - sqrt_a * ( 1.5 + a ) * exp_a ) / ( 0.5 * erf_sqrt_a - sqrt_a * exp_a ) )
 
     def sqrtEp_AverageAtE( self, E ) :
+        """
+        This method returns the value of the integral :math:`\int dE' \sqrt{E'} P(E') at projectile energy *E*.
+
+        :param E:   Energy of the projectile.
+
+        :return:    Python float.
+        """
 
         theta = self.parameter1.data.evaluate( E )
         a = ( E - self.U.value ) / theta
@@ -792,6 +1423,13 @@ class SimpleMaxwellianFission( FunctionalBase ) :
         return( math.sqrt( theta ) * ( 1 - ( 1. + a ) * exp_a ) / ( 0.5 * erf_sqrt_a - sqrt_a * exp_a ) )
 
     def energySpectrumAtEnergy( self, energyIn ) :
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn*,
+
+        :param energyIn:            Energy of the projectile.
+
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         def A( energyOut, self ) :
 
@@ -802,12 +1440,34 @@ class SimpleMaxwellianFission( FunctionalBase ) :
         return( XYs1d( spectrum2, axes = defaultAxes( energyUnit = self.domainUnit ) ) )
 
     def evaluate( self, energy ) :
+        """
+        Returns a 1d function of *self* evaluated at projectile energy *energy*.
+
+        :param energy:      The energy of the outgoing particle.
+
+        :return:            :py:class:`SimpleMaxwellianFission1d` instance.
+        """
 
         return( SimpleMaxwellianFission1d( energy, self.theta.data.evaluate( energy ), self.U.value ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         def evaluateAtX( self, x ) :
+            """
+            A function needed by :py:class:`EnergyFunctionalDataToPointwise` to evaluate a simple Maxwellian fission
+            distribution at the outgoing particle energy *x* for :math:`\theta(E)` = self.p1.
+
+            :param x:       The energy of the outgoing particle.
+
+            :return:        Python float.
+            """
 
             return( math.sqrt( x ) * math.exp( -x / self.p1 ) )
 
@@ -816,6 +1476,17 @@ class SimpleMaxwellianFission( FunctionalBase ) :
 
     @classmethod
     def parseNodeUsingClass(cls, MFelement, xPath, linkData, **kwargs):
+        """
+        Parse *MFelement* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param MFelement:   Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *MFelement*.
+        """
 
         xPath.append( MFelement.tag )
         theta_ = Theta.parseNodeUsingClass(MFelement.find(Theta.moniker), xPath, linkData, **kwargs)
@@ -825,6 +1496,29 @@ class SimpleMaxwellianFission( FunctionalBase ) :
         return SMF
 
 class Evaporation1d:       # FIXME, needs units
+    """
+    This class represents an :py:class:`Evaporation` instance evaluated at the specified projectile energy.
+    The 1d function is :math:`P(E') = E' \, \exp(-E' /  \theta) / I` with :math:`\theta = \theta(E)` where E is the projectile energy
+    for this function.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | energy        | The projectile energy this function is evaluated at.              |
+    +---------------+-------------------------------------------------------------------+
+    | theta         | The value of :math:`theta(E)` at E = *energy*.                    |
+    +---------------+-------------------------------------------------------------------+
+    | U             | Constant that defines the upper energy limit for the              |
+    |               | secondary particle so that 0 ≤ E' ≤ E - U.                        |
+    +---------------+-------------------------------------------------------------------+
+
+    :param energy:          The projectile energy which :math:`theta = theta(E)` is evaluated at.
+    :param theta:           The value of :math:`theta = theta(E)` evaluated for E = energy.
+    :param U:               Constant that defines the upper energy limit for the secondary particle so that 0 ≤ E' ≤ E - U.
+                            This is not used/needed so should be removed.
+    """
 
     def __init__( self, energy, theta, U ) :
 
@@ -837,19 +1531,41 @@ class Evaporation1d:       # FIXME, needs units
 
     @property
     def domainMin( self ) :
+        """
+        Returns the minimum projectile energy for *self*.
+        """
 
         return( 0.0 )
 
     @property
     def domainMax( self ) :
+        """
+        Returns the maximum projectile energy for *self*.
+        """
 
         return( self.U )
 
     def evaluate( self, energy ) :
+        """
+        Returns the value of *self* evaluated at outgoing particle energy *energy*.
+
+        :param energy:      The energy of the outgoing particle.
+
+        :return:            Python float.
+        """
 
         return( energy * math.exp( -energy / self.theta ) / self.norm )
 
     def integrate( self, energyMin, energyMax ) :
+        """
+        This meethod integrates the distribution at projectile energy over the specified outgoing energy, mu and phi ranges.
+        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*, *muOut* and *phiOut*.
+        
+        :param energyMin:           The minimum value for the outgoing energy range.
+        :param energyMax:           The maximum value for the outgoing energy range.
+
+        :return:                    A float representing the value of the integration.
+        """
 
         energyMin = max( 0.0, min( energyMin, self.U ) ) / self.theta
         energyMax = max( 0.0, min( energyMax, self.U ) ) / self.theta
@@ -861,6 +1577,25 @@ class Evaporation1d:       # FIXME, needs units
         return( integral )
 
 class Evaporation( FunctionalBase ) :
+    """
+    Class for storing the 2d evaporation energy distribution. The distribution is of the form
+    :math:`E' \, \exp(-E'/theta(E)) / I`.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | U             | Constant that defines the upper energy limit for the              |
+    |               | secondary particle so that 0 ≤ E' ≤ E - U.                        |
+    +---------------+-------------------------------------------------------------------+
+    | thetas        | The :math:`theta(E)` function.                                    |
+    +---------------+-------------------------------------------------------------------+
+
+    :param U:               Constant that defines the upper energy limit for the secondary particle so that 0 ≤ E' ≤ E - U.
+                            This is not used/needed so should be removed.
+    :param thetas:          The :math:`theta(E)` function.
+    """
 
     moniker = 'evaporation'
 
@@ -870,10 +1605,18 @@ class Evaporation( FunctionalBase ) :
 
     @property
     def theta( self ) :
+        """Returns a reference to the 1d :math:`\theta(E)` function."""
 
         return( self.parameter1 )
 
     def averageEp( self, E ) :
+        """
+        Calculated the average energy of the outgoing photon at projectile energy *E*.
+
+        :param E:       The energy of the projectile energy.
+
+        :return:                Python float.
+        """
 
         if( isinstance( self.parameter1.data, regionsModule.Regions1d ) ) :
             for region in self.parameter1.data :
@@ -887,10 +1630,24 @@ class Evaporation( FunctionalBase ) :
         return( theta * ( 2. - a**2 * exp_a / ( 1. - ( 1. + a ) * exp_a ) ) )
 
     def evaluate( self, energy ) :
+        """
+        Returns a 1d function of *self* evaluated at projectile energy *energy*.
+
+        :param energy:      The energy of the outgoing particle.
+
+        :return:            :py:class:`Evaporation1d` instance.
+        """
 
         return( Evaporation1d( energy, self.theta.data.evaluate( energy ), self.U.value ) )
 
     def energySpectrumAtEnergy( self, energyIn ) :
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn*,
+
+        :param energyIn:            Energy of the projectile.
+
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         def A( energyOut, self ) :
 
@@ -901,6 +1658,13 @@ class Evaporation( FunctionalBase ) :
         return( XYs1d( spectrum2, axes = defaultAxes( energyUnit = self.domainUnit ) ) )
 
     def sqrtEp_AverageAtE( self, E ) :
+        """
+        This method returns the value of the integral :math:`\int dE' \sqrt{E'} P(E') at projectile energy *E*.
+
+        :param E:   Energy of the projectile.
+
+        :return:    Python float.
+        """
 
         theta = self.parameter1.data.evaluate( E )
         a = ( E - self.U.value ) / theta
@@ -910,8 +1674,24 @@ class Evaporation( FunctionalBase ) :
         return( math.sqrt( theta ) * ( 1.32934038817913702 * math.erf( sqrt_a ) - sqrt_a * ( 1.5 + a ) * exp_a ) / ( 1. - ( 1. + a ) * exp_a ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         def evaluateAtX( self, x ) :
+            """
+            A function needed by :py:func:`EnergyFunctionalDataToPointwise` to evaluate an evaporation 
+            distribution at the outgoing particle energy *x* for :math:`\theta(x)` = self.p1.
+
+            :param x:       The energy of the outgoing particle.
+
+            :return:        Python float.
+            """
+
 
             return( x * math.exp( -x / self.p1 ) )
 
@@ -920,6 +1700,17 @@ class Evaporation( FunctionalBase ) :
 
     @classmethod
     def parseNodeUsingClass(cls, evapElement, xPath, linkData, **kwargs):
+        """
+        Parse *evapElement* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param evapElement: Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *evapElement*.
+        """
 
         xPath.append( evapElement.tag )
         theta_ = Theta.parseNodeUsingClass(evapElement.find(Theta.moniker), xPath, linkData, **kwargs)
@@ -929,6 +1720,31 @@ class Evaporation( FunctionalBase ) :
         return ES
 
 class Watt( FunctionalBase ) :
+    """
+    Class for storing the 2d Watt energy distribution. The distribution is of the form
+    :math:`E' \, \exp(-E'/a(E)) \, \sinh(\sqrt{b(E) \, E'})/ I` where :math:`a(E)` and :math:`b(E)`
+    are 1d function of the projectile energy :math:`E`.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | U             | Constant that defines the upper energy limit for the              |
+    |               | secondary particle so that 0 ≤ E' ≤ E - U.                        |
+    +---------------+-------------------------------------------------------------------+
+    | a             | The :math:`a(E)` function.                                        |
+    +---------------+-------------------------------------------------------------------+
+    | b             | The :math:`b(E)` function.                                        |
+    +---------------+-------------------------------------------------------------------+
+
+    :param U:               Constant that defines the upper energy limit for the secondary particle so that 0 ≤ E' ≤ E - U.
+                            This is not used/needed so should be removed.
+    :param a:               The :math:`a(E)` function.
+    :param b:               The :math:`b(E)` function.
+    """
+
+    moniker = 'evaporation'
 
     moniker = 'Watt'
 
@@ -937,6 +1753,13 @@ class Watt( FunctionalBase ) :
         FunctionalBase.__init__( self, 11, U, a, b )
 
     def averageEp( self, E ) :
+        """
+        Calculated the average energy of the outgoing photon at projectile energy *E*.
+
+        :param E:       The energy of the projectile energy.
+
+        :return:                Python float.
+        """
 
         a, b = self.parameter1.data.evaluate( E ), self.parameter2.data.evaluate( E )
         domainMax_a  = ( E - self.U.value ) / a
@@ -952,11 +1775,25 @@ class Watt( FunctionalBase ) :
         return( EI / ( 16 * I ) )
 
     def energySpectrumAtEnergy( self, energyIn ) :
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn*,
+
+        :param energyIn:            Energy of the projectile.
+
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         return( self.evaluate( energyIn ) )
 
     def evaluate(self, energyIn, extrapolation=xDataEnumsModule.Extrapolation.none):
-        """Returns an XYs1d instance of self evaluated at the incident energy **energyIn**."""
+        """
+        This method returns a 1d function of *self* evaluated at projectile energy *energyIn*.
+
+        :param energyIn:        The projectile energy to evaluate *self* at.
+        :param extrapolation:   This argument is not used.
+
+        :return:                Instance of :py:class:`XYs1d`.
+        """
 
         def A( energyOut, parameters ) :
 
@@ -982,6 +1819,14 @@ class Watt( FunctionalBase ) :
         return( xys1d )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method returns the list of projectile energies that *self* is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         aMin, aMax = self.parameter1.data.domainMin, self.parameter1.data.domainMax
         if( EMin is None ) : EMin = aMin
@@ -1001,8 +1846,24 @@ class Watt( FunctionalBase ) :
         return( Es )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         def evaluateAtX( self, x ) :
+            """
+            A function needed by :py:func:`EnergyFunctionalDataToPointwise` to evaluate a Watt distribution
+            distribution at the outgoing particle energy *x* for :math:`\A(E)` = self.p1 and :math:`\B(E)` = self.p2.
+
+            :param x:       The energy of the outgoing particle.
+
+            :return:        Python float.
+            """
+
 
             return( math.exp( -x / self.p1 ) * math.sinh( math.sqrt( self.p2 * x ) ) )
 
@@ -1011,7 +1872,17 @@ class Watt( FunctionalBase ) :
 
     @classmethod
     def parseNodeUsingClass(cls, WattElement, xPath, linkData, **kwargs):
-        """Translate <Watt> element from xml."""
+        """
+        Parse *WattElement* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param WattElement: Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *WattElement*.
+        """
 
         xPath.append( WattElement.tag )
         _a = A.parseNodeUsingClass(WattElement.find(A.moniker), xPath, linkData, **kwargs)
@@ -1022,6 +1893,25 @@ class Watt( FunctionalBase ) :
         return WS
 
 class MadlandNix( FunctionalBase ) :
+    """
+    Class for storing the 2d Madland/Nix energy distribution.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | EFL           | Average kinetic energy per nucleon of the light fission fragment. |
+    +---------------+-------------------------------------------------------------------+
+    | EFH           | Average kinetic energy per nucleon of the heavy fission fragment. |
+    +---------------+-------------------------------------------------------------------+
+    | Ts            | The :math:`T_M(E)` function.                                      |
+    +---------------+-------------------------------------------------------------------+
+
+    :param EFL:             Average kinetic energy per nucleon of the light fission fragment.
+    :param EFH:             Average kinetic energy per nucleon of the heavy fission fragment.
+    :param Ts:              The :math:`T_M(E)` function.
+    """
 
     moniker = 'MadlandNix'
 
@@ -1032,12 +1922,20 @@ class MadlandNix( FunctionalBase ) :
         self.EFH = EFH
 
     def copy( self ):
+        """
+        Returns a copy of *self*.
+        """
 
         return MadlandNix( self.EFL.copy( ), self.EFH.copy( ), self.parameter1.copy( ) )
 
     __copy__ = copy
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
 
@@ -1048,23 +1946,48 @@ class MadlandNix( FunctionalBase ) :
         return warnings
 
     def averageEp( self, E ) :
+        """
+        Calculated the average energy of the outgoing photon at projectile energy *E*.
+
+        :param E:       The energy of the projectile energy.
+
+        :return:                Python float.
+        """
 
         unit = self.parameter1.data.axes[-1].unit
         return( 0.5 * ( self.EFL.getValueAs( unit ) + self.EFH.getValueAs( unit ) ) + 4. * self.parameter1.data.evaluate( E ) / 3. )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         FunctionalBase.convertUnits( self, unitMap )
         self.EFL.convertUnits( unitMap )
         self.EFH.convertUnits( unitMap )
 
     def energySpectrumAtEnergy( self, energyIn ) :
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn*,
+
+        :param energyIn:            Energy of the projectile.
+
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         return( self.evaluate( energyIn ) )
 
     def evaluate(self, energyIn, extrapolation=xDataEnumsModule.Extrapolation.none):
-        """Returns an XYs1d instance of self evaluated at the incident energy **energyIn**."""
+        """
+        This method returns a 1d function of *self* evaluated at projectile energy *energyIn*.
+
+        :param energyIn:        The projectile energy to evaluate *self* at.
+        :param extrapolation:   This argument is not used.
+
+        :return:                Instance of :py:class:`XYs1d`.
+        """
 
         from numericalFunctions import specialFunctions
 
@@ -1111,10 +2034,25 @@ class MadlandNix( FunctionalBase ) :
         return( xys1d )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method returns the list of projectile energies that *self* is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         return( [ x for x, y in self.parameter1.data ] )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         pwl = XYs2d( axes = defaultAxes( energyUnit = self.parameter1.data.axes[0].unit ) )
         for E, T_M in self.parameter1.data :        # This logic ignores the interpolation of parameter1 as the only two subforms in ENDF/B-VII shows 
@@ -1123,13 +2061,33 @@ class MadlandNix( FunctionalBase ) :
         return( pwl )
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+        """
+        This method returns a copy of *self* as a :py:class:`XYs2d` representation with the
+        P(E') data as :py:class:`Xs_pdf_cdf1d` instances.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+                    
+        :return:                :py:class:`XYs2d`
+        """
 
         linear = self.toPointwise_withLinearXYs( )
         return( linear.to_xs_pdf_cdf1d( style, tempInfo, indent ) )
 
     @classmethod
     def parseNodeUsingClass(cls, MNelement, xPath, linkData, **kwargs):
-        """Translate <MadlandNix> element from xml."""
+        """
+        Parse *MNelement* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param MNelement:   Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *MNelement*.
+        """
 
         xPath.append( MNelement.tag )
         tm = T_M.parseNodeUsingClass(MNelement.find(T_M.moniker), xPath, linkData, **kwargs)
@@ -1140,6 +2098,22 @@ class MadlandNix( FunctionalBase ) :
         return MN
 
 class NBodyPhaseSpace( Subform ) :
+    """
+    Class for storing the 2d N-body phase space energy distribution in the center-of-mass frame.
+
+    The following table list the primary members of this class:
+    
+    +-------------------+-------------------------------------------------------------------+
+    | Member            | Description                                                       |
+    +===================+===================================================================+
+    | numberOfProducts  | Number of outgoing particles.                                     |
+    +-------------------+-------------------------------------------------------------------+
+    | mass              | Mass of the *numberOfProducts* outgoing particle.                 |
+    +-------------------+-------------------------------------------------------------------+
+
+    :param numberOfProducts:    Number of outgoing particles.
+    :param mass:                Mass of the *numberOfProducts* outgoing particle.
+    """
 
     moniker = 'NBodyPhaseSpace'
 
@@ -1152,16 +2126,28 @@ class NBodyPhaseSpace( Subform ) :
         self.mass = mass 
 
     def convertUnits( self, unitMap ) :
+        """
+        Converts all data in *self* per *unitMap*.
 
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
         pass
 
     def copy( self ) :
+        """
+        Returns a copy of *self*.
+        """
 
         return NBodyPhaseSpace( self.numberOfProducts, self.mass.copy( ) )
 
     __copy__ = copy
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         #if ( abs( self.mass - info['reactionSuite'].products['n'].getMass('amu') * self.numberOfProducts ) >
         #        self.mass * 0.1 ) :    # return warning?
@@ -1172,6 +2158,15 @@ class NBodyPhaseSpace( Subform ) :
         """
         Calculate the average energy of the product in the center-of-mass frame for projectile energy E. This method only works for
         a one-step reaction.
+
+        :param E:                   The energy of the projectile.
+        :param massUnit:            The unit for *projectileMass*, *targetMass* and *productMass*.
+        :param projectileMass:      The mass of the projectile in unit of *massUnit*.
+        :param targetMass:          The mass of the target in unit of *massUnit*.
+        :param productMass:         The mass of the product in unit of *massUnit*.
+        :param Q:                   The Q-value for the reaction.
+
+        :return:                Python float.
         """
 
         M = self.mass.getValueAs( massUnit )
@@ -1184,6 +2179,13 @@ class NBodyPhaseSpace( Subform ) :
         return 0
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         from fudge import product as productModule
         from fudge import reactionSuite as reactionSuiteModule
@@ -1251,7 +2253,14 @@ class NBodyPhaseSpace( Subform ) :
         return pwl
 
     def toXML_strList( self, indent = '', **kwargs ) :
-        """Returns the xml string representation of self."""
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -1263,11 +2272,38 @@ class NBodyPhaseSpace( Subform ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *element*.
+        """
 
         mass = physicalQuantityModule.Mass.parseNodeUsingClass(element.find( 'mass' ), xPath, linkData, **kwargs)
         return cls( int( element.get( "numberOfProducts" ) ), mass )
 
 class Weighted1d :
+    """
+    This class represents an :py:class:`Weighted` instance evaluated at the specified projectile energy.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | weight        | A Python float the multiplies the functional.                     |
+    +---------------+-------------------------------------------------------------------+
+    | functional    | A 1d energy distribution of :math:`P(E')`.                        |
+    +---------------+-------------------------------------------------------------------+
+
+    :param weight:              The weight to apply to the functional to get the final :math:`f(E')` which my not be nornalized,
+    :param functional:          A 1d energy distribution of :math:`P(E')`.
+    """
 
     def __init__( self, weight, functional ) :
 
@@ -1276,23 +2312,59 @@ class Weighted1d :
 
     @property
     def domainMin( self ) :
+        """
+        Returns the minimum output particle energy for *self*.
+        """
 
         return( self.functional.domainMin )
 
     @property
     def domainMax( self ) :
+        """
+        Returns the maximum output particle energy for *self*.
+        """
 
         return( self.functional.domainMax )
 
     def evaluate( self, energy ) :
+        """
+        Returns the value of *self* evaluated at outgoing particle energy *energy*.
+
+        :param energy:      The energy of the outgoing particle.
+
+        :return:            Python float.
+        """
 
         return( self.weight * self.functional.evaluate( energy ) )
 
     def integrate( self, energyMin, energyMax ) :
+        """
+        This meethod integrates the distribution at projectile energy over the specified outgoing energy, mu and phi ranges.
+        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*, *muOut* and *phiOut*.
+        
+        :param energyMin:           The minimum value for the outgoing energy range.
+        :param energyMax:           The maximum value for the outgoing energy range.
+
+        :return:                    A float representing the value of the integration.
+        """
 
         return( self.weight * self.functional.integrate( energyMin, energyMax ) )
 
 class WeightedFunctionals1d :
+    """
+    This class represents an :py:class:`WeightedFunctionals` instance evaluated at the specified projectile energy.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | weighted1d    | The list of :py:class:`Weighted1d` instances that make the        |
+    |               | complete, normalized :math:`P(E')`.                               |
+    +---------------+-------------------------------------------------------------------+
+
+    :param weighted1d:      The list of :py:class:`Weighted1d` instances that make the complete, normalized :math:`P(E')`.
+    """
 
     def __init__( self ) :
 
@@ -1300,31 +2372,75 @@ class WeightedFunctionals1d :
 
     @property
     def domainMin( self ) :
+        """
+        Returns the minimum outgoing particle energy for *self*.
+        """
 
         return( min( weighted1d1.domainMin for weighted1d1 in self.weighted1d ) )
 
     @property
     def domainMax( self ) :
+        """
+        Returns the maximum outgoing particle energy for *self*.
+        """
 
         return( max( weighted1d1.domainMax for weighted1d1 in self.weighted1d ) )
 
     def append( self, _weighted1d ) :
+        """
+        Appends a :py:class:`Weighted1d` instance to *self*.
+
+        :param _weighted1d: A :py:class:`Weighted1d` instance.
+        """
 
         self.weighted1d.append( _weighted1d )
 
     def evaluate( self, energy ) :
+        """
+        Returns the value of *self* evaluated at outgoing particle energy *energy*.
+
+        :param energy:      The energy of the outgoing particle.
+
+        :return:            Python float.
+        """
 
         value = 0.0
         for weighted1d in self.weighted1d : value += weighted1d.evaluate( energy )
         return( value )
 
     def integrate( self, energyMin, energyMax ) :
+        """
+        This meethod integrates the distribution at projectile energy over the specified outgoing energy, mu and phi ranges.
+        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*, *muOut* and *phiOut*.
+        
+        :param energyMin:           The minimum value for the outgoing energy range.
+        :param energyMax:           The maximum value for the outgoing energy range.
+
+        :return:                    A float representing the value of the integration.
+        """
 
         value = 0.0
         for weighted1d in self.weighted1d : value += weighted1d.integrate( energyMin, energyMax )
         return( value )
 
 class Weighted(ancestryModule.AncestryIO):
+    r"""
+    This class represents 2d energy distribution math:`P(E'|E)` with a projectile energy dependent
+    weight function :math:`w(E)`. That is, the 2d energy distribution is :math:`w(E) \, P(E'|E)`.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | weight        | The projectile energy dependent function :math:`w(E)`.            |
+    +---------------+-------------------------------------------------------------------+
+    | functional    | The 2d energy distribution :math:`P(E'|E)`.                       |
+    +---------------+-------------------------------------------------------------------+
+
+    :param weight:              The weight function.
+    :param functional:          The 2d energy distribution :math:`P(E')`.
+    """
 
     moniker = 'weighted'
     ancestryMembers = ( 'weight', 'functional' )
@@ -1342,12 +2458,19 @@ class Weighted(ancestryModule.AncestryIO):
         self.functional.setAncestor( self )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.weight.convertUnits( unitMap )
         self.functional.convertUnits( unitMap )
 
     def copy( self ):
+        """
+        Returns a copy of *self*.
+        """
 
         return Weighted( self.weight.copy( ), self.functional.copy( ) )
 
@@ -1359,10 +2482,24 @@ class Weighted(ancestryModule.AncestryIO):
         self.functional.checkProductFrame( )
 
     def averageEp( self, E ) :
+        """
+        Calculated the average energy of the outgoing photon at projectile energy *E*.
+
+        :param E:           The energy of the projectile energy.
+
+        :return:            Python float.
+        """
 
         return( self.weight.evaluate( E ) * self.functional.averageEp( E ) )
 
     def evaluate( self, energy ) :
+        """
+        Returns the value of *self* evaluated at projectile energy *energy*.
+
+        :param energy:      The energy of the projectile.
+
+        :return:            A :py:class:`Weighted1d` instance..
+        """
 
         return( Weighted1d( self.weight.evaluate( energy ), self.functional.evaluate( energy ) ) )
 
@@ -1377,6 +2514,14 @@ class Weighted(ancestryModule.AncestryIO):
         return  numberOfFixes
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method returns the list of projectile energies that *self* is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         energyArray = self.functional.getEnergyArray( EMin, EMax )
         for x, y in self.weight :
@@ -1385,7 +2530,14 @@ class Weighted(ancestryModule.AncestryIO):
         return( energyArray )
 
     def toXML_strList( self, indent = '', **kwargs ) :
-        """Returns the xml string representation of self."""
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -1397,6 +2549,17 @@ class Weighted(ancestryModule.AncestryIO):
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         xPath.append(node.tag)
 
@@ -1418,6 +2581,18 @@ class Weighted(ancestryModule.AncestryIO):
         return instance
 
 class WeightedFunctionals( Subform ) :
+    """
+    This class represents the :math:`P(E'|E)` distribution as a list of :py:class:`Weighted` instances.
+
+    The following table list the primary members of this class:
+    
+    +---------------+-------------------------------------------------------------------+
+    | Member        | Description                                                       |
+    +===============+===================================================================+
+    | weights       | The list of :py:class:`Weighted` instances that make the          |
+    |               | complete, normalized distribution :math:`P(E'|E)`.                |
+    +---------------+-------------------------------------------------------------------+
+    """
 
     moniker = 'weightedFunctionals'
     ancestryMembers = ( 'weights', )
@@ -1428,19 +2603,34 @@ class WeightedFunctionals( Subform ) :
         self.weights = []
 
     def __len__( self ) :
+        """Returns the number of :py:class:`Weighted` instances in *self*."""
 
         return( len( self.weights ) )
 
     def __getitem__( self, i ) :
+        """
+        Returns the (i-1)^th :py:class:`Weighted` instance in *self*.
+
+        :param i:       The index of the :py:class:`Weighted` instance to return.
+
+        :return:        A :py:class:`Weighted` instance.
+        """
 
         return( self.weights[i] )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         for weight in self.weights : weight.convertUnits( unitMap )
 
     def copy( self ) :
+        """
+        Returns a copy of *self*.
+        """
 
         newWF = WeightedFunctionals( )
         for weight in self : newWF.addWeight( weight.copy( ) )
@@ -1449,6 +2639,11 @@ class WeightedFunctionals( Subform ) :
     __copy__ = copy
 
     def addWeight( self, weight ) :
+        """
+        Appends a :py:class:`Weighted` instance to *self*.
+
+        :param weight:  A :py:class:`Weighted` instance.
+        """
 
 # BRB. either we remove this class (WeightedFunctionals) or self.weights should be a suite like object and it should be
 # the ancestor of weight (i.e., self.weights[-1].setAncestor( self.weights ) and not weight.setAncestor( self ).
@@ -1457,6 +2652,11 @@ class WeightedFunctionals( Subform ) :
         weight.setAncestor( self )
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
 
@@ -1471,18 +2671,39 @@ class WeightedFunctionals( Subform ) :
         return warnings
 
     def averageEp( self, E ) :
+        """
+        Calculated the average energy of the outgoing photon at projectile energy *E*.
+
+        :param E:           The energy of the projectile energy.
+
+        :return:            Python float.
+        """
 
         Ep = 0
         for weight in self : Ep += weight.averageEp( E )
         return( Ep )
 
     def evaluate( self, energy ) :
+        """
+        This method returns a 1d functional representation of *self* evaluated at projectile energy *energy*.
+
+        :param energy:      The projectile energy to evaluate *self* at.
+
+        :return:            A :py:class:`WeightedFunctionals1d` instance.
+        """
 
         weightedFunctionals1d1 = WeightedFunctionals1d( )
         for weight in self : weightedFunctionals1d1.append( weight.evaluate( energy ) )
         return( weightedFunctionals1d1 )
 
     def energySpectrumAtEnergy( self, energyIn ) :
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn*,
+
+        :param energyIn:            Energy of the projectile.
+
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         xys1d = XYs1d( axes = defaultAxes( energyUnit = self.weights[0].functional.domainUnit ) )
         for weight in self :
@@ -1504,11 +2725,23 @@ class WeightedFunctionals( Subform ) :
         """
         This method has not been implemented. It returns None so the method uncorrelated.calculateAverageProductData will still work
         when calculating the momentum deposition for isotropic scattering in the lab frame, but will execute a raise otherwise.
+
+        :param E:       The energy of the projectile.
+
+        :return:        Python None
         """
 
         return( None )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method returns the list of projectile energies that *self* is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         energyArray = []
         for weight in self :
@@ -1534,6 +2767,13 @@ class WeightedFunctionals( Subform ) :
         return weightedFunctionals
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         if( len( self ) > 2 ) : raise Exception( 'more than two weights currently not supported' )
         E_ins, data = [], []
@@ -1563,7 +2803,14 @@ class WeightedFunctionals( Subform ) :
         return( pwl )
 
     def toXML_strList( self, indent = '', **kwargs ) :
-        """Returns the xml string representation of self."""
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -1574,6 +2821,17 @@ class WeightedFunctionals( Subform ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         xPath.append(node.tag)
 
@@ -1586,6 +2844,13 @@ class WeightedFunctionals( Subform ) :
         return WF
 
 class EnergyFunctionalDataToPointwise :
+    """
+    For internal use. This class is used by the methods toPointwise_withLinearXYs of the 2d functional energy distribution
+    to convert the functional into an :py:class:`XYs2d` instance.
+
+    :param data:            An instance of the 2d functional energy distribution.
+    :param evaluateAtX:     A function that evaluates the 2d functional energy distribution at a specific projectile energy.
+    """
 
     def __init__( self, data, evaluateAtX ) :
 
@@ -1593,6 +2858,13 @@ class EnergyFunctionalDataToPointwise :
         self.evaluateAtX = evaluateAtX
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         from fudge.core.math import fudgemath
 
@@ -1659,6 +2931,21 @@ class EnergyFunctionalDataToPointwise :
         return( pwl )
 
 class Form( baseModule.Form ) :
+    """
+    This class stores the enegy distribution part (i.e., :math:`P(E'|E)`) for an uncorrelated distribution.
+
+    The following table list the primary members of this class:
+    
+    +-------------------+-----------------------------------------------------------+
+    | Member            | Description                                               |
+    +===================+===========================================================+
+    | energySubform     | 2d energy distribution.                                   |
+    +-------------------+-----------------------------------------------------------+
+    
+    :param label:               The label for this form.
+    :param productFrame:        The frame the product data are specified in.
+    :param energySubform:       An :py:class:`Subform` representing the energy data.
+    """
 
     moniker = 'energy'
     subformAttributes = ( 'energySubform', )
@@ -1670,7 +2957,17 @@ class Form( baseModule.Form ) :
 
     @classmethod
     def parseNodeUsingClass(cls, energyElement, xPath, linkData, **kwargs):
-        """Translate energy component from xml."""
+        """
+        Parse *energyElement* into an instance of *cls*.
+
+        :param cls:             Form class to return.
+        :param energyElement:   Node to parse.
+        :param xPath:           List containing xPath to current node, useful mostly for debugging.
+        :param linkData:        dict that collects unresolved links.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *energyElement*.
+        """
 
         subformClass = {
                 DiscreteGamma.moniker :             DiscreteGamma,
