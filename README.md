@@ -52,9 +52,11 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
     - Clone FUDGE in the current directory: 
      
+        ```
         git clone https://github.com/LLNL/fudge.git
         # or using SSH (requires creating a github account and registering an ssh key):
         git clone git@github.com:LLNL/fudge.git
+        ```
      
     - Build FUDGE:
 
