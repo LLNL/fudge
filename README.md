@@ -7,8 +7,9 @@ The current release of **FUDGE** focuses on supporting version 2.0 of the Genera
 The **FUDGE** package includes tools to translate other nuclear data formats to and from **GNDS**,
 plus tools for testing, visualizing, and processing **GNDS** data.
 
-[!NOTE] An introductory class on FUDGE, GIDIplus and GNDS will be held at the NEA databank in Paris May 21-24, 2024.
-For more information, please see the [registration website](https://www.oecd-nea.org/jcms/pl_87938/fudge/-mc-gidi/gnds-introductory-course).[!NOTE]
+
+| :exclamation: An introductory class on FUDGE, GIDIplus and GNDS will be held at the NEA databank in Paris May 21-24, 2024. For more information, please see the [registration website](https://www.oecd-nea.org/jcms/pl_87938/fudge/-mc-gidi/gnds-introductory-course). |
+| ----------------- |
 
 # Contents of this README:
 
