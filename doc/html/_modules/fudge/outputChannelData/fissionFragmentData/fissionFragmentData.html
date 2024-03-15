@@ -132,6 +132,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__fissionEnergyReleases</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__productYields</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
+<div class="viewcode-block" id="FissionFragmentData.cullStyles"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.cullStyles">[docs]</a>    <span class="k">def</span> <span class="nf">cullStyles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">styleList</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; See documentation for reactionSuite.cullStyles. &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__delayedNeutrons</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span><span class="n">styleList</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fissionEnergyReleases</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span><span class="n">styleList</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__productYields</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span><span class="n">styleList</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="FissionFragmentData.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calls the **fixDomains** for the **delayedNeutrons** member.</span>

@@ -2039,10 +2039,10 @@ class Parsers :
     _spaces = r'[ \t]*'
     _anything_RE = '(.*)'
     _sign = '[+-]?'                                     # Optional sign regular expression.
-    _unsignedInteger = '\d+'
+    _unsignedInteger = r'\d+'
     _signedInteger = _sign + _unsignedInteger
-    _mantissa = '(%s)((\d+)\.?(\d*)|\.(\d+))' % _sign   # Regular expression matching a decimal or an integer string.
-    _exponent = '([eE](%s\d+))?' % _sign                # Optional exponent regular expression.
+    _mantissa = r'(%s)((\d+)\.?(\d*)|\.(\d+))' % _sign   # Regular expression matching a decimal or an integer string.
+    _exponent = r'([eE](%s\d+))?' % _sign                # Optional exponent regular expression.
 
     _floatingPoint_RE = '(%s%s)' % ( _mantissa, _exponent )   # Floating point regular expression.
     _floatingPoint_PO = re.compile( '^' + _spaces + _floatingPoint_RE + _spaces + '$' )
@@ -2583,7 +2583,7 @@ def _findUnit( unit ) :
     if( isinstance( unit, str ) ) :
         symbol = unit.strip( )
 
-        if( symbol == '' ) :
+        if( symbol == '' or symbol == 'as') : # exception to handle atto-second: conflict with python keyword "as"
             unit = _unit_table[symbol]
         else:
             unit = eval( symbol, _unit_table )
@@ -2646,7 +2646,7 @@ _prefixes = [( 'Y',  1.e24, 'yotta' ),
              ( 'n',  1.e-9, 'nano' ),
              ( 'p',  1.e-12, 'pico' ),
              ( 'f',  1.e-15, 'femto' ),
-             ( 'a',  1.e-18, 'atto' ),
+             ( 'a',  1.e-18, 'atto' ), # We support atto-second, but no operations within a single PhysicalUnit instance.
              ( 'z',  1.e-21, 'zepto' ),
              ( 'y',  1.e-24, 'yocto' ),
              ]
@@ -2663,7 +2663,10 @@ def _addUnit( symbol, unit, name = '' ) :
     if( name ) : _help.append( ( name, unit, symbol ) )
 
     if( isinstance( unit, str ) ) :
-        unit = eval( unit, _unit_table )
+        if unit == 'as': # exception to handle atto-second: conflict with python keyword "as"
+            unit = _unit_table[unit]
+        else:
+            unit = eval( unit, _unit_table )
 
         for cruft in ['__builtins__', '__args__'] :
             try :

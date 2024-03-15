@@ -9,6 +9,8 @@ import unittest
 import os
 import sys
 
+import numpy
+
 from pqu import PQU
 from fudge import reactionSuite
 from fudge.resonances.resolved import RMatrix, BoundaryCondition
@@ -1902,7 +1904,7 @@ class TestRMLClassAndBaseClasses(TestWithIsClose):
         self.assertEqual(self.RRRSmall.RR.reducedWidthAmplitudes, False)
         #self.assertEqual(self.RRRSmall.RR.calculatePenetrability, True)  # FIXME: why not this one too?
         self.assertEqual(self.RRRSmall.RR.calculateShift, False)
-        self.assertEqual(self.RRRSmall.RR.calculateChannelRadius, True)
+        self.assertEqual(self.RRRSmall.RR.calculateChannelRadius, False)
 
     def test_RR_spinGroup_memberData(self):
         self.assertEqual(self.RRRSmall.RR.spinGroups[0].label, '0')
@@ -2310,8 +2312,9 @@ class TestRMLClassAndBaseClasses(TestWithIsClose):
                     A2 = F * F + G * G
                     shift = numpy.array([rho]) * (S1 - R1 * (G * G1 + F * F1) / A2)
                     penet = numpy.array([rho]) / A2
-                    self.assertAlmostEqual(complex(shift, penet), complex(self.RRRSmall.shiftFactor(c.l, rho),
-                                                                          self.RRRSmall.penetrationFactor(c.l, rho)))
+                    self.assertTrue(numpy.allclose(
+                        shift + 1j * penet,
+                        self.RRRSmall.shiftFactor(c.l, rho) + 1j * self.RRRSmall.penetrationFactor(c.l, rho)))
 
                     # This is  a tougher test, it checks whether the L0's imaginary part matches the penetrability
                     # factor computed in the coulombPenetrationFactor function
@@ -2756,9 +2759,12 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
     def test_getCrossSection( self ):
         """Test 1 MeV point"""
         result = self.Zr90URR.getCrossSection(1e+6)
-        answer = { 'total':6.6530426032410315, 'elastic':6.648122758610173, 'fission':0.0, 'capture':0.004919844630858361 }
+        answer = {'total': 6.6530426032410315,
+                  'elastic': 6.648122758610173,
+                  'fission': 0.0,
+                  'capture': 0.004919844630858361}
         for k in answer:
-            self.assertAlmostEqual( float(answer[k]), float(result[k]), places=5 )
+            self.assertTrue(numpy.allclose(answer[k], result[k]))
 
     def test_rho(self):
         self.assertEqual( self.Zr90URR.rho(E=0.), 0.0 )

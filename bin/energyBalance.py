@@ -49,6 +49,7 @@ singleProtareArguments = argumentsForScriptsModule.SingleProtareArguments(parser
 parser.add_argument('outputDir', type=pathlib.Path,                         help='Director where all output files are written.')
 parser.add_argument('-o', '--output', type=pathlib.Path, default = '',      help='If present, file name to write the protare which contains the added energy data.')
 parser.add_argument('--plot', action='store_true',                          help='If present, the energy balance by reaction curves are plotted.')
+parser.add_argument('-w', '--crossSectionWeighted', action='store_true',    help='If present, the plot will be cross section weighted energy balance.')
 parser.add_argument('-d', '--dump', action='store', default=None,           help='If present, the protare is written the specified file after average product data are calculated.')
 parser.add_argument('-v', '--verbose', action='count', default=0,           help='If present, prints infomation.')
 args = parser.parse_args()
@@ -134,11 +135,18 @@ def output(reactionOutputDir, fileName, curve, crossSection=None):
         weighted = []
         for index, (xValue, yValue) in enumerate(curve):
             weighted.append([xValue, evaluateCurve(crossSection, xValue) * yValue])
-        weighted = XYs1dModule.XYs1d(data=weighted)
+        axes = curve.axes.copy()
+        axes[0].unit = '%s * %s' % (axes[0].unit, crossSection.axes[0].unit)
+        weighted = XYs1dModule.XYs1d(data=weighted, axes=axes)
         outputName = reactionOutputDir / 'CrossSectionWeighted' / fileName
         outputName.parent.mkdir(exist_ok=True)
         with outputName.open('w') as fOut:
             print(weighted.toString(), file=fOut, end='')
+
+        if args.crossSectionWeighted:
+            return weighted
+
+        return curve
 
 def outputProductData(reactionOutputDir, crossSection, outputChannel, productSums, level):
     '''
@@ -169,6 +177,9 @@ def checkTwoBody(reactionOutputDir, crossSection, outputChannel):
         product1, product2 = outputChannel.products[0], outputChannel.products[1]
 
         output(reactionOutputDir, 'twoBodyAverageProductEnergy_%s.dat' % product1.label, product1.averageProductEnergy[apdLabel], crossSection)
+        if apdLabel not in product2.averageProductEnergy:
+            print('WARNING: Two-body residual missing average product energy:' + product2.toXLink())
+            return
         output(reactionOutputDir, 'twoBodyAverageProductEnergy_%s.dat' % product2.label, product2.averageProductEnergy[apdLabel], crossSection)
 
         averageProductEnergy = product1.averageProductEnergy[apdLabel] + product2.averageProductEnergy[apdLabel]
@@ -218,11 +229,11 @@ def process(reaction, isReaction):
     for pid in productSums:
         totalProductEnergy = addCurves1d(totalProductEnergy, productSums[pid])
         output(reactionOutputDir, '_%s_averageProductEnergy.dat' % pid, productSums[pid], crossSection)
-    output(reactionOutputDir, 'totalProductEnergy.dat', totalProductEnergy, crossSection)
+    plotCurve = output(reactionOutputDir, 'totalProductEnergy.dat', totalProductEnergy, crossSection)
 
     if isReaction:
         energyBalance = addCurves1d(availableEnergy, -totalProductEnergy)
-        output(reactionOutputDir, 'energyBalance.dat', energyBalance, crossSection)
+        plotCurve = output(reactionOutputDir, 'energyBalance.dat', energyBalance, crossSection)
 
         for sumMT in sums:
             indices = sums[sumMT]['indices']
@@ -239,9 +250,9 @@ def process(reaction, isReaction):
                         crossSection2, productSum = crossSection2.mutualify(lowerUpperEpsilon, lowerUpperEpsilon, True, productSum, lowerUpperEpsilon, lowerUpperEpsilon, True)
                     sums[sumMT]['crossSection_energy'][pid] = addCurves1d(sums[sumMT]['crossSection_energy'][pid], crossSection2 * productSum)
     else:
-        energyBalance = totalProductEnergy
-    energyBalance.plotLabel = str(reaction)
-    energyBalanceCurves.append(energyBalance)
+        plotCurve = -totalProductEnergy
+    plotCurve.plotLabel = str(reaction)
+    energyBalanceCurves.append(plotCurve)
 
     reactionIndex += 1
 
@@ -324,7 +335,18 @@ if __name__=='__main__':
                 output(sumOutputDir, 'energyBalance.dat', energyBalance.thin(thinDefault), crossSection)
 
     if args.plot:
-        XYs1dModule.XYs1d.multiPlot(energyBalanceCurves, title='Energy balance per reaction')
+        title='Energy balance per reaction - %s' % str(protare)
+        xLabel = 'Energy [%s]' % protare.domainUnit
+        if args.crossSectionWeighted:
+            yLabel = 'Cross section * (energy available - sum of product energy) [%s]' % energyBalanceCurves[0].axes[0].unit
+            total = XYs1dModule.XYs1d()
+            for curve in energyBalanceCurves:
+                total = addCurves1d(total, curve)
+            total.plotLabel = 'total'
+            energyBalanceCurves.append(total)
+        else:
+            yLabel = 'Energy available - sum of product energy) [%s]' % energyBalanceCurves[0].axes[0].unit
+        XYs1dModule.XYs1d.multiPlot(energyBalanceCurves, title=title, xLabel=xLabel, yLabel=yLabel)
 
     if str(args.output) != '.':
         protare.saveToFile(args.output)

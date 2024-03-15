@@ -94,13 +94,14 @@ def defaultAxes( energyUnit ) :
     axes[2] = axesModule.Axis( 'energy_in', 2, energyUnit )
     return( axes )
 
+
 class XYs1d( XYs1dModule.XYs1d ) :
-    """
+    r"""
     Class to store :math:`P(\mu)` as a list of :math:`\mu_i` and :math:`P_i` points.
     """
 
     def averageMu( self ) :
-        """
+        r"""
         This method returns the average value of :math:`\mu` for *self*.
         """
 
@@ -109,7 +110,7 @@ class XYs1d( XYs1dModule.XYs1d ) :
         return( xys.integrateWithWeight_x( ) )
 
     def invert( self ) :
-        """
+        r"""
         This methed returns an :py:class:`XYs1d` instance that is the reflection of *self* (i.e., :math:`P(-\mu)`).
         """
 
@@ -156,7 +157,7 @@ class XYs1d( XYs1dModule.XYs1d ) :
         return Xs_pdf_cdf1d.fromXYs(self, outerDomainValue=self.outerDomainValue, thinEpsilon=1e-14)
 
 class Legendre( series1dModule.LegendreSeries ) :
-    """
+    r"""
     Class to store :math:`P(\mu)` as Legendre series coefficients.
     """
 
@@ -200,7 +201,7 @@ class Legendre( series1dModule.LegendreSeries ) :
         return( linear.to_xs_pdf_cdf1d( style, tempInfo, indent ) )
 
 class Xs_pdf_cdf1d( xs_pdf_cdfModule.Xs_pdf_cdf1d ) :
-    """
+    r"""
     This class stores both the :math:`P(\mu|E)` (i.e., pdf) and its cumlative distribution function cdf as three lists: one list
     for the :math:`\mu` values, and one list for the associated pdf value and one list for the associated cdf value for each :math:`\mu` value,
     """
@@ -220,7 +221,7 @@ class Xs_pdf_cdf1d( xs_pdf_cdfModule.Xs_pdf_cdf1d ) :
         return( XYs1d )
 
 class Isotropic1d(ancestryModule.AncestryIO):
-    """
+    r"""
     This class specifies that the angular distribution :math:`P(\mu)` is isotopic. 
     """
 
@@ -247,7 +248,7 @@ class Isotropic1d(ancestryModule.AncestryIO):
         return( 1.0 )
 
     def evaluate( self, mu ) :
-        """
+        r"""
         This method returns the value of :math:`P(\mu)` which is always 0.5 for an isotropic distribution.
 
         :param mu:      Value of :math:`\mu`  to evaluated :math:`P(\mu)` at.
@@ -330,7 +331,7 @@ class Subform( baseModule.Subform ) :
         return 0
 
 class Isotropic2d( Subform ) :
-    """
+    r"""
     Specifies that the angular distribution :math:`P(\mu|E)` is isotopic for all E. 
     """
 
@@ -514,7 +515,7 @@ class Isotropic2d( Subform ) :
         return cls()
 
 class Forward( Subform ) :
-    """
+    r"""
     Specifies that the angular distribution :math:`P(\mu|E)` is :math:`\delta( mu - 1 )` for all E. 
     """
 
@@ -582,7 +583,7 @@ class Forward( Subform ) :
         return( [ EMin, EMax ] )
 
     def invert( self ) :
-        """
+        r"""
         This methed returns an :py:class:`XYs1d` instance that is the reflection of *self* (i.e., :math:`P(-\mu)`).
         """
 
@@ -660,7 +661,7 @@ class Forward( Subform ) :
         return cls()
 
 class Recoil( linkModule.Link, Subform ) :
-    """
+    r"""
     Specifies that the angular distribution :math:`P(\mu|E)` is the recoil of the other two-body outgoing particle. 
     """
 
@@ -736,7 +737,7 @@ class Recoil( linkModule.Link, Subform ) :
     __copy__ = copy
 
     def evaluate( self, energy ) :
-        """
+        r"""
         This method returns a :math:`P(\mu)` of *self* evaluated at projectile energy *energy*.
 
         :param energy:      The projectile energy to evaluate *self* at.
@@ -747,7 +748,7 @@ class Recoil( linkModule.Link, Subform ) :
     def getNumericalDistribution( self ) :
         """
         This method returns a pointwise representation of *self*.
-\       """
+        """
 
         partnerForm = self.partner.toPointwise_withLinearXYs( upperEps = 1e-8 ).invert( )
         return( partnerForm )
@@ -808,7 +809,7 @@ class Recoil( linkModule.Link, Subform ) :
         return( self.partner.invert( ).toPointwise_withLinearXYs( **kwargs ) )
 
 class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
-    """
+    r"""
     Stores :math:`P(\mu|E)` as a list of :math:`E`, :math:`P(\mu)`. The :math:`P(\mu)` functions can be any value 1d angular function.
 
     :param kwargs:              A dictionary that contains data to control the way this method acts.
@@ -820,7 +821,7 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         Subform.__init__( self )
 
     def getAtEnergy( self, energy ) :
-        """
+        r"""
         This method returns :math:`P(\mu)` evaluated at projectile energy *energy*.
 
         :param energy:      The energy of the projectile.
@@ -838,8 +839,8 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         return probabilitiesModule.PofX1GivenX2.fixDomains(self, domainMin, domainMax, fixToDomain, tweakLower = tweakLower)
 
     def invert( self ) :
-        """
-        This methed returns an :py:class:`XYs2d` instance that is the reflection of *self* (i.e., :math:`P(-\mu|E)`).
+        r"""
+        This method returns an :py:class:`XYs2d` instance that is the reflection of *self* (i.e., :math:`P(-\mu|E)`).
         """
 
         ptw = XYs2d( axes = self.axes.copy( ) )
@@ -956,7 +957,7 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         return( ( XYs1d, Legendre, Xs_pdf_cdf1d ) )
 
 class Regions2d( Subform, regionsModule.Regions2d ) :
-    """
+    r"""
     Stores :math:`P(\mu|E)` as a list of other 2d angular distributions that abut at specific E values and form
     a contiguous function of E.
 
@@ -1238,7 +1239,7 @@ class Form( baseModule.Form ) :
         return( angularSubform )
 
 class TwoBody( baseModule.Form ) :
-    """
+    r"""
     This class specifies that the :math:`P(\mu|E)` is for a two-body reaction and that the data are in the center-of-mass frame. 
 
     The following table list the primary members of this class:
@@ -1271,7 +1272,7 @@ class TwoBody( baseModule.Form ) :
 
     @data.setter
     def data(self, data):
-        """
+        r"""
         Sets the data of *self* to *data*. Temporary method until I redo all the classes that have a data-like member. Need to check data type.
 
         :param data:    The :math:`P(\mu|E)` data for *self.*
@@ -1422,13 +1423,13 @@ class TwoBody( baseModule.Form ) :
         return PofEnergyPrime
 
     def evaluate( self, energy, mu, phi = 0, frame = None ) :
-        """
+        r"""
         This method returns the value of *self* at :math:`P(\mu|energy)`.
 
         :param energy:      This parameter is the projectile energy to evaluate *self* at.
         :param mu:          This parameter is the :math:`\mu` value to evaluate *self* at.
         :param phi:         This parameter is not used.
-        :param frame:       The frame to evalue *self* in.
+        :param frame:       The frame to evaluate *self* in.
         """
 
         if( frame is None ) : frame = self.productFrame
@@ -1567,8 +1568,8 @@ class TwoBody( baseModule.Form ) :
         return( angular_evaluate * phi_evaluate )
 
     def invert( self ) :
-        """
-        This methed returns a 2d angular instance that is the reflection of *self* (i.e., :math:`P(-\mu|E)`).
+        r"""
+        This method returns a 2d angular instance that is the reflection of *self* (i.e., :math:`P(-\mu|E)`).
         """
 
         return( self.angularSubform.invert( ) )
@@ -1697,7 +1698,7 @@ class TwoBody( baseModule.Form ) :
 
     @staticmethod
     def productMuInCOM_fromProductMuInLab(muLab, COM_speed, productCOM_speed):
-        """
+        r"""
         This function returns the tuple (mu1, mu2, isTangent) where mu1 and mu2 are the center-of-
         mass (COM) frame mus for an outgoing particle (product) that correspond to the lab frame mu *muLab*.
         The interaction is two-body, *COM_speed* is the COM mass speed and *productCOM_speed*
@@ -1778,7 +1779,7 @@ def calculateAverageProductData( self, style, indent, **kwargs ) :
     """
 
     def calculateDepositionEnergyAtE( angularData, E, parameters ) :
-        """
+        r"""
         For internal use. This function calculates the average energy to the outgoing particle in the lab frame.
 
         :param angularData:     The angular data :math:`P(\mu|E)`.
@@ -1791,7 +1792,7 @@ def calculateAverageProductData( self, style, indent, **kwargs ) :
         return( a1x * E + a2y * dE + 2. * math.sqrt( a1x * a2y * E * dE ) * angularData.averageMu( E, accuracy = energyAccuracy ) )
 
     def calculateDepositionEnergyAtEForPhotoProjectile( angularData, E, parameters ) :
-        """
+        r"""
         For internal use. This function calculates the average energy to the outgoing photon in the lab frame
         when the projectile is a photon.
 
@@ -1806,7 +1807,7 @@ def calculateAverageProductData( self, style, indent, **kwargs ) :
         return( 0.5 * E__E_m2**2 * massx + dE + E__E_m2 * math.sqrt( 2. * dE * massx ) * angularData.averageMu( E, accuracy = energyAccuracy ) )
 
     def calculateDepositionEnergyAtE_forInfiniteTargetMass( angularData, E, parameters ) :
-        """
+        r"""
         For internal use. This function calculates the average energy to the outgoing photon in the lab frame assuming theat the
         target mass can be assumed to be infinite. The returned value is alwasy *E*.
 
@@ -1841,7 +1842,7 @@ def calculateAverageProductData( self, style, indent, **kwargs ) :
             return( self.func( self.angular, E, self.parameters ) )
 
     def calculateDepositionMomentumAtE( angularData, E, parameters ) :
-        """
+        r"""
         For internal use. This function calculates the average momentum to the outgoing particle in the lab frame.
 
         :param angularData:     The angular data :math:`P(\mu|E)`.
@@ -1854,7 +1855,7 @@ def calculateAverageProductData( self, style, indent, **kwargs ) :
         return( b1x * math.sqrt( 2. * E / mass1 ) + math.sqrt( 2. * massx * a2y * dE ) * angularData.averageMu( E, accuracy = momentumAccuracy ) )
 
     def calculateDepositionMomentumAtEForPhotoProjectile( angularData, E, parameters ) :
-        """
+        r"""
         For internal use. This function calculates the average energy to the outgoing particle in the lab frame
         when the projectile is a photon.
 
@@ -1869,9 +1870,9 @@ def calculateAverageProductData( self, style, indent, **kwargs ) :
         return( E__E_m2 * massx + math.sqrt( 2. * dE * massx ) * angularData.averageMu( E, accuracy = momentumAccuracy ) )
 
     def calculateDepositionMomentumAtE_forInfiniteTargetMass( angularData, E, parameters ) :
-        """
-        For internal use. This function calculates the average energy to the outgoing photon in the lab frame assuming theat the
-        target mass can be assumed to be infinite.
+        r"""
+        For internal use. This function calculates the average energy to the outgoing photon in the lab frame assuming
+        that the target mass can be assumed to be infinite.
 
         :param angularData:     The angular data :math:`P(\mu|E)`.
         :param E:               The projectile energy the average energy is evaluated at.

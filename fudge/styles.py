@@ -371,7 +371,7 @@ class Styles(ancestryModule.AncestryIO_base):
             xmlStringList += _style.toXML_strList(indent2, **kwargs, parameters = parameters)
 
         if len(xmlStringList) == 1:
-            if kwargs.get('showEmptySuites', False):
+            if kwargs.get('showEmpty', False) or kwargs.get('showEmptySuite', False):
                 xmlStringList = [xmlStringList[0][:-1] + '/>']
             else:
                 xmlStringList = []

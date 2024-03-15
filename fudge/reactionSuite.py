@@ -1468,7 +1468,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
         if( kwargs['failures'] > 0 ) : raise ValueError( "kwargs['failures'] = %d  > 0" % kwargs['failures'] )
 
     def multiGroupVector(self, childSuite, multiGroupVectorMethod, multiGroupSettings, temperatureInfo, **kwargs):
-        """
+        r"""
         General method to return multiGroupVector output from a specified multiGroupVectorMethod for specified reactionSuite child nodes.
 
         :param childSuite: Suite which to iterate over.

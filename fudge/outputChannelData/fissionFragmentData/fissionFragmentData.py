@@ -93,6 +93,13 @@ class FissionFragmentData(ancestryModule.AncestryIO_base):
         self.__fissionEnergyReleases.convertUnits( unitMap )
         self.__productYields.convertUnits( unitMap )
 
+    def cullStyles(self, styleList):
+        """ See documentation for reactionSuite.cullStyles. """
+
+        self.__delayedNeutrons.cullStyles(styleList)
+        self.__fissionEnergyReleases.cullStyles(styleList)
+        self.__productYields.cullStyles(styleList)
+
     def fixDomains(self, labels, energyMin, energyMax):
         """
         Calls the **fixDomains** for the **delayedNeutrons** member.

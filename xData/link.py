@@ -255,9 +255,6 @@ class Link2(ancestryModule.AncestryIO):
         if self.__instance is None:
             self.updateLink()
 
-        if self.__instance is None:
-            self.updateLink()
-
         return self.__instance
 
     @instance.setter

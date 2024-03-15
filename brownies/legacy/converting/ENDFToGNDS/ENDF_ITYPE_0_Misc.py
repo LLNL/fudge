@@ -2466,7 +2466,7 @@ def readMF8(info, MT, MTData, warningList):
                     TAB1, crossSection = MF10Data[idx]
                 QM, QI, IZAP, LFS9or10 = TAB1['C1'], TAB1['C2'], int( TAB1['L1'] ), int( TAB1['L2'] )
                 ELFS9or10 = QM - QI
-                if abs(ELFS - ELFS9or10) > 2e-4 * abs(ELFS):
+                if abs(ELFS - ELFS9or10) > 2e-4 * abs(ELFS) and abs(ELFS - ELFS9or10) > 1e-6 * abs(QM):
                     if not info.convertJENDL_stylePrimarygammas or abs(ELFS - ELFS9or10) > 1e-3 * abs(ELFS):
                         warningList.append(
                             f"MF8 residual level energy = {ELFS} for level {LIS} of ZA = {ZAP} not close "

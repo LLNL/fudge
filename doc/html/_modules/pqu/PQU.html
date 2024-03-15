@@ -2078,10 +2078,10 @@
     <span class="n">_spaces</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[ \t]*&#39;</span>
     <span class="n">_anything_RE</span> <span class="o">=</span> <span class="s1">&#39;(.*)&#39;</span>
     <span class="n">_sign</span> <span class="o">=</span> <span class="s1">&#39;[+-]?&#39;</span>                                     <span class="c1"># Optional sign regular expression.</span>
-    <span class="n">_unsignedInteger</span> <span class="o">=</span> <span class="s1">&#39;\d+&#39;</span>
+    <span class="n">_unsignedInteger</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\d+&#39;</span>
     <span class="n">_signedInteger</span> <span class="o">=</span> <span class="n">_sign</span> <span class="o">+</span> <span class="n">_unsignedInteger</span>
-    <span class="n">_mantissa</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">)((\d+)\.?(\d*)|\.(\d+))&#39;</span> <span class="o">%</span> <span class="n">_sign</span>   <span class="c1"># Regular expression matching a decimal or an integer string.</span>
-    <span class="n">_exponent</span> <span class="o">=</span> <span class="s1">&#39;([eE](</span><span class="si">%s</span><span class="s1">\d+))?&#39;</span> <span class="o">%</span> <span class="n">_sign</span>                <span class="c1"># Optional exponent regular expression.</span>
+    <span class="n">_mantissa</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">)((\d+)\.?(\d*)|\.(\d+))&#39;</span> <span class="o">%</span> <span class="n">_sign</span>   <span class="c1"># Regular expression matching a decimal or an integer string.</span>
+    <span class="n">_exponent</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;([eE](</span><span class="si">%s</span><span class="s1">\d+))?&#39;</span> <span class="o">%</span> <span class="n">_sign</span>                <span class="c1"># Optional exponent regular expression.</span>
 
     <span class="n">_floatingPoint_RE</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">%s%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">_mantissa</span><span class="p">,</span> <span class="n">_exponent</span> <span class="p">)</span>   <span class="c1"># Floating point regular expression.</span>
     <span class="n">_floatingPoint_PO</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span> <span class="s1">&#39;^&#39;</span> <span class="o">+</span> <span class="n">_spaces</span> <span class="o">+</span> <span class="n">_floatingPoint_RE</span> <span class="o">+</span> <span class="n">_spaces</span> <span class="o">+</span> <span class="s1">&#39;$&#39;</span> <span class="p">)</span>
@@ -2622,7 +2622,7 @@
     <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
         <span class="n">symbol</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span> <span class="p">)</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="n">symbol</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">symbol</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">symbol</span> <span class="o">==</span> <span class="s1">&#39;as&#39;</span><span class="p">)</span> <span class="p">:</span> <span class="c1"># exception to handle atto-second: conflict with python keyword &quot;as&quot;</span>
             <span class="n">unit</span> <span class="o">=</span> <span class="n">_unit_table</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">unit</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">_unit_table</span> <span class="p">)</span>
@@ -2685,7 +2685,7 @@
              <span class="p">(</span> <span class="s1">&#39;n&#39;</span><span class="p">,</span>  <span class="mf">1.e-9</span><span class="p">,</span> <span class="s1">&#39;nano&#39;</span> <span class="p">),</span>
              <span class="p">(</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span>  <span class="mf">1.e-12</span><span class="p">,</span> <span class="s1">&#39;pico&#39;</span> <span class="p">),</span>
              <span class="p">(</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span>  <span class="mf">1.e-15</span><span class="p">,</span> <span class="s1">&#39;femto&#39;</span> <span class="p">),</span>
-             <span class="p">(</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span>  <span class="mf">1.e-18</span><span class="p">,</span> <span class="s1">&#39;atto&#39;</span> <span class="p">),</span>
+             <span class="p">(</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span>  <span class="mf">1.e-18</span><span class="p">,</span> <span class="s1">&#39;atto&#39;</span> <span class="p">),</span> <span class="c1"># We support atto-second, but no operations within a single PhysicalUnit instance.</span>
              <span class="p">(</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span>  <span class="mf">1.e-21</span><span class="p">,</span> <span class="s1">&#39;zepto&#39;</span> <span class="p">),</span>
              <span class="p">(</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span>  <span class="mf">1.e-24</span><span class="p">,</span> <span class="s1">&#39;yocto&#39;</span> <span class="p">),</span>
              <span class="p">]</span>
@@ -2702,7 +2702,10 @@
     <span class="k">if</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span> <span class="n">_help</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">symbol</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="n">unit</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">_unit_table</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s1">&#39;as&#39;</span><span class="p">:</span> <span class="c1"># exception to handle atto-second: conflict with python keyword &quot;as&quot;</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="n">_unit_table</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">_unit_table</span> <span class="p">)</span>
 
         <span class="k">for</span> <span class="n">cruft</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;__builtins__&#39;</span><span class="p">,</span> <span class="s1">&#39;__args__&#39;</span><span class="p">]</span> <span class="p">:</span>
             <span class="k">try</span> <span class="p">:</span>

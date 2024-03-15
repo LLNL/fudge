@@ -10,9 +10,11 @@
 import sys, os
 import brownies.legacy.toENDF6.endfFormats as endfFormatsModule
 
-f = open( sys.argv[1] )
-ls = f.readlines( )
-f.close( )
+with open(sys.argv[1]) as fin:
+    ls = fin.readlines()
+
+while len(ls[-1].strip()) == 0:
+    ls.pop()    # ignore empty lines at EOF
 
 f = open( sys.argv[2], 'w' )
 

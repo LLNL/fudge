@@ -40,7 +40,7 @@ def getVersionNumber():
             gitDescribe = runShellCommand(['git', 'describe', '--abbrev=40', '--match', 'fudge[0-9].[0-9]*'], True)
             
             # see https://www.python.org/dev/peps/pep-0440/
-            regexGitDescribe = re.compile('^fudge(?P<major>\d+).(?P<minor>\d+)(?:-(?P<releaseCondidate>rc\d+)(-(?P<postRelease>\d+)-(?P<repoIdentifier>.+))?)?$')
+            regexGitDescribe = re.compile(r'^fudge(?P<major>\d+).(?P<minor>\d+)(?:-(?P<releaseCondidate>rc\d+)(-(?P<postRelease>\d+)-(?P<repoIdentifier>.+))?)?$')
             regexMatch = regexGitDescribe.match(gitDescribe)
             if regexMatch:
                 regexMatch = regexMatch.groupdict()

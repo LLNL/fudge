@@ -104,6 +104,16 @@ class Gridded1d( Gridded ) :
         """
         return self.array.constructVector()
 
+    def copyDataToXsAndYs(self):
+        """
+        """
+
+        xs = self.axes[1].values.values
+        ys = list(self.constructVector())
+        ys.append(ys[-1])
+
+        return xs, ys
+
 class Gridded2d( Gridded ) :
 
     moniker = 'gridded2d'
