@@ -17,11 +17,11 @@ from fudge import reactionSuite as reactionSuiteModule
 from fudge.processing import transporting as transportingModule
 from fudge.processing.deterministic import multiGroupSettings as multiGroupSettingsModule
 
-summaryDocStringFUDGE_example = '''This script shows how to use GIDI to access multi-group data in a GNDS file.'''
+summaryDocStringFUDGE_example = """This script shows how to use FUDGE to access multi-group data in a GNDS file."""
 
-description = '''
-This script shows how to use GIDI to access multi-group data in a GNDS file.
-'''
+description = """
+This script shows how to use FUDGE to access multi-group data in a GNDS file.
+"""
 
 doubleFormat = '%14.7e'
 file=sys.stdout
@@ -74,9 +74,9 @@ for label in multiGroups:
     break
 
 def printVector(prefix, vector, temperature):
-    '''
+    """
     Prints the vector as a histogram (group boundary, value) pairs if option '--histogram' present. Otherwise, calls printVector2.
-    '''
+    """
 
     if not args.histogram:
         printVector2(prefix, vector)
@@ -88,7 +88,7 @@ def printVector(prefix, vector, temperature):
             print('%s %s' % (doubleFormat % boundaries[index+1], doubleFormat % value))
 
 def printVector2(prefix, vector):
-    '''Prints the prefix and vector data on one line.'''
+    """Prints the prefix and vector data on one line."""
 
     print('# %s::' % prefix, end='')
     for value in vector:
@@ -96,7 +96,7 @@ def printVector2(prefix, vector):
     print()
 
 def printMatrix(prefix, matrix):
-    '''Prints a matrix by calling printVector2 for each row of the matrix.'''
+    """Prints a matrix by calling printVector2 for each row of the matrix."""
 
     prefix = '%s (shape = %s)' % (prefix, matrix.shape)
     rowPrefix = len(prefix) * ' '

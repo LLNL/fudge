@@ -27,7 +27,7 @@ def runShellCommand(_shellCommand, returnSTDOUT=False):
 
 def defaultVersionNumber():
     if not os.path.isfile(versionOutputFile):
-        output = ['FUDGE_MAJORVERSION = 6', 'FUDGE_MINORVERSION = 5', 'FUDGE_RELEASECANDIDATE = \'\'', 'FUDGE_POSTRELEASE = \'\'', 'FUDGE_REPOIDENTIFIER = \'\'']
+        output = ['FUDGE_MAJORVERSION = 6', 'FUDGE_MINORVERSION = 6', 'FUDGE_RELEASECANDIDATE = \'\'', 'FUDGE_POSTRELEASE = \'\'', 'FUDGE_REPOIDENTIFIER = \'\'']
 
         with open(versionOutputFile, 'w') as fileObject:
             fileObject.write('\n'.join(output))
@@ -40,7 +40,7 @@ def getVersionNumber():
             gitDescribe = runShellCommand(['git', 'describe', '--abbrev=40', '--match', 'fudge[0-9].[0-9]*'], True)
             
             # see https://www.python.org/dev/peps/pep-0440/
-            regexGitDescribe = re.compile('^fudge(?P<major>\d+).(?P<minor>\d+)(?:-(?P<releaseCondidate>rc\d+)(-(?P<postRelease>\d+)-(?P<repoIdentifier>.+))?)?$')
+            regexGitDescribe = re.compile(r'^fudge(?P<major>\d+).(?P<minor>\d+)(?:-(?P<releaseCondidate>rc\d+)(-(?P<postRelease>\d+)-(?P<repoIdentifier>.+))?)?$')
             regexMatch = regexGitDescribe.match(gitDescribe)
             if regexMatch:
                 regexMatch = regexMatch.groupdict()

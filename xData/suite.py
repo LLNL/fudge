@@ -268,20 +268,24 @@ class Suite(ancestryModule.AncestryIO_bare):
         self.clear( )
         for item in other : self.add( item.copy( ) )
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
         """
         Returns an list of XML strings representing *self* and its items.
         """
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-        showEmptySuites = kwargs.get( 'showEmptySuites', False )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
+        showEmptySuite = kwargs.get('showEmpty', False) or kwargs.get('showEmptySuite', False)
 
-        if( ( len( self ) == 0 ) and not( showEmptySuites ) ) : return( [] )
-        XML_stringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        for item in self : XML_stringList += item.toXML_strList( indent = indent2, **kwargs )
+        if len(self) == 0 and not showEmptySuite:
+            return []
+        if showEmptySuite:
+            return ['%s%-24s <!-- suite -->' % (indent, '<%s/>' % self.moniker)]
+        XML_stringList = ['%s<%s>' % (indent, self.moniker)]
+        for item in self:
+            XML_stringList += item.toXML_strList(indent = indent2, **kwargs)
         XML_stringList[-1] += '</%s>' % self.moniker
 
-        return( XML_stringList )
+        return XML_stringList
 
     def uniqueKey( self, item ) :
         """

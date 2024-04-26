@@ -31,48 +31,55 @@ class Context:
     plus a nested list of warnings or other context instances
     """
 
-    def __init__( self, message='', warningList=None ):
+    def __init__(self, message="", warningList=None):
         self.message = message
         self.warningList = warningList or []
 
-    def __len__( self ):
+    def __len__(self):
         return len(self.warningList)
 
-    def __getitem__( self, idx ):
+    def __getitem__(self, idx):
         return self.warningList[idx]
 
-    def __str__( self ):
+    def __str__(self):
         if len(self.warningList) == 0:
             return self.message + ": no problems encountered"
-        return '\n'.join(self.toStringList())
+        return "\n".join(self.toStringList())
 
-    def __eq__( self, other ):
+    def __eq__(self, other):
         return self.message == other.message and self.warningList == other.warningList
 
-    def filter( self, include=None, exclude=None ):
+    def filter(self, threshold=None, include=None, exclude=None):
         """
         Filter warning list to only include (or exclude) specific classes of warning. For example:
 
-        >>> newWarnings = warnings.filter( exclude=[DiscreteLevelsOutOfOrder] )
+        >>> newWarnings = warnings.filter(exclude=[DiscreteLevelsOutOfOrder])
 
         Note that if both 'include' and 'exclude' lists are provided, exclude is ignored.
         """
 
-        if include is None and exclude is None: return self
         newWarningList = []
+        screened = {}
+        if include is None and exclude is None and threshold is None:
+            return self, screened
         for warning in self.warningList:
-            if isinstance(warning, Context):
-                newContext = warning.filter(include, exclude)
-                if newContext: newWarningList.append(newContext)
+            if not isinstance(warning, Warning):
+                newContext, newScreened = warning.filter(include, exclude)
+                if newContext:
+                    newWarningList.append(newContext)
+                for key in newScreened:
+                    screened[key] = screened.get(key, 0) + newScreened[key]
+            elif threshold is not None:
+                pass    # FIXME implement thresholds for PoPs warnings!
             elif include is not None:
                 if warning.__class__ in include:
                     newWarningList.append(warning)
             else:  # exclude is not None:
                 if warning.__class__ not in exclude:
                     newWarningList.append(warning)
-        return Context(self.message, newWarningList)
+        return Context(self.message, newWarningList), screened
 
-    def flatten( self ):
+    def flatten(self):
         """
         From a nested hierarchy of warnings, get back a flat list for easier searching:
 
@@ -90,9 +97,9 @@ class Context:
                 List += val.flatten()
         return List
 
-    def toStringList( self, indent='', dIndent='    ' ):
-        """ Format warnings for printing. Returns a list of warning strings with indentation. """
-        s = ['%s%s' % (indent, self.message)]
+    def toStringList(self, indent="", dIndent="    "):
+        """Format warnings for printing. Returns a list of warning strings with indentation."""
+        s = ["%s%s" % (indent, self.message)]
         for warning in self.warningList:
             s += warning.toStringList(indent + dIndent)
         return s
@@ -105,25 +112,26 @@ class Warning:  # FIXME make abstract base class?
     and information about the warning or error.
     """
 
-    def __init__( self, obj=None ):
+    def __init__(self, obj=None):
         self.obj = obj
-        self.xpath = ''
-        if hasattr(obj, 'toXLink'):
+        self.xpath = ""
+        if hasattr(obj, "toXLink"):
             self.xpath = obj.toXLink()
 
-    def __str__( self ):
+    def __str__(self):
         return "Generic warning for %s" % self.xpath
 
-    def __eq__( self, other ):
+    def __eq__(self, other):
         return self.xpath == other.xpath
 
-    def toStringList( self, indent='' ):
-        return ['%sWARNING: %s' % (indent, self)]
+    def toStringList(self, indent=""):
+        return ["%sWARNING: %s" % (indent, self)]
 
 
 #
 # specific warning classes:
 #
+
 
 class NotImplemented(Warning):
     def __init__(self, form, obj=None):
@@ -138,13 +146,14 @@ class NotImplemented(Warning):
 
 
 class UnknownEnergy(Warning):
-
     def __init__(self, nucleus):
         Warning.__init__(self)
         self.nucleus = nucleus
 
     def __str__(self):
-        return "Could not determine excitation energy for nucleus '%s'" % self.nucleus.id
+        return (
+            "Could not determine excitation energy for nucleus '%s'" % self.nucleus.id
+        )
 
 
 class DiscreteLevelsOutOfOrder(Warning):
@@ -168,7 +177,7 @@ class UnnormalizedDecayProbabilities(Warning):
         return "Sum of decay probabilities = %s, should be 1.0!" % (self.branchingSum)
 
     def __eq__(self, other):
-        return (self.xpath == other.xpath and self.branchingSum == other.branchingSum)
+        return self.xpath == other.xpath and self.branchingSum == other.branchingSum
 
 
 class AliasToNonExistentParticle(Warning):

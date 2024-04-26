@@ -59,6 +59,7 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
 
 <span class="kn">from</span> <span class="nn">xml.etree</span> <span class="kn">import</span> <span class="n">cElementTree</span>
 
@@ -382,7 +383,11 @@
 
         <span class="n">xPathList</span> <span class="o">=</span> <span class="n">xPath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>                        <span class="c1"># FIXME refactor to use xml.etree.ElementPath.xpath_tokenizer?</span>
 
-        <span class="k">while</span> <span class="ow">not</span> <span class="n">xPathList</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">xPathList</span> <span class="o">=</span> <span class="n">xPathList</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>   <span class="c1"># Trim empty sections from the beginning.</span>
+        <span class="k">while</span> <span class="n">xPathList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">xPathList</span> <span class="o">=</span> <span class="n">xPathList</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>                       <span class="c1"># Trim empty sections from the beginning.</span>
+
+        <span class="k">while</span> <span class="n">xPathList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">xPathList</span> <span class="o">=</span> <span class="n">xPathList</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>                      <span class="c1"># Trim empty sections from the end as can happend with xPath = &#39;../&#39;.</span>
 
         <span class="k">if</span> <span class="s1">&#39;{&#39;</span> <span class="ow">in</span> <span class="n">xPath</span><span class="p">:</span>                                    <span class="c1"># Careful, qualifiers may contain &#39;/&#39;.</span>
             <span class="n">xpl2</span> <span class="o">=</span> <span class="p">[]</span>
@@ -396,7 +401,61 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">follow2</span><span class="p">(</span><span class="n">xPathList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">XPathNotFound</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">XPathNotFound</span><span class="p">(</span><span class="s2">&quot;Cannot locate path &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">xPath</span><span class="p">)</span></div></div>
+            <span class="k">raise</span> <span class="n">XPathNotFound</span><span class="p">(</span><span class="s2">&quot;Cannot locate path &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">xPath</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ancestry.printNewMembers"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.printNewMembers">[docs]</a>    <span class="k">def</span> <span class="nf">printNewMembers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method prints the type of *self* and then prints all the member added since the base class *cls2*. That is, </span>
+<span class="sd">        those members which are not defined in by base class *cls2*.</span>
+
+<span class="sd">        :param cls2:        Must be a base class for *self**.</span>
+<span class="sd">        :param exclude:     If True, any member starting with an underscore (i.e., &#39;_&#39;) is also not printed.</span>
+<span class="sd">        :param width:       The number of members printed per line.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">cls2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cls2</span> <span class="o">=</span> <span class="n">Ancestry</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">cls2</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;self is not a derived fom class cls2&#39;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmro</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="p">)</span>
+
+        <span class="n">members</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">_ancestryMembers</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="n">cls2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span> <span class="ow">and</span> <span class="n">exclude</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">_ancestryMembers</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="n">width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%%</span><span class="s1">-</span><span class="si">%d</span><span class="s1">s&#39;</span> <span class="o">%</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">members</span><span class="p">))</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;   &#39;</span>
+        <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="n">fmt</span> <span class="o">%</span> <span class="n">member</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">counter</span> <span class="o">%</span> <span class="n">width</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">()</span>
+                <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;   &#39;</span>
+        <span class="k">if</span> <span class="n">counter</span> <span class="o">%</span> <span class="n">width</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Ancestry.printNonAncestryMembers"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.printNonAncestryMembers">[docs]</a>    <span class="k">def</span> <span class="nf">printNonAncestryMembers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method prints the type of *self* and then prints all the member added by the derived class. That is, </span>
+<span class="sd">        those members which are not defined by the :py:class:`Ancestry` class.</span>
+
+<span class="sd">        :param exclude:     If True, any member starting with an underscore (i.e., &#39;_&#39;) is also not printed.</span>
+<span class="sd">        :param width:       The number of members printed per line.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">printNewMembers</span><span class="p">(</span><span class="n">Ancestry</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="AncestryIO_base"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base">[docs]</a><span class="k">class</span> <span class="nc">AncestryIO_base</span><span class="p">(</span><span class="n">Ancestry</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class adds methods to read and write *self* to a file. Currently, its supports reading and writing to an XML file.&quot;&quot;&quot;</span>

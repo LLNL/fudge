@@ -738,6 +738,9 @@ def toGNDS(self, evaluationLibrary, evaluationVersion, formatVersion=GNDS_format
             else:
                 if( not TNSL_include_all_reactions ) :
                     continue
+        elif C == 73 and S == 91:
+            # fluorescence / atomic relaxation data, skip for now
+            continue
         elif( C == 81 ) :
             if( verbose > 0 ) : print( '   ', C, S )
             X1_MTs = {}
@@ -1437,7 +1440,7 @@ def toGNDS(self, evaluationLibrary, evaluationVersion, formatVersion=GNDS_format
         nonElastic.Q.add( returnConstantQ( info.style, 0, crossSection ) )
         reactionSuite.sums.crossSectionSums.add( nonElastic )
 
-        gammaProduction = orphanProductModule.OrphanProduct('0', enumsModule.Genre.NBody, ENDF_MT = 3)
+        gammaProduction = orphanProductModule.OrphanProduct('Orphan product 0', enumsModule.Genre.NBody, ENDF_MT = 3)
         gammaProduction.crossSection.add( crossSectionModule.Reference( link = nonElastic.crossSection, label = info.style ) )
         gammaProduction.outputChannel.Q.add( c55s[0].outputChannel.Q.evaluated )
         for C55 in c55s:

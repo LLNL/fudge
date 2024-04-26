@@ -191,7 +191,7 @@ def plot_phase(_rrr, _Ls=defaultLs, channel=None, _Egrid=defaultEgrid, title_str
             PlotDataSet(
                 data=[_Egrid, [_rrr.phi(L, _rrr.rho(E, channel)) for E in _Egrid]],
                 legend="L=%i" % L, _type='line_xy', color=None, kwrds={}) for L in _Ls],
-        title='$\phi_{L}(E)$ for ' + title_string,
+        title=r'$\phi_{L}(E)$ for ' + title_string,
         xaxislabel="E (eV)",
         yaxislabel='phase (rad)',
         legend_loc=legend_loc,
@@ -232,7 +232,7 @@ def plot_widthddist(_rrr, aveWidth, expectedDOF, L, J, reaction, scaled=False, t
     # Now do the plots
     if not scaled:
         yaxislabel = 'Frequency (1/eV)'
-        xaxislabel = '$\Gamma_{%s}$ (eV)' % widthSubscript[reaction]
+        xaxislabel = r'$\Gamma_{%s}$ (eV)' % widthSubscript[reaction]
         norm = len(widths)
         plot_functions(
             [PlotDataSet(data=widths, legend='ENDF', _type='hist')],
@@ -247,7 +247,7 @@ def plot_widthddist(_rrr, aveWidth, expectedDOF, L, J, reaction, scaled=False, t
         # dx=.1
         xs = numpy.logspace(math.log10(1e-4), math.log10(10.0), 201)  # numpy.array( [i*dx for i in range(1,101)] )
         yaxislabel = 'Frequency (no-dim)'
-        xaxislabel = '$\Gamma_{%s}/\overline{\Gamma_{%s}}$' % (
+        xaxislabel = r'$\Gamma_{%s}/\overline{\Gamma_{%s}}$' % (
             widthSubscript.get(reaction, reaction.split(' + ')[0]),
             widthSubscript.get(reaction, reaction.split(' + ')[0]))
         plot_functions(
@@ -308,7 +308,7 @@ def plot_cumlev(_lsa, title_string=None, include_fits=True, legend_loc='best', y
         reslin = linear_regression(xs[:half], ys[:half])
         ds.append(
             PlotDataSet(data=[xs, flin(xs, reslin[0], reslin[1])],
-                        legend="Fit to $c+E/\overline{D}$,\n$\overline{D}=%6.2f\pm%6.2f$\nFit range (0.0, %6.2f) eV" % (
+                        legend=r"Fit to $c+E/\overline{D}$,\n$\overline{D}=%6.2f\pm%6.2f$\nFit range (0.0, %6.2f) eV" % (
                         1.0 / reslin[1], reslin[2] / reslin[1] / reslin[1], xs[half]),
                         _type='line_xy'))
         # Residuals (not plotted yet)

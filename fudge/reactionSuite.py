@@ -470,7 +470,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
                 'crossSectionOnly': False,
                 'crossSectionMaxDiff': 1e-3,
                 'multiplicityMaxDiff': 1e-3,
-                'transportables': ('n',),
+                'transportables': ('n', 'photon', 'H1', 'H2', 'H3', 'He3', 'He4'),
                 'normTolerance': 1e-5,
                 'checkEnergyBalance': True,
                 'reconstructResonances': True,
@@ -1468,7 +1468,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
         if( kwargs['failures'] > 0 ) : raise ValueError( "kwargs['failures'] = %d  > 0" % kwargs['failures'] )
 
     def multiGroupVector(self, childSuite, multiGroupVectorMethod, multiGroupSettings, temperatureInfo, **kwargs):
-        """
+        r"""
         General method to return multiGroupVector output from a specified multiGroupVectorMethod for specified reactionSuite child nodes.
 
         :param childSuite: Suite which to iterate over.

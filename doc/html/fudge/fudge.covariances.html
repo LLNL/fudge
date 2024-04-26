@@ -1259,7 +1259,7 @@ scheme.  We note that we could write this scheme as an expansion over basis func
 <p><img src="../_images/math/b9c842b81e65f5ed28f370dbd753cdadcaa5a399.png" alt="f(E) = \sum_{i=0}^{N+1} w_i(E) * f_i"/></p>
 </div><p>where the weight functions <img class="math" src="../_images/math/2072ff8039492d073ea4a823cbe5e798bc910aa4.png" alt="w_i(E)"/> are</p>
 <div class="math">
-<p><img src="../_images/math/a38a6541f2fb7d54eaf0466bb516b649cba1951b.png" alt="w_i(E) = 1  \;\text{for}\; E_i &lt;= E &lt;= E_{i+1}; \;\; 0 \;\textrm{otherwise}"/></p>
+<p><img src="../_images/math/421d0b64109496582d41d82efb7988f0ecaced2e.png" alt="w_i(E) = 1  \;\\text{for}\; E_i &lt;= E &lt;= E_{i+1}; \;\; 0 \;\\textrm{otherwise}"/></p>
 </div><p>These weights are an orthogonal (but not orthonormal) basis, with</p>
 <div class="math">
 <p><img src="../_images/math/b13ce8fc9d6912c4659ecd010a7e66aa741320b6.png" alt="(E_{i+1}-E_i) \delta_{ij} = \int dE w_i(E) * w_j(E)"/></p>
@@ -1296,12 +1296,12 @@ boundaries <img class="math" src="../_images/math/04e094603df9343f34a7250021d199
 <blockquote>
 <div><ul class="simple">
 <li><p>Below <img class="math" src="../_images/math/b093524cca7c5e201eff20c8daedae7e61432d1d.png" alt="E_0"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/1eb0514994edf71549d3baf4fbfa79d643bca95e.png" alt="0.0"/></p></li>
-<li><p>From <img class="math" src="../_images/math/3290943726ee46f8b00db6f7d2c59323b1485873.png" alt="E_0 \rightarrow E_1"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/4219fbe33be36f254f9093809318b9fb7b889a9a.png" alt="f_0"/></p></li>
-<li><p>From <img class="math" src="../_images/math/c7556cb98a58c7c492be015c98c138a24701dfe4.png" alt="E_1 \rightarrow E_2"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/0464a071da3203b9d565701f510a766ae52f3016.png" alt="f_1"/></p></li>
+<li><p>From <img class="math" src="../_images/math/d518ff11535f0fe155de3951ae2316e018b26859.png" alt="E_0 \\rightarrow E_1"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/4219fbe33be36f254f9093809318b9fb7b889a9a.png" alt="f_0"/></p></li>
+<li><p>From <img class="math" src="../_images/math/881422679d778857a65ed9065ad718e87769e2bd.png" alt="E_1 \\rightarrow E_2"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/0464a071da3203b9d565701f510a766ae52f3016.png" alt="f_1"/></p></li>
 <li><p>…</p></li>
-<li><p>From <img class="math" src="../_images/math/02c8061a6034148f11d578582755e3eae9e49cf1.png" alt="E_{i} \rightarrow E_{i+1}"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/a960eb612c236288975208781dc321395934f356.png" alt="f_i"/></p></li>
+<li><p>From <img class="math" src="../_images/math/408d192b93059712a302f71741737f4eb98c6dff.png" alt="E_{i} \\rightarrow E_{i+1}"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/a960eb612c236288975208781dc321395934f356.png" alt="f_i"/></p></li>
 <li><p>…</p></li>
-<li><p>From <img class="math" src="../_images/math/3b2dabe94293cca9493ab85332dc73648f41e4e4.png" alt="E_{N-1} \rightarrow E_N"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/5f11c6205eb3f1cd4279a0e87b0e6d26e8eaeb25.png" alt="f_{N-1}"/></p></li>
+<li><p>From <img class="math" src="../_images/math/fab073600966bbcfc54fcb306592c0f956d0e5ee.png" alt="E_{N-1} \\rightarrow E_N"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/5f11c6205eb3f1cd4279a0e87b0e6d26e8eaeb25.png" alt="f_{N-1}"/></p></li>
 <li><p>Above <img class="math" src="../_images/math/c774764e8e120dcedf98ae0e553ce56653836a3a.png" alt="E_N"/>, <img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/1eb0514994edf71549d3baf4fbfa79d643bca95e.png" alt="0.0"/></p></li>
 </ul>
 </div></blockquote>

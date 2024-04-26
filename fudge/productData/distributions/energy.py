@@ -167,7 +167,7 @@ class Regions1d( regionsModule.Regions1d ) :
         return( averageEnergy )
 
     def integrateWithWeight_x( self ) :
-        """
+        r"""
         Returns the value of the integral :math:`\int dE' E' P(E').
 
         :return:        A float.
@@ -709,7 +709,8 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         if self.interpolationQualifier is xDataEnumsModule.InterpolationQualifier.none:
             domains = set([(xys1d.domainMin, xys1d.domainMax) for xys1d in self])
             if len(domains) != 1:
-                warnings.append(warning.MissingInterpolationQualifier())
+                transportable = self.findAttributeInAncestry('pid') in info['transportables']
+                warnings.append(warning.MissingInterpolationQualifier(transportable))
 
         for idx in range(len(self)):
             integral = self[idx].integrate()
@@ -724,7 +725,7 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         return warnings
 
     def sqrtEp_AverageAtE( self, E ) :
-        """
+        r"""
         This method returns the value of the integral :math:`\int dE' \sqrt{E'} P(E') at projectile energy *E*.
 
         :param E:   Energy of the projectile.
@@ -1178,7 +1179,7 @@ class GeneralEvaporation( FunctionalBase ) :
         return( self.parameter1.data.evaluate( E ) * self.parameter2.data.integrateWithWeight_x( ) )
 
     def sqrtEp_AverageAtE( self, E ) :
-        """
+        r"""
         This method returns the value of the integral :math:`\int dE' \sqrt{E'} P(E') at projectile energy *E*.
 
         :param E:   Energy of the projectile.
@@ -1267,7 +1268,7 @@ class GeneralEvaporation( FunctionalBase ) :
         return GES
 
 class SimpleMaxwellianFission1d:       # FIXME, needs units
-    """
+    r"""
     This class represents a :py:class:`SimpleMaxwellianFission` instance evaluated at the specified projectile energy.
     The 1d function is :math:`P(E') = \sqrt{E'} \, \exp(-E' /  \theta) / I` with :math:`\theta = \theta(E)` where E is the projectile energy
     for this function.
@@ -1356,7 +1357,7 @@ class SimpleMaxwellianFission1d:       # FIXME, needs units
         return( ( self.evaluateIndefiniteIntegral( energyMax ) - self.evaluateIndefiniteIntegral( energyMin ) ) / self.norm )
 
 class SimpleMaxwellianFission( FunctionalBase ) :
-    """
+    r"""
     Class for storing the 2d simple Maxwellian fission distribution. The distribution is defined as
     :math:`P(E') = \sqrt{E'} \, \exp(-E' /  \theta(E)) / I`.
 
@@ -1406,7 +1407,7 @@ class SimpleMaxwellianFission( FunctionalBase ) :
         return( theta * ( 0.75 * erf_sqrt_a - sqrt_a * ( 1.5 + a ) * exp_a ) / ( 0.5 * erf_sqrt_a - sqrt_a * exp_a ) )
 
     def sqrtEp_AverageAtE( self, E ) :
-        """
+        r"""
         This method returns the value of the integral :math:`\int dE' \sqrt{E'} P(E') at projectile energy *E*.
 
         :param E:   Energy of the projectile.
@@ -1496,7 +1497,7 @@ class SimpleMaxwellianFission( FunctionalBase ) :
         return SMF
 
 class Evaporation1d:       # FIXME, needs units
-    """
+    r"""
     This class represents an :py:class:`Evaporation` instance evaluated at the specified projectile energy.
     The 1d function is :math:`P(E') = E' \, \exp(-E' /  \theta) / I` with :math:`\theta = \theta(E)` where E is the projectile energy
     for this function.
@@ -1577,7 +1578,7 @@ class Evaporation1d:       # FIXME, needs units
         return( integral )
 
 class Evaporation( FunctionalBase ) :
-    """
+    r"""
     Class for storing the 2d evaporation energy distribution. The distribution is of the form
     :math:`E' \, \exp(-E'/theta(E)) / I`.
 
@@ -1658,7 +1659,7 @@ class Evaporation( FunctionalBase ) :
         return( XYs1d( spectrum2, axes = defaultAxes( energyUnit = self.domainUnit ) ) )
 
     def sqrtEp_AverageAtE( self, E ) :
-        """
+        r"""
         This method returns the value of the integral :math:`\int dE' \sqrt{E'} P(E') at projectile energy *E*.
 
         :param E:   Energy of the projectile.
@@ -1720,7 +1721,7 @@ class Evaporation( FunctionalBase ) :
         return ES
 
 class Watt( FunctionalBase ) :
-    """
+    r"""
     Class for storing the 2d Watt energy distribution. The distribution is of the form
     :math:`E' \, \exp(-E'/a(E)) \, \sinh(\sqrt{b(E) \, E'})/ I` where :math:`a(E)` and :math:`b(E)`
     are 1d function of the projectile energy :math:`E`.
@@ -1855,7 +1856,7 @@ class Watt( FunctionalBase ) :
         """
 
         def evaluateAtX( self, x ) :
-            """
+            r"""
             A function needed by :py:func:`EnergyFunctionalDataToPointwise` to evaluate a Watt distribution
             distribution at the outgoing particle energy *x* for :math:`\A(E)` = self.p1 and :math:`\B(E)` = self.p2.
 
@@ -2173,6 +2174,73 @@ class NBodyPhaseSpace( Subform ) :
         Ea = targetMass / ( targetMass + projectileMass ) * E + Q
         return( Ea * ( M - productMass ) / ( M * ( self.numberOfProducts - 1 ) ) )
 
+    def evaluate(self, energy_in, **kwargs):
+        """
+        This method returns the P(E) at projectile energy *energy_in*.
+        The accuracy of the returned P(E) can be set by the value of the 'accuracy' key in *kwargs*.
+
+        :param energy_in:       The energy of the projectile.
+        :param kwargs:          A dictionary that contains data to control the way this method acts.
+        """
+
+        from fudge import product as productModule
+        from fudge import reactionSuite as reactionSuiteModule
+        from fudge import outputChannel as outputChannelModule
+        from fudge.reactions import reaction as reactionModule
+        from fudge.core.math import fudgemath
+
+        class Tester:
+            """
+            This class is used by :py:func:`fudgemath.thickenXYList` to add points until the desired accuracy is reached.
+            """
+
+            def __init__(self, relativeTolerance, absoluteTolerance, n, EMax_i):
+                """
+                :param relativeTolerance:   The relative desired accuracy.
+                :param absoluteTolerance:   The absolute desired accuracy.
+                :param n:
+                :param EMax_i:              The maximum energy of the outgoing product.
+                """
+
+                self.relativeTolerance = relativeTolerance
+                self.absoluteTolerance = absoluteTolerance
+                self.n = n
+                self.EMax_i = EMax_i
+
+            def evaluateAtX(self, energy_out):
+
+                return math.sqrt(energy_out) * math.pow((self.EMax_i - energy_out), 1.5 * self.n - 4.0)
+
+        accuracy = kwargs.get('accuracy', 1e-3)
+
+        mass, massUnit = self.mass.value, self.mass.unit
+        product = self.findClassInAncestry(productModule.Product)
+        productMass = product.getMass(massUnit)
+
+        reactionSuite = self.findClassInAncestry(reactionSuiteModule.ReactionSuite)
+        projectile = reactionSuite.PoPs.final(reactionSuite.projectile)
+        projectileMass = projectile.getMass(massUnit)
+
+        targetID = reactionSuite.target
+        target = reactionSuite.PoPs.final(reactionSuite.target)
+        targetMass = target.getMass(massUnit)
+
+        outputChannel = self.findClassInAncestry(outputChannelModule.OutputChannel)
+        Q = outputChannel.Q.getConstant()
+
+        Ea = targetMass / (targetMass + projectileMass) * energy_in + Q
+        EMax_i = Ea * (mass - productMass) / mass
+        if EMax_i < 0:
+            EMax_i = 1e-5                                    # This is a kludge
+
+        tester = Tester(accuracy, 1e-10, self.numberOfProducts, EMax_i)
+        tester.absoluteTolerance = 1e-10 * tester.evaluateAtX(0.5 * EMax_i)
+        data = fudgemath.thickenXYList([[0., 0.], [EMax_i, 0.]], tester, biSectionMax=10)
+        data = XYs1d(data, outerDomainValue=energy_in)
+        data.normalize(insitu=True)
+
+        return data
+
     def fixDomains(self, labels, energyMin, energyMax):
         """This method does nothing."""
 
@@ -2202,9 +2270,9 @@ class NBodyPhaseSpace( Subform ) :
                 self.n = n
                 self.setEMax_i( 1 )
 
-            def evaluateAtX( self, x ) :
+            def evaluateAtX(self, x):
 
-                return( math.sqrt( x ) * math.pow( ( self.EMax_i - x ), 0.5 * ( 3. * self.n - 5. ) ) )
+                return math.sqrt(x) * math.pow((self.EMax_i - x), 1.5 * self.n - 4.0)
 
             def setEMax_i( self, EMax_i ) :
 

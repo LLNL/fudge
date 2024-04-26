@@ -22,6 +22,7 @@ from . import productYield as productYieldModule
 class FissionFragmentData(ancestryModule.AncestryIO_base):
 
     moniker = 'fissionFragmentData'
+    ancestryMembers = ('delayedNeutrons', 'fissionEnergyReleases', 'productYields')
 
     def __init__( self ) :
 
@@ -92,6 +93,13 @@ class FissionFragmentData(ancestryModule.AncestryIO_base):
         self.__delayedNeutrons.convertUnits( unitMap )
         self.__fissionEnergyReleases.convertUnits( unitMap )
         self.__productYields.convertUnits( unitMap )
+
+    def cullStyles(self, styleList):
+        """ See documentation for reactionSuite.cullStyles. """
+
+        self.__delayedNeutrons.cullStyles(styleList)
+        self.__fissionEnergyReleases.cullStyles(styleList)
+        self.__productYields.cullStyles(styleList)
 
     def fixDomains(self, labels, energyMin, energyMax):
         """

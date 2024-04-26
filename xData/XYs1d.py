@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""
+r"""
     This module contains the class ``XYs1d``. This class treats a list of :math:`(x_i, y_i)` pairs as if they were 
     the function :math:`y(x)`.  That is, it is a numerical representation of :math:`f(x)`. The function :math:`y(x)` 
     is also called a 1-dimensional or univariant function. As an example, let 
@@ -132,7 +132,8 @@ def allow_XYsWithSameUnits_orNumberWithSameUnit( self, other ) :
          other = otherToSelfsUnits( self, other )                                       # Returned other is a pointwiseXY instance
     else :
         yUnit = self.getAxisUnitSafely( yAxisIndex )
-        other = PQUModule.PQU( other, checkOrder = False ).getValueAs( yUnit )
+        if isinstance(other, PQUModule.PQU):
+            other = PQUModule.PQU( other, checkOrder = False ).getValueAs( yUnit )
     return( other )
 
 class XYs1d(baseModule.XDataFunctional):
@@ -672,6 +673,37 @@ class XYs1d(baseModule.XDataFunctional):
 
         return( self.__nf_pointwiseXY.lowerIndexBoundingX( x ) )
 
+    def multiply(self, other, accuracy, biSectionMax, lowerEps, upperEps, asXYs1d, allowFlat, cls=None):
+        """
+        The method returns the multiplication of *self* by another xData 1d-function. Currently, this method only works for
+        *other* of class :py:class:`XYs1d`. Also, *allowFlat* is currently not implemented.
+
+        :param other:               An xData 1d-function. Currently, must be an instance of :py:class:`XYs1d`.
+        :param accuracy:            The accuracy of the multiplication as allowed by *biSectionMax*.
+        :param biSectionMax:        The maximum amount of besecting between two initial union points.
+        :param lowerEps:            This parameter is passed onto the method :py:func:`changeInterpolationIfNeeded`.
+        :param upperEps:            This parameter is passed onto the method :py:func:`changeInterpolationIfNeeded`.
+        :param asXYs1d:             If True, the returned instance will be an :py:class:`XYs1d`. Otherwise, it may be an instance of the class of *other*.
+        :param allowFlat:           If True, will try to preserve flat interapolation if possible.
+        :param cls:                 The class of the returned instance. Default is :py:class:`XYs1d`.
+        """
+
+        if cls is None:
+            cls = XYs1d
+
+        self2  = self.changeInterpolationIfNeeded([enumsModule.Interpolation.linlin], accuracy, lowerEps=lowerEps, upperEps=upperEps, cls=cls)
+        self2.nf_pointwiseXY.setAccuracy(accuracy)
+        self2.nf_pointwiseXY.setBiSectionMax(biSectionMax)
+
+        other2 = other.changeInterpolationIfNeeded([enumsModule.Interpolation.linlin], accuracy, lowerEps=lowerEps, upperEps=upperEps, cls=cls)
+        other2.nf_pointwiseXY.setAccuracy(accuracy)
+        other2.nf_pointwiseXY.setBiSectionMax(biSectionMax)
+
+        product = self2 * other2
+        product = cls(product, axes=product.axes)
+
+        return product
+
     def mutualify( self, lowerEps1, upperEps1, positiveXOnly1, other, lowerEps2, upperEps2, positiveXOnly2 ) :
         '''
         .. note:: Need to check that x units are the same.
@@ -862,7 +894,7 @@ class XYs1d(baseModule.XDataFunctional):
         return( self.returnAsClass( self, self.nf_pointwiseXY.convolute( func, 0 ) ) )
 
     def group( self, xs, f2 = None, f3 = None, norm = None, asXYs = False ) :
-        """
+        r"""
         The argument ``xs`` is a list of x-values with ``xs[i] < xs[i+1]``. This function calculates the integrals
 
         .. math::
@@ -977,8 +1009,20 @@ class XYs1d(baseModule.XDataFunctional):
 
         return len(self) > 1
 
-    def integrate( self, domainMin = None, domainMax = None ) :
+    def lowerIndexContainingDomainValue(self, domainValue):
         """
+        The method returns the index within *self* for which self[index] <= *domainValue* < self[index+1].
+        If *domainValue* is not in the domain of *self*, then -1 is returned.
+
+        :param domainValue: The x-value.
+
+        :returns:           A python3 int.
+        """
+
+        return self.nf_pointwiseXY.lowerIndexBoundingX(domainValue)
+
+    def integrate( self, domainMin = None, domainMax = None ) :
+        r"""
         Definite integral of current ``XYs1d`` instance from ``domainMin`` to ``domainMax``:
         
         .. math::
@@ -1014,7 +1058,7 @@ class XYs1d(baseModule.XDataFunctional):
         return( self.__nf_pointwiseXY.integrateWithWeight_sqrt_x( domainMin, domainMax ) )
 
     def indefiniteIntegral( self, domainMin = None, domainMax = None ) :
-        '''
+        r"""
         Indefinite integral of self:
         
         .. math::
@@ -1022,7 +1066,7 @@ class XYs1d(baseModule.XDataFunctional):
             \int_0^x dx \; XYs(x)
             
         The new ``XYs1d`` instance is defined on the range of the old one and the units are wrong.
-        '''
+        """
 
 # BRB: I think this is just a running sum and may be implemented already. Needs units.
         myAxes = self.axes

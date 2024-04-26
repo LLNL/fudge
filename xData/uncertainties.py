@@ -51,7 +51,10 @@ class Uncertainty(ancestryModule.AncestryIO_bare):
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        if self.data is None: return []
+        if self.data is None:
+            if kwargs.get('showEmpty', False):
+                return ['%s<%s/>' % ( indent, self.moniker )]
+            return []
 
         XML_strList = ['%s<%s>' % ( indent, self.moniker )]
         XML_strList += self.__functional.toXML_strList(indent=indent2, **kwargs)

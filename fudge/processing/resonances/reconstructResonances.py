@@ -3261,39 +3261,38 @@ class URRcrossSection(ResonanceReconstructionBaseClass):
                 VL = self.DOFs[(l,j)]['elastic'] * self.penetrationFactor(l,rho) / rho
                 # Save all the widths in a new widths container to simplify coding in the fluctuating integral widget
                 widths = {}
-                for label in self.averageWidths[(l,j)]:
-                    function = self.averageWidths[(l,j)][label]
-                    widths[label] = numpy.array( [function.evaluate(energy) for energy in E]
-                                                 ).reshape(-1,1) # convert to column vector
+                for label in self.averageWidths[(l, j)]:
+                    function = self.averageWidths[(l, j)][label]
+                    widths[label] = numpy.array([function.evaluate(energy) for energy in E.flatten()]
+                                                ).reshape(-1, 1)    # convert to column vector
 
                 widths['elastic'] *= self.energyFactor * VL*numpy.sqrt(E)   # convert reduced width to 'regular' width
 
-                RE,RC,RF = self.getFluctuationIntegrals(E, widths, self.DOFs[(l,j)])
+                RE, RC, RF = self.getFluctuationIntegrals(E, widths, self.DOFs[(l, j)])
 
                 # common factor for all reactions:
-                levelSpacing = numpy.array( [self.levelSpacings[(l,j)].evaluate(energy) for energy in E]
-                                             ).reshape(-1,1)
+                levelSpacing = numpy.array(
+                    [self.levelSpacings[(l, j)].evaluate(energy) for energy in E.flatten()]).reshape(-1, 1)
                 comfac = 2 * numpy.pi * gfactor * widths['elastic'] / levelSpacing
 
-                elasticSum += ( (RE * widths['elastic'] - 2 * numpy.sin(phi)**2) * comfac )[:,0]
-                captureSum += ( RC * widths['capture'] * comfac )[:,0]
+                elasticSum += ((RE * widths['elastic'] - 2 * numpy.sin(phi)**2) * comfac)[:, 0]
+                captureSum += (RC * widths['capture'] * comfac)[:, 0]
                 if 'fission' in widths:
-                    fissionSum += ( RF * widths['fission'] * comfac )[:,0]
+                    fissionSum += (RF * widths['fission'] * comfac)[:, 0]
 
-
-            elasticSum += 4*(2*l+1)*numpy.sin(phi[:,0])**2
+            elasticSum += 4*(2*l+1)*numpy.sin(phi[:, 0])**2
 
         # common factor 'beta' as row vector:
-        beta = numpy.pi / self.k(E)[:,0]**2
+        beta = numpy.pi / self.k(E)[:, 0]**2
         capture = beta * captureSum
         elastic = beta * elasticSum
         fission = beta * fissionSum
-        for reaction in (capture,elastic,fission):
-            reaction[ reaction<=0 ] = 0
+        for reaction in (capture, elastic, fission):
+            reaction[reaction <= 0] = 0
         total = elastic + capture + fission
         nonelastic = capture + fission
 
-        xscs = {'total':total, 'elastic':elastic, 'capture':capture, 'fission':fission, 'nonelastic':nonelastic}
+        xscs = {'total': total, 'elastic': elastic, 'capture': capture, 'fission': fission, 'nonelastic': nonelastic}
         return xscs
 
     def getTransmissionCoefficients(self, skipFission=True, method='weakCoupling'):

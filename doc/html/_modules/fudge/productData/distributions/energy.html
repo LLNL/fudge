@@ -206,7 +206,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">averageEnergy</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Regions1d.integrateWithWeight_x"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Regions1d.integrateWithWeight_x">[docs]</a>    <span class="k">def</span> <span class="nf">integrateWithWeight_x</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the value of the integral :math:`\int dE&#39; E&#39; P(E&#39;).</span>
 
 <span class="sd">        :return:        A float.</span>
@@ -748,7 +748,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolationQualifier</span> <span class="ow">is</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">InterpolationQualifier</span><span class="o">.</span><span class="n">none</span><span class="p">:</span>
             <span class="n">domains</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([(</span><span class="n">xys1d</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMax</span><span class="p">)</span> <span class="k">for</span> <span class="n">xys1d</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">domains</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">MissingInterpolationQualifier</span><span class="p">())</span>
+                <span class="n">transportable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findAttributeInAncestry</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;transportables&#39;</span><span class="p">]</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">MissingInterpolationQualifier</span><span class="p">(</span><span class="n">transportable</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="n">integral</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
@@ -763,7 +764,7 @@
         <span class="k">return</span> <span class="n">warnings</span></div>
 
 <div class="viewcode-block" id="XYs2d.sqrtEp_AverageAtE"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.XYs2d.sqrtEp_AverageAtE">[docs]</a>    <span class="k">def</span> <span class="nf">sqrtEp_AverageAtE</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns the value of the integral :math:`\int dE&#39; \sqrt{E&#39;} P(E&#39;) at projectile energy *E*.</span>
 
 <span class="sd">        :param E:   Energy of the projectile.</span>
@@ -1217,7 +1218,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter1</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">E</span> <span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter2</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">integrateWithWeight_x</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GeneralEvaporation.sqrtEp_AverageAtE"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.GeneralEvaporation.sqrtEp_AverageAtE">[docs]</a>    <span class="k">def</span> <span class="nf">sqrtEp_AverageAtE</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns the value of the integral :math:`\int dE&#39; \sqrt{E&#39;} P(E&#39;) at projectile energy *E*.</span>
 
 <span class="sd">        :param E:   Energy of the projectile.</span>
@@ -1306,7 +1307,7 @@
         <span class="k">return</span> <span class="n">GES</span></div></div>
 
 <div class="viewcode-block" id="SimpleMaxwellianFission1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.SimpleMaxwellianFission1d">[docs]</a><span class="k">class</span> <span class="nc">SimpleMaxwellianFission1d</span><span class="p">:</span>       <span class="c1"># FIXME, needs units</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class represents a :py:class:`SimpleMaxwellianFission` instance evaluated at the specified projectile energy.</span>
 <span class="sd">    The 1d function is :math:`P(E&#39;) = \sqrt{E&#39;} \, \exp(-E&#39; /  \theta) / I` with :math:`\theta = \theta(E)` where E is the projectile energy</span>
 <span class="sd">    for this function.</span>
@@ -1395,7 +1396,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluateIndefiniteIntegral</span><span class="p">(</span> <span class="n">energyMax</span> <span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluateIndefiniteIntegral</span><span class="p">(</span> <span class="n">energyMin</span> <span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="SimpleMaxwellianFission"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.SimpleMaxwellianFission">[docs]</a><span class="k">class</span> <span class="nc">SimpleMaxwellianFission</span><span class="p">(</span> <span class="n">FunctionalBase</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for storing the 2d simple Maxwellian fission distribution. The distribution is defined as</span>
 <span class="sd">    :math:`P(E&#39;) = \sqrt{E&#39;} \, \exp(-E&#39; /  \theta(E)) / I`.</span>
 
@@ -1445,7 +1446,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">theta</span> <span class="o">*</span> <span class="p">(</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">erf_sqrt_a</span> <span class="o">-</span> <span class="n">sqrt_a</span> <span class="o">*</span> <span class="p">(</span> <span class="mf">1.5</span> <span class="o">+</span> <span class="n">a</span> <span class="p">)</span> <span class="o">*</span> <span class="n">exp_a</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">erf_sqrt_a</span> <span class="o">-</span> <span class="n">sqrt_a</span> <span class="o">*</span> <span class="n">exp_a</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SimpleMaxwellianFission.sqrtEp_AverageAtE"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.SimpleMaxwellianFission.sqrtEp_AverageAtE">[docs]</a>    <span class="k">def</span> <span class="nf">sqrtEp_AverageAtE</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns the value of the integral :math:`\int dE&#39; \sqrt{E&#39;} P(E&#39;) at projectile energy *E*.</span>
 
 <span class="sd">        :param E:   Energy of the projectile.</span>
@@ -1535,7 +1536,7 @@
         <span class="k">return</span> <span class="n">SMF</span></div></div>
 
 <div class="viewcode-block" id="Evaporation1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Evaporation1d">[docs]</a><span class="k">class</span> <span class="nc">Evaporation1d</span><span class="p">:</span>       <span class="c1"># FIXME, needs units</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class represents an :py:class:`Evaporation` instance evaluated at the specified projectile energy.</span>
 <span class="sd">    The 1d function is :math:`P(E&#39;) = E&#39; \, \exp(-E&#39; /  \theta) / I` with :math:`\theta = \theta(E)` where E is the projectile energy</span>
 <span class="sd">    for this function.</span>
@@ -1616,7 +1617,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">integral</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Evaporation"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Evaporation">[docs]</a><span class="k">class</span> <span class="nc">Evaporation</span><span class="p">(</span> <span class="n">FunctionalBase</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for storing the 2d evaporation energy distribution. The distribution is of the form</span>
 <span class="sd">    :math:`E&#39; \, \exp(-E&#39;/theta(E)) / I`.</span>
 
@@ -1697,7 +1698,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">spectrum2</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Evaporation.sqrtEp_AverageAtE"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Evaporation.sqrtEp_AverageAtE">[docs]</a>    <span class="k">def</span> <span class="nf">sqrtEp_AverageAtE</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns the value of the integral :math:`\int dE&#39; \sqrt{E&#39;} P(E&#39;) at projectile energy *E*.</span>
 
 <span class="sd">        :param E:   Energy of the projectile.</span>
@@ -1759,7 +1760,7 @@
         <span class="k">return</span> <span class="n">ES</span></div></div>
 
 <div class="viewcode-block" id="Watt"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Watt">[docs]</a><span class="k">class</span> <span class="nc">Watt</span><span class="p">(</span> <span class="n">FunctionalBase</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for storing the 2d Watt energy distribution. The distribution is of the form</span>
 <span class="sd">    :math:`E&#39; \, \exp(-E&#39;/a(E)) \, \sinh(\sqrt{b(E) \, E&#39;})/ I` where :math:`a(E)` and :math:`b(E)`</span>
 <span class="sd">    are 1d function of the projectile energy :math:`E`.</span>
@@ -1894,7 +1895,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">evaluateAtX</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            A function needed by :py:func:`EnergyFunctionalDataToPointwise` to evaluate a Watt distribution</span>
 <span class="sd">            distribution at the outgoing particle energy *x* for :math:`\A(E)` = self.p1 and :math:`\B(E)` = self.p2.</span>
 
@@ -2212,6 +2213,73 @@
         <span class="n">Ea</span> <span class="o">=</span> <span class="n">targetMass</span> <span class="o">/</span> <span class="p">(</span> <span class="n">targetMass</span> <span class="o">+</span> <span class="n">projectileMass</span> <span class="p">)</span> <span class="o">*</span> <span class="n">E</span> <span class="o">+</span> <span class="n">Q</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">Ea</span> <span class="o">*</span> <span class="p">(</span> <span class="n">M</span> <span class="o">-</span> <span class="n">productMass</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">numberOfProducts</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
+<div class="viewcode-block" id="NBodyPhaseSpace.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.NBodyPhaseSpace.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_in</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the P(E) at projectile energy *energy_in*.</span>
+<span class="sd">        The accuracy of the returned P(E) can be set by the value of the &#39;accuracy&#39; key in *kwargs*.</span>
+
+<span class="sd">        :param energy_in:       The energy of the projectile.</span>
+<span class="sd">        :param kwargs:          A dictionary that contains data to control the way this method acts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">product</span> <span class="k">as</span> <span class="n">productModule</span>
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span> <span class="k">as</span> <span class="n">reactionSuiteModule</span>
+        <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">outputChannel</span> <span class="k">as</span> <span class="n">outputChannelModule</span>
+        <span class="kn">from</span> <span class="nn">fudge.reactions</span> <span class="kn">import</span> <span class="n">reaction</span> <span class="k">as</span> <span class="n">reactionModule</span>
+        <span class="kn">from</span> <span class="nn">fudge.core.math</span> <span class="kn">import</span> <span class="n">fudgemath</span>
+
+        <span class="k">class</span> <span class="nc">Tester</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This class is used by :py:func:`fudgemath.thickenXYList` to add points until the desired accuracy is reached.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relativeTolerance</span><span class="p">,</span> <span class="n">absoluteTolerance</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">EMax_i</span><span class="p">):</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                :param relativeTolerance:   The relative desired accuracy.</span>
+<span class="sd">                :param absoluteTolerance:   The absolute desired accuracy.</span>
+<span class="sd">                :param n:</span>
+<span class="sd">                :param EMax_i:              The maximum energy of the outgoing product.</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">relativeTolerance</span> <span class="o">=</span> <span class="n">relativeTolerance</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">absoluteTolerance</span> <span class="o">=</span> <span class="n">absoluteTolerance</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">EMax_i</span> <span class="o">=</span> <span class="n">EMax_i</span>
+
+            <span class="k">def</span> <span class="nf">evaluateAtX</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_out</span><span class="p">):</span>
+
+                <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">energy_out</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">EMax_i</span> <span class="o">-</span> <span class="n">energy_out</span><span class="p">),</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="mf">4.0</span><span class="p">)</span>
+
+        <span class="n">accuracy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">)</span>
+
+        <span class="n">mass</span><span class="p">,</span> <span class="n">massUnit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">unit</span>
+        <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">productModule</span><span class="o">.</span><span class="n">Product</span><span class="p">)</span>
+        <span class="n">productMass</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span>
+
+        <span class="n">reactionSuite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">reactionSuiteModule</span><span class="o">.</span><span class="n">ReactionSuite</span><span class="p">)</span>
+        <span class="n">projectile</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span><span class="p">)</span>
+        <span class="n">projectileMass</span> <span class="o">=</span> <span class="n">projectile</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span>
+
+        <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">target</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">targetMass</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span>
+
+        <span class="n">outputChannel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">outputChannelModule</span><span class="o">.</span><span class="n">OutputChannel</span><span class="p">)</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">outputChannel</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+
+        <span class="n">Ea</span> <span class="o">=</span> <span class="n">targetMass</span> <span class="o">/</span> <span class="p">(</span><span class="n">targetMass</span> <span class="o">+</span> <span class="n">projectileMass</span><span class="p">)</span> <span class="o">*</span> <span class="n">energy_in</span> <span class="o">+</span> <span class="n">Q</span>
+        <span class="n">EMax_i</span> <span class="o">=</span> <span class="n">Ea</span> <span class="o">*</span> <span class="p">(</span><span class="n">mass</span> <span class="o">-</span> <span class="n">productMass</span><span class="p">)</span> <span class="o">/</span> <span class="n">mass</span>
+        <span class="k">if</span> <span class="n">EMax_i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">EMax_i</span> <span class="o">=</span> <span class="mf">1e-5</span>                                    <span class="c1"># This is a kludge</span>
+
+        <span class="n">tester</span> <span class="o">=</span> <span class="n">Tester</span><span class="p">(</span><span class="n">accuracy</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">numberOfProducts</span><span class="p">,</span> <span class="n">EMax_i</span><span class="p">)</span>
+        <span class="n">tester</span><span class="o">.</span><span class="n">absoluteTolerance</span> <span class="o">=</span> <span class="mf">1e-10</span> <span class="o">*</span> <span class="n">tester</span><span class="o">.</span><span class="n">evaluateAtX</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">EMax_i</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">fudgemath</span><span class="o">.</span><span class="n">thickenXYList</span><span class="p">([[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span><span class="n">EMax_i</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]],</span> <span class="n">tester</span><span class="p">,</span> <span class="n">biSectionMax</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">XYs1d</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="n">energy_in</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">insitu</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
 <div class="viewcode-block" id="NBodyPhaseSpace.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.NBodyPhaseSpace.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This method does nothing.&quot;&quot;&quot;</span>
 
@@ -2241,9 +2309,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">setEMax_i</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">evaluateAtX</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">def</span> <span class="nf">evaluateAtX</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 
-                <span class="k">return</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">EMax_i</span> <span class="o">-</span> <span class="n">x</span> <span class="p">),</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span> <span class="mf">3.</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="mf">5.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">EMax_i</span> <span class="o">-</span> <span class="n">x</span><span class="p">),</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="mf">4.0</span><span class="p">)</span>
 
             <span class="k">def</span> <span class="nf">setEMax_i</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMax_i</span> <span class="p">)</span> <span class="p">:</span>
 

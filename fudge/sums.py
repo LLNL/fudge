@@ -94,12 +94,9 @@ class Sums(ancestryModule.AncestryIO_bare):
             xmlStringList += val.toXML_strList(indent2, **kwargs)
 
         if len(xmlStringList) == 1:
-            if kwargs.get('showEmptySuites', False):
-                xmlStringList = [xmlStringList[0][:-1] + '/>']
-            else:
-                xmlStringList = []
-        else:
-            xmlStringList[-1] += '</%s>' % self.moniker
+            return []
+
+        xmlStringList[-1] += '</%s>' % self.moniker
 
         return xmlStringList
 

@@ -148,9 +148,10 @@ class Regions( baseModule.XDataFunctional ) :
 
         if isinstance(curve, Regions):
             for region in curve:
-                self[len(self)] = region.copy()
+                self.append(region.copy())
         else:
             self[len(self)] = curve
+            curve.keyName = 'index'
 
     def prepend(self, curve):
         '''

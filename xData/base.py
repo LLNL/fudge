@@ -123,8 +123,10 @@ class XDataFunctional(XDataCoreMembers):
 
         if not isinstance(axes1, axesModule.Axes): raise TypeError('axes in not an axes instance')
         if len(axes1) > 0:
-            if len(axes1) <= self.dimension: raise Exception('len( axes ) = %d != ( self.dimension + 1 ) = %d' % ( len(axes1), ( self.dimension + 1 ) ))
-        axes1 = axes1.copy()
+            if len(axes1) <= self.dimension:
+                raise Exception('len( axes ) = %d != ( self.dimension + 1 ) = %d' % (len(axes1), self.dimension + 1))
+        if axes1.ancestor is not None:
+            axes1 = axes1.copy()
         axes1.setAncestor(self)
         self.__axes = axes1
 
@@ -189,7 +191,9 @@ class XDataFunctional(XDataCoreMembers):
         """
 
         XML_strList = startTag
-        if self.isPrimaryXData() and len(self.axes) > 0: XML_strList += self.axes.toXML_strList(indent=indent, **kwargs)
+        if self.isPrimaryXData():
+            if len(self.axes) > 0 or kwargs.get('showEmpty', False):
+                XML_strList += self.axes.toXML_strList(indent=indent, **kwargs)
         XML_strList += extraData
         XML_strList += self.uncertainty.toXML_strList(indent=indent, **kwargs)
         XML_strList[-1] += '</%s>' % self.moniker

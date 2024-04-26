@@ -101,7 +101,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             NRO = region.evaluated.getScatteringRadius().isEnergyDependent()
         NAPS = not region.evaluated.calculateChannelRadius
         if LRF == 7:
-            NAPS = 0    # NAPS is unused for LRF=7
+            NAPS = 1    # never compute radii for LRF=7
         endf.append(endfFormatsModule.endfHeadLine(EL, EH, LRU, LRF, NRO, NAPS))
         endf += region.evaluated.toENDF6(flags, targetInfo, verbosityIndent)
     if unresolvedCount != 0:

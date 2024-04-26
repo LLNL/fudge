@@ -6,6 +6,8 @@
 # <<END-copyright>>
 
 import functools
+
+import PoPs.warning
 from fudge import styles as stylesModule
 from LUPY import enums as enumsModule
 
@@ -87,11 +89,12 @@ class Context:
         'include' takes precedence over 'exclude', 'threshold' can be used with either 'include' or 'exclude'
         """
 
-        if threshold is None and include is None and exclude is None: return self
         newWarningList = []
         screened = {}
+        if threshold is None and include is None and exclude is None:
+            return self, screened
         for warning in self.warningList:
-            if isinstance(warning, Context):
+            if isinstance(warning, (Context, PoPs.warning.Context)):
                 newContext, newScreened = warning.filter(threshold, include, exclude)
                 if newContext: newWarningList.append(newContext)
                 for key in newScreened:
@@ -921,8 +924,12 @@ class FlatIncidentEnergyInterpolation(Warning):
 
 
 class MissingInterpolationQualifier(Warning):
-    def __init__(self, obj=None):
-        Warning.__init__(self, Level.Moderate, obj)
+    def __init__(self, transportable=True, obj=None):
+        if transportable:
+            level = Level.Moderate
+        else:
+            level = Level.Pedantic
+        Warning.__init__(self, level, obj)
 
     def __str__(self):
         return "Missing interpolationQualifier for outgoing energy spectrum (should be 'unitBase', 'correspondingPoints', etc.)"

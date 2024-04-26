@@ -20,6 +20,7 @@ import abc
 import copy
 import numpy
 import pathlib
+import inspect
 
 from xml.etree import cElementTree
 
@@ -343,7 +344,11 @@ class Ancestry(abc.ABC):
 
         xPathList = xPath.split('/')                        # FIXME refactor to use xml.etree.ElementPath.xpath_tokenizer?
 
-        while not xPathList[0]: xPathList = xPathList[1:]   # Trim empty sections from the beginning.
+        while xPathList[0] == '':
+            xPathList = xPathList[1:]                       # Trim empty sections from the beginning.
+
+        while xPathList[-1] == '':
+            xPathList = xPathList[:-1]                      # Trim empty sections from the end as can happend with xPath = '../'.
 
         if '{' in xPath:                                    # Careful, qualifiers may contain '/'.
             xpl2 = []
@@ -358,6 +363,60 @@ class Ancestry(abc.ABC):
             return follow2(xPathList, self)
         except XPathNotFound:
             raise XPathNotFound("Cannot locate path '%s'" % xPath)
+
+    def printNewMembers(self, cls2=None, exclude=False, width=3):
+        """
+        This method prints the type of *self* and then prints all the member added since the base class *cls2*. That is, 
+        those members which are not defined in by base class *cls2*.
+
+        :param cls2:        Must be a base class for *self**.
+        :param exclude:     If True, any member starting with an underscore (i.e., '_') is also not printed.
+        :param width:       The number of members printed per line.
+        """
+
+        if cls2 is None:
+            cls2 = Ancestry
+
+        if not issubclass(self.__class__, cls2):
+            raise TypeError('self is not a derived fom class cls2')
+
+        print(type(self))
+        for cls in inspect.getmro(self.__class__):
+            print('  %s' % cls)
+
+        members = []
+        _ancestryMembers = dir(cls2)
+        for item in dir(self):
+            if item[:1] == '_' and exclude:
+                continue
+            if item in _ancestryMembers:
+                continue
+            members.append(item)
+
+        width = max(1, width)
+        fmt = '%%-%ds' % max(map(len, members))
+        counter = 0
+        sep = '   '
+        for member in members:
+            print(sep, fmt % member, end='')
+            sep = ''
+            counter += 1
+            if counter % width == 0:
+                print()
+                sep = '   '
+        if counter % width != 0:
+            print()
+
+    def printNonAncestryMembers(self, exclude=False, width=3):
+        """
+        This method prints the type of *self* and then prints all the member added by the derived class. That is, 
+        those members which are not defined by the :py:class:`Ancestry` class.
+
+        :param exclude:     If True, any member starting with an underscore (i.e., '_') is also not printed.
+        :param width:       The number of members printed per line.
+        """
+
+        self.printNewMembers(Ancestry, exclude=exclude, width=width)
 
 class AncestryIO_base(Ancestry):
     """This class adds methods to read and write *self* to a file. Currently, its supports reading and writing to an XML file."""

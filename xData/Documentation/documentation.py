@@ -233,7 +233,6 @@ class Documentation(ancestryModule.AncestryIO):
         if kwargs.get('skipDocumentation', False):
             return []
 
-        showEmptySuites = kwargs.get('showEmptySuites', False)
         incrementalIndent = kwargs.get('incrementalIndent', '  ')
         indent2 = indent + incrementalIndent
 
@@ -257,7 +256,8 @@ class Documentation(ancestryModule.AncestryIO):
         attributes += '' if self.version == '' else ' version="%s"' % self.version
         attributes += self.__publicationDate.asXML_attribute(name = 'publicationDate')
 
-        if not showEmptySuites and len(XMLList) == 0 and len(attributes) == 0: return []
+        if len(XMLList) == 0 and len(attributes) == 0:
+            return []
 
         XMLList.insert(0, '%s<%s%s>' % (indent, self.moniker, attributes))
         XMLList[-1] += '</%s>' % self.moniker

@@ -148,9 +148,14 @@ class Text(ancestryModule.AncestryIO):
         extraAttributes = self.XML_extraAttributes(**kwargs)
 
         if not self.__filled:
-            if extraAttributes == '' and not kwargs.get('showEmptyText', False):
+            showEmptyText = kwargs.get('showEmpty', False) or kwargs.get('showEmptyText', False)
+            comment = ''
+            if extraAttributes == '' and not showEmptyText:
                 return []
-            return ['%s<%s%s/>' % (indent, self.moniker, extraAttributes)]
+            XML_string = '<%s%s/>' % (self.moniker, extraAttributes)
+            if extraAttributes == '':
+                XML_string = '%-24s <!-- text -->' % XML_string
+            return [ indent + XML_string]
 
         attributeStr = ''
         if self.__label is not None: attributeStr += ' label="%s"' % self.__label

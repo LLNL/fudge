@@ -35,7 +35,9 @@ def printInfo(moduleName, scripts):
             lines = fIn.readlines()
             for line in lines:
                 if re.match('^summaryDocString%s\s*=\s*.+$' % moduleName, line):
-                    data[script.name] = line.split('=')[-1].strip().strip("'")
+                    variable = line.split('=')[0].strip()
+                    exec(line)
+                    data[script.name] = locals()[variable]
                     break
 
     nameWidth = 0

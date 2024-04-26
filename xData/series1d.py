@@ -350,7 +350,7 @@ class Series1d( baseModule.XDataFunctional ) :
         return( None, None )
 
 class LegendreSeries( Series1d ) :
-    """
+    r"""
     This class represent a Legendre series for a function f(mu) as:
 
     ..math::
@@ -604,7 +604,7 @@ class Polynomial1d( Series1d ) :
         return( self.toPointwiseLinear( **kwargs ) )
 
 class LinearSpline1d( Series1d ) :
-    """
+    r"""
     This class is a simple linear spline.  It basically wraps the XYs1d class.
     Linear interpolation uses the linear spline or the "hat" basis.  The first basis function looks like this::
 

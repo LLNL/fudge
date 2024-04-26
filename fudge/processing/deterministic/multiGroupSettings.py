@@ -125,7 +125,7 @@ class MG(Settings):
 
         if styleLabel not in suite:
             if self.raiseOnError:
-                raise KeyError(f'Style Label {styleLabel} not found in suite')
+                raise KeyError(f'Style Label {styleLabel} not found in suite: %s.' % suite.toXLink())
             else:
                 return None
 

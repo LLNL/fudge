@@ -333,8 +333,9 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
 
         moniker = self.monikerByFormat.get(kwargs.get('formatVersion'), self.moniker)
         if len(self) == 0:
-            if kwargs.get('showEmptySuites', False):
-                return ['%s<%s/>' % (indent, moniker)]
+            showEmptySuite = kwargs.get('showEmpty', False) or kwargs.get('showEmptySuite', False)
+            if showEmptySuite:
+                return ['%s%-24s <!-- suite -->' % (indent, ('<%s/>' % moniker))]
             return []
 
         xmlString = ['%s<%s>' % (indent, moniker)]

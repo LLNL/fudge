@@ -384,7 +384,7 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
             productChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
             for QForm in outputChannel.Q : productChannel.Q.add( QForm )
             for gamma in gammas : productChannel.products.add( productChannel.products.uniqueLabel( gamma ) )
-            productionReaction = orphanProductModule.OrphanProduct( str(i1), productChannel.genre, ENDF_MT = MT )
+            productionReaction = orphanProductModule.OrphanProduct('Orphan product %s' % str(i1), productChannel.genre, ENDF_MT = MT )
             endf_endlModule.setReactionsOutputChannelFromOutputChannel( info, productionReaction, productChannel )
             crossSectionLink = crossSectionModule.Reference( link = summedCrossSection.crossSection.evaluated, label = info.style )
             linksToCheck.append( crossSectionLink )

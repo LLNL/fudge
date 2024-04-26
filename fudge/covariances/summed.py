@@ -15,7 +15,7 @@ from . import enums as covarianceEnumsModule
 from . import base
 
 class SummedCovariance( ancestryModule.AncestryIO, base.Covariance ):
-    """ 
+    r"""
     Covariance matrix stored as sum/difference of matrices from other reactions,
     valid over a specified domain.
     Note: summed matrices may sum over other summed matrices, which opens up the possibility of
