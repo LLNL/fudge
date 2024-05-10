@@ -58,253 +58,972 @@
 </section>
 <section id="module-fudge.processing.deterministic.transferMatrices">
 <span id="fudge-processing-deterministic-transfermatrices-module"></span><h2>fudge.processing.deterministic.transferMatrices module<a class="headerlink" href="#module-fudge.processing.deterministic.transferMatrices" title="Permalink to this heading">¶</a></h2>
+<p>This module is for FUDGE internal use.
+This module calculates the multi-group products matrices for various types of districtions. Many of the functions in this
+module interface between various distribution classes and Merced.</p>
+<p>This module contains the following functions:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>twoBodyTransferMatrix</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>twoBodyTransferMatrix2</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>wholeAtomScattering</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>comptonScattering</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>ENDFEMuEpP_TransferMatrix</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ENDLEMuEpP_TransferMatrix</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>ELEpP_TransferMatrix</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>EEpMuP_TransferMatrix</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Legendre_TransferMatrix</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>doubleDifferential_EEpMuP</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>uncorrelated_EMuP_EEpP_TransferMatrix</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>discreteGammaAngularData</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>primaryGammaAngularData</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>NBodyPhaseSpace</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>KalbachMann_TransferMatrix</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>executeCommand</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>parseOutputFile</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>commonDataToString</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>GBToString</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>fluxToString</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>crossSectionToString</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>multiplicityToString</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>angularToString</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>energyFunctionToString</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>EEpPDataToString</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>LEEpPDataToString</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>LegendreDataToString</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>EMuEpPDataToString</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>EEpMuPDataToString</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>KalbachMannDataToString</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>oneDToString</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>twoDToString</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>threeDToString</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>threeDListToString</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>addTMs</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.EEpMuPDataToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">EEpMuPDataToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">EEpMuPData</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpMuPDataToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpMuPDataToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the MT = 6 LAW = 1, LANG = 11-15 distribution data 
+that will be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>EMuEpPData</strong> – The distribution data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the distribution.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.EEpMuP_TransferMatrix">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">EEpMuP_TransferMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energyAngularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpMuP_TransferMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpMuP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is ENDF MT=6 LAW=1, LANG=1,11-15 type data.</p>
+<dd><p>This function calculates multi-group product matices for MT = 6 LAW = 1, LANG = 1, 11-15 data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>energyAngularData</strong> – This is the distribution data for the product.</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.EEpPDataToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">EEpPDataToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">EEpPData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">changeInterpolationQualifierWarning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpPDataToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpPDataToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the energy data for an uncorrelated distribution that will 
+be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energyData</strong> – The energy data.</p></li>
+<li><p><strong>changeInterpolationQualifierWarning</strong> – A boolean indicating if a warning message should be printed if the angular data’s interpolation qualifier is not used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the energy distribution.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.ELEpP_TransferMatrix">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">ELEpP_TransferMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LEEpPData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ELEpP_TransferMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ELEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is for ENDL I = 4 data with l &gt; 0. This form is deprecated.</p>
+<dd><p>This function calculates multi-group product matices for ENDL I = 4 data with l &gt; 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>LEEpPData</strong> – This is the distribution data for the product (i.e., ENDL I = 4 data).</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.EMuEpPDataToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">EMuEpPDataToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">EMuEpPData</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EMuEpPDataToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EMuEpPDataToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the MF = 6, LAW = 7 distribution data 
+that will be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>EMuEpPData</strong> – The distribution data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the distribution.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.ENDFEMuEpP_TransferMatrix">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">ENDFEMuEpP_TransferMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angularEnergyData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ENDFEMuEpP_TransferMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ENDFEMuEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is ENDF MF = 6, LAW = 7 type data.</p>
+<dd><p>This function calculates multi-group product matices for ENDF MF = 6, LAW = 7 type data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>scatteringFactor</strong> – This is the incoherent scattering function.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.ENDLEMuEpP_TransferMatrix">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">ENDLEMuEpP_TransferMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">EMuEpPData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ENDLEMuEpP_TransferMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ENDLEMuEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is LLNL I = 1, 3 type data.</p>
+<dd><p>This function calculates multi-group product matices for ENDL I = 1, 3 type data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>angularData</strong> – This is the angular distribution data for the product (i.e., ENDL I = 1 data).</p></li>
+<li><p><strong>EMuEpPData</strong> – This is the energy distribution data for the product (i.e., ENDL I = 3 data).</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.GBToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">GBToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_in_unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#GBToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.GBToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the multi-group boundaries that will be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Either the string ‘Projectile’ or ‘Product’.</p></li>
+<li><p><strong>gb</strong> – The list of multi-group boundaries.</p></li>
+<li><p><strong>energy_in_unit</strong> – The unit that the boundaries will be converted to before processing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the multi-group boundaries.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.KalbachMannDataToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">KalbachMannDataToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">KalbachMannData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_in_unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#KalbachMannDataToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.KalbachMannDataToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the Kalbach/Mann distribution data 
+that will be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>EMuEpPData</strong> – The distribution data.</p></li>
+<li><p><strong>energy_in_unit</strong> – The unit that the energies will be converted to before processing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the distribution.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.KalbachMann_TransferMatrix">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">KalbachMann_TransferMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particlesData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">KalbachMannData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#KalbachMann_TransferMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.KalbachMann_TransferMatrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function calculates multi-group product matices for a Kalbach/Mann distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>KalbachMannData</strong> – This is the Kalbach/Mann data.</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.LEEpPDataToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">LEEpPDataToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LEEpPData</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#LEEpPDataToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.LEEpPDataToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the ENDL I = 4 data with l &gt; 0 distribution data 
+that will be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>LEEpPData</strong> – The ENDL I = 4 data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the distribution.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.LegendreDataToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">LegendreDataToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LegendreData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">changeInterpolationQualifierWarning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#LegendreDataToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.LegendreDataToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the MT = 6 LAW = 1, LANG = 1 distribution data 
+that will be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>LegendreData</strong> – The distribution data.</p></li>
+<li><p><strong>changeInterpolationQualifierWarning</strong> – A boolean indicating if a warning message should be printed if the angular data’s interpolation qualifier is not used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the distribution.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.Legendre_TransferMatrix">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">Legendre_TransferMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LegendreData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#Legendre_TransferMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.Legendre_TransferMatrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function calculates multi-group product matices for MT = 6 LAW = 1, LANG = 1 data. This function is for internal use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>LegendreData</strong> – This is the distribution data for the product.</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.NBodyPhaseSpace">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">NBodyPhaseSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numberOfProducts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mTotal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#NBodyPhaseSpace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.NBodyPhaseSpace" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function calculates multi-group product matices for an n-body phase space distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>numberOfProducts</strong> – This is the number of products.</p></li>
+<li><p><strong>mTotal</strong> – This is total mass of the particles.</p></li>
+<li><p><strong>Q</strong> – This is the Q-value.</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.addTMs">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">addTMs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">TMs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#addTMs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.addTMs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the sum of the product matrices in <em>TMs</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TMs</strong> – A list of product matrices.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns a product matrix that is the sum of the product matrices in <em>TMs</em>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.angularToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">angularToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">twoBody</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">changeInterpolationQualifierWarning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#angularToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.angularToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the angular data that will be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angularData</strong> – The angular data.</p></li>
+<li><p><strong>crossSection</strong> – The cross section for the reaction.</p></li>
+<li><p><strong>weight</strong> – This is the pointwise linear weight to multiply the kernal of the integral by.</p></li>
+<li><p><strong>twoBody</strong> – A boolean indicating if the interaction is two-body.</p></li>
+<li><p><strong>changeInterpolationQualifierWarning</strong> – A boolean indicating if a warning message should be printed if the angular data’s interpolation qualifier is not used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the angular distribution.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.commonDataToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">commonDataToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_in_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photonFrame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Frame.lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modifiedProductGroup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#commonDataToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.commonDataToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function converts common data needed to calculate any of the distribution product matrices to a list of string and returns the list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in.</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>energy_in_unit</strong> – The unit that the energy will be converted to before processing.</p></li>
+<li><p><strong>weight</strong> – This is the pointwise linear weight to multiply the kernal of the integral by.</p></li>
+<li><p><strong>photonFrame</strong> – This is the frame of the photon data.</p></li>
+<li><p><strong>legendreMax</strong> – This is the maximum Legendre order that the product matrices are to be calculated to.</p></li>
+<li><p><strong>modifiedProductGroup</strong> – This is a subset of the product groups to handle an issue in Merced.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the common data.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.comptonScattering">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">comptonScattering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatteringFactor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#comptonScattering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.comptonScattering" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function calculates multi-group product matices for photo-atomic incoherent scattering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>scatteringFactor</strong> – This is the incoherent scattering function.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.crossSectionToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">crossSectionToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_in_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#crossSectionToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.crossSectionToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the cross section that will be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is not used.</p></li>
+<li><p><strong>crossSection</strong> – The cross section for the reaction.</p></li>
+<li><p><strong>energy_in_unit</strong> – The unit that the cross section energies will be converted to before processing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the cross section.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.discreteGammaAngularData">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">discreteGammaAngularData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gammaEnergy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#discreteGammaAngularData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.discreteGammaAngularData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used
+<dd><p>This function calculates multi-group product matices for a discrete photon distribution.
+Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used
 for pair-production which pass angularData as None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>gammaEnergy</strong> – This is the energy of the discrete photon.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>angularData</strong> – This is the angular distribution data for the product.</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.doubleDifferential_EEpMuP">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">doubleDifferential_EEpMuP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">EEpMuPData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#doubleDifferential_EEpMuP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.doubleDifferential_EEpMuP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function calculates multi-group product matices for MT = 6 LAW = 1, LANG = 11-15 data. This function is for internal use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>EEpMuPData</strong> – This is the distribution data for the product.</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.energyFunctionToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">energyFunctionToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energyData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#energyFunctionToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.energyFunctionToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the energy data for an uncorrelated distribution that will 
+be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energyData</strong> – The energy data.</p></li>
+<li><p><strong>weight</strong> – This is the pointwise linear weight to multiply the kernal of the integral by.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the energy distribution.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.executeCommand">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">executeCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">restart</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productOffset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#executeCommand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.executeCommand" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Runs executable (presumably Merced) on a single input, parses resulting output file and returns two transfer matrices:</dt><dd><ul class="simple">
-<li><p>1st has constant weight (conserves number of particles)</p></li>
-<li><p>2nd is weighted by E’ (conserves energy)</p></li>
+<dd><p>This function runs <em>executable</em> (presumably Merced) on a single input, parses resulting output file and returns two transfer matrices:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the first returned matric has weight 1 (i.e., conserves number of particles)</p></li>
+<li><p>the second returned matrix has weight E’ (i.e., conserves energy)</p></li>
+</ul>
+</div></blockquote>
+<p>If executable fails, a file named workFile + ‘_in.err’ is created in the working directory for easier searching.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logFile</strong> – Currently unused! Remove argument?</p></li>
+<li><p><strong>executable</strong> – Executable to run which is generally Merced.</p></li>
+<li><p><strong>cmd</strong> – String which will be written as the input file for <em>executable</em>.</p></li>
+<li><p><strong>workDir</strong> – Directory where executable will be run. processProtare.py creates new workDir for each projectile/target/temperature.</p></li>
+<li><p><strong>workFile</strong> – List of form [reaction identifier, product identifier] (e.g., [‘r0001’,’n’] or [‘r0045’,’photon__b’])
+used to generate unique file name for the input and output files.</p></li>
+<li><p><strong>restart</strong> – boolean. If True, check whether executable was previously run for this input and if so skip re-running 
+(useful for resuming jobs that timed out).</p></li>
+<li><p><strong>productOffset</strong> – The product energy group where the reaction threshold energy resides.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
 </dl>
-<p>If executable fails, create a ‘.err’ file in the working directory (for easier searching)</p>
-<p>&#64;param logFile: currently unused! Remove argument?
-&#64;param executable: compiled executable to run, generally FUDGE/bin/merced
-&#64;param cmd: full text of executable input file
-&#64;param workDir: directory where executable will be run. processProtare creates new workDir for each projectile/target/temperature
-&#64;param workFile: list of form [reaction identifier, product identifier], e.g. [‘r0001’,’n’] or [‘r0045’,’photon__b’]. Used to generate unique file names.
-&#64;param restart: boolean. If True, check whether executable was previously run for this input and if so skip re-running (useful for resuming jobs that timed out).</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.fluxToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">fluxToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_in_unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#fluxToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.fluxToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the flux that will be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flux</strong> – The flux function.</p></li>
+<li><p><strong>energy_in_unit</strong> – The unit that the flux energies will be converted to before processing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the flux.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.multiplicityToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">multiplicityToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_in_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#multiplicityToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.multiplicityToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function returns a string representation of the cross section that will be writted to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – The style of the multiplicity to process.</p></li>
+<li><p><strong>_multiplicity</strong> – The cross section function.</p></li>
+<li><p><strong>energy_in_unit</strong> – The unit that the multiplicity energies will be converted to before processing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing the multiplicity.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.oneDToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">oneDToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#oneDToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.oneDToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function takes a list of floats and returns a list of strings representations of the floats that will be 
+written to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Oaram data<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of floats.</p>
+</dd>
+<dt class="field-even">Oaram factor<span class="colon">:</span></dt>
+<dd class="field-even"><p>A number to scale each value in <em>data</em> by.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A python list of strings representing <em>data</em>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.parseOutputFile">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">parseOutputFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productOffset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">firstLine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#parseOutputFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.parseOutputFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function parses the Merced output file that contains the product matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> – Path to the Merced output file.</p></li>
+<li><p><strong>productOffset</strong> – The product energy group where the reaction threshold energy resides.</p></li>
+<li><p><strong>firstLine</strong> – This is the first list that should be in output file which is use to verify that the file can be read.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The tuple (number product matrices, energy weighted product matrices, dictionary ).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.primaryGammaAngularData">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">primaryGammaAngularData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energyData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#primaryGammaAngularData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.primaryGammaAngularData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. massRatio is the
+<dd><p>This function calculates multi-group product matices for a primary photon distribution from a capture reaction.
+Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. massRatio is the
 target mass divide by the sum of the projectile and target masses.</p>
 <p>This function perform the integration</p>
 <blockquote>
-<div><p>TM = int_g dE int_h dE’ S(E) M(E) f(E) P(E -&gt; E’) / int_g dE f(E)</p>
+<div><p><img class="math" src="../_images/math/076c526223d9db5e4a58de2cfc7cfc0c205296a4.png" alt="TM = \int_g dE \int_h dE' S(E) M(E) f(E) P(E -&gt; E') / \int_g dE f(E)"/></p>
 </div></blockquote>
-<p>where int_g is the integral of E from E_i to E_{i+1}, int_g is the integral of E’ from E’_j to E’_{j+1}, S(E) is the cross section,
-M(E) is the products multiplicity, f(E) is the flux weighting and P(E -&gt; E’) is the probability for a projectile of energy E producing
-a primary gamma of energy E’ for binding energy bindingEnergy. This function assumes that M(E) is a constant. For primary gamma’s captured
-into binding energy bindingEnergy P(E -&gt; E’) = deltaFunction( E’ - ( bindingEnergy + massRatio E ) ) where massRatio = mt / ( mp + mt ),
-mp is the projectile’s mass and mt is the target’s mass. Note, this formula is from the ENDF manual which ignores the recoil of the residual
-nucleus.</p>
+<p>where <img class="math" src="../_images/math/51fdaf1ea7fd53442362e612c730c0e6ff505214.png" alt="\int_g"/> is the integral of <img class="math" src="../_images/math/1815f600df7845409443aed470eac2d449e4ddb0.png" alt="E"/> from <img class="math" src="../_images/math/9c58f0e8b0fe372667bf1fad2943133f3a2b4370.png" alt="E_i"/> to <img class="math" src="../_images/math/3f2f250436795e01bbefecb8234b7f46f4fd04ca.png" alt="E_{i+1}"/>, <img class="math" src="../_images/math/51fdaf1ea7fd53442362e612c730c0e6ff505214.png" alt="\int_g"/> is the integral of <img class="math" src="../_images/math/babbc089a093e2c77ae50fd1990c4f609e0fe22e.png" alt="E'"/>
+from <img class="math" src="../_images/math/e54b6cd1219d4c5d587624da70c43d124dd53ad9.png" alt="E'_j"/> to <img class="math" src="../_images/math/a309f7a9d49d51990b61af445aafc1aef0b04d8c.png" alt="E'_{j+1}"/>, <img class="math" src="../_images/math/463a3c55c515ecff766f8f9e8b611a90a2b6903c.png" alt="S(E)"/> is the cross section, <img class="math" src="../_images/math/d42561a4de8488ba5c1148c7d2bee61711d3f637.png" alt="M(E)"/> is the products multiplicity, 
+<img class="math" src="../_images/math/edfe863ac66560c53f68084c9cd1db3cacbe49b2.png" alt="f(E)"/> is the flux weighting and <img class="math" src="../_images/math/2c69baaeef840047edf5e3e802be6f6bea7a634f.png" alt="P(E -&gt; E')"/> is the probability for a projectile of energy <img class="math" src="../_images/math/2e98d0a0babfed5c4d0ed09759a09fb2b338881a.png" alt="E producing"/>
+a primary gamma of energy <img class="math" src="../_images/math/babbc089a093e2c77ae50fd1990c4f609e0fe22e.png" alt="E'"/> for binding energy bindingEnergy. This function assumes that <img class="math" src="../_images/math/d42561a4de8488ba5c1148c7d2bee61711d3f637.png" alt="M(E)"/> is a constant. 
+For primary gamma’s captured into binding energy bindingEnergy <img class="math" src="../_images/math/2c69baaeef840047edf5e3e802be6f6bea7a634f.png" alt="P(E -&gt; E')"/> = deltaFunction( E’ - ( bindingEnergy + massRatio E ) ) 
+where massRatio = <img class="math" src="../_images/math/82da321816424a6f9e3f7fb49a5e8c7db9033a72.png" alt="mt / ( mp + mt )"/>, mp is the projectile’s mass and mt is the target’s mass. Note, this formula is 
+from the ENDF manual which ignores the recoil of the residual nucleus.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>energyData</strong> – This is the energy of the discrete photon.</p></li>
+<li><p><strong>angularData</strong> – This is the angular distribution data for the product.</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.threeDListToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">threeDListToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linearizeXYs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#threeDListToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.threeDListToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function takes a pointwise 2d function (i.e., f(x,y)) and returns a list of strings representations of the data that will be 
+written to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – </p></li>
+<li><p><strong>linearizeXYs</strong> – A boolean indicating if the data are to be converted to poinwise data and linearized.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing <em>data</em>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.threeDToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">threeDToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linearizeXYs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#threeDToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.threeDToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function takes a pointwise 2d function (i.e., f(x,y)) and returns a list of strings representations of the data that will be 
+written to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – The pointwise 2d data (i.e., f(x,y)).</p></li>
+<li><p><strong>linearizeXYs</strong> – A boolean indicating if the data are to be converted to poinwise data and linearized.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing <em>data</em>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">twoBodyTransferMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoBodyTransferMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate input and call processing code to generate a transfer matrix for two-body angular distribution.
-If the distribution is actually made up of two different forms in different energy regions, this function
-calls itself in the two regions and sums the result.</p>
+<dd><p>This function calculates multi-group product matices from a two-body distribution which must be in the center-of-mass frame. 
+This function allows for the distribution to have different incident energy regions. It calls <a class="reference internal" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2" title="fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2"><code class="xref py py-func docutils literal notranslate"><span class="pre">twoBodyTransferMatrix2()</span></code></a> 
+for each region and sums the resuts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>angularData</strong> – This is the angular distribution data for the product.</p></li>
+<li><p><strong>Q</strong> – This is the Q-value for the two-body reaction.</p></li>
+<li><p><strong>weight</strong> – This is the pointwise linear weight to multiply the kernal of the integral by.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">twoBodyTransferMatrix2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoBodyTransferMatrix2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function for twoBodyTransferMatrix. This should be called separately for every interpolation 
-region within a Regions2d form.</p>
+<dd><p>This function calculates multi-group product matices from a two-body distribution which must be in the center-of-mass frame. 
+This function is called by <a class="reference internal" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix" title="fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">twoBodyTransferMatrix()</span></code></a> to handle one region of the distrition. This function is for internal use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>angularData</strong> – This is the angular distribution data for the product.</p></li>
+<li><p><strong>Q</strong> – This is the Q-value for the two-body reaction.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>weight</strong> – This is the pointwise linear weight to multiply the kernal of the integral by.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.twoDToString">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">twoDToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">addHeader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">addExtraBlankLine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoDToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoDToString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function takes a list of points (x,y) and returns a list of strings representations of the floats that will be 
+written to the Merced input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – A string indicating the type of data.</p></li>
+<li><p><strong>data</strong> – The data to convert to strings.</p></li>
+<li><p><strong>addHeader</strong> – A boolean indicating if a header is written that contains <em>label</em> and the number of data points.</p></li>
+<li><p><strong>addExtraBlankLine</strong> – A boolean indicating if an extra blank line is added at the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of strings representing <em>data</em>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.uncorrelated_EMuP_EEpP_TransferMatrix">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">uncorrelated_EMuP_EEpP_TransferMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energyData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#uncorrelated_EMuP_EEpP_TransferMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.uncorrelated_EMuP_EEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function calculates multi-group product matices for uncorrelated energy and angular distributions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>crossSection</strong> – This is the pointwise linear cross section for the reaction.</p></li>
+<li><p><strong>angularData</strong> – This is the angular distribution data for the product.</p></li>
+<li><p><strong>energyData</strong> – This is the energy distribution data for the product.</p></li>
+<li><p><strong>multiplicity</strong> – This is the product’s multiplicity.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+<li><p><strong>weight</strong> – This is the pointwise linear weight to multiply the kernal of the integral by.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.wholeAtomScattering">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">wholeAtomScattering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formFactor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">realAnomalousFactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginaryAnomalousFactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#wholeAtomScattering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.wholeAtomScattering" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function calculates multi-group product matices for photo-atomic coherent scattering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>productFrame</strong> – This is the frame the product data are in and must always be center-of-mass for two-body reactions.</p></li>
+<li><p><strong>formFactor</strong> – This is the coherent scattering form factor.</p></li>
+<li><p><strong>realAnomalousFactor</strong> – This is the real part of the anomalous factor.</p></li>
+<li><p><strong>imaginaryAnomalousFactor</strong> – This is the imaginary part of the anomalous factor.</p></li>
+<li><p><strong>comment</strong> – This is a comment that is written to the Merced input file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number and energy conserving product matices.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-fudge.processing.deterministic.multiGroupUpScatter">
 <span id="fudge-processing-deterministic-multigroupupscatter-module"></span><h2>fudge.processing.deterministic.multiGroupUpScatter module<a class="headerlink" href="#module-fudge.processing.deterministic.multiGroupUpScatter" title="Permalink to this heading">¶</a></h2>
+<p>This module is for FUDGE internal use.
+The functions in this module are used to calculate product matrices for neutron elastic scattering including a non-zero
+temperature of the target.</p>
+<p>This module contains the following functions:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SnElasticUpScatter</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>executeCommand</p></td>
+<td><p>This function is used internally to call
+<code class="xref py py-func docutils literal notranslate"><span class="pre">subprocessingModule.executeCommand()</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>checkNegative_l0</p></td>
+<td><p>This function counts the number of negative elements in the l=0 product matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p>parseAveEnergyOutputFile</p></td>
+<td><p>This function parses the average product data in the file <em>fileName</em>.</p></td>
+</tr>
+<tr class="row-even"><td><p>rescaleCrossSection</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>analyzeMatrix</p></td>
+<td><p>This function is not used.</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.multiGroupUpScatter.SnElasticUpScatter">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.multiGroupUpScatter.</span></span><span class="sig-name descname"><span class="pre">SnElasticUpScatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#SnElasticUpScatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.SnElasticUpScatter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate input and call processing code to generate a transfer matrix for two-body angular distribution.
-If the distribution is actually made up of two different forms in different energy regions, this function
-calls itself in the two regions and sums the result.</p>
+<dd><p>This function generates input for and calls the code which includes a target temperature when calculating product matrices for
+neutron elastic scattering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is not used.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>comment</strong> – This is not used.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.multiGroupUpScatter.analyzeMatrix">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.multiGroupUpScatter.</span></span><span class="sig-name descname"><span class="pre">analyzeMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">TM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#analyzeMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.analyzeMatrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function is not used and should be deleted.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.multiGroupUpScatter.checkNegative_l0">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.multiGroupUpScatter.</span></span><span class="sig-name descname"><span class="pre">checkNegative_l0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">TM_EEpL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infoFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#checkNegative_l0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.checkNegative_l0" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function counts the number of negative l=0 elements in the product matrix <em>TM_EEpL</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>TM_EEpL</strong> – The product matrix to check.</p></li>
+<li><p><strong>weight</strong> – A string indicating if the weight is ‘1’ or ‘E’. Oops, need to fix the calling string of ‘0’ should be ‘1’.</p></li>
+<li><p><strong>infoFile</strong> – Path to log file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int that is the number of negative l=0 elements found.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.multiGroupUpScatter.executeCommand">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.multiGroupUpScatter.</span></span><span class="sig-name descname"><span class="pre">executeCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#executeCommand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.executeCommand" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This functions sets up stuff and executes <em>cmd</em> using <code class="xref py py-func docutils literal notranslate"><span class="pre">ubprocessingModule.executeCommand()</span></code>..</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cmd</strong> – The system command to execute.</p></li>
+<li><p><strong>workDir</strong> – The directory where input and output files are written to.</p></li>
+<li><p><strong>workFile</strong> – Path to file where infomation about the calculations is written.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of negative l=0 product matrix elements.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.multiGroupUpScatter.parseAveEnergyOutputFile">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.multiGroupUpScatter.</span></span><span class="sig-name descname"><span class="pre">parseAveEnergyOutputFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#parseAveEnergyOutputFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.parseAveEnergyOutputFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>For interal use. This function parses the average product data in the file <em>fileName</em> and returns the values as a list of floats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fileName</strong> – The path of the file to parse.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python list of floats.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.multiGroupUpScatter.rescaleCrossSection">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.multiGroupUpScatter.</span></span><span class="sig-name descname"><span class="pre">rescaleCrossSection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupedCrossSec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UpScatterMatrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#rescaleCrossSection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.rescaleCrossSection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>For each incident group in <em>UpScatterMatrix</em>, this function scales each element so that sum of the l=0 component is equal to 
+the corresponding element in <em>groupedCrossSec</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>groupedCrossSec</strong> – The multi-group cross sections.</p></li>
+<li><p><strong>UpScatterMatrix</strong> – The product matrices to scale to match <em>groupedCrossSec</em>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The scaled <em>UpScatterMatrix</em>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-fudge.processing.deterministic">

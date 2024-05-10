@@ -5,6 +5,32 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module contains the all the classes for handling regions functions. A regions container is designed to handle
+a function that has 1 or more of the following::
+
+    -) an outer dimension that is multi-value at one of more domain values (e.g., :math:`f(x)` != :math:`f(x)` for one or more values of x).
+    -) the interpolation of the outer dimension of the function is different in different regions of the domain.
+    -) different functions are used in different regions of the domain (e.g., Legendre functions may be used for the outer domain
+        < 5 and XYs1d functions otherwise).
+
+This module contains the following classes:
+        
+    +-------------------+-------------------------------------------------------------------------------------------------------+
+    | Class             | Description                                                                                           |
+    +===================+=======================================================================================================+
+    | Regions           | This is the base class for the other regions classes.                                                 |
+    +-------------------+-------------------------------------------------------------------------------------------------------+
+    | Regions1d         | This is a class for a 1 dimensional regions function.                                                 |
+    +-------------------+-------------------------------------------------------------------------------------------------------+
+    | RegionsMultiD     | This is the base class for the 2 and dimensional regions classes.                                     |
+    +-------------------+-------------------------------------------------------------------------------------------------------+
+    | Regions2d         | This is a class for a 2 dimensional regions function.                                                 |
+    +-------------------+-------------------------------------------------------------------------------------------------------+
+    | Regions3d         | This is a class for a 3 dimensional regions function.                                                 |
+    +-------------------+-------------------------------------------------------------------------------------------------------+
+"""
+
 import abc
 import math
 
@@ -20,38 +46,84 @@ from . import base as baseModule
 domainEpsilon = 1e-15
 
 class Regions( baseModule.XDataFunctional ) :
-    """Abstract base class for Regions."""
+    """
+    This is the absract base class for the other regions classes.
+
+    The following table list the primary members of this class:
+
+    +-------------------+---------------------------------------------------------------+
+    | Member            | Description                                                   |
+    +===================+===============================================================+
+    | axes              | This is the axes member.                                      |
+    +-------------------+---------------------------------------------------------------+
+    | outerDomainValue  | This is the domain value for the next higher dimension for    |
+    |                   | a function that is embedded in a high dimensional functions.  |
+    +-------------------+---------------------------------------------------------------+
+    | index             | This is the index member use by some xData classes.           |
+    +-------------------+---------------------------------------------------------------+
+    | label             | This is the label member use by some xData classes.           |
+    +-------------------+---------------------------------------------------------------+
+    | valueType         | This describes the type of data in array (i.e., float, int).  |
+    +-------------------+---------------------------------------------------------------+
+    | __regions         | This is a python list of the regions that have been added.    |
+    +-------------------+---------------------------------------------------------------+
+    """
 
     ancestryMembers = baseModule.XDataFunctional.ancestryMembers                # See note in multiD_XYs.py about setting ancestryMembers.
 
     def __init__( self, axes = None, index = None, valueType = enumsModule.ValueType.float64, outerDomainValue = None, label = None ) :
+        """
+        :param axes:                This is the axes member.
+        :param index:               This is the index member.
+        :param valueType:           This describes the type of data (i.e., float, int) returned by the function.
+        :param outerDomainValue:    This is the domain value for the next higher dimension for a function that is
+                                    embedded in a high dimensional function.
+        :param label:               This is the label member.
+        """
 
         baseModule.XDataFunctional.__init__(self, axes, index=index, valueType=valueType, outerDomainValue=outerDomainValue, label=label)
         self.__regions = []
 
     def __len__( self ) :
-        """Returns the number of regions in self."""
+        """
+        This method returns the number of regions in self.
+
+        :returns:       A python int.
+        """
 
         return( len( self.__regions ) )
 
     @staticmethod
     @abc.abstractmethod
     def allowedSubElements( ):
+        """
+        This method is abstract and must be over loaded by each sub-class. This method returns a list of all functions of the 
+        same dimension as the sub-class that can be added as a region of the sub-class.
+        """
+
         pass
 
     def __getitem__( self, index ) :
-        """Returns the (i-1)^th region of self."""
+        """
+        This method returns the (i-1)^th region of self.
+
+        :param index:   The index of the region to return.
+
+        :returns:       A function that has the same dimension as *self*.
+        """
 
         return( self.__regions[index] )
 
     def __setitem__( self, index, region ) :
         """
-        Set region (the right-hand-side) to the :math:`{i-1}^{th}` region of self. Region must be an instance of 
+        This method set the region at index *index* to *region*. The *region* must be an instance of 
         base.XDataFunctional with the same dimension as self.
-        If :math:`i > 0`, the following must also be met:
-        
-            - all the prior regions must already exists,
-            - region's minimum domain value must be equal to the prior region's maximum domain value.
+        The region must fix between any abutting regions. That is, if *index* is greater than 0, the domainMin of 
+        *region* must be equal to the domainMax of the prior region. And, if *index* is less than the number of regions
+        in *self* minus 1, then domainMax of *region* must be equal to the domainMin of the next region.
+
+        :param index:       The index where *region* is inserted.
+        :param region:      This must be an instance of a class in :py:func:`allowedSubElements`.
         """
 
 # BRB need to check axes.
@@ -76,6 +148,8 @@ class Regions( baseModule.XDataFunctional ) :
         region.index = index
 
     def __add__(self, other):
+        """
+        """
 
         self2, other2 = self.copyToCommonRegions(other)
         for i1, region in enumerate(self2):
@@ -93,16 +167,27 @@ class Regions( baseModule.XDataFunctional ) :
 
     @property
     def domainMin( self ) :
+        """
+        This method returns the minimum domain value for *self*.
+        """
 
         return( self.__regions[0].domainMin )
 
     @property
     def domainMax( self ) :
+        """
+        This method returns the maximum domain value for *self*.
+        """
 
         return( self.__regions[-1].domainMax )
 
     @property
     def domainGrid( self ) :
+        """
+        This method returns all domain values for *self* as a python list.
+
+        :returns:           A python list.
+        """
 
         grid = set()
         for region in self: grid.update( region.domainGrid )
@@ -110,6 +195,9 @@ class Regions( baseModule.XDataFunctional ) :
 
     @property
     def domainUnit( self ) :
+        """
+        This method returns the domain unit for *self*.
+        """
 
         return( self.getAxisUnitSafely( self.dimension ) )
 
@@ -141,10 +229,10 @@ class Regions( baseModule.XDataFunctional ) :
         return( "function%dds" % self.dimension )
 
     def append(self, curve):
-        '''
+        """
         Appends *curve* to the end of *self*. If *curve* is a **Regions** instance, then **append** is call for 
         each region in curve.
-        '''
+        """
 
         if isinstance(curve, Regions):
             for region in curve:
@@ -154,10 +242,10 @@ class Regions( baseModule.XDataFunctional ) :
             curve.keyName = 'index'
 
     def prepend(self, curve):
-        '''
+        """
         Prepends *curve* to the beginning of *self*. If *curve* is a **Regions** instance, then **append** is call 
         for each region in curve.
-        '''
+        """
 
         if isinstance(curve, Regions):
             for index in range(len(curve), 0, -1):
@@ -175,6 +263,11 @@ class Regions( baseModule.XDataFunctional ) :
             curve.index = 0
 
     def convertUnits( self, unitMap ) :
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         factors = self.axes.convertUnits( unitMap )
         for region in self : region.convertUnits( unitMap )
@@ -190,9 +283,9 @@ class Regions( baseModule.XDataFunctional ) :
         return( newRegions )
 
     def hasData(self):
-        '''
+        """
         Returns True if one of self's regions hasData returns True and False otherwise.
-        '''
+        """
 
         for region in self:
             if region.hasData():
@@ -216,6 +309,13 @@ class Regions( baseModule.XDataFunctional ) :
                 return
 
     def domainUnitConversionFactor( self, unitTo ) :
+        """
+        This method returns the factor needed to convert self's domain to unit *unitTo*.
+
+        :param unitTo:      The unit for converting self's domain.
+
+        :returns:           A float.
+        """
 
         if( unitTo is None ) : return( 1. )
         return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
@@ -256,7 +356,13 @@ class Regions( baseModule.XDataFunctional ) :
 
     def fixDomains(self, domainMin, domainMax, fixToDomain):
         """
-        Sets domain minimum and maximum per the arguments.
+        This method sets the domain minimum and maximum per the arguments.
+
+        :param domainMin:       The lower limit of the domain.
+        :param domainMax:       The upper limit of the domain.
+        :param fixToDomain:     An instance of :py:class:`enumsModule.FixDomain` that specifies which limits are to be fixed.
+
+        :returns:               This method returns 0 if no domain limit was moved and 1 if at least one was moved.
         """
 
         OldDomainMin = self.domainMin
@@ -349,6 +455,14 @@ class Regions( baseModule.XDataFunctional ) :
         return( s1 )
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
 
@@ -372,6 +486,17 @@ class Regions( baseModule.XDataFunctional ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
+        """
 
         attributes, extraAttributes = baseModule.XDataFunctional.parseBareNodeCommonAttributes(node, xPath)     # parseBareNodeCommonAttributes adds to xPath.
         if len(extraAttributes) > 0: raise Exception('Invalid attributes: %s.' % ( ', '.join(list(extraAttributes.keys())) ))
@@ -402,6 +527,9 @@ class Regions( baseModule.XDataFunctional ) :
         return regions1
 
 class Regions1d( Regions ) :
+    """
+    This class supports storing a 1d function as a list of abutting 1d functions.
+    """
 
     moniker = 'regions1d'
     dimension = 1
@@ -430,8 +558,14 @@ class Regions1d( Regions ) :
 
     def copyToCommonRegions(self, other, epsilon = domainEpsilon):
         """
-        Returns two regions instances that are copies of self and other but with regions added as
-        needed so that each has the same number of regions and the region boundaries align.
+        This method returns two :py:class:`Regions1d` instances that yield the same function as *self* and *other*,
+        but with *self* and *other* broken up so that they have the same number of regions and the regions align.
+        Currenlty, *other* can only be a :py:class:`Regions1d` or :py:class:`XYs1dModule.XYs1d` instance.
+
+        :param other:       A :py:class:`Regions1d` or :py:class:`XYs1dModule.XYs1d` instance.
+        :param epsilon:     Two boundaries are considered to be the same if they are relativley within this value.
+
+        :returns:           Two :py:class:`Regions1d` instances.
         """
 
         if self.dimension != other.dimension:
@@ -507,6 +641,13 @@ class Regions1d( Regions ) :
             boundaries.remove(boundary)
 
         def processBoundaries(regions_, boundaries, boundariesToMove):
+            """
+            This method adds regions to *regions_* so that its has a region boundary for each value in boundaries.
+
+            :param regions_:            This is the regions to work on.
+            :param boundaries:          This is the list of boundaries that the final regions shall have.
+            :param boundariesToMove:    This is the list of (new, old) boundaries in *regions_* where old is tweaked to become new.
+            """
 
             for region in regions_:
                 domainMin, domainMax = region.domainMin, region.domainMax
@@ -529,7 +670,11 @@ class Regions1d( Regions ) :
         return self2, other2
 
     def copyDataToXsAndYs(self):
-        '''Copies data in regions to a list of xs and ys. Only works if each has  "copyDataToXsAndYs" method.'''
+        """
+        This method copies data in *self* to a list of xs and ys. Only works if each region instance has a "copyDataToXsAndYs" method.
+
+        :returns:   Two python lists, one with the x-values and one with the y-values.
+        """
 
         xs = []
         ys = []
@@ -541,7 +686,14 @@ class Regions1d( Regions ) :
 
     def normalize( self, insitu = False, dimension = 1 ) :
         """
+        This method normalizes the data in *self*, ergo, scaled so that its integral is 1.0.
+        If *insitu* is True, *self* is normalized and returned, otherwise a copy of *self* is normalizes and the copy is returned.
         The dimension argument is currently ignored, but kept to be compatible with calling from XYsnd.normalize.
+
+        :param insitu:          If True, *self* is normalized and returned.
+        :param dimension:       The argument is ignored.
+
+        :returns:               A *self* like instance.
         """
 
         factor = 1.0 / self.integrate()
@@ -554,38 +706,53 @@ class Regions1d( Regions ) :
         return( copy )
 
     def plot(self, **kwargs):
-        '''
+        """
         Calls multiPlot with only *self* as a curve.
-        '''
+        """
 
         self.multiPlot([self], **kwargs)
 
     def toPointwiseLinear( self, **kwargs ) :
         """
-        Returns a new instance, converted to lin-lin interpolation with added points to maintain desired accuracy.
-        For more details see toPointwise_withLinearXYs.
+        This method returns the results of calling :py:func:`toPointwise_withLinearXYs`.
+
+        :param kwargs:      A dictionary of data needed by *self*.
+
+        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.
         """
 
         return( self.toPointwise_withLinearXYs( **kwargs ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
         """
-        Converts the regions of self into a single ``XYs1d.XYs1d`` instance that has 'lin-lin' interpolation. At the
-        boundary between two abutting regions, the x-values are the same, which is not allowed for an ``XYs1d.XYs1d`` instance.
+        This method converts the regions of *self* into a single :py:class:`XYs1dModule.XYs1d` instance that has 'lin-lin' interpolation. At the
+        boundary between two abutting regions, the x-values are the same, which is not allowed for an :py:class:`XYs1dModule.XYs1d` instance
+        so some points may be added or removed as speicfied by data in the argument *kwargs* as described in the following:
 
-        Optional (key-word) arguments:
-        :param accuracy: indicates desired accuracy. Controls how many points are added when switching interpolation
-        :param lowerEps:
-        :param upperEps: These arguments are used to smear the x-values at a boundary as follows. Let :math:`(x_l, y_l)` and
-        :math:`(x_u, y_u)` be the abutting points for two abutting regions. If :math:`y_l = y_u` then the point :math:`(x_u, y_u)` is removed.
-        Otherwise, if( lowerEps > 0 ) the point :math:`(x_l, y_l)` is moved to :math:`x = x_l * ( 1 - lowerEps )` (or :math:`x = x_l * ( 1 + lowerEps )`
-        if :math:`x_l < 0`) and the :math:`y` value is interpolated at :math:`x`. If :math:`x` is less than the x-value of the point below :math:`(x_l, y_l)`
-        and ``removeOverAdjustedPoints`` is True then the point :math:`(x_l, y_l)` is removed; otherwise, a raise is executed. Similarly
-        for upperEps and the point :math:`(x_u, y_u)`.
-        :param cls: class to return. Defaults to xData.regions.Regions1d
+            -) accuracy:    This controls how many points are added when switching interpolation.
+            -) lowerEps and upperEps: These arguments are used to smear the x-values at a boundary as follows. Let :math:`(x, y_l)` and
+                            :math:`(x, y_u)` be the abutting points for two abutting regions. If :math:`y_l = y_u` then the 
+                            point :math:`(x, y_u)` is removed.  Otherwise, if( lowerEps > 0 ) the point :math:`(x, y_l)` is 
+                            moved to :math:`x' = x * ( 1 - lowerEps )` (or :math:`x' = x * ( 1 + lowerEps )` if :math:`x < 0`) 
+                            and the :math:`y` value is interpolated at :math:`x'`. If :math:`x'` is less than the x-value of the point 
+                            below :math:`(x', y_l)` and ``removeOverAdjustedPoints`` is True then the point :math:`(x, y_l)` is removed; 
+                            otherwise, a raise is executed. Similarly for upperEps and the point :math:`(x, y_u)`.
+
+        :param kwargs:      A dictionary of data needed by *self*.
+
+        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.
         """
 
         def getAdjustedX( x, eps ) :
+            """
+            This method returns an x-value that is shifted from *x* by *eps*. If *eps* is negative, the returned value will be
+            left than *x*; otherwise, it will be greater than.  Thie method is for internal use.
+
+            :param x:       The initial x-value.
+            :param eps:     The small amount to move the new x-value from *x*.
+
+            :returns:       A python float.
+            """
 
             if( x == 0. ) :
                 x_ = eps
@@ -646,25 +813,64 @@ class Regions1d( Regions ) :
         return( pointwise )
 
     def toLinearXYsClass( self ) :
+        """
+        This method always returns the class :py:class:`XYs1dModule.XYs1d`.
+
+        :returns:       The class :py:class:`XYs1dModule.XYs1d`.
+        """
 
         return( XYs1dModule.XYs1d )
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns a list of all 1d functions class that can be added as a region to an instance of :py:class:`Regions1d`.
+
+        :returns:       A list of 1d functions classes
+        """
 
         return( ( XYs1dModule.XYs1d, series1dModule.Series1d ) )
 
     @staticmethod
     def multiPlot(curve1ds, **kwargs):
-        '''
+        """
         Plots a list of 1d curves on the same plot. Uses each curve's 'plotLabel' as the legend key. Each curve must have a copyDataToXsAndYs method.
-        '''
+        """
 
         XYs1dModule.XYs1d.multiPlot(curve1ds, **kwargs)
 
 class RegionsMultiD( Regions ) :
+    """
+    This is the absract base class for the other regions classes of dimension 2 and 3..
+    """
 
     def getBoundingSubFunctions( self, domainValue ) :
+        """
+        This method returns the two sub-functions in the region containing the domain point *domainValue*
+        whose outerDomainValues bound *value*. Additonal information is also returned.
+        The returned inforamtion is the tuple (flag, functional1, functional2, frac, interpolation, interpolationQualifier).
+
+        Flag is one of
+            +-------+---------------------------------------------------------------------------+
+            | None  | no data,                                                                  |
+            +-------+---------------------------------------------------------------------------+
+            | '<'   | value below domainMin,                                                    |
+            +-------+---------------------------------------------------------------------------+
+            | '>'   | value above domainMax,                                                    |
+            +-------+---------------------------------------------------------------------------+
+            | '='   | value at functional1 or                                                   |
+            +-------+---------------------------------------------------------------------------+
+            | ''    | functional1.outerDomainValue <= value < functional2.outerDomainValue.     |
+            +-------+---------------------------------------------------------------------------+
+
+        If flag is None then functional1, functional2 and frac are also None.  If flag is not '' then functional2 is None.
+        The data frac, interpolation and interpolationQualifier give the fraction position of *value* between the
+        two sub-functions, and how to interpolate between the two returned sub-functions. this method is mainly for internal use.
+
+        :param value:   The domain value which is between the two returned sub-functions outerDomainValues.
+
+        :returns:       A tuple containing information about the bounding sub-functions.
+        """
 
         for region in self.regions :
             if( domainValue < region.domainMax ) : return( region.getBoundingSubFunctions( domainValue ) )
@@ -672,32 +878,58 @@ class RegionsMultiD( Regions ) :
         return( self.regions[-1].getBoundingSubFunctions( domainValue ) )  # Domain value is above the last region. Let the last region determine what to do.
 
 class Regions2d( RegionsMultiD ) :
+    """
+    This class supports storing a 2d function as a list of abutting 2d functions.
+    """
 
     moniker = 'regions2d'
     dimension = 2
 
     def toLinearXYsClass( self ) :
+        """
+        This method always returns the class :py:class:`Regions`.
+
+        :returns:       The class :py:class:`Regions`.
+        """
 
         return( Regions )
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns a list of all 2d functions class that can be added as a region to an instance of :py:class:`Regions2d`.
+
+        :returns:       A list of 2d functions classes
+        """
 
         from . import multiD_XYs as multiD_XYsModule
 
         return( ( multiD_XYsModule.XYs2d, ) )
 
 class Regions3d( RegionsMultiD ) :
+    """
+    This class supports storing a 3d function as a list of abutting 3d functions.
+    """
 
     moniker = 'regions3d'
     dimension = 3
 
     def toLinearXYsClass( self ) :
+        """
+        This method always returns the class :py:class:`Regions`.
+
+        :returns:       The class :py:class:`Regions`.
+        """
 
         return( Regions )
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns a list of all 3d functions class that can be added as a region to an instance of :py:class:`Regions3d`.
+
+        :returns:       A list of 3d functions classes
+        """
 
         from . import multiD_XYs as multiD_XYsModule
 

@@ -5,6 +5,28 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module contains classes for storing the data in an inverse speed node.
+
+This module contains the following classes:
+
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Class                                 | Description                                                                       |
+    +=======================================+===================================================================================+
+    | Gridded1d                             | This class stores the multi-group inverse speed data.                             |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | InverseSpeed                          | This class represents and inverseSpeeds node.                                     |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+
+This module contains the following functions:
+
+    +---------------------------------------+---------------------------------------------------------------------------------------+
+    | Function                              | Description                                                                           |
+    +=======================================+=======================================================================================+
+    | multiGroupInverseSpeed                | This function calculates multi-group inverse speeds for the multi-group boundaries.   |
+    +---------------------------------------+---------------------------------------------------------------------------------------+
+"""
+
 import math
 
 from LUPY import ancestry as ancestryModule
@@ -21,6 +43,7 @@ from . import group as groupModule
 from . import miscellaneous as miscellaneousModule
 
 class Gridded1d( griddedModule.Gridded1d ) :
+    """This class stores the multi-group inverse speed data."""
 
     def convertUnits( self, unitMap ) :
 
@@ -35,6 +58,9 @@ class InverseSpeed( ancestryModule.AncestryIO ) :
     moniker = 'inverseSpeed'
 
     def __init__( self, data ) :
+        """
+        :param data:        The multi-group inverse speed data in a :py:class:`Gridded1d` instance.
+        """
 
         ancestryModule.AncestryIO.__init__(self)
 
@@ -43,10 +69,23 @@ class InverseSpeed( ancestryModule.AncestryIO ) :
         self.data.setAncestor( self )
 
     def convertUnits( self, unitMap ) :
+        """
+        unitMap is a dictionary of the form { 'eV' : 'MeV', 'b' : 'mb' }.
+    
+        :param unitMap:                 A dictionary that maps a existing unit into a new unit.
+        """
 
         self.data.convertUnits( unitMap )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a python list of str instances representing the XML lines of *self*.
+    
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                Python list of str instances.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -57,6 +96,17 @@ class InverseSpeed( ancestryModule.AncestryIO ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    Dictionary that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         xPath.append( element.tag )
 
@@ -72,6 +122,14 @@ class InverseSpeed( ancestryModule.AncestryIO ) :
         return( _inverseSpeed )
 
 def multiGroupInverseSpeed( style, tempInfo ) :
+    """
+    This function calculates multi-group inverse speeds for the multi-group boundaries defined in *style*.
+
+    :param style:           This is the multi-group style for the multi-group data.
+    :param tempInfo:        This is a dictionary with needed data.
+
+    :returns:               A :py:class:`Gridded1d` instance.
+    """
 
     _groupBoundaries, flux = miscellaneousModule._groupFunctionsAndFluxInit( style, tempInfo, None )
     groupBoundaries = _groupBoundaries.values.values

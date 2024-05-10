@@ -237,12 +237,31 @@ This is useful for converting between relative and absolute covariance (default:
 <dt class="sig sig-object py" id="fudge.covariances.covarianceSuite.CovarianceSuite.parseCleanup">
 <span class="sig-name descname"><span class="pre">parseCleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#CovarianceSuite.parseCleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.CovarianceSuite.parseCleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method does nothing. A place holder incase the derived class needs one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.covarianceSuite.CovarianceSuite.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSuite.html#CovarianceSuite.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.covarianceSuite.CovarianceSuite.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -360,6 +379,11 @@ covariance between coefficients for two Legendre orders at various energies</p>
 <dt class="sig sig-object py" id="fudge.covariances.distributions.LegendreLValue.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreLValue.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreLValue.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -410,13 +434,29 @@ between a pair of L-values</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.distributions.LegendreOrderCovarianceForm.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreOrderCovarianceForm.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.distributions.LegendreOrderCovarianceForm.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/distributions.html#LegendreOrderCovarianceForm.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.distributions.LegendreOrderCovarianceForm.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -612,6 +652,11 @@ to convert self into a relative covariance matrix.</p>
 <dt class="sig sig-object py" id="fudge.covariances.mixed.MixedForm.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/mixed.html#MixedForm.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.mixed.MixedForm.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -678,6 +723,11 @@ FIXME method should be inherited, but abstractClasses.Component defines methods 
 <dt class="sig sig-object py" id="fudge.covariances.modelParameters.ParameterCovariance.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#ParameterCovariance.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.modelParameters.ParameterCovariance.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -716,7 +766,18 @@ FIXME method should be inherited, but abstractClasses.Component defines methods 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.modelParameters.ParameterCovarianceMatrix.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#ParameterCovarianceMatrix.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.modelParameters.ParameterCovarianceMatrix.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -743,6 +804,11 @@ FIXME method should be inherited, but abstractClasses.Component defines methods 
 <dt class="sig sig-object py" id="fudge.covariances.modelParameters.ParameterCovarianceMatrix.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#ParameterCovarianceMatrix.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.modelParameters.ParameterCovarianceMatrix.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -770,7 +836,18 @@ a parameterLink pointing to the table, with
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.modelParameters.ParameterLink.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/modelParameters.html#ParameterLink.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.modelParameters.ParameterLink.toXML_strList" title="Permalink to this definition">¶</a></dt>
-<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dd><p>Returns a list of str instances representing the XML lines of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indent</strong> – The minimum amount of indentation.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary of extra arguments that controls how <em>self</em> is converted to a list of XML strings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of str instances representing the XML lines of self.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -879,6 +956,11 @@ FIXME method should be inherited, but abstractClasses.Component defines methods 
 <dt class="sig sig-object py" id="fudge.covariances.covarianceSection.CovarianceSection.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#CovarianceSection.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.CovarianceSection.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -891,14 +973,40 @@ FIXME method should be inherited, but abstractClasses.Component defines methods 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.covarianceSection.DataLink.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">linkElement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#DataLink.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.DataLink.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse the link. The resulting link points to None, and must be resolved by the calling function.
-Link attributes can be converted to desired type by passing a ‘typeConversion’ dictionary in linkData</p>
+<dd><p>Parse <em>node</em> into an instance of <em>cls</em>.
+The resulting link points to None, and must be resolved by the calling function.
+Link attributes can be converted to desired type by passing a ‘typeConversion’ dictionary in linkData.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> – Class to return.</p></li>
+<li><p><strong>node</strong> – Node to parse.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary of extra arguments that controls how <em>self</em> is converted to a list of XML strings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of <em>cls</em> representing <em>node</em>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.covarianceSection.DataLink.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#DataLink.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.DataLink.toXML_strList" title="Permalink to this definition">¶</a></dt>
-<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dd><p>Returns a list of str instances representing the XML lines of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indent</strong> – The minimum amount of indentation.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary of extra arguments that controls how <em>self</em> is converted to a list of XML strings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of str instances representing the XML lines of self.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -958,13 +1066,29 @@ Each Slice fixes a value or range along one dimension of the multi-dimensional f
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.covarianceSection.Slice.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#Slice.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.covarianceSection.Slice.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/covarianceSection.html#Slice.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.covarianceSection.Slice.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1032,7 +1156,7 @@ These sections only produce a diagonal, no cross-correlations.</p>
 <dd><p>Uses deepcopy to make a copy of self.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>copy of self</p>
+<dd class="field-odd"><p>A copy of self.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1080,7 +1204,18 @@ These sections only produce a diagonal, no cross-correlations.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#ShortRangeSelfScalingVariance.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1098,6 +1233,11 @@ These sections only produce a diagonal, no cross-correlations.</p>
 <dt class="sig sig-object py" id="fudge.covariances.shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/shortRangeSelfScalingVariance.html#ShortRangeSelfScalingVariance.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -1149,7 +1289,7 @@ The parameter <code class="docutils literal notranslate"><span class="pre">units
 <dd><p>Uses deepcopy to make a copy of self.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>copy of self</p>
+<dd class="field-odd"><p>A copy of self.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1475,7 +1615,18 @@ relative because this will throw an error.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.summed.Summand.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#Summand.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.summed.Summand.toXML_strList" title="Permalink to this definition">¶</a></dt>
-<dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dd><p>Returns a list of str instances representing the XML lines of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indent</strong> – The minimum amount of indentation.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary of extra arguments that controls how <em>self</em> is converted to a list of XML strings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of str instances representing the XML lines of self.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1582,7 +1733,18 @@ a recursively-defined covariance. Recursion is avoided so long as the domains do
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.covariances.summed.SummedCovariance.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/covariances/summed.html#SummedCovariance.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.covariances.summed.SummedCovariance.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

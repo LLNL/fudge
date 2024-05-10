@@ -11,7 +11,9 @@ import argparse
 
 from fudge import map as mapModule
 
-description = '''Reads the specified map file and recursively prints the path to all map files imported.'''
+summaryDocStringFUDGE = """This script reads the specified map file and recursively prints the path to all map files imported."""
+
+description = """This script reads the specified map file and recursively prints the path to all map files imported."""
 
 parser = argparse.ArgumentParser(description=description)
 

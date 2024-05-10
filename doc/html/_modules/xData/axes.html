@@ -44,6 +44,22 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module containes all the classes for handling GNDS axes and its child nodes.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class                             | Description                                                           |</span>
+<span class="sd">    +===================================+=======================================================================+</span>
+<span class="sd">    | Axis                              | This class represents a GNDS axis node.                               |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Grid                              | This class represents a GNDS grid node.                               |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Axes                              | This class represents a GNDS axes node.                               |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">string</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
@@ -58,12 +74,29 @@
 <span class="n">linkGridToken</span> <span class="o">=</span> <span class="s1">&#39;link&#39;</span>
 
 <div class="viewcode-block" id="Axis"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axis">[docs]</a><span class="k">class</span> <span class="nc">Axis</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a GNDS axis node.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member    | Description                                                   |</span>
+<span class="sd">    +===========+===============================================================+</span>
+<span class="sd">    | label     | The label for the axis.                                       |</span>
+<span class="sd">    +-----------+---------------------------------------------------------------+</span>
+<span class="sd">    | index     | The index of the axis in the parent :py:class: Axes instance. |</span>
+<span class="sd">    +-----------+---------------------------------------------------------------+</span>
+<span class="sd">    | unit      | The unit for the data for the axis.                           |</span>
+<span class="sd">    +-----------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;axis&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructor for the axis class.</span>
+<span class="sd">        :param label:       The label for the axis.</span>
+<span class="sd">        :param index:       The index of the axis in the parent :py:class: Axes instance.</span>
+<span class="sd">        :param unit:        The unit for the data for the axis. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -81,65 +114,129 @@
         <span class="k">return</span> <span class="s1">&#39;label=&quot;</span><span class="si">%s</span><span class="s1">&quot;, index=&quot;</span><span class="si">%s</span><span class="s1">&quot;, unit=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if *self* and *other* are equal and False otherwise.</span>
+<span class="sd">        For two :py:class:`Axis` instances to be equal, they must have the same *label* and *unit*.</span>
+
+<span class="sd">        :param other:   Another :py:class:`Axis` instance to compare with *self*.</span>
+
+<span class="sd">        :returns:       A boolean instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Axis</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">label</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span>
 
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if *self* and *other* are not equal and False otherwise.</span>
+<span class="sd">        For two :py:class:`Axis` instances to be equal, they must have the same *label* and *unit*.</span>
+
+<span class="sd">        :param other:   Another :py:class:`Axis` instance to compare with *self*.</span>
+
+<span class="sd">        :returns:       A boolean instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">keyName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        This method returns the key name for *self*.</span>
+
+<span class="sd">        :returns:       A python str instance. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">keyValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the key value for *self*.</span>
+
+<span class="sd">        :returns:       Whatever the type of the keyValue is.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the index for *self*.</span>
+
+<span class="sd">        :returns:       A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__index</span><span class="p">)</span>
 
     <span class="nd">@index</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the index for *self* to *value*.</span>
+
+<span class="sd">        :param value:       The new index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the label for *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__label</span><span class="p">)</span>
 
     <span class="nd">@label</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the label to *value*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the label for *self* to *value*.</span>
+
+<span class="sd">        :param value:       The new label.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the unit for *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unit</span>
 
     <span class="nd">@unit</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets self&#39;s unit. Only checks that unit is a string. If unit is None, it is set to an empty string (i.e., &#39;&#39;).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the unit of *self* to *value. This method only checks that unit is a string or None. </span>
+<span class="sd">        If None, the unit is set to an empty string (i.e., &#39;&#39;).</span>
+
+<span class="sd">        :param value:   The new unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;unit type &quot;</span><span class="si">%s</span><span class="s1">&quot; is not a string&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__unit</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Axis.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axis.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">unit</span><span class="p">,</span> <span class="n">factor</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span>
         <span class="k">return</span> <span class="n">factor</span></div>
 
 <div class="viewcode-block" id="Axis.copy"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axis.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new instance that is a copy of self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a new instance that is a copy of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`Axis`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">Axis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
 
@@ -147,7 +244,11 @@
 
 <div class="viewcode-block" id="Axis.divideUnit"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axis.divideUnit">[docs]</a>    <span class="k">def</span> <span class="nf">divideUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the unit obtained by the division of self.unit by other.unit. Other must be an axis based instance.</span>
+<span class="sd">        This method returns the unit obtained by the division of self.unit by other.unit. Other must be an instance of :py:class:`Axis`.</span>
+
+<span class="sd">        :param other:   An :py:class:`Axis` instance.</span>
+
+<span class="sd">        :returns:       A python str.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">pqu</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="o">/</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
@@ -156,7 +257,11 @@
 
 <div class="viewcode-block" id="Axis.multiplyUnit"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axis.multiplyUnit">[docs]</a>    <span class="k">def</span> <span class="nf">multiplyUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the unit obtained by the product of self.unit times other.unit. Other must be an axis based instance.</span>
+<span class="sd">        This method returns the unit obtained by the product of self.unit times other.unit. Other must be an instance of :py:class:`Axis`.</span>
+
+<span class="sd">        :param other:   An :py:class:`Axis` instance.</span>
+
+<span class="sd">        :returns:       A python str.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">pqu</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="o">*</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
@@ -164,6 +269,11 @@
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">pqu</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Axis.plotLabel"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axis.plotLabel">[docs]</a>    <span class="k">def</span> <span class="nf">plotLabel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the string composed of self&#39;s label and unit that can be used as an axis label.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
         <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
@@ -172,15 +282,37 @@
         <span class="k">return</span> <span class="n">label</span></div>
 
 <div class="viewcode-block" id="Axis.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axis.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> index=&quot;</span><span class="si">%d</span><span class="s1">&quot; label=&quot;</span><span class="si">%s</span><span class="s1">&quot; unit=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span> <span class="p">]</span></div>
 
 <div class="viewcode-block" id="Axis.unitConversionFactor"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axis.unitConversionFactor">[docs]</a>    <span class="k">def</span> <span class="nf">unitConversionFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newUnit</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns as a float the factor needed to convert self&#39;s unit to newUnit. If units are not compatible, a raise is executed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a scale factor as a float that is needed to convert self&#39;s unit to *newUnit*. If units are not compatible, a raise is executed.</span>
+
+<span class="sd">        :param newUnit:     A unit.</span>
+
+<span class="sd">        :returns:           A float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">newUnit</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Axis.parseNode"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axis.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets data in *self* using the contents of *node*.</span>
+
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[@index=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">Axis</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;index&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 
@@ -192,6 +324,17 @@
 
 <div class="viewcode-block" id="Axis.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axis.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return: an instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">axis1</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="n">axis1</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -199,13 +342,39 @@
         <span class="k">return</span> <span class="n">axis1</span></div></div>
 
 <div class="viewcode-block" id="Grid"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Grid">[docs]</a><span class="k">class</span> <span class="nc">Grid</span><span class="p">(</span><span class="n">Axis</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a GNDS grid node.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                   |</span>
+<span class="sd">    +===================+===============================================================+</span>
+<span class="sd">    | label             | The label for the axis.                                       |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | index             | The index of the axis in the parent :py:class: Axes instance. |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | unit              | The unit for the data for the axis.                           |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | style             | The style of the grid.                                        |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | values            | The list of numbers for the grid.                             |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | interpolaction    | The interpolation rule for the values in the grid.            |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;grid&#39;</span>
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;values&#39;</span><span class="p">,</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a new instance of grid.</span>
+<span class="sd">        :param label:           The label for the axis.</span>
+<span class="sd">        :param index:           The index of the axis in the parent :py:class: Axes instance.</span>
+<span class="sd">        :param unit:            The unit for the data for the axis. </span>
+<span class="sd">        :param style:           The style of the grid.</span>
+<span class="sd">        :param values:          The list of grid values.</span>
+<span class="sd">        :param interpolation:   The interpolation rule for the values in the grid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">Axis</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
@@ -224,6 +393,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">style</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Thid method returns *self*&#39;s style.</span>
+
+<span class="sd">        :returns:               A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__style</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">isLink</span><span class="p">():</span>
             <span class="c1"># follow link to determine actual style:</span>
@@ -232,38 +406,80 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Thid method returns *self*&#39;s value instance.</span>
+
+<span class="sd">        :returns:               A :py:class:`valuesModule.Values` or :py:class:`linkModule.Link` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__values</span>
 
 <div class="viewcode-block" id="Grid.isLink"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Grid.isLink">[docs]</a>    <span class="k">def</span> <span class="nf">isLink</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if *self* is a :py:class:`linkModule.Link` instance and False otherwise.</span>
+
+<span class="sd">        :returns:               A boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__values</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the minimum domain value for *self*&#39;s grid.</span>
+
+<span class="sd">        :returns:       A number.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the maximum domain value for *self*&#39;s grid.</span>
+
+<span class="sd">        :returns:       A number.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the domain unit for *self*&#39;s grid with is the same as self&#39;s unit.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span>
 
 <div class="viewcode-block" id="Grid.domainUnitConversionFactor"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Grid.domainUnitConversionFactor">[docs]</a>    <span class="k">def</span> <span class="nf">domainUnitConversionFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the factor needed to convert self&#39;s domain to unit *unitTo*.</span>
+
+<span class="sd">        :param unitTo:      The unit for converting self&#39;s domain.</span>
+
+<span class="sd">        :returns:           A float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unitConversionFactor</span><span class="p">(</span><span class="n">unitTo</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainGrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns all domain values for *self* as a python list.</span>
+
+<span class="sd">        :returns:           A python list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="p">[</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="p">]</span>
 
 <div class="viewcode-block" id="Grid.convertToUnit"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Grid.convertToUnit">[docs]</a>    <span class="k">def</span> <span class="nf">convertToUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method changes *self*&#39;s unit to *unit* and scales the grid to the new unit.</span>
+
+<span class="sd">        :param unit:    The new unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unitConversionFactor</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span>
@@ -271,6 +487,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__values</span> <span class="o">=</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="p">([</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="p">])</span></div>
 
 <div class="viewcode-block" id="Grid.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Grid.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">factor</span> <span class="o">=</span> <span class="n">Axis</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">factor</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
@@ -279,7 +500,11 @@
         <span class="k">return</span> <span class="n">factor</span></div>
 
 <div class="viewcode-block" id="Grid.copy"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Grid.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new grid instance that is a copy of self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a new grid instance that is a copy of self.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`Grid`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">grid1</span> <span class="o">=</span> <span class="n">Grid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">interpolation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">grid1</span></div>
@@ -288,10 +513,12 @@
 
 <div class="viewcode-block" id="Grid.getIndexOfValue"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Grid.getIndexOfValue">[docs]</a>    <span class="k">def</span> <span class="nf">getIndexOfValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the index of the value in values where x would fit</span>
-<span class="sd">        :param v:</span>
+<span class="sd">        Thie method returns the lower index of the two elements of the grid where *v* is between. If *v* is not in the domain</span>
+<span class="sd">        of the grid, None is returned.</span>
 
-<span class="sd">        :return:</span>
+<span class="sd">        :param v:       The value whose index is returned.</span>
+
+<span class="sd">        :returns:       A python int or None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">ival</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
@@ -300,6 +527,14 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Grid.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Grid.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
 
@@ -316,6 +551,17 @@
 
 <div class="viewcode-block" id="Grid.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Grid.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:            An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[@index=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">Grid</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">)</span> <span class="p">))</span>
 
@@ -346,6 +592,18 @@
         <span class="k">return</span> <span class="n">grid1</span></div></div>
 
 <div class="viewcode-block" id="Axes"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axes">[docs]</a><span class="k">class</span> <span class="nc">Axes</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a GNDS Axes node. Basically, this class stores a list :py:class:`Axis` and/or py:class:`Grid` children.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                   |</span>
+<span class="sd">    +===================+===============================================================+</span>
+<span class="sd">    | axes              | The list of axis and/or grid children.                        |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;axes&#39;</span>
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;axes&#39;</span><span class="p">,</span> <span class="p">)</span>
@@ -354,7 +612,14 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor for ``axes`` class. For example::</span>
 
-<span class="sd">            _axes = Axes(labelsUnits = { 0: ( &#39;crossSection&#39; , &#39;b&#39; ), 1: ( &#39;energy_in&#39;, &#39;eV&#39; ) })</span>
+<span class="sd">            axes = Axes(labelsUnits = { 0: ( &#39;crossSection&#39; , &#39;b&#39; ), 1: ( &#39;energy_in&#39;, &#39;eV&#39; ) })</span>
+
+<span class="sd">        The *labelsUnits* argument is a dictionary where the keys are the index for each child :py:class:`Axis`</span>
+<span class="sd">        and the corresponding value is a list of (label, unit). Child :py:class:`Axis` not specified by *labelsUnits*</span>
+<span class="sd">        are given default labels and an empty unit.</span>
+
+<span class="sd">        :param size:            The number of :py:class:`Axis` children to create.</span>
+<span class="sd">        :param labelsUnits:     A dictionary of initial labels and units for each :py:class:`Axis` children.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -372,6 +637,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Axis</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">unit</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if *self* and *other* have the same child axis nodes.</span>
+
+<span class="sd">        :param other:   Another :py:class:`Axes` instance to compare with *self*.</span>
+
+<span class="sd">        :returns:       A boolean instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Axes</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Other not an Axes instance&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
@@ -380,18 +652,43 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if *self* and *other* have the same child axis nodes.</span>
+
+<span class="sd">        :param other:   Another :py:class:`Axes` instance to compare with *self*.</span>
+
+<span class="sd">        :returns:       A boolean instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the number of child axis nodes.</span>
+
+<span class="sd">        :returns:       A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the child node at *index*.</span>
+
+<span class="sd">        :param index:       The index of the child node to return.</span>
+
+<span class="sd">        :returns:           An :py:class:`Axes` or :py:class:`Grid` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">axisOrGrid</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the child node at *index*.</span>
+
+<span class="sd">        :param index:       The index to where *axisOrGrid* is put.</span>
+<span class="sd">        :param axisOrGrid:  An :py:class:`Axes` or :py:class:`Grid` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">axisOrGrid</span><span class="p">,</span> <span class="p">(</span> <span class="n">Axis</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link2</span> <span class="p">)):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;axisOrGrid is not an instance of Axis or Grid&#39;</span><span class="p">)</span>
 
@@ -408,14 +705,19 @@
         <span class="n">axisOrGrid</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returned a simple string representation of each **Axes** of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returned a simple string representation of each **Axes** of *self*.</span>
+
+<span class="sd">        :returns:   A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="nb">str</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span> <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">])</span>
 
 <div class="viewcode-block" id="Axes.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axes.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Converts each axis units.</span>
-<span class="sd">        unitMap is a dictionary of mapping old units to new units (e.g., { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }).</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">factors</span> <span class="o">=</span> <span class="p">[]</span>
@@ -425,6 +727,11 @@
         <span class="k">return</span> <span class="n">factors</span></div>
 
 <div class="viewcode-block" id="Axes.copy"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axes.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a new instance that is a copy of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`Axes`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">newAxes</span> <span class="o">=</span> <span class="n">Axes</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">):</span> <span class="n">newAxes</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -437,6 +744,14 @@
     <span class="n">__copy__</span> <span class="o">=</span> <span class="n">copy</span>
 
 <div class="viewcode-block" id="Axes.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axes.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
 
@@ -447,6 +762,14 @@
         <span class="k">return</span> <span class="n">XML_strList</span></div>
 
 <div class="viewcode-block" id="Axes.parseNode"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axes.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>       <span class="c1"># FIXME2, needed until self.axes is a suite instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets data in *self* using the contents of *node*.</span>
+
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
 
@@ -461,6 +784,17 @@
 
 <div class="viewcode-block" id="Axes.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.axes.Axes.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:            An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">axes</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">axes</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

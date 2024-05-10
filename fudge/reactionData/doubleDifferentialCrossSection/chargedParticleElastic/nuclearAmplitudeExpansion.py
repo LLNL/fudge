@@ -4,11 +4,27 @@
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
+
 """
-The nuclearAmplitudeExpansion represents charged-particle elastic scattering using four terms:
- - pure Coulomb scattering  (i.e. RutherfordScattering),
- - pure nuclear scattering
- - complex interference between Coulomb and nuclear terms, broken into real and imaginary components
+The double differential cross section for elastic scattering of two charged particle can be written
+as the sum of three terms: pure Coulomb scattering, nuclear and an interference term (the 
+interference term has real and imaginary components). This module contains classes for storing 
+the nuclear and interference term as the class :py:class:`NuclearAmplitudeExpansion`.
+
+This module contains the following classes:
+        
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | NuclearTerm                       | This class stores the nuclear term.                                   |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | RealInterferenceTerm              | This class stores the real part of the interference term.             |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | ImaginaryInterferenceTerm         | This class stores the imaginary part of the interference term.        |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | NuclearAmplitudeExpansion         | This class contains the nuclear, and real and imaginary               |
+    |                                   | interference terms as its members.                                    |
+    +-----------------------------------+-----------------------------------------------------------------------+
 """
 
 import math
@@ -26,18 +42,21 @@ from . import misc as miscModule
 
 
 class NuclearTerm( miscModule.ChargedParticleElasticTerm ):
+    """This class store the nuclear term."""
 
     moniker = 'nuclearTerm'
 
     allowedDataForms = (angularModule.XYs2d, angularModule.Regions2d)
 
 class RealInterferenceTerm( miscModule.ChargedParticleElasticTerm ):
+    """This class stores the real part of the interference term."""
 
     moniker = 'realInterferenceTerm'
 
     allowedDataForms = (angularModule.XYs2d, angularModule.Regions2d)
 
 class ImaginaryInterferenceTerm( miscModule.ChargedParticleElasticTerm ):
+    """This class stores the imaginary part of the interference term."""
 
     moniker = 'imaginaryInterferenceTerm'
 
@@ -45,10 +64,30 @@ class ImaginaryInterferenceTerm( miscModule.ChargedParticleElasticTerm ):
 
 
 class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
+    """
+    This class contains the nuclear, and real and imaginary interference terms as its members.
+
+    The following table list the primary members of this class: 
+    
+    +-----------------------+-----------------------------------------------------------+
+    | Member                | Description                                               |
+    +=======================+===========================================================+
+    | nuclearTerm           | The data for the nuclear term.                            |
+    +-----------------------+-----------------------------------------------------------+
+    | realInterference      | The data for the real interference term.                  |
+    +-----------------------+-----------------------------------------------------------+
+    | imaginaryInterference | The data for the imaginary interference term.             |
+    +-----------------------+-----------------------------------------------------------+
+    """
 
     moniker = 'nuclearAmplitudeExpansion'
 
     def __init__( self, nuclearTerm = None, realInterference = None, imaginaryInterference = None ):
+        """
+        :param nuclearTerm:             The data for the nuclear term.
+        :param realInterference:        The data for the real interference term.
+        :param imaginaryInterference:   The data for the imaginary interference term.
+        """
 
         ancestryModule.AncestryIO.__init__( self )
         self.nuclearTerm = nuclearTerm
@@ -57,15 +96,24 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
 
     @property
     def etaCoefficient( self ) :
+        """This method returns the parameter :math:`\eta \, \sqrt{E} = Z_1 \, Z_2 \, sqrt{\alpha^2 \mu m_1 / 2}`."""
 
         return( self.ancestor.etaCoefficient )
 
     @property
     def nuclearTerm( self ):
+        """This method returns the nuclear term."""
+
         return self.__nuclear
 
     @nuclearTerm.setter
     def nuclearTerm(self, value):
+        """
+        This method sets the nuclear term to *value*.
+
+        :param value:       The nuclear term.
+        """
+
         if not isinstance(value, NuclearTerm):
             raise TypeError( '%s nuclear term must be instance of %s' % (self.moniker, NuclearTerm.moniker))
         value.setAncestor( self )
@@ -73,10 +121,18 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
 
     @property
     def realInterferenceTerm( self ):
+        """This method returns the real part of the interference term."""
+
         return self.__realInterference
 
     @realInterferenceTerm.setter
     def realInterferenceTerm(self, value):
+        """
+        This method set the real part of the interference term to *value*.
+
+        :param value:       The real part of the interference term.
+        """
+
         if not isinstance(value, RealInterferenceTerm):
             raise TypeError( '%s real interference term must be instance of %s' %
                              (self.moniker, RealInterferenceTerm.moniker))
@@ -85,10 +141,18 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
 
     @property
     def imaginaryInterferenceTerm( self ):
+        """This method returns the imaginary part of the interference term."""
+
         return self.__imaginaryInterference
 
     @imaginaryInterferenceTerm.setter
     def imaginaryInterferenceTerm(self, value):
+        """
+        This method set the imaginary part of the interference term to *value*.
+
+        :param value:       The imaginary part of the interference term.
+        """
+
         if not isinstance(value, ImaginaryInterferenceTerm):
             raise TypeError( '%s imaginary interference term must be instance of %s' %
                              (self.moniker, ImaginaryInterferenceTerm.moniker))
@@ -97,21 +161,25 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
 
     @property
     def domainMin(self) :
+        """Returns the minimum projectile energy for *self*."""
 
         return self.nuclearTerm.data.domainMin
 
     @property
     def domainMax(self) :
+        """Returns the maximum projectile energy for *self*."""
 
         return self.nuclearTerm.data.domainMax
 
     @property
     def domainUnit(self) :
+        """Returns the energy unit of the projectile."""
 
         return self.nuclearTerm.data.domainUnit
 
     @property
     def identicalParticles( self ) :
+        """This function returns True if the projectile and target are the same paritcle type and False otherwise."""
 
         return( self.ancestor.identicalParticles )
 
@@ -122,10 +190,16 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
         There may be more checks we can perform depending on whether particles are identical
         :return:
         """
+
         return []
         raise NotImplementedError()
 
     def convertUnits( self, unitMap ):
+        """
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.nuclearTerm.convertUnits( unitMap )
         self.realInterferenceTerm.convertUnits( unitMap )
@@ -133,19 +207,29 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
 
     def dSigma_dMu(self, energy, accuracy=1e-3, muMax=0.999, probability=False):
         """
-        Returns d(Sigma)/d(mu) at the specified incident energy.
+        This function returns :math:`d\sigma / d\mu` at the specified incident energy.
 
         :param energy:      Energy of the projectile.
         :param accuracy:    The accuracy of the returned *dSigma_dMu*.
         :param muMax:       Slices the upper domain mu to this value.
         :param probability: If **True** P(mu) is returned instead of d(Sigma)/d(mu).
 
-        :return:            d(Sigma)/d(mu) at *energy*.
+        :return:            An instance of :pt:class:`angularModule.XYs1d`.
         """
 
         class Tester :
+            """
+            This class is used to added point to :math:`d\sigma / d\mu` until the desired lin-lin interpolation is met. 
+            This class is for internal use.
+            """
 
             def __init__( self, evaluate, energy, relativeTolerance, absoluteTolerance ) :
+                """
+                :param evaluate:            The function used to evaluate *self*.
+                :param energy:              The energy of the projectile.
+                :param relativeTolerance:   The relative tolerance used to determine if enough points have been added.
+                :param absoluteTolerance:   The asbolute tolerance used to determine if enough points have been added.
+                """
 
                 self.evaluate = evaluate
                 self.energy = energy
@@ -153,6 +237,11 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
                 self.absoluteTolerance = absoluteTolerance
 
             def evaluateAtX( self, mu ) :
+                """
+                This function returns *self* evaluated at a projectile energy and outgoing :math:`\mu`.
+
+                :param mu:  The mu point to evaluate *self* at.
+                """
 
                 return( self.evaluate( self.energy, mu ) )
 
@@ -190,8 +279,11 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
 
     def evaluate( self, E, mu, phi = 0.0 ) :
         """
+        This function returns the differential cross section at E, mu (integrated over phi) in b/sr.
+
         :param E: incident energy
         :param mu: scattering angle cosine
+
         :return: differential cross section at E,mu (integrated over phi) in b/sr
         """
 
@@ -249,6 +341,14 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
         return( nuclear + interference )
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent+kwargs.get('incrementalIndent','  ')
         xml = [ '%s<%s>' % (indent, self.moniker) ]
@@ -260,6 +360,17 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
         for child in element:
@@ -280,5 +391,11 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
 
     @staticmethod
     def defaultAxes( energyUnit, crossSectionUnit = 'b' ) :
+        """
+        This function returns an :py:class:`miscModule.defaultAxes` instance for a double difference cross section.
+
+        :param energyUnit:          The unit for energy.
+        :param crossSectionUnit:    The unit for cross section.
+        """
 
         return( miscModule.defaultAxes( energyUnit, crossSectionUnit ) )

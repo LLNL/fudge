@@ -44,6 +44,32 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains 1d functions that store a function as a polynomial expansion.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class             | Description                                                                                           |</span>
+<span class="sd">    +===================+=======================================================================================================+</span>
+<span class="sd">    | Series1d          | This is the base class for the other polynomial classes.                                              |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | LegendreSeries    | This class stores the function as a Legendre polynomials.                                             |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Polynomial1d      | This class stores the function as a simple polynomial expansion.                                      |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | LinearSpline1d    | This class is a simple linear spline.                                                                 |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------+</span>
+
+<span class="sd">This module contains the following functions:</span>
+<span class="sd">    </span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class             | Description                                                                                           |</span>
+<span class="sd">    +===================+=======================================================================================================+</span>
+<span class="sd">    | Legendre          | This function evaluates :math:`P_l(\mu)`.                                                             |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">abc</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
@@ -62,8 +88,14 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">XYs1d</span> <span class="k">as</span> <span class="n">XYs1dModule</span>
 
 <div class="viewcode-block" id="Legendre"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Legendre">[docs]</a><span class="k">def</span> <span class="nf">Legendre</span><span class="p">(</span> <span class="n">n</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">checkXRange</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns the value of the Legendre function of order n at mu using the recursive relationship.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Thid function returns the value of the Legendre polynomial of order *n* at *mu* using the recursive relationship.</span>
+
+<span class="sd">    :param n:               The order of the Legendre polynomial.</span>
+<span class="sd">    :param mu:              The :math:`\mu` value.</span>
+<span class="sd">    :param checkXRange:     If True, :math:`\mu` is check to ensure that it is in the domain [-1, 1].</span>
+
+<span class="sd">    :returns:               A python float.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error, n = </span><span class="si">%d</span><span class="s2"> &lt; 0&quot;</span> <span class="o">%</span> <span class="n">n</span> <span class="p">)</span>
@@ -83,10 +115,42 @@
 
 
 <div class="viewcode-block" id="Series1d"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d">[docs]</a><span class="k">class</span> <span class="nc">Series1d</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is the base class for storing a 1d function as a polynomial series. The function store the </span>
 <span class="sd">    polynomial coefficients and has methods for manipulations of the coefficients that are generic to</span>
 <span class="sd">    all polynomial series (e.g., simple polynomial, Legendre).</span>
+
+<span class="sd">    Mathematically and from the table below, the function can be written as</span>
+
+<span class="sd">    :math:`\sum_{i=l}^{l+n} \, {\rm Cs[i-l]} \, x^i`.</span>
+
+<span class="sd">    where Cs are the coefficients, l is *lowerIndex*, n is the number of coefficients and :math:`x` is the domain value</span>
+<span class="sd">    for :math:`{\rm domainMin} \le x \le {\rm domainMax}`.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                   |</span>
+<span class="sd">    +===================+===============================================================+</span>
+<span class="sd">    | coefficients      | This is a python list of the regions that have been added.    |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | domainMin         | This is a python list of the regions that have been added.    |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | domainMax         | This is a python list of the regions that have been added.    |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | lowerIndex        | This is the power for the first coefficient.                  |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | axes              | This is the axes member.                                      |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | outerDomainValue  | This is the domain value for the next higher dimension for    |</span>
+<span class="sd">    |                   | a function that is embedded in a high dimensional functions.  |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | index             | This is the index member use by some xData classes.           |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | label             | This is the label member use by some xData classes.           |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | valueType         | This describes the type of data in array (i.e., float, int).  |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
@@ -94,6 +158,17 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param coefficients:        This is the list of coefficients for the 1d polymonial function.</span>
+<span class="sd">        :param domainMin:           This is the minimum domain value that the function is valid for.</span>
+<span class="sd">        :param domainMax:           This is the maximum domain value that the function is valid for.</span>
+<span class="sd">        :param lowerIndex:          This is the power for the first coefficient.</span>
+<span class="sd">        :param axes:                This is the axes for the function.</span>
+<span class="sd">        :param index:               This is the index member use by some xData classes.</span>
+<span class="sd">        :param valueType:           This is currently not used.</span>
+<span class="sd">        :param outerDomainValue:    This is the domain value for the next higher dimension for a function that is embedded in a high dimensional function.</span>
+<span class="sd">        :param label:               This is the label member.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">valueType</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
@@ -104,17 +179,32 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="o">=</span> <span class="n">coefficients</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of coefficients in the instance (e.g., for Legendre series it is lMax + 1).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the number of coefficients in the instance (e.g., for Legendre series it is lMax + 1).</span>
+
+<span class="sd">        :returns:       A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">l</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the (l+1)^th coefficient.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the (l+1)^th coefficient.</span>
+
+<span class="sd">        :param l:       The index for the coefficient to return.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the (l+1)^th coefficient to c_l. l must be less than or equal to lMax.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the (l+1)^th coefficient to c_l. l must be less than or equal to lMax.</span>
+
+<span class="sd">        :param l:       The index for the coefficient to set.</span>
+<span class="sd">        :param c_l:     The new value for the coefficient.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">l</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="n">c_l</span> <span class="p">)</span> <span class="p">)</span>
@@ -122,7 +212,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">c_l</span> <span class="p">)</span> 
 
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a series that is the sum of self and other. Other must be of type series.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a series that is the sum of *self* and *other*. *Other* must be a number or the same type as *self*.</span>
+
+<span class="sd">        :param other:   A number or an instace that is the same class as *self*.</span>
+
+<span class="sd">        :returns:       A new instance that is the same class as *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span> <span class="p">:</span>
             <span class="n">other</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
@@ -137,7 +233,13 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">c_ls</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a series that is the difference of self and other. Other must be of type series.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a series that is the difference of *self* and *other*. *Other* must be a number or the same type as *self*.</span>
+
+<span class="sd">        :param other:   A number or an instace that is the same class as *self*.</span>
+
+<span class="sd">        :returns:       A new instance that is the same class as *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span> <span class="p">:</span>
             <span class="n">other</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
@@ -152,7 +254,13 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">c_ls</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new series that is each coefficient of self multiplied by value. Value must be convertible to a float.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a new series that is each coefficient of self multiplied by *value*. *Value* must be convertible to a float.</span>
+
+<span class="sd">        :param other:   A number to multipliy each coefficient of *self* by.</span>
+
+<span class="sd">        :returns:       A new instance that is the same class as *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">value_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span>
         <span class="n">c_ls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
@@ -162,7 +270,13 @@
     <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
 
     <span class="k">def</span> <span class="nf">__div__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns a new series that is each coefficient of self divided by value. Value must be convertible to a float.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a new series that is each coefficient of *self* divided by *value*. *Value* must be convertible to a float.</span>
+
+<span class="sd">        :param other:   A number to divide each coefficient of *self* by.</span>
+
+<span class="sd">        :returns:       A new instance that is the same class as *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">value_</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="n">c_ls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -171,37 +285,65 @@
         <span class="k">return</span> <span class="n">c_ls</span> 
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns true if self and other have the same coefficients, domain and lowerIndex.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if *self* and *other* have the same coefficients, domain and lowerIndex, and False otherwise.</span>
+
+<span class="sd">        :param other:   An instance of the same class as *self*.</span>
+
+<span class="sd">        :returns:       A python boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">areDomainsMutual</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerIndex</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">lowerIndex</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">coefficients</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string representation of the coefficients of self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a string representation of the coefficients of *self*.</span>
+
+<span class="sd">        :returns:       A python str,</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">c_l</span> <span class="k">for</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">])</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to *self*&#39;s coefficients.</span>
+
+<span class="sd">        :returns:       A python list of floats.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span>
 
     <span class="nd">@coefficients</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets *self*&#39;s coefficients to *coefficients*.</span>
+
+<span class="sd">        :param coefficients:    A list of floats.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Series1d.areDomainsMutual"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.areDomainsMutual">[docs]</a>    <span class="k">def</span> <span class="nf">areDomainsMutual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns True if domain mins are the same for *self* and *other*, and domain maxs are the same for *self* and *other*;</span>
-<span class="sd">        otherwise, returns False.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if the domain minimum for *self* and *other* are the same, and if the domain maximum for *self* and *other*</span>
+<span class="sd">        are the same. It returns False otherwise.</span>
 
-<span class="sd">        :param other:       Another xData 1d instance.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        :param other:       Another 1d function.</span>
+
+<span class="sd">        :returns:           A python boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">domainMin</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">domainMax</span></div>
 
 <div class="viewcode-block" id="Series1d.evaluate"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluates the Legendre series at the mu.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the results of the series evaluated at the mu.</span>
+
+<span class="sd">        :param mu:              The domain value.</span>
+
+<span class="sd">        :returns:               A python float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">):</span>
@@ -209,16 +351,31 @@
         <span class="k">return</span> <span class="n">total</span></div>
 
 <div class="viewcode-block" id="Series1d.evaluateBasisFunction"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.evaluateBasisFunction">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateBasisFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a dummy method that needs to be overwritten by the derived class.</span>
+
+<span class="sd">        :param x:       The domain value.</span>
+<span class="sd">        :param i:       The order of the function to evaluate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Implement in derived classes&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Series1d.checkSameSeriesType"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.checkSameSeriesType">[docs]</a>    <span class="k">def</span> <span class="nf">checkSameSeriesType</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">operator</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method executes a raise if *self* and *other* not the same type of series.</span>
+
+<span class="sd">        :param other:       The instance to check against *self*.</span>
+<span class="sd">        :param operator:    A python str that represents the operation of the calling method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">Series1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;other of type &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Cannot </span><span class="si">%s</span><span class="s1"> series </span><span class="si">%s</span><span class="s1"> to series </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">operator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Series1d.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        unitMap is a dictionary of the for { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }.</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span>
@@ -238,9 +395,9 @@
 
 <div class="viewcode-block" id="Series1d.copy"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a new series that is a copy of self. The new </span>
-<span class="sd">        instance&#39;s index and value members are changes if index or value arguments are not None </span>
-<span class="sd">        respectively.</span>
+<span class="sd">        Thie method creates a new series that is a copy of *self*.</span>
+
+<span class="sd">        :returns:       An instance that is the same class as *self*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span> <span class="p">)</span> <span class="p">)</span></div>
@@ -249,42 +406,72 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the minimum domain value for *self*.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the maximum domain value for *self*.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">lowerIndex</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the lowerIndex for *self*.</span>
+
+<span class="sd">        :returns:       A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lowerIndex</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">upperIndex</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the upper index for *self* which is lowerIndex plus the number of coefficients of *self*.</span>
+
+<span class="sd">        :returns:       A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lowerIndex</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Series1d.domainUnitConversionFactor"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.domainUnitConversionFactor">[docs]</a>    <span class="k">def</span> <span class="nf">domainUnitConversionFactor</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the factor needed to convert self&#39;s domain to unit *unitTo*.</span>
+
+<span class="sd">        :param unitTo:      The unit for converting self&#39;s domain.</span>
+
+<span class="sd">        :returns:           A float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">unitTo</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;1 &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">unitTo</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Series1d.getCoefficientSafely"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.getCoefficientSafely">[docs]</a>    <span class="k">def</span> <span class="nf">getCoefficientSafely</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">l</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the (l+1)^th coefficient. Returns 0 if l is greater than lMax. This is like</span>
-<span class="sd">        __getitem__ but allows for l to be greater than lMax.</span>
+<span class="sd">        This method returns the (l+1)^th coefficient or 0 if *l* is greater than the number of coefficients of *self*. This is like</span>
+<span class="sd">        __getitem__ but allows for *l* to be greater than the number of coefficients of *self*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">l</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">0.</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Series1d.hasData"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.hasData">[docs]</a>    <span class="k">def</span> <span class="nf">hasData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns True if the length of self&#39;s coefficients is greater than 0.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if the length of self&#39;s coefficients is greater than 0.</span>
+
+<span class="sd">        :returns:   A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
 
@@ -292,6 +479,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns a series instance that is the mirror of self about x1 = 0 (i.e., negates all odd coefficients).</span>
 <span class="sd">        For example, for a Legendre series return equilavent of pdf(-mu).</span>
+
+<span class="sd">        :returns:       An instance that is the same class as *self*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">series_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
@@ -299,27 +488,54 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">series_</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Series1d.setData"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.setData">[docs]</a>    <span class="k">def</span> <span class="nf">setData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets *self* coefficients to *data*.</span>
+
+<span class="sd">        :param data:        A list of floats.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="o">=</span> <span class="n">data</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rangeMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method should return the miminum range of *self*; however, since this depends on the type of polynomial series, this</span>
+<span class="sd">        method just executes a raise. Ergo, this method needs to be overwritten by the derived class.</span>
+
+<span class="sd">        :raises NotImplementedError:    This is always raised.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rangeMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method should return the maxinum range of *self*; however, since this depends on the type of polynomial series, this</span>
+<span class="sd">        method just executes a raise. Ergo, this method needs to be overwritten by the derived class.</span>
+
+<span class="sd">        :raises NotImplementedError:    This is always raised.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Series1d.toString"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a simple string representation of *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="nb">str</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%16.8g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">coefficient</span> <span class="p">)</span> <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">coefficient</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coefficients</span> <span class="p">)</span> <span class="p">]</span>
         <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Series1d.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method returns self as a list of strings.</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
@@ -350,6 +566,18 @@
 
 <div class="viewcode-block" id="Series1d.returnAsClass"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.returnAsClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">returnAsClass</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns an instance of *cls* that gets *domainMin*, *domainMax*, *lowerIndex*, *axes*, *label and *valueType* from *self*.</span>
+<span class="sd">        This is for internal use.</span>
+
+<span class="sd">        :param cls:                 The class of the instance to return.</span>
+<span class="sd">        :param self:                An instance of class *cls* where meta-data not given by the arguments are taken from.</span>
+<span class="sd">        :param coefficients:        This is the list of coefficients for the 1d polymonial function.</span>
+<span class="sd">        :param index:               This is the index member use by some xData classes.</span>
+<span class="sd">        :param outerDomainValue:    This is the domain value for the next higher dimension for a function that is embedded in a high dimensional function.</span>
+
+<span class="sd">        :returns:                   An instance of class *cls*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">coefficients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerIndex</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> 
                 <span class="n">valueType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valueType</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span></div>
@@ -357,7 +585,15 @@
 <div class="viewcode-block" id="Series1d.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Translate a series XML element into its python xData class.</span>
+<span class="sd">        This method parses *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">attributes</span><span class="p">,</span> <span class="n">extraAttributes</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="n">parseBareNodeCommonAttributes</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">)</span>     <span class="c1"># parseBareNodeCommonAttributes adds to xPath.</span>
@@ -385,25 +621,28 @@
 
 <div class="viewcode-block" id="Series1d.fixedDomain"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Series1d.fixedDomain">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">fixedDomain</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method does nothing.</span>
+
+<span class="sd">        :returns:           (None, None).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="LegendreSeries"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries">[docs]</a><span class="k">class</span> <span class="nc">LegendreSeries</span><span class="p">(</span> <span class="n">Series1d</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class represent a Legendre series for a function f(mu) as:</span>
+<span class="sd">    This class represent a polynomial with Legendre functions as the base functions. Ergo, the function :math:`f(\mu)` as:</span>
 
 <span class="sd">    ..math::</span>
 
-<span class="sd">        f(\mu) = \sum_L ( l + 0.5 ) * C_l * P_l(\mu)</span>
+<span class="sd">        f(\mu) = \sum_{l=0}^{\rm lMax} ( l + 0.5 ) \, C_l \, P_l(\mu)</span>
 
-<span class="sd">    so</span>
+<span class="sd">    where :math:`C_l` is the Legendre coefficient for order :math:`l` and is defined as:</span>
 
 <span class="sd">    ..math::</span>
-<span class="sd">        C_l=\int_{-1}^1 d\mu P_l(\mu) f(\mu)</span>
+<span class="sd">        C_l = \int_{-1}^1 d\mu \, P_l(\mu) \, f(\mu)</span>
 
-<span class="sd">    where the sum is from l = 0 to lMax, lMax is the highest Legendre coefficients in the instance, C_l</span>
-<span class="sd">    is the Legendre coefficient for Legendre order l and P_l(mu) is the Legendre polynomial of order l.</span>
-<span class="sd">    This class stores the Legendre coefficients C_l.</span>
+<span class="sd">    Here lMax is the highest Legendre coefficients in the instance, and :math:`P_l(\mu)` is the Legendre polynomial of order *l*.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;Legendre&#39;</span>
@@ -411,6 +650,9 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
             <span class="n">valueType</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        See method :py:func:`Series1d.__init__` for definition of arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">lowerIndex</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;lowerIndex = </span><span class="si">%s</span><span class="s1"> must be 0&#39;</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">domainMin</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">domainMax</span> <span class="o">!=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;domain must be [-1, 1], not [</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span> <span class="p">)</span> <span class="p">)</span>
@@ -418,22 +660,48 @@
                 <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method interates over the coefficients.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">length</span> <span class="p">)</span> <span class="p">:</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
 
 <div class="viewcode-block" id="LegendreSeries.evaluate"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">mu</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Using the Legendre coefficients, this method calculates f(mu) and returns it.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the value of *self* at :math:`\mu`.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">P</span> <span class="o">=</span> <span class="mf">0.</span>
         <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="p">)</span> <span class="p">:</span> <span class="n">P</span> <span class="o">+=</span> <span class="p">(</span> <span class="n">l</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="p">)</span> <span class="o">*</span> <span class="n">c_l</span> <span class="o">*</span> <span class="n">Legendre</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">checkXRange</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> 
         <span class="k">return</span><span class="p">(</span> <span class="n">P</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegendreSeries.evaluateBasisFunction"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.evaluateBasisFunction">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateBasisFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns :math:`( l + 0.5 ) \, P_l(\mu)` evaluated at *mu*.</span>
+
+<span class="sd">        :param mu:      The :math:`\mu` value.</span>
+<span class="sd">        :param l:       The order of the function to evaluate.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">return</span> <span class="p">(</span> <span class="n">l</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="p">)</span> <span class="o">*</span> <span class="n">Legendre</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">checkXRange</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegendreSeries.integrate"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the integral of *self* from *domainMin* to *domainMax*.</span>
+
+<span class="sd">        :param domainMin:   The lower limit of the domain. If None, set to -1.</span>
+<span class="sd">        :param domainMax:   The upper limit of the domain. If None, set to 1.</span>
+
+<span class="sd">        :returns:           A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">domainMin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">domainMin</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
@@ -478,7 +746,11 @@
         <span class="k">return</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">integral</span></div>
 
 <div class="viewcode-block" id="LegendreSeries.isIsotropic"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if self is isotropic.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if self is isotropic and False otherwise.</span>
+
+<span class="sd">        :returns:       A python boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">coefficient</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">:</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">coefficient</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
@@ -486,7 +758,13 @@
 
 <div class="viewcode-block" id="LegendreSeries.normalize"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">insitu</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The dimension argument is ignored. Only here to be compatable with calling from XYsnd.normalize.</span>
+<span class="sd">        This method returns an instance of class *self* that is normalized.</span>
+<span class="sd">        The *dimension* argument is ignored as it is only here to be compatable with other normalize methods.</span>
+
+<span class="sd">        :param insitu:      If True, *self* is normalizes and returned; otherwise, a copy of *self* is normalized and returned.</span>
+<span class="sd">        :param dimension:   This argument is ignored.</span>
+
+<span class="sd">        :returns:       </span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -497,13 +775,22 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegendreSeries.toLinearXYsClass"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the class that is used to represent *self* as a 1d pointwise function, which is always :py:class:`XYs1dModule.XYs1d`.</span>
+
+<span class="sd">        returns:        The class :py:class:`XYs1dModule.XYs1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegendreSeries.toPointwiseLinear"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.toPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method constructs the pdf(mu) versus mu and returns it as a XYs1d instance. The accuracy of the </span>
-<span class="sd">        reconstruction (hence the number of points in the returned XYs1d) is determined by the accuracy argument.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a representation of *self* as an :py:class:`XYs1dModule.XYs1d` instance (i.e., a pointwise :math:`P(\mu)`). </span>
+<span class="sd">        The accuracy of the reconstruction is determined by kwargs[&#39;accuracy&#39;].</span>
+
+<span class="sd">        :param kwargs:      A dictionary of data needed by *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">arguments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getArguments</span><span class="p">(</span> <span class="n">kwargs</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;accuracy&#39;</span> <span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s1">&#39;biSectionMax&#39;</span> <span class="p">:</span> <span class="mi">16</span> <span class="p">}</span> <span class="p">)</span>
@@ -531,17 +818,41 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">P</span><span class="o">.</span><span class="n">thin</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegendreSeries.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s toPointwiseLinear method.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the results of calling :py:func:`toPointwiseLinear`.</span>
+
+<span class="sd">        :param kwargs:      A dictionary of data needed by *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwiseLinear</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegendreSeries.fixedDomain"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.fixedDomain">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">fixedDomain</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the domain of *self* which is always [-1, 1].A</span>
+
+<span class="sd">        :returns:       The tuple ( -1, 1 ).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegendreSeries.fromXYs1d"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LegendreSeries.fromXYs1d">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">fromXYs1d</span><span class="p">(</span> <span class="n">xys1d</span><span class="p">,</span> <span class="n">maxOrder</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns an instance of :py:class:`LegendreSeries` that represents *xys1d* as:</span>
+
+<span class="sd">        ..math::</span>
+<span class="sd">            C_l = \int_{-1}^1 d\mu \, P_l(\mu) \, f(\mu)</span>
+
+<span class="sd">        where *xys1d*is the poinwise representation of :math:`f(\mu)`.</span>
+
+<span class="sd">        :param xys1d:       An instance of :py:class:`XYs1dModule.XYs1d`.</span>
+<span class="sd">        :param maxOrder:    The maximum Legendre order of the returned instance.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`LegendreSeries`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMin</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Domain min must be -1. It is </span><span class="si">%e</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">!=</span>  <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Domain max must be 1. It is </span><span class="si">%e</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
@@ -550,17 +861,31 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">LegendreSeries</span><span class="p">(</span> <span class="n">Legendre_C</span><span class="o">.</span><span class="n">from_pointwiseXY_C</span><span class="p">(</span> <span class="n">xys1d</span><span class="p">,</span> <span class="n">maxOrder</span> <span class="p">),</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Polynomial1d"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d">[docs]</a><span class="k">class</span> <span class="nc">Polynomial1d</span><span class="p">(</span> <span class="n">Series1d</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represent a polynomial with as a simple power series in the domain variable. This is, for the</span>
+<span class="sd">    function :math:`f(x)` the polynomial :math:`\sum_{i=0}^{\rm iMax} C_i \, x^i`.</span>
+
+<span class="sd">        f(\mu) = \sum_{l=0}^{\rm lMax} ( l + 0.5 ) \, C_l \, P_l(\mu).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;polynomial1d&#39;</span>
     <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
             <span class="n">valueType</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        See method :py:func:`Series1d.__init__` for definition of arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">Series1d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">lowerIndex</span> <span class="o">=</span> <span class="n">lowerIndex</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span> 
                 <span class="n">valueType</span> <span class="o">=</span> <span class="n">valueType</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__findExtrema</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the list of domain values that are the roots of the polynomial.</span>
+
+<span class="sd">        :returns:   A python list of numbers that may be complex.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">numpy.polynomial.polynomial</span> <span class="kn">import</span> <span class="n">Polynomial</span>
         <span class="n">p1</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">),</span>
@@ -569,30 +894,61 @@
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">pprimeroots</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Polynomial1d.evaluate"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Using the polynomial coefficients, this method calculates p(x) and returns it.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the value of *self* evaluated at *x*.</span>
+
+<span class="sd">        :param x:       The domain value to evaluate *self* at.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">P</span> <span class="o">=</span> <span class="mf">0.</span>
         <span class="k">for</span> <span class="n">c_l</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="p">)</span> <span class="p">:</span> <span class="n">P</span> <span class="o">=</span> <span class="n">c_l</span>  <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">P</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">P</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Polynomial1d.evaluateBasisFunction"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.evaluateBasisFunction">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateBasisFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns that basis function evaluated at *x* which is :math:`x^i`.</span>
+
+<span class="sd">        :param x:       The domain value.</span>
+<span class="sd">        :param i:       The power the domain value.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">return</span> <span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rangeMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the minimum range value for *self*.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">extrema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__findExtrema</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">min</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">extrema</span><span class="p">])</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rangeMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the maximum range value for *self*.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">extrema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__findExtrema</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">max</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">extrema</span><span class="p">])</span>
 
 <div class="viewcode-block" id="Polynomial1d.fixDomains"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sets *domainMin* and *domainMax* per the arguments.</span>
+<span class="sd">        This method sets the domain minimum and maximum per the arguments.</span>
+
+<span class="sd">        :param domainMin:       The lower limit of the domain.</span>
+<span class="sd">        :param domainMax:       The upper limit of the domain.</span>
+<span class="sd">        :param fixToDomain:     An instance of :py:class:`enumsModule.FixDomain` that specifies which limits are to be fixed.</span>
+
+<span class="sd">        :returns:               This method returns 0 if no domain limit was moved and 1 if at least one was moved.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">OldDomainMin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span>
@@ -612,14 +968,22 @@
         <span class="k">return</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="Polynomial1d.toLinearXYsClass"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the class that is used to represent *self* as a 1d pointwise function, which is always :py:class:`XYs1dModule.XYs1d`.</span>
+
+<span class="sd">        returns:        The class :py:class:`XYs1dModule.XYs1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Polynomial1d.toPointwiseLinear"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.toPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method constructs the y(x) versus x and returns it as a XYs1d instance. The accuracy of the </span>
-<span class="sd">        reconstruction (hence the number of points in the returned XYs1d) is determined by the accuracy argument.</span>
-<span class="sd">        Currently, accuracy is not implemented.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a representation of *self* as an :py:class:`XYs1dModule.XYs1d` instance (i.e., a pointwise :math:`y(x)`).</span>
+<span class="sd">        The accuracy of the reconstruction is determined by kwargs[&#39;accuracy&#39;].  Currently, accuracy is not fully implemented.</span>
+
+<span class="sd">        :param kwargs:      A dictionary of data needed by *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">arguments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getArguments</span><span class="p">(</span> <span class="n">kwargs</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;accuracy&#39;</span> <span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s1">&#39;biSectionMax&#39;</span> <span class="p">:</span> <span class="mi">16</span> <span class="p">}</span> <span class="p">)</span>
@@ -638,7 +1002,13 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">P</span><span class="o">.</span><span class="n">thin</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Polynomial1d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.Polynomial1d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39; toPointwiseLinear method.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the results of calling the method :py:func:`toPointwiseLinear`.</span>
+
+<span class="sd">        :param kwargs:      A dictionary of data needed by *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwiseLinear</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
@@ -659,13 +1029,16 @@
 <span class="sd">        /    \</span>
 <span class="sd">        ------</span>
 
-<span class="sd">    and so on.  Together y(x) = \sum_i B_i(x) y_i such that y_i = y(x_i)</span>
+<span class="sd">    and so on.  Together :math:`y(x) = \sum_i B_i(x) y_i` such that :math`y_i = y(x_i)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;linearSpline1d&#39;</span>
     <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        See method :py:func:`Series1d.__init__` for definition of arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">xdata</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">ydata</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Number of x and y values not equal.&quot;</span> <span class="p">)</span>
 
@@ -676,6 +1049,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">)),</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LinearSpline1d.evaluateBasisFunction"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LinearSpline1d.evaluateBasisFunction">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateBasisFunction</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the value of the basis function of order *i* evaluated at *x*.</span>
+
+<span class="sd">        :param x:       The domain value.</span>
+<span class="sd">        :param i:       The order of the function to evaluate.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -683,13 +1064,23 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="LinearSpline1d.toLinearXYsClass"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LinearSpline1d.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the class that is used to represent *self* as a 1d pointwise function, which is always :py:class:`XYs1dModule.XYs1d`.</span>
+
+<span class="sd">        returns:        The class :py:class:`XYs1dModule.XYs1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LinearSpline1d.toPointwiseLinear"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LinearSpline1d.toPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method constructs the y(x) versus x and returns it as a XYs1d instance. Basically we just copy the basis</span>
-<span class="sd">        function widget and put the y values back.</span>
+<span class="sd">        This method returns a representation of *self* as an :py:class:`XYs1dModule.XYs1d` instance (i.e., a pointwise :math:`y(x)`).</span>
+<span class="sd">        The accuracy of the reconstruction is determined by kwargs[&#39;accuracy&#39;].  </span>
+<span class="sd">        Basically it just copy the basis function widget and put the y values back.</span>
+
+<span class="sd">        :param kwargs:      A dictionary of data needed by *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -699,7 +1090,13 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="LinearSpline1d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../xData/index.html#xData.series1d.LinearSpline1d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s toPointwiseLinear method.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the restuls of Calling :py:class:`toPointwiseLinear` method.</span>
+
+<span class="sd">        :param kwargs:      A dictionary of data needed by *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwiseLinear</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div></div>
 

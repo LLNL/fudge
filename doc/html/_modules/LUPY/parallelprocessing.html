@@ -44,6 +44,25 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;         </span>
+<span class="sd">This module contains functions for running tasks in parallel mainly through :py:func:`execute`</span>
+<span class="sd">and :py:func:`executeMultiThreaded`.</span>
+<span class="sd">                </span>
+<span class="sd">    This module contains the following functions:</span>
+
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Function              | Description                                                           |</span>
+<span class="sd">    +=======================+=======================================================================+</span>
+<span class="sd">    | executeOne            | This function is mainly for an example.                               | </span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | addProcess            | This functions is internal use by :py:func:`execute`.                 |</span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | execute               | This function is used to run many processes in parallel.              |</span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | executeMultiThreaded  | This function is used to run many tasks in parallel as threads.       |</span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>     
+
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span>
@@ -51,8 +70,10 @@
 
 <div class="viewcode-block" id="executeOne"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.parallelprocessing.executeOne">[docs]</a><span class="k">def</span> <span class="nf">executeOne</span><span class="p">(</span> <span class="n">command</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function is mainly for an example of what the target argument of multiprocessing.Process may look.</span>
+<span class="sd">    This function is mainly for an example of what the target argument of :py:class:`multiprocessing.Process` may look.</span>
 <span class="sd">    The main thing is to call sys.exit with a status and to properly handle the status returned by os.system.</span>
+
+<span class="sd">    :param command:     System comannd to execute.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">status</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span> <span class="n">command</span> <span class="p">)</span>
@@ -60,7 +81,18 @@
     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span> <span class="n">status</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="addProcess"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.parallelprocessing.addProcess">[docs]</a><span class="k">def</span> <span class="nf">addProcess</span><span class="p">(</span> <span class="n">numberLaunched</span><span class="p">,</span> <span class="n">processes</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">callback</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Added a process.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calls :py:func:`multiprocessing.Proces` with target of *callback* and args of items[numberLaunched] to create </span>
+<span class="sd">    a new process, and then calls start on that process. The created process is appended to *processes*.</span>
+<span class="sd">    This function is for internal use by :py:class:`execute`.</span>
+
+<span class="sd">    :param numberLaunched:  Index into *items* which contains the arguments for the callback function.</span>
+<span class="sd">    :param processes:       The list of processes which the created process will be added to.</span>
+<span class="sd">    :param items:           The list of args for all processes to create.</span>
+<span class="sd">    :param callback:        That function called by :py:class:`multiprocessing.Process`.</span>
+
+<span class="sd">    :returns:               *numberLaunched* incremented by one.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">process</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span> <span class="n">target</span> <span class="o">=</span> <span class="n">callback</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="p">(</span> <span class="n">items</span><span class="p">[</span><span class="n">numberLaunched</span><span class="p">],</span> <span class="p">)</span> <span class="p">)</span>
     <span class="n">process</span><span class="o">.</span><span class="n">start</span><span class="p">(</span> <span class="p">)</span>
@@ -69,10 +101,17 @@
 
 <div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.parallelprocessing.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">numberOfParallelProcesses</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">percentNotifications</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function loops over each item in *items* and processes it by calling user&#39;s callback function. At most *numberOfParallelProcesses* of</span>
-<span class="sd">    processes can run in parallel. The user&#39;s callback must create a command to execute and call function **executeOne**.</span>
+<span class="sd">    This function loops over each item in *items*, and creates and runs each with a :py:func:`multiprocessing.Proces` process.</span>
+<span class="sd">    Also see function :py:func:`addProcess`.  At most *numberOfParallelProcesses* of</span>
+<span class="sd">    processes can run in parallel. The user&#39;s callback must create a command to execute and a backcall function similar</span>
+<span class="sd">    to the example :py:func:`executeOne`.</span>
 
 <span class="sd">    percentNotifications is in percent of number to do and for every percent of number done a message is sent to sys.syserr.</span>
+
+<span class="sd">    :param numberOfParallelProcesses:   The maximum number of process to have running at one time.</span>
+<span class="sd">    :param items:                       A python list where each element contains the arguments for one process.</span>
+<span class="sd">    :param callback:                    The target passed to :py:class:`multiprocessing.Process`.</span>
+<span class="sd">    :param percentNotifications:        This parameter determines how often a progress message is printed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">numberOfFailures</span> <span class="o">=</span> <span class="mi">0</span>
@@ -114,22 +153,21 @@
 
 <div class="viewcode-block" id="executeMultiThreaded"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.parallelprocessing.executeMultiThreaded">[docs]</a><span class="k">def</span> <span class="nf">executeMultiThreaded</span><span class="p">(</span><span class="n">taskList</span><span class="p">,</span> <span class="n">runner</span><span class="p">,</span> <span class="n">nThreads</span><span class="o">=</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(),</span> <span class="n">sleepTime</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    General-purpose multi-threading code. Applies &#39;runner&#39; to each task in the taskList,</span>
-<span class="sd">    returns list of completed runners once all tasks are complete.</span>
-<span class="sd">    Note: order of returned list may not match order of submitted taskList.</span>
-
-<span class="sd">    TODO: add index to each thread in case we need to sort results? Could use thread.name too...</span>
+<span class="sd">    The function runs the items in *taskList* as separate threads. Applies *runner* to each task in the taskList and</span>
+<span class="sd">    returns list of completed runners once all tasks are complete.  Note: order of returned list may not match order of taskList.</span>
 
 <span class="sd">    Due to the Python GIL, this should be most efficient for runners that spend most of their time</span>
-<span class="sd">    in compiled code e.g. C extensions rather than in interpreted Python code.</span>
+<span class="sd">    in compiled code e.g., C extensions rather than in interpreted Python code.</span>
 
-<span class="sd">    @param taskList: list of tasks.</span>
-<span class="sd">    @param runner: class (inheriting from threading.Thread) with a run() method that completes each task.</span>
-<span class="sd">    @param nThreads: maximum number of concurrent threads.</span>
-<span class="sd">    @param sleepTime: how long (in seconds) to wait between polling for finished threads.</span>
-<span class="sd">    @param verbose: if True, print updates as each task starts.</span>
-<span class="sd">    @return list of finished tasks.</span>
+<span class="sd">    :param taskList:    List of tasks to run.</span>
+<span class="sd">    :param runner:      Class (inheriting from threading.Thread) with a run() method that completes each task.</span>
+<span class="sd">    :param nThreads:    Maximum number of concurrent threads.</span>
+<span class="sd">    :param sleepTime:   How long (in seconds) to wait between polling for finished threads.</span>
+<span class="sd">    :param verbose:     If True, print updates as each task starts.</span>
+
+<span class="sd">    :returns:           List of finished tasks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<span class="c1">#   TODO: add index to each thread in case we need to sort results? Could use thread.name.</span>
 
     <span class="n">nTasks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">taskList</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>

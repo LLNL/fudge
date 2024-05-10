@@ -1126,7 +1126,7 @@ class FunctionalBase( Subform ) :
         return( xmlString )
 
 class GeneralEvaporation( FunctionalBase ) :
-    """
+    r"""
     Class for storing the 2d general evaporation energy distribution. The distribution is of the form
     :math:`g(E' / theta(E))`.
 
@@ -2893,7 +2893,7 @@ class WeightedFunctionals( Subform ) :
         Parse *node* into an instance of *cls*.
 
         :param cls:         Form class to return.
-        :param node:     Node to parse.
+        :param node:        Node to parse.
         :param xPath:       List containing xPath to current node, useful mostly for debugging.
         :param linkData:    dict that collects unresolved links.
         :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.

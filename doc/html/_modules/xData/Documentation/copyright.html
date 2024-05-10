@@ -45,17 +45,38 @@
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module contains the class for the GNDS documentation child node copyright.</span>
+<span class="sd">This module contains the class for the GNDS documentation/copyright node.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +---------------------------+-------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                     | Description                                                                   |</span>
+<span class="sd">    +===========================+===============================================================================+</span>
+<span class="sd">    | Copyright                 | This class represents a GNDS documentation/copyright node.                    |</span>
+<span class="sd">    +---------------------------+-------------------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">text</span> <span class="k">as</span> <span class="n">textModule</span>
 
 <div class="viewcode-block" id="Copyright"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.copyright.Copyright">[docs]</a><span class="k">class</span> <span class="nc">Copyright</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS documentation/copyright node.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class representing a GNDS documentation/copyright node.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member        | Description                                                   |</span>
+<span class="sd">    +===============+===============================================================+</span>
+<span class="sd">    | href          | A url to the copyright.                                       |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;copyright&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">href</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param href:    A url to the copyright.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
@@ -63,17 +84,33 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">href</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s href instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Thie method returns self&#39;s href instance.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span>
 
     <span class="nd">@href</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">href</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the href member of *self* to *value*.</span>
+
+<span class="sd">        :param value:       The new href value for *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;href must be a str instance.&#39;</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="Copyright.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.copyright.Copyright.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This methods returns the XML attributes for *self* as a single python str.</span>
+
+<span class="sd">        :kwargs:        This argument is not used.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
 
@@ -81,7 +118,12 @@
 
 <div class="viewcode-block" id="Copyright.parseNode"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.copyright.Copyright.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parses a copyright node.</span>
+<span class="sd">        This method fills *self* by parsing the data in *node*.</span>
+
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

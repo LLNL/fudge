@@ -44,6 +44,20 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module represents classes that are for internal use.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class             | Description                                                                                                       |</span>
+<span class="sd">    +===================+===================================================================================================================+</span>
+<span class="sd">    | Suite             | This class represents a suite that is like a python OrderedDict.                                                  |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | SortedSuite       | This class represents a suite that is like :py:class:`Suite` except for how item are sort in the internal list.   |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span> 
+
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">abc</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
@@ -52,7 +66,7 @@
 
 <div class="viewcode-block" id="Suite"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite">[docs]</a><span class="k">class</span> <span class="nc">Suite</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_bare</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Abstract base class for holding a list of objects that can be indexed by an integer or a string.</span>
+<span class="sd">    This class is the abstract base class for holding a list of objects that can be indexed by an integer or a string.</span>
 <span class="sd">    For integer indexing, the indexing is by order in which an object was put into the array or,</span>
 <span class="sd">    if a sortedSuite instance, by its sort order in the suite.  For string indexing, this class acts </span>
 <span class="sd">    like the python dict class. </span>
@@ -61,17 +75,23 @@
 <span class="sd">    class as it does act differently. For example, only objects in the list of **allowedClasses** can be</span>
 <span class="sd">    added to an suite instance. The **allowedClasses** is a required argument to the constructor.</span>
 
-<span class="sd">    The constructor for this class has 2 (not counting self) arguments. They are::</span>
+<span class="sd">    The following table list the primary members of this class:</span>
 
-<span class="sd">        + ------------------+-----------------------------------------------------------+</span>
-<span class="sd">        | allowedClasses    | A list of classes. Only objects matching one of the       |</span>
-<span class="sd">        |                   | classes can be added to the suite.                        |</span>
-<span class="sd">        + ------------------+-----------------------------------------------------------+</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                           |</span>
+<span class="sd">    +===================+=======================================================================+</span>
+<span class="sd">    | allowedClasses    | This is a list of the allowed classes that can be added to the suite. |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | items             | The list of objects stored in the suite.                              |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">allowedClasses</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param allowedClasses:  A list of classes and only objects matching one of these classes can be added to the suite.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
@@ -87,7 +107,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns True if the suite has an item whose **keyValue** is *key* and False otherwise.</span>
 
-<span class="sd">        :param str key: The key.</span>
+<span class="sd">        :param key: The key.</span>
+
 <span class="sd">        :rtype:     bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -99,11 +120,11 @@
 
     <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Removes an element from self&#39;s list. If *key* is an **int**, the item at that index is removed.</span>
+<span class="sd">        This method removes an element from self&#39;s list. If *key* is an **int**, the item at that index is removed.</span>
 <span class="sd">        If *key* is a **str**, the item with that **keyValue** is removed.</span>
 
-<span class="sd">        :param key: The key of the item to remove.</span>
-<span class="sd">        :type key: int or str.</span>
+<span class="sd">        :param key:     The key of the item to remove.</span>
+<span class="sd">        :type key:      int or str.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
@@ -116,11 +137,13 @@
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns an item from the suite. If *key* is an int, the item at that index is returned.</span>
+<span class="sd">        This method returns an item from the suite. If *key* is an int, the item at that index is returned.</span>
 <span class="sd">        If *key* is a str, the item with that keyValue is returned.</span>
 
-<span class="sd">        :param key: The key of the item to return.</span>
-<span class="sd">        :type key: int or str.</span>
+<span class="sd">        :param key:     The key of the item to return.</span>
+<span class="sd">        :type key:      int or str.</span>
+
+<span class="sd">        :returns:       The item specified by *key*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
@@ -131,14 +154,18 @@
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s1">&#39;key &quot;</span><span class="si">%s</span><span class="s1">&quot; not found in suite &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterates over self using the index order of items (i.e. int indexing).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method iterates over the items in self using the index order of items (i.e. int indexing).</span>
+
+<span class="sd">        :returns:   The next item of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the number of items in self.</span>
+<span class="sd">        This method returns the number of items in self.</span>
 
 <span class="sd">        :rtype:     int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -147,14 +174,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">allowedClasses</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the tuple of allowed classes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the tuple of allowed classes that *self* can contain.</span>
+
+<span class="sd">        :returns:   A reference to *self*&#39;s allowedClasses member.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowedClasses</span> <span class="p">)</span>     <span class="c1"># Ok to let user touch this since it cannot be alter as __allowedClasses is a tuple.</span>
 
 <div class="viewcode-block" id="Suite.add"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds **item** to the suite. **item** must be an allowed class, otherwise a **TypeError** exception is raised.</span>
-
+<span class="sd">        This method adds **item** to the suite. **item** must be an allowed class, otherwise a **TypeError** exception is raised.</span>
 <span class="sd">        If another item in the suite has the same keyValue a **KeyError** exception is raised.</span>
 
 <span class="sd">        :param item:    The item to add to the suite.</span>
@@ -176,13 +206,13 @@
 
 <div class="viewcode-block" id="Suite.addIndex"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.addIndex">[docs]</a>    <span class="k">def</span> <span class="nf">addIndex</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the index at which *item* will be added to *self*.</span>
+<span class="sd">        This method returns the index at which *item* will be added to *self*.</span>
 
 <span class="sd">        :param item:    The item to add to the suite.</span>
 
 <span class="sd">        :return:    the tuple *( index, exists )*. *index* is the index in *self* at which *item* will be added. </span>
-<span class="sd">                    *exists* is **True** if an *item* with the same **keyValue** already exist and **False** otherwise.</span>
-<span class="sd">        :rtype:         ( int, bool )</span>
+<span class="sd">                    If an *item* with the same **keyValue** already exist, *exists* is True, otherwise it is False.</span>
+<span class="sd">        :rtype:     (int, bool)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
@@ -192,30 +222,48 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">index</span><span class="p">,</span> <span class="kc">False</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.amendForPatch"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.amendForPatch">[docs]</a>    <span class="k">def</span> <span class="nf">amendForPatch</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method calls **amendForPatch** for each item in the suite.</span>
+
+<span class="sd">        :param fromLabel:   The old label.</span>
+<span class="sd">        :param toLabel:     The new label.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">amendForPatch</span><span class="p">(</span> <span class="n">fromLabel</span><span class="p">,</span> <span class="n">toLabel</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.checkAncestry"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.checkAncestry">[docs]</a>    <span class="k">def</span> <span class="nf">checkAncestry</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method calls **checkAncestry** for each item in the suite.</span>
+
+<span class="sd">        :param verbose:     The verbosity of the output.</span>
+<span class="sd">        :param level:       The current nested level.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">checkAncestry</span><span class="p">(</span> <span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="n">level</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.clear"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Remove all members of the suite.</span>
+<span class="sd">        This method removes all members from *self*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="Suite.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calls each items convertUnits function.</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
 
-<span class="sd">        :param unitMap:     A dictionary of keys of &quot;from&quot; units and values of &quot;to&quot; units.</span>
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__items</span> <span class="p">)</span> <span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.diff"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.diff">[docs]</a>    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">diffResults</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used by the FUDGE script **diffGNDS.py** to get a crude difference between the items in the suite.</span>
+
+<span class="sd">        :param other:           Another :py:class:`Suite` instance to diff with *self*.</span>
+<span class="sd">        :param diffResults:     The object that will store the diff results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">keys1</span> <span class="o">=</span> <span class="p">[</span> <span class="n">item</span><span class="o">.</span><span class="n">keyValue</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">]</span>
         <span class="n">keys2</span> <span class="o">=</span> <span class="p">[</span> <span class="n">item</span><span class="o">.</span><span class="n">keyValue</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">other</span> <span class="p">]</span>
@@ -239,11 +287,11 @@
 
 <div class="viewcode-block" id="Suite.pop"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">*</span><span class="n">default</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Removes *item* with **keyValue** *key*, and returns it. If *key* is not found, *default* is returned if given, </span>
-<span class="sd">        otherwise **KeyError** is raised.</span>
+<span class="sd">        This method removes the item with **keyValue** *key*, and returns it. If *key* is not found, *default* is returned if given, </span>
+<span class="sd">        otherwise **KeyError** is raised. Also see method :py:func:`remove`.</span>
 
-<span class="sd">        :param key:         KeyValue of item to Remove.</span>
-<span class="sd">        :param default:     Item to return if no item with *key* found.</span>
+<span class="sd">        :param key:         KeyValue of item to remove.</span>
+<span class="sd">        :param default:     The item to return if no item with *key* is found.</span>
 
 <span class="sd">        :return:            Returns the *item* removed or *default* if one is given.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -258,7 +306,8 @@
 
 <div class="viewcode-block" id="Suite.remove"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Removes item by with keyValue *key*. Returns True if key was present, otherwise returns False.</span>
+<span class="sd">        This method removes item with keyValue *key*. Returns True if key was present, otherwise returns False.</span>
+<span class="sd">        Also see method :py:func:`pop`.</span>
 
 <span class="sd">        :param key: str</span>
 
@@ -274,8 +323,8 @@
 
 <div class="viewcode-block" id="Suite.replace"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.replace">[docs]</a>    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Replace an existing item with *item*. If no item in the suite has the same keyValue as *item*, a KeyError is raised.</span>
-<span class="sd">        If *item* is not an allowed class, a TypeError is raised.</span>
+<span class="sd">        This method replaces an existing item with the same keyValue as *item* with *item*. If no item in the suite has the same </span>
+<span class="sd">        keyValue as *item*, a KeyError is raised.  If *item* is not an allowed class, a TypeError is raised.</span>
 
 <span class="sd">        :param item:</span>
 <span class="sd">        :return:</span>
@@ -301,7 +350,9 @@
 
 <div class="viewcode-block" id="Suite.replicate"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.replicate">[docs]</a>    <span class="k">def</span> <span class="nf">replicate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Clear self and then makes a copy of all items in *other* and adds the copy to *self*.</span>
+<span class="sd">        This method clears self and then makes a copy of all items in *other* and adds the copy to *self*.</span>
+
+<span class="sd">        :param other:       An instance of :py:class:`Suite`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">(</span> <span class="p">)</span>
@@ -309,7 +360,12 @@
 
 <div class="viewcode-block" id="Suite.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns an list of XML strings representing *self* and its items.</span>
+<span class="sd">        This method returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
@@ -328,11 +384,23 @@
 
 <div class="viewcode-block" id="Suite.uniqueKey"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.uniqueKey">[docs]</a>    <span class="k">def</span> <span class="nf">uniqueKey</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        If item&#39;s keyValue is the same as another item&#39;s keyValue in self, construct a new unique key</span>
-<span class="sd">        based on item&#39;s keyValue appended with &#39;__&#39; and one or more lower case letters (i.e., &#39;a&#39; to &#39;z&#39;).</span>
+<span class="sd">        This method will construct a new keyValue for *item* if *item*&#39;s keyValue is the same as another item&#39;s </span>
+<span class="sd">        keyValue in the suite. The constructed unique key is based on item&#39;s keyValue appended with &#39;__&#39; and </span>
+<span class="sd">        one or more lower case letters (i.e., &#39;__a&#39; to &#39;__z&#39;). The keyValue of item is changed if needed.</span>
+
+<span class="sd">        :param item:    This item whose keyValue is make unique within *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">incrementSuffix</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This method increments suffix. This method if for internal use.</span>
+
+<span class="sd">            :param suffix:      The current suffix that needs to be incremented.</span>
+
+<span class="sd">            :returns:           A python str.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
 
             <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;a&#39;</span> <span class="p">)</span>
             <span class="n">index</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">suffix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
@@ -363,6 +431,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Suite.parseNode"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets data in *self* using the contents of *node*.</span>
+
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
 
@@ -383,14 +459,14 @@
 
 <div class="viewcode-block" id="SortedSuite"><a class="viewcode-back" href="../../xData/index.html#xData.suite.SortedSuite">[docs]</a><span class="k">class</span> <span class="nc">SortedSuite</span><span class="p">(</span> <span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Like the **suite** class except the index at which an *item* is added is determined by the</span>
+<span class="sd">    This class is like the :py:class:`Suite` class except the index at which an *item* is added is determined by the</span>
 <span class="sd">    *item*&#39;s **sortCompare** method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SortedSuite.addIndex"><a class="viewcode-back" href="../../xData/index.html#xData.suite.SortedSuite.addIndex">[docs]</a>    <span class="k">def</span> <span class="nf">addIndex</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Uses *item*&#39;s **sortCompare** method to determine the index in *self* at which *item* will be added.</span>
-<span class="sd">        Overrides the **addIndex** method in the **suite** class.</span>
+<span class="sd">        This method uses *item*&#39;s **sortCompare** method to determine the index in *self* at which *item* will be added.</span>
+<span class="sd">        Overrides the **addIndex** method in the :py:class:`Suite` class.</span>
 
 <span class="sd">        :return:    the tuple *( index, exists )*. *index* is the index in *self* at which *item* will be added. </span>
 <span class="sd">                    *exists* is **True** if an *item* with the same **keyValue** already exist and **False** otherwise.</span>
@@ -405,20 +481,6 @@
                 <span class="k">return</span><span class="p">(</span> <span class="n">i1</span><span class="p">,</span> <span class="kc">False</span> <span class="p">)</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">),</span> <span class="kc">False</span> <span class="p">)</span></div></div>
-
-<div class="viewcode-block" id="Suite2"><a class="viewcode-back" href="../../xData/index.html#xData.suite.Suite2">[docs]</a><span class="k">class</span> <span class="nc">Suite2</span><span class="p">(</span> <span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Like the **suite** class except the method **toXML** are added.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="SortedSuite2"><a class="viewcode-back" href="../../xData/index.html#xData.suite.SortedSuite2">[docs]</a><span class="k">class</span> <span class="nc">SortedSuite2</span><span class="p">(</span> <span class="n">SortedSuite</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Like the **sortSuite** class except the method **toXML** are added.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">pass</span></div>
 </pre></div>
 
             <div class="clearer"></div>

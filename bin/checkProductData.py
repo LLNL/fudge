@@ -92,6 +92,9 @@ def checkOutputChannel(self, indent):
     for product in self.products:
         checkProduct(product, indent)
 
+        if product.outputChannel:
+            checkOutputChannel(product.outputChannel, indent)
+
     checkfissionFragmentData(self.fissionFragmentData, indent)
 
 def checkReaction(self, indent):

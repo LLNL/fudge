@@ -5,6 +5,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module contains functions for calculating the cross section, distribution, average product energy and average product momentum
+data for the double differential data representing a coherent elastic reaction for the thermal neutron scattering law.
+"""
+
 import math
 
 from xData import axes as axesModule
@@ -16,8 +21,28 @@ from fudge.productData.distributions import uncorrelated as uncorrelatedModule
 from . import base as baseModule
 
 def calculatePofMu( energy, index, SofE, epsilon ) :
+    """
+    This function calculates :math:`P(\mu)` for projectile energy *energy*.
+
+    :param energy:      The projectile energy.
+    :param index:       The index within *SofE* that corresponds to *energy*.
+    :param SofE:        The :math:`s_i` data.
+    :param epsilon:     The fractional width of the triangle point to add.
+
+    :returns:           The python list of :math:`P(\mu)`.
+    """
 
     def addDeltaFunction( PofMu, energy, energy_i, S_i, S_im1, epsilon ) :
+        """
+        This function adds a triangle to *PofMu* to represent a delta functtion.
+
+        :param PofMu:       The :math:`P(\mu)` the triangle is added to.
+        :param energy:      The energy of the projectile.
+        :param energy_i:    The energy for the point at index *i*.
+        :param S_i:         The :math:`s_i` at index *i*.
+        :param S_im1:       The :math:`s_i` at index *i - 1*.
+        :param epsilon:     The half width of the triangle added.
+        """
 
         dS = S_i - S_im1
         if( dS == 0 ) : return
@@ -73,6 +98,19 @@ def calculatePofMu( energy, index, SofE, epsilon ) :
     return( PofMu )
 
 def bisectionTest( crossSectionFine, x1, y1, x2, y2, accuracy, level = 0 ) :
+    """
+    This function checks the lin-lin interpolation of a cross section between energies *x1* and *x2*, and adds a point between
+    *x1* and *x2 to *crossSectionFine* if needed. If a point is needed, this function calls itself to add more points
+    between *x1* and *x2 if needed.
+
+    :param crossSectionFine:    The array to adds points to if needed.
+    :param x1:                  A projectile energy.
+    :param y1:                  The cross section at *x1*.
+    :param x2:                  The next projectile energy.
+    :param y2:                  The cross section at *y1*.
+    :param accuracy:            The desired accuracy of the point between *x1* and *x2*.
+    :param level:               This arument is not used.
+    """
 
     y2p = y1 * x1 / x2
     xMid = 0.5 * ( x1 + x2 )
@@ -84,6 +122,18 @@ def bisectionTest( crossSectionFine, x1, y1, x2, y2, accuracy, level = 0 ) :
     bisectionTest( crossSectionFine, xMid, yMid, x2,   y2,   accuracy, level + 1 )
 
 def process( self, label, energyMin, energyMax, temperature, kwargs ) :
+    """
+    This method calculates the cross section, distribution, average product energy and average product momentum
+    data for the double differential data and returns their forms.
+
+    :param label:           The label for the returned forms.
+    :param energyMin:       The minimum projectile energy for the cross section, and other data.
+    :param energyMax:       The maximum projectile energy for the cross section, and other data.
+    :param temperature:     The temperature to calculate the cross section, and other data at.
+    :param kwargs:          A dictionary containing data needed for processing.
+
+    :returns:               The return data from :py:func:`baseModule.processedToForms` and an instance of :py:class:`uncorrelatedModule.Form`
+    """
 
     accuracy = min( 0.1, max( 1e-5, kwargs['accuracy'] ) )
     epsilon = min( 1e-3, max( 1e-15, kwargs['epsilon'] ) )
@@ -105,8 +155,9 @@ def process( self, label, energyMin, energyMax, temperature, kwargs ) :
 
     def expandGrid(energyGrid, array):
         """
-        Add energyMax to the energy if not already present. energyMin dealt with later
+        This function adds the reguested minimum and maximum projectile energy to *array* if not already present.
         """
+
         Xs = list(energyGrid.values)
         Ys = list(array)
         if Xs[0] > energyMin:

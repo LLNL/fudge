@@ -13,7 +13,9 @@ import pathlib
 from LUPY import argumentsForScripts as argumentsForScriptsModule
 import fudge.styles as stylesModule
 
-description = """This script removed all processed data (except resonance reconstructed data) for the specified GNDS protare file."""
+summaryDocStringFUDGE = """This script removed all processed data (except resonance reconstructed data) for the specified GNDS protare file."""
+
+description = summaryDocStringFUDGE
 
 parser = argparse.ArgumentParser(description=description, allow_abbrev=False)
 singleProtareArguments = argumentsForScriptsModule.SingleProtareArguments(parser)

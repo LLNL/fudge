@@ -5,6 +5,34 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module contains classes for storing the data in a groups node.
+
+This module contains the following classes:
+
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Class                                 | Description                                                                       |
+    +=======================================+===================================================================================+
+    | Group                                 | This class stores data (e.g., boundaries) for one multi-group.                    |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Groups                                | This class stores a list of :py:class:`Group` instances.                          |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+
+This module contains the following functions:
+        
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Class                                 | Description                                                                       |
+    +=======================================+===================================================================================+
+    | toMultiGroup1d                        | This function takes 1-d multi-group data as a list of floats and return           |
+    |                                       | a Gridded1d instance.                                                             |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | TMs2Form                              | Takes a raw transfer matrices and wraps them in a                                 |
+    |                                       | :py:class:`multiGroupModule.Form` instance.                                       |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | read                                  | Reads in a file and returns a :py:class:`Groups` instance.                        |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+"""
+
 import numpy
 
 from LUPY import ancestry as ancestryModule
@@ -19,12 +47,26 @@ from fudge import suites as suitesModule
 
 class Group( ancestryModule.AncestryIO ) :
     """
-    This class stores the multi-group information.
+    This class stores the multi-group information (e.g., boundaries).
+
+    The following table list the primary members of this class:
+
+    +---------------+-----------------------------------------------------------+
+    | Member        | Description                                               |
+    +===============+===========================================================+
+    | label         | The label for the instance.                               |
+    +---------------+-----------------------------------------------------------+
+    | boundaries    | The multi-group boundaries.                               |
+    +---------------+-----------------------------------------------------------+
     """
 
     moniker = 'group'
 
     def __init__( self, label, boundaries ) :
+        """
+        :param label:           The label for the instance.
+        :param boundaries:      The multi-group boundaries.
+        """
 
         ancestryModule.AncestryIO.__init__( self )
         if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must only be a string instance.' )
@@ -37,15 +79,26 @@ class Group( ancestryModule.AncestryIO ) :
 
     @property
     def label( self ) :
+        """
+        Returns the label of *self*.
+        """
 
         return( self.__label )
 
     @property
     def boundaries( self ) :
+        """
+        Returns a reference to the boundaries of *self*.
+        """
 
         return( self.__boundaries )
 
     def copy( self ) :
+        """
+        This function returns a copy of *self*.
+
+        :returns:           An instance of :py:class:`Group`.
+        """
 
         return Group(self.label, self.boundaries.copy())
 
@@ -54,11 +107,21 @@ class Group( ancestryModule.AncestryIO ) :
     def convertUnits( self, unitMap ) :
         """
         unitMap is a dictionary of the form { 'eV' : 'MeV', 'b' : 'mb' }.
+
+        :param unitMap:                 A dictionary that maps a existing unit into a new unit.
         """
 
         self.__boundaries.convertUnits( unitMap )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a python list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                Python list of str instances.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -69,6 +132,17 @@ class Group( ancestryModule.AncestryIO ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    Dictionary that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         xPath.append(node.tag)
 
@@ -81,8 +155,18 @@ class Group( ancestryModule.AncestryIO ) :
 def toMultiGroup1d( cls, style, tempInfo, _axes, data, addLabel = True, zeroPerTNSL = True ) :
     """
     This function takes 1-d multi-group data as a list of floats and return to 1-d gridded instance
-    containing the multi-group data. The list of data must contain n values where n is the
+    of class *cls* containing the multi-group data. The list of data must contain n values where n is the
     number of groups.
+
+    :param cls:             The Gridded1d class to wrap the data in and return.
+    :param style:           This is the multi-group style for the multi-group data.
+    :param tempInfo:        This is a dictionary with needed data.
+    :param _axes:           The axes for the data.
+    :param data:            The 1-d multi-gruup data.
+    :param addLabel:        A boolean that, if True
+    :param zeroPerTNSL:     Indicates that the protare is a TNSL protare which requires extra treatment.
+
+    :returns:               An instance of *cls*.
     """
 
     reactionSuite = tempInfo['reactionSuite']
@@ -112,6 +196,18 @@ def toMultiGroup1d( cls, style, tempInfo, _axes, data, addLabel = True, zeroPerT
     return( cls( label = label, axes = axes, array = flattened ) )
 
 def TMs2Form( style, tempInfo, TM_1, TM_E, productName = None ) :
+    """
+    This function takes raw transfer matrices and wraps them in a :py:class:`multiGroupModule.Form` instance. 
+    The *conserve* member for the product's transportable determines which transfer matrices, *TM_1*, *TM_E*, is returned.
+
+    :param style:           This is the multi-group style for the multi-group data.
+    :param tempInfo:        This is a dictionary with needed data.
+    :param TM_1:            The number convering transfer matrice.
+    :param TM_E:            The energy convering transfer matrice.
+    :param productName:     The PoPs id of the proeuct.
+
+    :returns:               A :py:class:`multiGroupModule.Form` instance.
+    """
 
     from fudge.processing import transportables as transportablesModule
     from fudge.productData.distributions import multiGroup as multiGroupModule
@@ -135,6 +231,14 @@ def TMs2Form( style, tempInfo, TM_1, TM_E, productName = None ) :
     axes[3] = axesModule.Grid( 'energy_in',                 3, energyUnit, xDataEnumsModule.GridStyle.boundaries, energyInGrid )
     if conserve == enumsModule.Conserve.number:
         TM = TM_1
+    elif conserve == enumsModule.Conserve.energyOut:
+        TM = TM_E
+        eout = numpy.array(energyOutGrid)
+        ebar = 0.5 * (eout[:-1] + eout[1:])
+        for key in TM:
+            outgoing = TM[key]
+            for key2 in outgoing:
+                outgoing[key2] = [val / ebar[key2] for val in outgoing[key2]]
     else:
         raise NotImplementedError('Need to implement')
 
@@ -184,6 +288,9 @@ def TMs2Form( style, tempInfo, TM_1, TM_E, productName = None ) :
     return( multiGroupModule.Form( style.label, xDataEnumsModule.Frame.lab, gridded3d ) )
 
 class Groups( suitesModule.Suite ) :
+    """
+    This class stores a list of :py:class:`Group` instances.
+    """
 
     moniker = 'groups'
 
@@ -193,6 +300,17 @@ class Groups( suitesModule.Suite ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    Dictionary that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         instance = cls()
         instance.parseNode(node, xPath, linkData, **kwargs)
@@ -202,14 +320,24 @@ class Groups( suitesModule.Suite ) :
     @staticmethod
     def read(fileName, **kwargs):
         """
-        Reads in the file name *fileName* and returns a **Groups** instance.
+        Reads in the file at path *fileName* and returns a :py:class:`Groups` instance.
+
+        :param fileName:    Path to the file to read.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is read.
+
+        :returns:           A :py:class:`Groups` instance.
         """
 
         return Groups.readXML_file(fileName, **kwargs)
 
 def read(fileName, **kwargs):
     """
-    Reads in the file name *fileName* and returns a **Groups** instance.
+    Reads in the file name *fileName* and returns a :py:class:`Groups` instance.
+
+    :param fileName:    Path to the file to read.
+    :param kwargs:      A dictionary of extra arguments that controls how *self* is read.
+
+    :returns:           A :py:class:`Groups` instance.
     """
 
     return Groups.read(fileName, **kwargs)

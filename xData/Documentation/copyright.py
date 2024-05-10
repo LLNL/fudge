@@ -6,17 +6,38 @@
 # <<END-copyright>>
 
 """
-This module contains the class for the GNDS documentation child node copyright.
+This module contains the class for the GNDS documentation/copyright node.
+
+This module contains the following classes:
+
+    +---------------------------+-------------------------------------------------------------------------------+
+    | Class                     | Description                                                                   |
+    +===========================+===============================================================================+
+    | Copyright                 | This class represents a GNDS documentation/copyright node.                    |
+    +---------------------------+-------------------------------------------------------------------------------+
 """
 
 from .. import text as textModule
 
 class Copyright( textModule.Text ) :
-    """A class representing a GNDS documentation/copyright node."""
+    """
+    A class representing a GNDS documentation/copyright node.
+
+    The following table list the primary members of this class:
+
+    +---------------+---------------------------------------------------------------+
+    | Member        | Description                                                   |
+    +===============+===============================================================+
+    | href          | A url to the copyright.                                       |
+    +---------------+---------------------------------------------------------------+
+    """
 
     moniker = 'copyright'
 
     def __init__( self, href = '' ) :
+        """
+        :param href:    A url to the copyright.
+        """
 
         textModule.Text.__init__( self )
 
@@ -24,17 +45,33 @@ class Copyright( textModule.Text ) :
 
     @property
     def href( self ) :
-        """Returns self's href instance."""
+        """
+        Thie method returns self's href instance.
+
+        :returns:       A python str.
+        """
 
         return( self.__href )
 
     @href.setter
     def href( self, value ) :
+        """
+        This method sets the href member of *self* to *value*.
+
+        :param value:       The new href value for *self*.
+        """
 
         if( not( isinstance( value, str ) ) ) : raise TypeError( 'href must be a str instance.' )
         self.__href = value
 
     def XML_extraAttributes( self, **kwargs ) :
+        """
+        This methods returns the XML attributes for *self* as a single python str.
+
+        :kwargs:        This argument is not used.
+
+        :returns:       A python str.
+        """
 
         if( self.href == '' ) : return ''
 
@@ -42,7 +79,12 @@ class Copyright( textModule.Text ) :
 
     def parseNode(self, node, xPath, linkData, **kwargs):
         """
-        Parses a copyright node.
+        This method fills *self* by parsing the data in *node*.
+
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
         """
 
         textModule.Text.parseNode(self, node, xPath, linkData, **kwargs)

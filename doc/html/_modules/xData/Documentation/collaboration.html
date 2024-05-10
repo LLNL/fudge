@@ -47,18 +47,44 @@
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module contains the class for the GNDS documentation child node collaboration.</span>
+<span class="sd">This module contains the class for the GNDS documentation child node collaborations.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                     | Description                                                                       |</span>
+<span class="sd">    +===========================+===================================================================================+</span>
+<span class="sd">    | Collaboration             | This class represents a GNDS documentation/collaborations/collaboration node.     |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Collaborations            | This is the suite class for the GNDS documentation/collaborations node.           |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
 
 <div class="viewcode-block" id="Collaboration"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.collaboration.Collaboration">[docs]</a><span class="k">class</span> <span class="nc">Collaboration</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS documentation/collaborations/collaboration node.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represent a GNDS documentation/collaborations/collaboration node.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member        | Description                                                   |</span>
+<span class="sd">    +===============+===============================================================+</span>
+<span class="sd">    | name          | The name of the collaboration.                                |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | href          | TBD.                                                          |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;collaboration&#39;</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param name:    The nanme of the collaboration.</span>
+<span class="sd">        :param href:    TBD.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -67,17 +93,33 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s label instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns self&#39;s label.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">href</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s href instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns self&#39;s href.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Collaboration.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.collaboration.Collaboration.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">href</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">href</span> <span class="o">=</span> <span class="s1">&#39; href=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span>
@@ -86,6 +128,17 @@
 
 <div class="viewcode-block" id="Collaboration.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.collaboration.Collaboration.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;name&#39;</span> <span class="p">)</span>
         <span class="n">href</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;href&#39;</span> <span class="p">)</span>
@@ -93,6 +146,9 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="n">href</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Collaborations"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.collaboration.Collaborations">[docs]</a><span class="k">class</span> <span class="nc">Collaborations</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the suite class for the GNDS documentation/collaborations node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;collaborations&#39;</span>
     <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>

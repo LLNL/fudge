@@ -235,7 +235,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.abstractClasses.Component.parseNode">
 <span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/abstractClasses.html#Component.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.abstractClasses.Component.parseNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -356,6 +367,11 @@
 <dt class="sig sig-object py" id="fudge.documentation.Documentation.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/documentation.html#Documentation.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.documentation.Documentation.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -399,7 +415,18 @@ and the relative path to another file (unix path representation).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.externalFile.ExternalFile.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/externalFile.html#ExternalFile.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.externalFile.ExternalFile.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -417,6 +444,11 @@ and the relative path to another file (unix path representation).</p>
 <dt class="sig sig-object py" id="fudge.externalFile.ExternalFile.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/externalFile.html#ExternalFile.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.externalFile.ExternalFile.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -494,13 +526,29 @@ The parsed instance is also returned.  This currently assumes that the data are 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.institution.Institution.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#Institution.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.Institution.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.institution.Institution.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#Institution.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.Institution.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -534,7 +582,18 @@ The parsed instance is also returned.  This currently assumes that the data are 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.institution.UnknownInstitution.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#UnknownInstitution.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.UnknownInstitution.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1819,6 +1878,11 @@ products, and not any decay products.</p>
 <dt class="sig sig-object py" id="fudge.outputChannel.OutputChannel.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannel.html#OutputChannel.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannel.OutputChannel.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -2244,6 +2308,11 @@ particles, and not any intermediate particles.</p>
 <dt class="sig sig-object py" id="fudge.product.Product.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/product.html#Product.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.product.Product.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -3521,11 +3590,25 @@ attribute for the reactionSuite will be returned, otherwise, the target ID list 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.styles.GriddedCrossSection.findEntity">
 <span class="sig-name descname"><span class="pre">findEntity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entityName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#GriddedCrossSection.findEntity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.GriddedCrossSection.findEntity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default findEntity method. In general, sub-classes should over-ride this method.
+<dd><p>This method takes one part of an xpath (e.g., the ‘pathB’ in /pathA/pathB/pathC’) and returns a 
+reference to the instance of <em>self</em> that match that part of the xpath.
+Thie is a default findEntity method. In general, sub-classes should over-ride this method.
 This method uses the following algorithm to find entity. Firstly, if ‘attribute’ is None, then self is assumed
 to have an attribute named entityName which is taken to be the desired entity. Otherwise, self is iterated
-over until an item with an attribute named attribute with value value is found. In either case, if
-an entity is found, its moniker value must be entityName. If no entity is found, raise AttributeError.</p>
+over until an item with an attribute named attribute with value <em>value</em> is found. In either case, if
+an entity is found, its moniker value must be entityName. If no entity is found, a raise AttributeError is executed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entityName</strong> – <p>?</p>
+</p></li>
+<li><p><strong>attribute</strong> – <p>?</p>
+</p></li>
+<li><p><strong>value</strong> – <p>?</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -4051,11 +4134,25 @@ object before it is returned in the tuple.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.styles.Styles.findEntity">
 <span class="sig-name descname"><span class="pre">findEntity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entityName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#Styles.findEntity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.Styles.findEntity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default findEntity method. In general, sub-classes should over-ride this method.
+<dd><p>This method takes one part of an xpath (e.g., the ‘pathB’ in /pathA/pathB/pathC’) and returns a 
+reference to the instance of <em>self</em> that match that part of the xpath.
+Thie is a default findEntity method. In general, sub-classes should over-ride this method.
 This method uses the following algorithm to find entity. Firstly, if ‘attribute’ is None, then self is assumed
 to have an attribute named entityName which is taken to be the desired entity. Otherwise, self is iterated
-over until an item with an attribute named attribute with value value is found. In either case, if
-an entity is found, its moniker value must be entityName. If no entity is found, raise AttributeError.</p>
+over until an item with an attribute named attribute with value <em>value</em> is found. In either case, if
+an entity is found, its moniker value must be entityName. If no entity is found, a raise AttributeError is executed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entityName</strong> – <p>?</p>
+</p></li>
+<li><p><strong>attribute</strong> – <p>?</p>
+</p></li>
+<li><p><strong>value</strong> – <p>?</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4182,6 +4279,12 @@ label is an empty string (i.e., ‘’), that moniker has not data.</p>
 <p>For a given temperature, stores the labels for each type of processed style. The list of processed styles represented 
 are Heated, GriddedCrossSection, URR_probabilityTables, HeatedMultiGroup and SnElasticUpScatter. If a style is not 
 present, its label will be an empty string.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.styles.TemperatureInfo.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#TemperatureInfo.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.TemperatureInfo.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method prints each member of <em>self</em> and information about its.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -4418,7 +4521,8 @@ If newItem is not an allowed class, a TypeError is raised.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.suites.Suite.checkAncestry">
 <span class="sig-name descname"><span class="pre">checkAncestry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#Suite.checkAncestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.Suite.checkAncestry" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method checks that all ancestryMembers are properly set up. This method checks <em>self</em> and all its child nodes.</p>
+<dd><p>This method checks that all ancestryMembers are properly set up. This method checks <em>self</em> and all its child nodes as
+determined by the <em>ancestryMembers</em> member.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4480,7 +4584,18 @@ If newItem is not an allowed class, a TypeError is raised.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.suites.Suite.parseNode">
 <span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#Suite.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.Suite.parseNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4536,6 +4651,11 @@ If newItem is not an allowed class, a TypeError is raised.</p>
 <dt class="sig sig-object py" id="fudge.suites.Suite.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#Suite.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.Suite.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4633,7 +4753,18 @@ based on item’s label appended with ‘__’ and one or more lower case letter
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.sums.CrossSectionSum.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/sums.html#CrossSectionSum.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.sums.CrossSectionSum.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4686,6 +4817,11 @@ Otherwise sum the evaluated style.
 <dt class="sig sig-object py" id="fudge.sums.CrossSectionSum.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/sums.html#CrossSectionSum.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.sums.CrossSectionSum.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -4750,7 +4886,18 @@ Otherwise sum the evaluated style.
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.sums.MultiplicitySum.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/sums.html#MultiplicitySum.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.sums.MultiplicitySum.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4768,6 +4915,11 @@ Otherwise sum the evaluated style.
 <dt class="sig sig-object py" id="fudge.sums.MultiplicitySum.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/sums.html#MultiplicitySum.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.sums.MultiplicitySum.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -4817,6 +4969,11 @@ Otherwise sum the evaluated style.
 <dt class="sig sig-object py" id="fudge.sums.Summands.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/sums.html#Summands.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.sums.Summands.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -4876,7 +5033,18 @@ could extend to other types of sums later.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.sums.Sums.parseNode">
 <span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/sums.html#Sums.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.sums.Sums.parseNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4889,6 +5057,11 @@ could extend to other types of sums later.</p>
 <dt class="sig sig-object py" id="fudge.sums.Sums.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/sums.html#Sums.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.sums.Sums.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

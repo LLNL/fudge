@@ -5,6 +5,18 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module contains classes for handling a GNDS values container.
+
+This module contains the following classes:
+
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | Values                            | This class represents a GNDS values container.                        |
+    +-----------------------------------+-----------------------------------------------------------------------+
+"""
+
 import copy
 
 from fudge import GNDS_formatVersion as GNDS_formatVersionModule
@@ -18,10 +30,41 @@ from . import enums as enumsModule
 from . import base as baseModule
 
 class Values(baseModule.XDataCoreMembers):
+    """
+    This class is used to store a list of numbers. The type of the numbers (e.g., floats, ints) stored is specified by 
+    the *valueType* member.  The list of all numbers the instance represents may be greater than the number of values 
+    in the *values* member as leading and trailing zero values do not have to be stored in the *values* member. 
+    The *start* member specifies the index of the first value in the *values* member with all values before *start* being zero. 
+    The *length* member specifies the total number of values the instance represents, including leading and trailing zero values.
+
+    The following table list the primary members of this class:
+
+    +---------------+-----------------------------------------------------------------------------------+
+    | Member        | Description                                                                       |
+    +===============+===================================================================================+
+    | start         | The index of the data represented by the first data value in the values member.   |
+    +---------------+-----------------------------------------------------------------------------------+
+    | length        | The total number of data values the instance represents, including leading and    |
+    |               | trailing zero values that are not stored in the *values* member.                  |
+    +---------------+-----------------------------------------------------------------------------------+
+    | values        | A list of the values not including the first *start* values which are 0.0 or      |
+    |               | trailing 0.0 values.                                                              |
+    +---------------+-----------------------------------------------------------------------------------+
+    | valueType     | The type of data stored in the values member.                                     |
+    +---------------+-----------------------------------------------------------------------------------+
+    """
 
     moniker = 'values'
 
     def __init__(self, _values, valueType=enumsModule.ValueType.float64, start=0, length=None, index=None, label=None):
+        """
+        :param _values:         The list of the values to store.
+        :param valueType:       The type of the data stored in the values member.
+        :param start:           The index of the data represented by the first data value in the values member.
+        :param length:          The total number of data values the instance represents, including leading and trailing zero values that are not stored in the *values* member.
+        :param index:           This is not used.
+        :param label:           The label of the values instance.
+        """
 
         baseModule.XDataCoreMembers.__init__(self, index=index, label=label)
 
@@ -40,18 +83,31 @@ class Values(baseModule.XDataCoreMembers):
 
     def __len__(self):
         """
-        Returns the number of stored values in *self*. The actual number of values that *self* represents is returned by **self.length** which
-        includes leading and trailing zeros not stored by *self*.
+        This method returns the number of stored values in *self*. The actual number of values that *self* represents is returned by the 
+        *length* method which includes leading and trailing zeros not stored by *self*.
+
+        :returns:           A python int.
         """
 
         return len(self.__values)
 
     def __getitem__(self, index):
+        """
+        This returns the stored value a index *index* - 1. Note, this will not be the value represented by *self* if *start* is not 0.
+
+        :param index:   An index into the stored numbers.
+
+        :returns:       A number of type *valueType*.
+        """
 
         return self.__values[index]
 
     def copy(self, untrimZeros = False):
-        """Returns a **values** instance that is a copy of *self*."""
+        """
+        Returns a :py:class:`Values instance that is a copy of *self*.
+
+        :returns:       An instance of :py:class:`Values`.
+        """
 
         start = self.start
         length = self.length
@@ -67,31 +123,51 @@ class Values(baseModule.XDataCoreMembers):
 
     @property
     def end(self):
-        """Returns the number of values not including the trailing zeros that are not stored."""
+        """
+        This method returns the number of values not including the trailing zeros that are not stored. Ergo, returns *start* + the number of stored values.
+
+        :returns:       A python int.
+        """
 
         return self.__start + len(self)
 
     @property
     def length(self):
         """
-        Returns the actual number of values represent by *self* which includes leading and trailing zeros not stored by *self*.
+        This method returns the actual number of values represented by *self* which includes leading and trailing zeros not stored by *self*.
+
+        :returns:       A python int.
         """
 
         return self.__length
 
     @property
     def start(self):
-        """Returns the index represent by the first value of *self*. All values before *start* are zeros and are not store by *self*."""
+        """
+        Returns the index represent by the first value of *self*. All values before *start* are zeros and are not store by *self*.
+
+        :returns:       A python int.
+        """
 
         return self.__start
 
     @property
     def values(self):
+        """
+        This method returns a reference to *self*'s values member.
+
+        :returns:       A python list.
+        """
 
         return self.__values
 
     @values.setter
     def values(self, _values):
+        """
+        This member sets the *values* member of *self* to *_values*
+
+        :param _values:     The new list of values for *self*.
+        """
 
         if self.valueType == enumsModule.ValueType.float64:
             checker = float
@@ -105,20 +181,42 @@ class Values(baseModule.XDataCoreMembers):
 
     @property
     def valueType(self):
+        """
+        This method returns the type of numbers stored in *self*.
+        """
 
         return self.__valueType
 
 
     def offsetScaleValues(self, offset, scale):
+        """
+        This method multiplies each value of *self* by *scale* and then adds *offset* to the value.
+
+        :param offset:      The offset for each value.
+        :param scale:       The multiplying factor for each value.
+        """
 
         for i1, value in enumerate(self.__values): self.__values[i1] = value * scale + offset
 
     def toString(self):
+        """
+        This method returns a simple string representation of the stored values of *self*.
+
+        :returns:       A python str.
+        """
 
         strList = [ "%s" % value for value in self.__values ]
         return ' '.join(strList)
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         def intValueFormatter(value, significantDigits = 0):     # Ignores significantDigits.
 
@@ -191,6 +289,17 @@ class Values(baseModule.XDataCoreMembers):
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
+        """
 
         attrs = {      'valueType': enumsModule.ValueType.float64,      'start': 0,   'length': None, 'label': None }
         attributes = { 'valueType': str,                                'start': int, 'length': int,  'label': str }
@@ -234,8 +343,13 @@ class Values(baseModule.XDataCoreMembers):
     @staticmethod
     def sortAndThin(_values, rel_tol = 0.0, abs_tol = 0.0):
         """
-        This function sorts the list of _values into an ascending order and then thins the list. 
+        This function sorts the list of float in *_values* into an ascending order and then thins the list. 
         If there are 2 or fewer points in _values, nothing is done.
+
+        :param rel_tol:     Relative tolerance used to determine if two consecutive points are too close.
+        :param abs_tol:     Abolute tolerance used to determine if two consecutive points are too close.
+
+        :returns:       A pythoh list of the sorted, thinned values.
         """
 
         __values = [ float(value) for value in _values ]
@@ -261,8 +375,10 @@ class Values(baseModule.XDataCoreMembers):
     @staticmethod
     def valuesWithTrimmedZeros(values1, valueType=enumsModule.ValueType.float64):
         """
-        This method determines the *start* and *end* of the non-zero data in *values1* and returns a **values** instance with
+        This method determines the *start* and *end* of the non-zero data in *values1* and returns a :py:class`Values` instance with
         *start* and *length* set accordingly.
+
+        :returns:       A :py:class`Values` instance.
         """
 
         length = len(values1)

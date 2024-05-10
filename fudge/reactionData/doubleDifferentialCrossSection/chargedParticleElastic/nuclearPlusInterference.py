@@ -4,10 +4,25 @@
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
-"""
-nuclearPlusInterference separates charged-particle elastic scattering into two terms:
- - (cross section) - (pure Rutherford cross section), integrated from mu = -1 up to a cut-off angle mu_cutoff
- - the distribution (P(mu|E) - P(mu|E)_Rutherford) / cross section), defined for mu = -1 to mu_cutoff
+
+r"""
+This module contains the classes for representing the nuclear + interference term of the elastic scattering of two nuclei.
+The main class is the :py:class:`NuclearPlusInterference` class which stores the double differential cross section as
+the product :math:`\sigma(E) \, P(\mu|E)`. The :math:`\sigma(E)` most be an instance of :py:class:`CrossSection` and
+the :math:`P(\mu|E)` most be an instance of :py:class:`Distribution`.
+
+This module contains the following classes:
+        
+    +---------------------------+-----------------------------------------------------------------------------------+
+    | Class                     | Description                                                                       |
+    +===========================+===================================================================================+
+    | CrossSection              | This class represents the :math:`\sigma(E)` part of :math:`\sigma(E) \, P(\mu|E)`.|
+    +---------------------------+-----------------------------------------------------------------------------------+
+    | Distribution              | This class represents the :math:`P(\mu|E)` part of :math:`\sigma(E) \, P(\mu|E)`. |
+    +---------------------------+-----------------------------------------------------------------------------------+
+    | NuclearPlusInterference   | This is an exception class that is raised when a method of the                    |
+    |                           | :py:class:`Form` cannot perform its calculation.                                  |
+    +---------------------------+-----------------------------------------------------------------------------------+
 """
 
 import math
@@ -20,12 +35,18 @@ from fudge.productData.distributions import angular as angularModule
 from . import misc as miscModule
 
 class CrossSection(miscModule.ChargedParticleElasticTerm):
+    """
+    This class represents the :math:`\sigma(E)` part of :math:`\sigma(E) \, P(\mu|E)`
+    """
 
     moniker = 'crossSection'
 
     allowedDataForms = (crossSectionModule.XYs1d, crossSectionModule.Regions1d)
 
 class Distribution( miscModule.ChargedParticleElasticTerm):
+    """
+    This class represents the :math:`P(\mu|E)` part of :math:`\sigma(E) \, P(\mu|E)`.
+    """
 
     moniker = 'distribution'
 
@@ -33,10 +54,33 @@ class Distribution( miscModule.ChargedParticleElasticTerm):
 
 
 class NuclearPlusInterference( ancestryModule.AncestryIO ):
+    """
+    This class represents the nuclear + interference term of the elastic scattering of two nuclei and
+    stores the double differential cross section as the product :math:`\sigma(E) \, P(\mu|E)`.
+    In :math:`P(\mu|E)` the :math:`\mu` ranges from muMin to muCutoff where muCutoff is a member of this
+    class and muMin is -muCutoff for identical particles and -1 otherwise.
+
+    The following table list the primary members of this class:
+
+    +-------------------+-------------------------------------------------------------------------------+
+    | Member            | Description                                                                   |
+    +===================+===============================================================================+
+    | muCutoff          | The maximum :math:`\mu` value the data represent.                             |
+    +-------------------+-------------------------------------------------------------------------------+
+    | crossSection      | The cross section part of the nuclear + interference term.                    |
+    +-------------------+-------------------------------------------------------------------------------+
+    | distribution      | The distribution part of the nuclear + interference term.                     |
+    +-------------------+-------------------------------------------------------------------------------+
+    """
 
     moniker = "nuclearPlusInterference"
 
     def __init__( self, muCutoff, crossSection = None, distribution = None ):
+        """
+        :param muCutoff:        The maximum :math:`\mu` value the data represent.
+        :param crossSection:    The cross section part of the nuclear + interference term.
+        :param distribution:    The distribution part of the nuclear + interference term.
+        """
 
         ancestryModule.AncestryIO.__init__( self )
         self.__muCutoff = muCutoff
@@ -44,14 +88,25 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
         self.distribution = distribution
 
     @property
-    def muCutoff(self): return self.__muCutoff
+    def muCutoff(self):
+        """This methods returns the value of *muCutoff*."""
+
+        return self.__muCutoff
 
     @property
     def crossSection( self ):
+        """This methods returns a reference to the cross section member."""
+
         return self.__crossSection
 
     @crossSection.setter
     def crossSection(self, value):
+        """
+        This methods set the cross section member to *value*.
+
+        :param value:   The cross section.
+        """
+
         if not isinstance(value, CrossSection):
             raise TypeError( '%s cross section must be instance of %s' % (self.moniker, CrossSection.moniker))
         value.setAncestor( self )
@@ -59,56 +114,75 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
 
     @property
     def distribution( self ):
+        """This methods returns a reference to the distribution member."""
+
         return self.__distribution
 
     @distribution.setter
     def distribution(self, value):
+        """
+        This methods set the distribution member to *value*.
+
+        :param value:   The distribution.
+        """
+
         if not isinstance(value, Distribution):
             raise TypeError( '%s distribution must be instance of %s' % (self.moniker, Distribution.moniker))
         value.setAncestor( self )
         self.__distribution = value
 
     @property
-    def domainMin(self): return self.crossSection.data.domainMin
+    def domainMin(self):
+        """Returns the minimum projectile energy for *self*.""" 
+
+        return self.crossSection.data.domainMin
 
     @property
-    def domainMax(self): return self.crossSection.data.domainMax
+    def domainMax(self):
+        """Returns the maximum projectile energy for *self*.""" 
+
+        return self.crossSection.data.domainMax
 
     @property
-    def domainUnit(self): return self.crossSection.data.domainUnit
+    def domainUnit(self):
+        """Returns the energy unit of the projectile."""
+
+        return self.crossSection.data.domainUnit
 
     @property
     def identicalParticles( self ) :
+        """This function returns True if the projectile and target are the same paritcle type and False otherwise."""
 
         return( self.ancestor.identicalParticles )
 
     def check( self, info ):
         """
-        Things to check: mu_cutoff should be between 0.99 and 1.0,
-        domain of effective xsc / distribution should match,
-        if identical particles distribution should only be for 0->muCutoff, otherwise -1->muCutoff
-        distribution should be normalized
-        If the cross section goes negative, also check that the pure Coulomb portion is large enough to 'win'
-        :return:
+        This method currently does nothing.
         """
+
         return []
         raise NotImplementedError
 
     def convertUnits( self, unitMap ):
+        """
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.crossSection.convertUnits( unitMap )
         self.distribution.convertUnits( unitMap )
 
     def dSigma_dMu(self, energy, accuracy=1e-3, muMax=None, probability=False):
         """
-        Returns d(Sigma)/d(mu) at the specified incident energy if probability is **False** and P(mu) otherwise.
+        Returns :math:`d\sigma / d\mu` at the specified projdctile energy.
+                
+        :param energy:          Energy of the projectile.
+        :param accuracy:        This argument is not used.
+        :param muMax:           Slices the upper domain mu to this value.
+        :param probability:     If True P(mu) is returned instead of d(Sigma)/d(mu).
 
-        :param energy:      Energy of the projectile.
-        :param accuracy:    Currently not used. Only need to be compatible with other *dSigma_dMu* methods.
-        :param muMax:       Slices the upper domain mu to this value.
-        :param probability: If **True** P(mu) is returned instead of d(Sigma)/d(mu).
-
-        :return:            d(Sigma)/d(mu) at *energy* of P(mu) if probability is **True**.
+        :return:                A :py:class:`angularModule.XYs1d` instance.
         """
 
         distribution = self.distribution.data.evaluate( energy )
@@ -133,10 +207,16 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
         return _dSigma_dMu
 
     def evaluate( self, E, mu, phi = 0.0 ) :
-        """
-        :param E: incident energy
-        :param mu: scattering angle cosine
-        :return: differential cross section at E,mu (integrated over phi) in b/sr
+        r"""
+        Returns the :math:`d\sigma / d \Omega(energy,\mu,\phi) for Rutherford scattering. Note, Rutherford
+        scattering is independent of phi but phi is listed as an argument to be consistent with others
+        :math:`d\sigma / d\Omega` that may depend on phi.
+
+        :param energy:  Projectile energy.
+        :param mu:      Scattering angle cosine.
+        :param phi:     The scattering azimuthal angle.
+
+        :returns:       A float.
         """
 
         if self.identicalParticles:
@@ -149,6 +229,14 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
         return abs( self.crossSection.data.evaluate( E ) ) * angular.evaluate( mu ) / ( 2 * math.pi )
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent+kwargs.get('incrementalIndent','  ')
         xml = [ '%s<%s muCutoff="%s">' % (indent, self.moniker, self.muCutoff) ]
@@ -159,6 +247,17 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
 
@@ -179,5 +278,11 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
 
     @staticmethod
     def defaultAxes( energyUnit, crossSectionUnit = 'b' ) :
+        """
+        This function returns an :py:class:`axesModule.Axes` instance for a double difference cross section.
+
+        :param energyUnit:          The unit for energy.
+        :oaram crossSectionUnit:    The unit for cross section.
+        """
 
         return( miscModule.defaultAxes( energyUnit, crossSectionUnit ) )

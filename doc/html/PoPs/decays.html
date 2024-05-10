@@ -107,7 +107,7 @@ being emitted sequentially.</p>
 <dd><p>Uses deepcopy to make a copy of self.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>copy of self</p>
+<dd class="field-odd"><p>A copy of self.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -115,13 +115,29 @@ being emitted sequentially.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.decayData.Decay.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#Decay.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.Decay.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.decayData.Decay.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#Decay.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.Decay.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -162,13 +178,29 @@ and a list of decay modes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.decayData.DecayData.parseNode">
 <span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayData.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayData.parseNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.decayData.DecayData.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayData.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayData.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -211,13 +243,29 @@ and/or photon emission probabilities.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.decayData.DecayMode.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayMode.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayMode.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.decayData.DecayMode.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayMode.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayMode.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -244,7 +292,18 @@ having the same key.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.decayData.DecayModes.parseNode">
 <span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayModes.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayModes.parseNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -271,7 +330,18 @@ having the same key.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.decayData.DecayPath.parseNode">
 <span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/decayData.html#DecayPath.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.decayData.DecayPath.parseNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -321,7 +391,18 @@ having the same key.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AverageEnergies.parseNode">
 <span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AverageEnergies.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AverageEnergies.parseNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -338,18 +419,27 @@ having the same key.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AverageEnergy.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AverageEnergy.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AverageEnergy.copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uses deepcopy to make a copy of self.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>copy of self</p>
-</dd>
-</dl>
+<dd><p>This method returns a copy of <em>self</em>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.averageEnergy.AverageEnergy.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/averageEnergy.html#AverageEnergy.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.averageEnergy.AverageEnergy.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>Parse <em>node</em> into an instance of <em>cls</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> – Form class to return.</p></li>
+<li><p><strong>node</strong> – Node to parse.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary of extra arguments that controls how <em>self</em> is converted to a list of XML strings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of <em>cls</em> representing <em>node</em>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -527,13 +617,29 @@ Discrete radiation may be accompanied by internalConversionCoefficients, interna
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.spectrum.Continuum.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Continuum.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Continuum.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.spectrum.Continuum.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Continuum.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Continuum.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -566,7 +672,7 @@ Should only be used with electron capture / beta+ decays</p></li>
 <dd><p>Uses deepcopy to make a copy of self.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>copy of self</p>
+<dd class="field-odd"><p>A copy of self.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -574,13 +680,29 @@ Should only be used with electron capture / beta+ decays</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.spectrum.Discrete.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Discrete.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Discrete.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.spectrum.Discrete.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Discrete.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Discrete.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -672,7 +794,18 @@ having the same key.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectra.parseNode">
 <span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectra.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectra.parseNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -726,13 +859,29 @@ having the same key.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectrum.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectrum.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectrum.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.spectrum.Spectrum.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Spectrum.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Spectrum.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -748,23 +897,41 @@ having the same key.</p></li>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.spectrum.Unitless.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Unitless.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Unitless.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="PoPs.decays.spectrum.Unitless.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Unitless.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Unitless.copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uses deepcopy to make a copy of self.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>copy of self</p>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – This is the value of the physical quantity.</p></li>
+<li><p><strong>unit</strong> – This is the unit of the physical quantity.</p></li>
+<li><p><strong>label</strong> – This is the label of the physical quantity.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="PoPs.decays.spectrum.Unitless.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Unitless.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Unitless.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a copy of <em>self</em>.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.spectrum.Unitless.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/spectrum.html#Unitless.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.spectrum.Unitless.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>Parse <em>node</em> into an instance of <em>cls</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> – Form class to return.</p></li>
+<li><p><strong>node</strong> – Node to parse.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary of extra arguments that controls how <em>self</em> is converted to a list of XML strings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of <em>cls</em> representing <em>node</em>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -795,7 +962,7 @@ having the same key.</p></li>
 <dd><p>Uses deepcopy to make a copy of self.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>copy of self</p>
+<dd class="field-odd"><p>A copy of self.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -803,13 +970,29 @@ having the same key.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.product.Product.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Product.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Product.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.product.Product.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Product.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Product.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -835,7 +1018,18 @@ having the same key.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="PoPs.decays.product.Suite.parseNode">
 <span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/product.html#Suite.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.product.Suite.parseNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

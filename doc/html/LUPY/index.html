@@ -126,6 +126,35 @@ to reference any other node in the hierarchy provided that each node of the hier
 from one of the ancestry classes and the method <a class="reference internal" href="#LUPY.ancestry.Ancestry.setAncestor" title="LUPY.ancestry.Ancestry.setAncestor"><code class="xref py py-func docutils literal notranslate"><span class="pre">Ancestry.setAncestor()</span></code></a> is called to
 contect a child node to its parent node.</p>
 <p>This module was mainly written to support linking and xpath referencing in a GNDS hierarchy.</p>
+<blockquote>
+<div><p>This module contains the following classes:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Ancestry</p></td>
+<td><p>Base class used by other ancestry classes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>AncestryIO_base</p></td>
+<td><p>This class adds reading and writing methods.</p></td>
+</tr>
+<tr class="row-even"><td><p>AncestryIO</p></td>
+<td><p>Base class for <code class="xref py py-class docutils literal notranslate"><span class="pre">FSubform</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">FSubform</span></code>,</p></td>
+</tr>
+<tr class="row-odd"><td><p>AncestryIO_bare</p></td>
+<td><p>This is an abstruct class that defined the abstract
+method <code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO_bare.parseNodeUsingClass</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p>AncestryIO_base</p></td>
+<td><p>This is an abstruct class that defined the abstract
+method <a class="reference internal" href="#LUPY.ancestry.AncestryIO_bare.parseNode" title="LUPY.ancestry.AncestryIO_bare.parseNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO_bare.parseNode</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 <dl class="py class">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.ancestry.</span></span><span class="sig-name descname"><span class="pre">Ancestry</span></span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry" title="Permalink to this definition">¶</a></dt>
@@ -155,16 +184,15 @@ position relative to another member in the hierarchy using xlinks.</p>
 <td><p>A map whose keys are legacy member names and whose associated values are the current memeber names.</p></td>
 </tr>
 <tr class="row-even"><td><p>monikerByFormat</p></td>
-<td><p>If the moniker had a different name for in a prior format version, then this is a dict of key/value where
-key it the format version and its associated value is the moniker used for that format version.</p></td>
+<td><p>If the moniker had a different name for in a prior format version, then this is a dict of key/value where</p></td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
-<p>This class defines moniker to be abstract meaning that all classes that inherit from this class must define moniker.
+<p>This class defines the member moniker to be an abstract member, meaning that all classes that inherit from this class must define moniker.
 The main reason for the <strong>keyName</strong> is that is it used by a <strong>Suite</strong> instance to reference (i.e., uniquely identify) its children.</p>
-<p>An instance has the xlink ‘/the/list/of/ancestors/andSelf’ if attribute is None or
-‘/the/list/of/ancestors/andSelf[&#64;attribute=”value”]’ if attribute is not None where each string
+<p>An instance has the xlink ‘/the/list/of/ancestors/andSelf’ if its attribute member is None or
+‘/the/list/of/ancestors/andSelf[&#64;attribute=”value”]’ if its attribute member is not None where each string
 part of the xpath the value of the moniker for that node. For example,
 for a hierarchy consisting of:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">A</span> <span class="k">with</span> <span class="n">moniker</span> <span class="s1">&#39;nameA&#39;</span> <span class="ow">and</span> 
@@ -173,12 +201,12 @@ for a hierarchy consisting of:</p>
 </pre></div>
 </div>
 <p>then the xlink for an instance of a C class in the hierarchy is ‘/nameA/nameB/nameC’. If the mC instance
-set attribute to be the member ‘greeting’ that, for this example as value ‘Hi’, then the
+set the attribute member to ‘greeting’, then for this example with value ‘Hi’, then the
 xlink for the C class is ‘/nameA/nameB/nameC[&#64;greeting=”Hi”]’.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.ancestor">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ancestor</span></span><a class="headerlink" href="#LUPY.ancestry.Ancestry.ancestor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self’s ancestor.</p>
+<dd><p>Returns self’s ancestor. That is, its parent.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -189,7 +217,8 @@ xlink for the C class is ‘/nameA/nameB/nameC[&#64;greeting=”Hi”]’.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.checkAncestry">
 <span class="sig-name descname"><span class="pre">checkAncestry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.checkAncestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.checkAncestry" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method checks that all ancestryMembers are properly set up. This method checks <em>self</em> and all its child nodes.</p>
+<dd><p>This method checks that all ancestryMembers are properly set up. This method checks <em>self</em> and all its child nodes as
+determined by the <em>ancestryMembers</em> member.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -198,7 +227,7 @@ xlink for the C class is ‘/nameA/nameB/nameC[&#64;greeting=”Hi”]’.</p>
 <dd><p>Uses deepcopy to make a copy of self.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>copy of self</p>
+<dd class="field-odd"><p>A copy of self.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -206,21 +235,58 @@ xlink for the C class is ‘/nameA/nameB/nameC[&#64;greeting=”Hi”]’.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.findAttributeInAncestry">
 <span class="sig-name descname"><span class="pre">findAttributeInAncestry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attributeName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.findAttributeInAncestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.findAttributeInAncestry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This method checks if <em>self</em> has an member (i.e., attribute) with name <em>attributeName</em>. If so, it returns its value. If
+not, this method recursively searches up the ancestry tree by calling <a class="reference internal" href="#LUPY.ancestry.Ancestry.findAttributeInAncestry" title="LUPY.ancestry.Ancestry.findAttributeInAncestry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ancestry.findAttributeInAncestry</span></code></a> on its ancestor.
+If root is reached and no member named <em>attributeName</em> is found, a raise is executed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>attributeName</strong> – The name of the member whose value it to be returned.</p>
+</dd>
+<dt class="field-even">Raise<span class="colon">:</span></dt>
+<dd class="field-even"><p>If member with name <em>attributeName</em> is not found in self or its ancestry.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.findClassInAncestry">
 <span class="sig-name descname"><span class="pre">findClassInAncestry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.findClassInAncestry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.findClassInAncestry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This method checks if <em>self</em> has an member that is an instance of <em>class_</em>. If so, a reference to it is returned.
+If not, this method recursively searches up the ancestry tree by calling <a class="reference internal" href="#LUPY.ancestry.Ancestry.findClassInAncestry" title="LUPY.ancestry.Ancestry.findClassInAncestry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ancestry.findClassInAncestry</span></code></a> on its ancestor
+until an instance of <em>class_</em> is found or root is reached. If root is reached and no instance of <em>class_</em> found,
+a raise is executed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>class</strong> – The class to search for in self and its ancestors.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p>If an instance of class <em>class_</em> is not found in self or its ancestry.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.findEntity">
 <span class="sig-name descname"><span class="pre">findEntity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entityName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.findEntity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.findEntity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default findEntity method. In general, sub-classes should over-ride this method.
+<dd><p>This method takes one part of an xpath (e.g., the ‘pathB’ in /pathA/pathB/pathC’) and returns a 
+reference to the instance of <em>self</em> that match that part of the xpath.
+Thie is a default findEntity method. In general, sub-classes should over-ride this method.
 This method uses the following algorithm to find entity. Firstly, if ‘attribute’ is None, then self is assumed
 to have an attribute named entityName which is taken to be the desired entity. Otherwise, self is iterated
-over until an item with an attribute named attribute with value value is found. In either case, if
-an entity is found, its moniker value must be entityName. If no entity is found, raise AttributeError.</p>
+over until an item with an attribute named attribute with value <em>value</em> is found. In either case, if
+an entity is found, its moniker value must be entityName. If no entity is found, a raise AttributeError is executed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entityName</strong> – <p>?</p>
+</p></li>
+<li><p><strong>attribute</strong> – <p>?</p>
+</p></li>
+<li><p><strong>value</strong> – <p>?</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -232,15 +298,16 @@ an entity is found, its moniker value must be entityName. If no entity is found,
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.followXPath">
 <span class="sig-name descname"><span class="pre">followXPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.followXPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.followXPath" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>This method returns the instance referenced to by the xpath <em>xPath</em> starting at <em>self</em> if the xpath is relative.
+This method uses Ancestry.findEntity to find each part of the xpath.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>xPath</strong> – string xPath, e.g. “/reactionSuite/reactions/reaction[&#64;label=’2’]”</p>
+<dd class="field-odd"><p><strong>xPath</strong> – String xPath, e.g., “/reactionSuite/reactions/reaction[&#64;label=’2’]”.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>class instance pointed to by xPath</p>
+<dd class="field-even"><p>Class instance pointed to by xPath</p>
 </dd>
 </dl>
-<p>Uses Ancestry.findEntity to find each element</p>
 </dd></dl>
 
 <dl class="py method">
@@ -261,7 +328,7 @@ an entity is found, its moniker value must be entityName. If no entity is found,
 <dl class="py property">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.keyValue">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">keyValue</span></span><a class="headerlink" href="#LUPY.ancestry.Ancestry.keyValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self’s keyValue. If keyName is <em>None</em>, then <em>None</em> is returned.</p>
+<dd><p>Returns self’s keyValue as determined by the member <em>keyName</em>. If keyName is None, then None is returned.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -272,7 +339,8 @@ an entity is found, its moniker value must be entityName. If no entity is found,
 <dl class="py property">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.moniker">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">moniker</span></span><a class="headerlink" href="#LUPY.ancestry.Ancestry.moniker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Abstract method that must be defined by all classes that inherit this class. Must return the moniker of the instance.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.monikerByFormat">
@@ -314,7 +382,7 @@ those members which are not defined by the <a class="reference internal" href="#
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.rootAncestor">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rootAncestor</span></span><a class="headerlink" href="#LUPY.ancestry.Ancestry.rootAncestor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Traverse up the ancestry tree to the root ancestor and returns a reference to it. 
-The root ancestor is the instance whose ancestor is None.</p>
+The root ancestor is the ancestor instance whose ancestor is None.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -345,10 +413,22 @@ xlink starts at the root element. For a description of xpath, see
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.ancestry.</span></span><span class="sig-name descname"><span class="pre">AncestryIO</span></span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#LUPY.ancestry.AncestryIO_base" title="LUPY.ancestry.AncestryIO_base"><code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO_base</span></code></a></p>
+<p>This is an abstruct class that defined the abstract method <code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO_bare.parseNodeUsingClass</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO.parseNodeUsingClass">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -357,10 +437,22 @@ xlink starts at the root element. For a description of xpath, see
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_bare">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.ancestry.</span></span><span class="sig-name descname"><span class="pre">AncestryIO_bare</span></span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_bare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_bare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#LUPY.ancestry.AncestryIO_base" title="LUPY.ancestry.AncestryIO_base"><code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO_base</span></code></a></p>
+<p>This is an abstruct class that defined the abstract method <a class="reference internal" href="#LUPY.ancestry.AncestryIO_bare.parseNode" title="LUPY.ancestry.AncestryIO_bare.parseNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO_bare.parseNode</span></code></a>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_bare.parseNode">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_bare.parseNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_bare.parseNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -373,36 +465,86 @@ xlink starts at the root element. For a description of xpath, see
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.parseAncestryMembers">
 <span class="sig-name descname"><span class="pre">parseAncestryMembers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.parseAncestryMembers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.parseAncestryMembers" title="Permalink to this definition">¶</a></dt>
-<dd><p>The method parses all member of <em>self.ancestryMembers</em> found in <em>node</em>. If <em>kwargs</em> contains the key <em>membersToSkip</em>
-then all members of <em>self</em> whose moniker is in the list <em>kwargs[‘membersToSkip’] are not parsed. This, for example,
-allows the calling instance to parse the *externalFiles</em> member and set up needed entries into <em>kwargs</em>.</p>
+<dd><p>The method parses all members defined in the ancestryMembers of <em>self</em> that are  found in <em>node</em>.  If <em>kwargs</em> contains 
+the key <em>membersToSkip</em> then all members of <em>self</em> whose moniker is in the list <em>kwargs[‘membersToSkip’] are not parsed. 
+This, for example, allows the calling instance to parse the *externalFiles</em> member and set up needed entries into <em>kwargs</em>.</p>
 <p>This method returns a dictionary and a list. The dictionary contains all child nodes of <em>node</em> not parsed, including 
 those specified by membersToSkip. The keys in the dictionary are the member monikers and the items are their associated 
 child node of <em>node</em>. The list contains all monikers for the <em>ancestryMembers</em> not in <em>node</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.parseCleanup">
 <span class="sig-name descname"><span class="pre">parseCleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.parseCleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.parseCleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method does nothing. A place holder incase the derived class needs one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.parseXMLString">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseXMLString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.parseXMLString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.parseXMLString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses a XML string using class <em>cls</em>.</p>
+<dd><p>This method parses a XML string to construct an instance of <em>cls</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> – String to parse.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of <em>cls</em>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.readXML_file">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">readXML_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.readXML_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.readXML_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads and parses an XML file using class <em>cls</em>.</p>
+<dd><p>This methods reads and parses the data in file <em>fileName</em> to construct an instance of <em>cls</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> – The class to construct from the data in file <em>fileName</em>.</p></li>
+<li><p><strong>fileName</strong> – Path to the file used to construct an instance of <em>cls</em>.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of <em>cls</em>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.saveToFile">
 <span class="sig-name descname"><span class="pre">saveToFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.saveToFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.saveToFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes an XML representation of <em>self</em> to path <em>fileName</em>. This methods opens the file and calls <strong>saveToOpenedFile</strong> and then closes the file.</p>
+<dd><p>Writes an XML representation of <em>self</em> to path <em>fileName</em>. This method opens the file and calls <strong>saveToOpenedFile</strong> 
+and then closes the file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fileName</strong> – File path to write <em>self</em> to.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -410,8 +552,8 @@ child node of <em>node</em>. The list contains all monikers for the <em>ancestry
 <span class="sig-name descname"><span class="pre">saveToHybrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">XML_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">HDF_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">HDF_subDir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minLength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.saveToHybrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.saveToHybrid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Saves <em>self</em> to as two files, with most of the hierarchy in an XML file but most of the numerical data saved in an associated HDF file.
 To construct the file names, the best is to leave <em>HDF_name</em> as None. However, if the HDF file should be put into a sub-directory
-below where the XML file will be placed, then one can leave <em>HDF_name</em> as <strong>None</strong> and set <em>HDF_subDir</em>. For example, to
-place the HDF file is the sub-directory ‘HDF’, set HDF_subDir=’HDF’. The following example will write the XMl to the file
+below where the XML file will be placed, then one can leave <em>HDF_name</em> as None and set <em>HDF_subDir</em>. For example, to
+place the HDF file is the sub-directory ‘HDF’, set HDF_subDir=’HDF’. The following example will write the XML to the file
 ‘path/to/n-Pu239.xml’ and the HDF data to the file ‘path/to/HDF/n-Pu239.h5’:</p>
 <p>node.saveToHybrid(‘path/to/n-Pu239.xml’, HDF_subDir=’HDF’)</p>
 <dl class="field-list simple">
@@ -423,7 +565,7 @@ place the HDF file is the sub-directory ‘HDF’, set HDF_subDir=’HDF’. The
 <li><p><strong>minLength</strong> – Minimum number of numerical values in a <em>Values</em> node before writing the <em>Values</em> node to HDF.</p></li>
 <li><p><strong>flatten</strong> – If True, GNDS datasets are concatenated into flattened HDF5 datasets.</p></li>
 <li><p><strong>compress</strong> – Enable gzip + shuffle compression for HDF5 datasets.</p></li>
-<li><p><strong>kwargs</strong> – Extra keywork arguments passed to other functions.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
 </ul>
 </dd>
 </dl>
@@ -432,20 +574,48 @@ place the HDF file is the sub-directory ‘HDF’, set HDF_subDir=’HDF’. The
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.saveToOpenedFile">
 <span class="sig-name descname"><span class="pre">saveToOpenedFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fOut</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.saveToOpenedFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.saveToOpenedFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes an XML representation of <em>self</em> to the opened file <em>fOut</em>. This method uses <em>self.toXML</em> to construct <em>self</em>’s XML representation.</p>
+<dd><p>Writes an XML representation of <em>self</em> to the opened file <em>fOut</em>. This method uses <em>self.toXML</em> to construct XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fOut</strong> – File stream to write <em>self</em> to.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.toXML">
 <span class="sig-name descname"><span class="pre">toXML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.toXML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.toXML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls self.toXML_strList and joins its returned list with ‘
-‘.</p>
+<dd><blockquote>
+<div><p>Calls self.toXML_strList and joins its returned list with ‘</p>
+</div></blockquote>
+<p>‘.</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">param indent<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Amount of starting indentation.</p>
+</dd>
+<dt class="field-even">param kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary that contains data to control the way this method acts.</p>
+</dd>
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>XML representation of <em>self</em>.</p>
+</dd>
+</dl>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.AncestryIO_base.toXML_strList">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#AncestryIO_base.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.AncestryIO_base.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -454,6 +624,7 @@ place the HDF file is the sub-directory ‘HDF’, set HDF_subDir=’HDF’. The
 <dt class="sig sig-object py" id="LUPY.ancestry.XPathNotFound">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LUPY.ancestry.</span></span><span class="sig-name descname"><span class="pre">XPathNotFound</span></span><a class="reference internal" href="../_modules/LUPY/ancestry.html#XPathNotFound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.XPathNotFound" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception class which is raised when the <code class="xref py py-func docutils literal notranslate"><span class="pre">followXPath()</span></code> cannot follow the path.</p>
 </dd></dl>
 
 </section>
@@ -715,52 +886,143 @@ is execute with message <em>message</em>.</p>
 </section>
 <section id="module-LUPY.parallelprocessing">
 <span id="lupy-parallelprocessing-module"></span><h2>LUPY.parallelprocessing module<a class="headerlink" href="#module-LUPY.parallelprocessing" title="Permalink to this heading">¶</a></h2>
+<p>This module contains functions for running tasks in parallel mainly through <a class="reference internal" href="#LUPY.parallelprocessing.execute" title="LUPY.parallelprocessing.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a>
+and <a class="reference internal" href="#LUPY.parallelprocessing.executeMultiThreaded" title="LUPY.parallelprocessing.executeMultiThreaded"><code class="xref py py-func docutils literal notranslate"><span class="pre">executeMultiThreaded()</span></code></a>.</p>
+<blockquote>
+<div><p>This module contains the following functions:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>executeOne</p></td>
+<td><p>This function is mainly for an example.</p></td>
+</tr>
+<tr class="row-odd"><td><p>addProcess</p></td>
+<td><p>This functions is internal use by <a class="reference internal" href="#LUPY.parallelprocessing.execute" title="LUPY.parallelprocessing.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p>execute</p></td>
+<td><p>This function is used to run many processes in parallel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>executeMultiThreaded</p></td>
+<td><p>This function is used to run many tasks in parallel as threads.</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.parallelprocessing.addProcess">
 <span class="sig-prename descclassname"><span class="pre">LUPY.parallelprocessing.</span></span><span class="sig-name descname"><span class="pre">addProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numberLaunched</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/parallelprocessing.html#addProcess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.parallelprocessing.addProcess" title="Permalink to this definition">¶</a></dt>
-<dd><p>Added a process.</p>
+<dd><p>This function calls <code class="xref py py-func docutils literal notranslate"><span class="pre">multiprocessing.Proces()</span></code> with target of <em>callback</em> and args of items[numberLaunched] to create 
+a new process, and then calls start on that process. The created process is appended to <em>processes</em>.
+This function is for internal use by <a class="reference internal" href="#LUPY.parallelprocessing.execute" title="LUPY.parallelprocessing.execute"><code class="xref py py-class docutils literal notranslate"><span class="pre">execute</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>numberLaunched</strong> – Index into <em>items</em> which contains the arguments for the callback function.</p></li>
+<li><p><strong>processes</strong> – The list of processes which the created process will be added to.</p></li>
+<li><p><strong>items</strong> – The list of args for all processes to create.</p></li>
+<li><p><strong>callback</strong> – That function called by <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.Process</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>numberLaunched</em> incremented by one.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.parallelprocessing.execute">
 <span class="sig-prename descclassname"><span class="pre">LUPY.parallelprocessing.</span></span><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numberOfParallelProcesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentNotifications</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/parallelprocessing.html#execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.parallelprocessing.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function loops over each item in <em>items</em> and processes it by calling user’s callback function. At most <em>numberOfParallelProcesses</em> of
-processes can run in parallel. The user’s callback must create a command to execute and call function <strong>executeOne</strong>.</p>
+<dd><p>This function loops over each item in <em>items</em>, and creates and runs each with a <code class="xref py py-func docutils literal notranslate"><span class="pre">multiprocessing.Proces()</span></code> process.
+Also see function <a class="reference internal" href="#LUPY.parallelprocessing.addProcess" title="LUPY.parallelprocessing.addProcess"><code class="xref py py-func docutils literal notranslate"><span class="pre">addProcess()</span></code></a>.  At most <em>numberOfParallelProcesses</em> of
+processes can run in parallel. The user’s callback must create a command to execute and a backcall function similar
+to the example <a class="reference internal" href="#LUPY.parallelprocessing.executeOne" title="LUPY.parallelprocessing.executeOne"><code class="xref py py-func docutils literal notranslate"><span class="pre">executeOne()</span></code></a>.</p>
 <p>percentNotifications is in percent of number to do and for every percent of number done a message is sent to sys.syserr.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>numberOfParallelProcesses</strong> – The maximum number of process to have running at one time.</p></li>
+<li><p><strong>items</strong> – A python list where each element contains the arguments for one process.</p></li>
+<li><p><strong>callback</strong> – The target passed to <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.Process</span></code>.</p></li>
+<li><p><strong>percentNotifications</strong> – This parameter determines how often a progress message is printed.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.parallelprocessing.executeMultiThreaded">
 <span class="sig-prename descclassname"><span class="pre">LUPY.parallelprocessing.</span></span><span class="sig-name descname"><span class="pre">executeMultiThreaded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">taskList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nThreads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleepTime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/parallelprocessing.html#executeMultiThreaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.parallelprocessing.executeMultiThreaded" title="Permalink to this definition">¶</a></dt>
-<dd><p>General-purpose multi-threading code. Applies ‘runner’ to each task in the taskList,
-returns list of completed runners once all tasks are complete.
-Note: order of returned list may not match order of submitted taskList.</p>
-<p>TODO: add index to each thread in case we need to sort results? Could use thread.name too…</p>
+<dd><p>The function runs the items in <em>taskList</em> as separate threads. Applies <em>runner</em> to each task in the taskList and
+returns list of completed runners once all tasks are complete.  Note: order of returned list may not match order of taskList.</p>
 <p>Due to the Python GIL, this should be most efficient for runners that spend most of their time
-in compiled code e.g. C extensions rather than in interpreted Python code.</p>
-<p>&#64;param taskList: list of tasks.
-&#64;param runner: class (inheriting from threading.Thread) with a run() method that completes each task.
-&#64;param nThreads: maximum number of concurrent threads.
-&#64;param sleepTime: how long (in seconds) to wait between polling for finished threads.
-&#64;param verbose: if True, print updates as each task starts.
-&#64;return list of finished tasks.</p>
+in compiled code e.g., C extensions rather than in interpreted Python code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>taskList</strong> – List of tasks to run.</p></li>
+<li><p><strong>runner</strong> – Class (inheriting from threading.Thread) with a run() method that completes each task.</p></li>
+<li><p><strong>nThreads</strong> – Maximum number of concurrent threads.</p></li>
+<li><p><strong>sleepTime</strong> – How long (in seconds) to wait between polling for finished threads.</p></li>
+<li><p><strong>verbose</strong> – If True, print updates as each task starts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of finished tasks.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.parallelprocessing.executeOne">
 <span class="sig-prename descclassname"><span class="pre">LUPY.parallelprocessing.</span></span><span class="sig-name descname"><span class="pre">executeOne</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/parallelprocessing.html#executeOne"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.parallelprocessing.executeOne" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function is mainly for an example of what the target argument of multiprocessing.Process may look.
+<dd><p>This function is mainly for an example of what the target argument of <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.Process</span></code> may look.
 The main thing is to call sys.exit with a status and to properly handle the status returned by os.system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>command</strong> – System comannd to execute.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
 <section id="module-LUPY.subprocessing">
 <span id="lupy-subprocessing-module"></span><h2>LUPY.subprocessing module<a class="headerlink" href="#module-LUPY.subprocessing" title="Permalink to this heading">¶</a></h2>
 <p>This module contains several functions that are useful for creating sub-processes using <code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code>.</p>
+<p>This module contains the following functions:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>_getSTDStreamOpen</p></td>
+<td><p>This function is for internal use by <a class="reference internal" href="#LUPY.subprocessing.executeCommand" title="LUPY.subprocessing.executeCommand"><code class="xref py py-func docutils literal notranslate"><span class="pre">executeCommand()</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>_getSTDStreamClose</p></td>
+<td><p>This function is for internal use by <a class="reference internal" href="#LUPY.subprocessing.executeCommand" title="LUPY.subprocessing.executeCommand"><code class="xref py py-func docutils literal notranslate"><span class="pre">executeCommand()</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p>executeCommand</p></td>
+<td><p>This function executes a command using <code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>spawn</p></td>
+<td><p>This function calls <code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>deleteFilesUsingGlob</p></td>
+<td><p>This function deletes file(s) matching patterns.</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 <dl class="py function">
 <dt class="sig sig-object py" id="LUPY.subprocessing.deleteFilesUsingGlob">
 <span class="sig-prename descclassname"><span class="pre">LUPY.subprocessing.</span></span><span class="sig-name descname"><span class="pre">deleteFilesUsingGlob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patterns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/subprocessing.html#deleteFilesUsingGlob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.subprocessing.deleteFilesUsingGlob" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes file(s) matching patterns. Skips deleting directories.
+<dd><p>This function deletes file(s) matching patterns. Skips deleting directories.
 The function is currently not used anywhere in FUDGE so probably should be deleted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -792,6 +1054,9 @@ returns the id of the created process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>args</strong> – Argument passed to <code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The id of the created.</p>
 </dd>
 </dl>
 </dd></dl>

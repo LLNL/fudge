@@ -11,8 +11,9 @@ import argparse
 
 from PoPs.chemicalElements import misc as PoPs_chemicalElementMiscModule
 
-description = """For each argument entered, which must be an isotope name specified by either its ZA (1000 * Z + A) or its PoPs id,
-this script prints that argument, its ZA and PoPs id."""
+summaryDocStringFUDGE = """For each argument entered, which must be an isotope name specified by either its ZA (1000 * Z + A) or its PoPs id, this script prints that argument, its ZA and PoPs id."""
+
+description = summaryDocStringFUDGE
 
 parser = argparse.ArgumentParser( description = description )
 

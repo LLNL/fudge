@@ -46,6 +46,24 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains the GNDS documentation child node endfCompatible class.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +---------------------------+---------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                     | Description                                                                                       |</span>
+<span class="sd">    +===========================+===================================================================================================+</span>
+<span class="sd">    | CovarianceScript          | This class represents a GNDS documentation/covarianceScript node.                                 |</span>
+<span class="sd">    +---------------------------+---------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | CorrectionScript          | This class represents a GNDS documentation/correctionScript node.                                 |</span>
+<span class="sd">    +---------------------------+---------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Note                      | This is the suite class for the GNDS documentation/node node.                                     |</span>
+<span class="sd">    +---------------------------+---------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | ExforDataSet              | This class represents a GNDS documentation/experimentalDataSets/exforDataSets/exforDataSet node.  |</span>
+<span class="sd">    +---------------------------+---------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | ExforDataSets             | This is the suite class for the GNDS documentation/experimentalDataSets/exforDataSets node.       |</span>
+<span class="sd">    +---------------------------+---------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | ExperimentalDataSets      | This is the suite class for the GNDS documentation/experimentalDataSets node.                     |</span>
+<span class="sd">    +---------------------------+---------------------------------------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">datetime</span>
@@ -57,25 +75,57 @@
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">date</span> <span class="k">as</span> <span class="n">dateModule</span>
 
 <div class="viewcode-block" id="CovarianceScript"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.CovarianceScript">[docs]</a><span class="k">class</span> <span class="nc">CovarianceScript</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a GNDS documentation/covarianceScript node. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;covarianceScript&#39;</span></div>
 
 <div class="viewcode-block" id="CorrectionScript"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.CorrectionScript">[docs]</a><span class="k">class</span> <span class="nc">CorrectionScript</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a GNDS documentation/correctionScript node. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;correctionScript&#39;</span></div>
 
 <div class="viewcode-block" id="Note"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.Note">[docs]</a><span class="k">class</span> <span class="nc">Note</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the suite class for the GNDS documentation/node node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;note&#39;</span></div>
 
 <div class="viewcode-block" id="ExforDataSet"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.ExforDataSet">[docs]</a><span class="k">class</span> <span class="nc">ExforDataSet</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS authors/exforDataSets/exforDataSet node.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a GNDS documentation/experimentalDataSets/exforDataSets/exforDataSet node.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-------------------+-------------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                       |</span>
+<span class="sd">    +===================+===================================================================+</span>
+<span class="sd">    | subentry          | This is the EXFOR subentry for the dataset.                       |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------+</span>
+<span class="sd">    | retrievalDate     | This is the date the dataset was retrieved.                       |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------+</span>
+<span class="sd">    | covarianceScript  | Script used to computing covariance matrices based off the        |</span>
+<span class="sd">    |                   | statistical and systematic errors presented in an EXFOR entry.    |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------+</span>
+<span class="sd">    | correctionScript  | Script used for data correction of an EXFOR entry.                |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------+</span>
+<span class="sd">    | note              | A :py:class:`textModule.Text` for storing notes.                  |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;exforDataSet&#39;</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;subentry&#39;</span>
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;covarianceScript&#39;</span><span class="p">,</span> <span class="s1">&#39;correctionScript&#39;</span><span class="p">,</span> <span class="s1">&#39;note&#39;</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_subentry</span><span class="p">,</span> <span class="n">_retrievalDate</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param _subentry:           This is the EXFOR subentry for the dataset.</span>
+<span class="sd">        :param _retrievalDate:      This is the date the dataset was retrieved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -87,30 +137,63 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">subentry</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The method returns the subentry.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`textModule.Text`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__subentry</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">covarianceScript</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the covarianceScript member.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`CovarianceScript`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__covarianceScript</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">correctionScript</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the correctionScript member.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`CorrectionScript`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__correctionScript</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">note</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the note member.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`Note`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__note</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">retrievalDate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the retrieval date.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`dateModule.Date`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__retrievalDate</span><span class="o">.</span><span class="fm">__str__</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="ExforDataSet.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.ExforDataSet.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">incrementalIndent</span>
@@ -125,6 +208,17 @@
 
 <div class="viewcode-block" id="ExforDataSet.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.ExforDataSet.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">_subentry</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;subentry&#39;</span> <span class="p">)</span>
         <span class="n">_retrievalDate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;retrievalDate&#39;</span> <span class="p">),</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="p">)</span>
@@ -132,7 +226,9 @@
         <span class="k">return</span> <span class="n">csl</span><span class="p">(</span><span class="n">_subentry</span><span class="p">,</span> <span class="n">_retrievalDate</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="ExforDataSets"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.ExforDataSets">[docs]</a><span class="k">class</span> <span class="nc">ExforDataSets</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS experimentalDataSets/exforDataSets node.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the suite class for the GNDS documentation/experimentalDataSets/exforDataSets node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;exforDataSets&#39;</span>
     <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;subentry&#39;</span>
@@ -142,6 +238,17 @@
         <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">ExforDataSet</span> <span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ExperimentalDataSets"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.ExperimentalDataSets">[docs]</a><span class="k">class</span> <span class="nc">ExperimentalDataSets</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the suite class for the GNDS documentation/experimentalDataSets node. </span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                   |</span>
+<span class="sd">    +===================+===============================================================+</span>
+<span class="sd">    | exforDataSets     | A suite of EXFOR datasets.                                    |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;experimentalDataSets&#39;</span>
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;exforDataSets&#39;</span><span class="p">,</span> <span class="p">)</span>
@@ -154,10 +261,23 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">exforDataSets</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the exforDataSets member.</span>
+
+<span class="sd">        :returns:       A instance of :py:class`ExforDataSets`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__exforDataSets</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="ExperimentalDataSets.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.ExperimentalDataSets.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__exforDataSets</span><span class="p">):</span> <span class="k">return</span> <span class="p">[]</span>
 
@@ -171,6 +291,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">XMLList</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ExperimentalDataSets.parseNode"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.ExperimentalDataSets.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method fills *self* by parsing the data in *node*.</span>
+
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__exforDataSets</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>

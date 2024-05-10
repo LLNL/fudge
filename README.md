@@ -32,7 +32,7 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
           conda create --name fudge python=3.9 numpy matplotlib PyQT5
           conda activate fudge
 
-      Some users have reported problems with installing PyQT5 with conda on Windows. It may be ommitted from the
+      Some users have reported problems with installing PyQT5 with conda on Windows. It may be omitted from the
       above `conda create` command and, if required, be installed via `pip install`.
     
     - Ensure that NumPy (version 1.15 or higher) and wheels are present in the Python environment.

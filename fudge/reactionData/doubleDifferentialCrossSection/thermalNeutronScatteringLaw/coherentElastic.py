@@ -6,7 +6,17 @@
 # <<END-copyright>>
 
 """
-Thermal neutron scattering law coherent elastic double difference cross section form and its supporting classes.
+This module contains the classes used to support a coherent elastic reaction for the thermal neutron scattering law.
+
+This module contains the following classes: 
+        
+    +--------------+--------------------------------------------------------------------------------------------+
+    | Class        | Description                                                                                |
+    +==============+============================================================================================+
+    | S_table      | This class represents the coherent elastic scattering :math:`S(E|T)` function.             |
+    +--------------+--------------------------------------------------------------------------------------------+
+    | Form         | This class represents pure-Coulomb scattering.                                             |
+    +--------------+--------------------------------------------------------------------------------------------+
 """
 
 
@@ -24,7 +34,7 @@ from . import coherentElasticMisc as coherentElasticMiscModule
 
 class S_table( ancestryModule.AncestryIO ) :
     """
-    For elastic coherent, cumulative structure factor 'S' is given as function of incident energy and temperature.
+    This class represents the coherent elastic scattering :math:`S(E|T)` function.
     """
 
     moniker = 'S_table'
@@ -36,17 +46,30 @@ class S_table( ancestryModule.AncestryIO ) :
 
     @property
     def domainUnit( self ) :
+        """
+        This method rReturns the energy unit of the projectile.
+        """
 
         return( self.gridded2d.axes[1].unit )
 
     def convertUnits( self, unitMap ) :
         """
-        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         self.gridded2d.convertUnits( unitMap )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -57,6 +80,17 @@ class S_table( ancestryModule.AncestryIO ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
 
@@ -68,6 +102,19 @@ class S_table( ancestryModule.AncestryIO ) :
         return _S_table
 
 class Form( baseModule.Form ) :
+    """
+    This class is the form for the coherent elastic reaction for the thermal neutron scattering law.
+
+    The following table list the primary members of this class:
+    
+    +-----------+---------------------------------------------------------------+
+    | Member    | Description                                                   |
+    +===========+===============================================================+
+    | label     | This member is the form's label.                              |
+    +-----------+---------------------------------------------------------------+
+    | S_table   | This member is a :py:class:`S_table` that contains the data.  |
+    +-----------+---------------------------------------------------------------+
+    """
 
     moniker = 'thermalNeutronScatteringLaw_coherentElastic'
     keyName = 'label'
@@ -76,6 +123,10 @@ class Form( baseModule.Form ) :
     subformAttributes = ( 'S_table', )
 
     def __init__( self, label, _S_table ) :
+        """
+        :param label:           The label for the form.
+        :param _S_table:        An :py:class:`S_table` instance.
+        """
 
         if( not( isinstance( _S_table, S_table ) ) ) : raise TypeError( "Invalid S_table for %s." % self.moniker )
 
@@ -83,10 +134,20 @@ class Form( baseModule.Form ) :
 
     @property
     def domainUnit( self ) :
+        """
+        This method rReturns the energy unit of the projectile.
+        """
 
         return( self.S_table.domainUnit )
 
     def processThermalNeutronScatteringLaw( self, style, kwargs ) :
+        """
+        This method calculates the cross section, distribution, average product energy and average product momentum
+        data for the double differential data and returns their forms. See :py:func:`coherentElasticMiscModule.process` for more details.
+
+        :param style:           The style for the returned data.
+        :param kwargs:          A dictionary containing data needed for processing.
+        """
 
         temperature = style.temperature.getValueAs( kwargs['temperatureUnit'] )
 
@@ -98,11 +159,27 @@ class Form( baseModule.Form ) :
         return( coherentElasticMiscModule.process( self, style.label, energyMin, energyMax, temperature, kwargs ) )
 
     def temperatures( self, _temperatures ) :
+        """
+        This method add to *_temperatures* the temperatures that *self* has been evaluated at.
+
+        :param _temperatures:   A dictionary with the key 'coherent-elastic' added by this method.
+        """
 
         _temperatures['coherent-elastic'] = [ self.S_table.gridded2d.axes[2].unit, self.S_table.gridded2d.axes[2].values.values ]
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
 

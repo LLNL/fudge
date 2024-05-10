@@ -46,6 +46,11 @@ class CoherentFunctionBase( ancestryModule.AncestryIO ) :
         self.data.setAncestor( self )
 
     def convertUnits( self, unitMap ):
+        """
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.data.convertUnits( unitMap )
 
@@ -54,6 +59,14 @@ class CoherentFunctionBase( ancestryModule.AncestryIO ) :
         return( [] )
 
     def toXML_strList( self, indent = "", **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -64,6 +77,17 @@ class CoherentFunctionBase( ancestryModule.AncestryIO ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
 
@@ -309,6 +333,17 @@ class Form( baseModule.Form ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
 

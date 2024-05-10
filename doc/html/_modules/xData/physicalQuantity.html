@@ -44,6 +44,18 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the :py:class:`PhysicalQuantity` class which is used to represents a number with a unit (e.g., &#39;1 cm&#39;, &#39;5.4 kg&#39;).</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class             | Description                                                                                           |</span>
+<span class="sd">    +===================+=======================================================================================================+</span>
+<span class="sd">    | PhysicalQuantity  | This class represents a physical quantity which is a number with a unit (e.g., &#39;1 cm&#39;, &#39;5.4 kg&#39;).     |</span>
+<span class="sd">    +-------------------+-------------------------------------------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
 
 <span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
@@ -51,10 +63,35 @@
 <span class="kn">from</span> <span class="nn">.uncertainty.physicalQuantity</span> <span class="kn">import</span> <span class="n">uncertainty</span> <span class="k">as</span> <span class="n">uncertaintyModule</span>
 
 <div class="viewcode-block" id="PhysicalQuantity"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity">[docs]</a><span class="k">class</span> <span class="nc">PhysicalQuantity</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is use to store a physical quantity which is a number with a unit (e.g., &#39;1 cm&#39;, &#39;5.4 kg&#39;), and</span>
+<span class="sd">    to support various operations on the physical quantity.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +---------------+-------------------------------------------------------------------------------+</span>
+<span class="sd">    | Member        | Description                                                                   |</span>
+<span class="sd">    +===============+===============================================================================+</span>
+<span class="sd">    | value         | This is the value for the physical quantity.                                  |</span>
+<span class="sd">    +---------------+-------------------------------------------------------------------------------+</span>
+<span class="sd">    | unit          | This is the unit for the physical quantity.                                   |</span>
+<span class="sd">    +---------------+-------------------------------------------------------------------------------+</span>
+<span class="sd">    | label         | This is the label member.                                                     |</span>
+<span class="sd">    +---------------+-------------------------------------------------------------------------------+</span>
+<span class="sd">    | uncertainty   | This is the uncertainy of value.                                              |</span>
+<span class="sd">    +---------------+-------------------------------------------------------------------------------+</span>
+<span class="sd">    | PQ            | A :py:class:`PQUModule.PQU` called with *self*&#39; value and unit.               |</span>
+<span class="sd">    +---------------+-------------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;physicalQuantity&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param value:   This is the value of the physical quantity.</span>
+<span class="sd">        :param unit:    This is the unit of the physical quantity.</span>
+<span class="sd">        :param label:   This is the label of the physical quantity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__PQ</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span>
@@ -66,16 +103,33 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the value and unit of *self* as a str.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__float__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *self*&#39;s value as a float.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PQ</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        If other is not a PhysicalQuantity instance, False is returned. Otherwise, calls self&#39;s compare with epsilonFactor = 5 and test return value.</span>
+<span class="sd">        This method returns True if *self* is equal to *other* and False otherwise.</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns</span>
+<span class="sd">        0 and False otherwise.</span>
+
+<span class="sd">        :param other:   A :py:class:`PhysicalQuantity` to compare to *self*.</span>
+
+<span class="sd">        :returns:       A python boolean.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PhysicalQuantity</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
@@ -84,7 +138,14 @@
 
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        If other is not a PhysicalQuantity instance, False is returned. Otherwise, calls self&#39;s compare with epsilonFactor = 5 and test return value.</span>
+<span class="sd">        This method returns True if *self* is not equal to *other* and False otherwise.</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns False if :py:func:`compare` with epsilonFactor = 5 returns</span>
+<span class="sd">        0 and True otherwise.</span>
+
+<span class="sd">        :param other:   A :py:class:`PhysicalQuantity` to compare to *self*.</span>
+
+<span class="sd">        :returns:       A python boolean.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PhysicalQuantity</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
@@ -92,58 +153,133 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if *self* is less than *other* and False otherwise.</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns</span>
+<span class="sd">        a negative number and False otherwise.</span>
+
+<span class="sd">        :param other:   A :py:class:`PhysicalQuantity` to compare to *self*.</span>
+
+<span class="sd">        :returns:       A python boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__le__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if *self* is less than or equal to *other*, and False otherwise.</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns</span>
+<span class="sd">        a negative number or 0, and False otherwise.</span>
+
+<span class="sd">        :param other:   A :py:class:`PhysicalQuantity` to compare to *self*.</span>
+
+<span class="sd">        :returns:       A python boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__gt__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if *self* is greater than *other* and False otherwise.</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns</span>
+<span class="sd">        a positive number, and False otherwise.</span>
+
+<span class="sd">        :param other:   A :py:class:`PhysicalQuantity` to compare to *self*.</span>
+
+<span class="sd">        :returns:       A python boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__ge__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns True if *self* is greater than or equal to *other* and False otherwise.</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns</span>
+<span class="sd">        a positive number or 0, and False otherwise.</span>
+
+<span class="sd">        :param other:   A :py:class:`PhysicalQuantity` to compare to *self*.</span>
+
+<span class="sd">        :returns:       A python boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="PhysicalQuantity.compare"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">epsilonFactor</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self&#39;s compare with epsilonFactor = 5 and test return value. Other must be a PhysicalQuantity instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method calls :py:func:`PQUModule.PQU.compare` with epsilonFactor = 5 and returns the results. </span>
+<span class="sd">        *Other* must be an instance of :py:func:`PhysicalQuantity`.</span>
+<span class="sd">        If *self* is less than *other* -1 is returned. If *self* is equal to *other* 0 is returned. Otherwise, 1 is returned.</span>
+
+<span class="sd">        :param other:   A :py:class:`PhysicalQuantity` to compare to *self*.</span>
+
+<span class="sd">        :returns:       A python in that is one of -1, 0 or 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PhysicalQuantity</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;other not instance of PhysicalQuantity&#39;</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PQ</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">__PQ</span><span class="p">,</span> <span class="n">epsilonFactor</span> <span class="p">)</span> <span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">key</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the keyName for *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the label for *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *self*&#39;s value as a float.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">unit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *self*&#39;s unit.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PQ</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">uncertainty</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to *self*&#39;s uncertainty.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`uncertaintyModule.Uncertainty` or None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span> <span class="p">)</span>
 
     <span class="nd">@uncertainty</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">uncertainty</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_uncertainty</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets *self*&#39;s uncertainty to *_uncertainty*.</span>
+
+<span class="sd">        :param _uncertainty:        An instance of :py:class:`uncertaintyModule.Uncertainty` or None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">_uncertainty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
             <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_uncertainty</span><span class="p">,</span> <span class="n">uncertaintyModule</span><span class="o">.</span><span class="n">Uncertainty</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid uncertainty instance.&#39;</span> <span class="p">)</span>
@@ -152,16 +288,29 @@
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="PhysicalQuantity.convertToUnit"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity.convertToUnit">[docs]</a>    <span class="k">def</span> <span class="nf">convertToUnit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method changes *self*&#39;s unit to *unit* and updates its value accordingly.</span>
+
+<span class="sd">        :param unit:    The new unit for *self*&#39;s value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__PQ</span><span class="o">.</span><span class="n">convertToUnit</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PhysicalQuantity.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">unit</span><span class="p">,</span> <span class="n">factor</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__PQ</span><span class="o">.</span><span class="n">convertToUnit</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span><span class="o">.</span><span class="n">parentConvertingUnits</span><span class="p">(</span> <span class="p">[</span> <span class="n">factor</span> <span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PhysicalQuantity.copy"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
@@ -170,20 +319,47 @@
     <span class="n">__copy__</span> <span class="o">=</span> <span class="n">copy</span>
 
 <div class="viewcode-block" id="PhysicalQuantity.copyToUnit"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity.copyToUnit">[docs]</a>    <span class="k">def</span> <span class="nf">copyToUnit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self* with new unit *unit*.</span>
+
+<span class="sd">        :param unit:    The unit of the copy of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`PhysicalQuantity`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">_copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
         <span class="n">_copy</span><span class="o">.</span><span class="n">convertToUnit</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">_copy</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PhysicalQuantity.getValueAs"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity.getValueAs">[docs]</a>    <span class="k">def</span> <span class="nf">getValueAs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a float that is *self*&#39;s value converted to *unit*.</span>
+
+<span class="sd">        :param uhit:        The unit of the returned value.</span>
+
+<span class="sd">        :returns:           A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PQ</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PhysicalQuantity.toString"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">keepPeriod</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the value and unit of *self* as a str.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PQ</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">significantDigits</span><span class="p">,</span> <span class="n">keepPeriod</span> <span class="o">=</span> <span class="n">keepPeriod</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PhysicalQuantity.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
         <span class="n">moniker</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;moniker&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
@@ -206,6 +382,17 @@
 
 <div class="viewcode-block" id="PhysicalQuantity.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.physicalQuantity.PhysicalQuantity.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 

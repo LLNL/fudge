@@ -44,6 +44,20 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the xData classes that represent functions that are constant over their independent axes.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +------------------------+--------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                  | Description                                                              |</span>
+<span class="sd">    +========================+==========================================================================+</span>
+<span class="sd">    | Constant               | This class is the base class for all constant classes.                   |</span>
+<span class="sd">    +------------------------+--------------------------------------------------------------------------+</span>
+<span class="sd">    | Constant1d             | This class represents a 1-d function that is constant over its domain.   |</span>
+<span class="sd">    +------------------------+--------------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">from</span> <span class="nn">numericalFunctions</span> <span class="kn">import</span> <span class="n">pointwiseXY_C</span> <span class="k">as</span> <span class="n">pointwiseXY_CModule</span>
 <span class="n">floatToShortestString</span> <span class="o">=</span> <span class="n">pointwiseXY_CModule</span><span class="o">.</span><span class="n">floatToShortestString</span>
 
@@ -54,8 +68,40 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">XYs1d</span> <span class="k">as</span> <span class="n">XYs1dModule</span>
 
 <div class="viewcode-block" id="Constant"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant">[docs]</a><span class="k">class</span> <span class="nc">Constant</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span> <span class="p">)</span>  <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                   |</span>
+<span class="sd">    +===================+===============================================================+</span>
+<span class="sd">    | value             | This is the value of the function at its points.              |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | domainMin         | This is the lower domain value for which the function defined.|</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | domainMax         | This is the upper domain value for which the function defined.|</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | axes              | This is the axes member.                                      |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | outerDomainValue  | This is the domain value for the next higher dimension for    |</span>
+<span class="sd">    |                   | a function that is embedded in a high dimensional functions.  |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | index             | This is the index member use by some xData classes.           |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    | label             | This is the label member use by some xData classes.           |</span>
+<span class="sd">    +-------------------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_value</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param _value:              This is the value of the function within its defined domain.</span>
+<span class="sd">        :param domainMin:           This is the lower domain value for which the function defined.</span>
+<span class="sd">        :param domainMax:           This is the upper domain value for which the function defined.</span>
+<span class="sd">        :param axes:                This is the axes member.</span>
+<span class="sd">        :param outerDomainValue:    This is the domain value for the next higher dimension for a function that is </span>
+<span class="sd">                                    embedded in a high dimensional function.</span>
+<span class="sd">        :param index:               This is the index member.</span>
+<span class="sd">        :param label:               This is the label member.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
 
@@ -70,6 +116,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">=</span> <span class="n">domainMax</span>
 
 <div class="viewcode-block" id="Constant.copy"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a new instance that is a copy of *self*.</span>
+
+<span class="sd">        :returns:           An instance the same type as *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">axes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
@@ -79,11 +130,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *self*&#39;s value.</span>
+
+<span class="sd">        :returns:           An instance of type float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="p">)</span>
 
     <span class="nd">@value</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_value</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets *self*&#39;s value to *_value*.</span>
+
+<span class="sd">        :param _value:  The new value for *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_value</span><span class="p">,</span> <span class="nb">int</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">_value</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_value</span><span class="p">,</span> <span class="nb">float</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;value not a float instance&#39;</span> <span class="p">)</span>
@@ -91,12 +152,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the minimum domain value for *self*.</span>
+
+<span class="sd">        :returns:       A float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="p">)</span>
 
     <span class="nd">@domainMin</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Sets self&#39;s domainMin to *domainMin*. *domainMin* must be less than self.domainMax or a **raise** is executed.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets self&#39;s domainMin to *domainMin*. *domainMin* must be less than self.domainMax or a **raise** is executed.</span>
+
+<span class="sd">        :param domainMin:   The new lower limit for the domain.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">domainMin</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;domainMin = %.17 &gt;= self.domainMax = </span><span class="si">%.17e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">))</span>
@@ -104,12 +174,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the maximum domain value for *self*.</span>
+
+<span class="sd">        :returns:       A float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="p">)</span>
 
     <span class="nd">@domainMax</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Sets self&#39;s domainMax to *domainMax*. *domainMax* must be greater than self.domainMin or a **raise** is executed.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Thie method sets *self*&#39;s domainMax to *domainMax*. *domainMax* must be greater than self.domainMin or a **raise** is executed.</span>
+
+<span class="sd">        :param domainMin:   The new lower limit for the domain.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">domainMax</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;domainMax = %.17 &lt;= self.domainMin = </span><span class="si">%.17e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">domainMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">))</span>
@@ -117,16 +196,31 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainGrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *self*&#39;s *domainMin* and *domainMax* values.</span>
+
+<span class="sd">        :returns:           A python tuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the domain unit for *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAxisUnitSafely</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rangeMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method always returns *self*&#39;s value.</span>
+
+<span class="sd">        :returns:       A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="p">)</span>
 
@@ -134,17 +228,33 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rangeUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the unit for the dependent variable.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAxisUnitSafely</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Constant.fixDomainPerUnitChange"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant.fixDomainPerUnitChange">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomainPerUnitChange</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">factors</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method multiplies *domainMin* and *domainMax* by factors[self.dimension].</span>
+
+<span class="sd">        :param factors:     This is a list of scaling factors and must contain at least two floats.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Constant.fixDomains"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">fixToDomain</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sets *domainMin* and *domainMax* per the arguments.</span>
+<span class="sd">        This method sets *domainMin* and *domainMax* per the arguments.</span>
+
+<span class="sd">        :param domainMin:       The lower limit of the domain.</span>
+<span class="sd">        :param domainMax:       The upper limit of the domain.</span>
+<span class="sd">        :param fixToDomain:     An instance of :py:class:`enumsModule.FixDomain` that specifies which limits are to be fixed.</span>
+
+<span class="sd">        :returns:               This method returns 0 if no domain limit was moved and 1 if at least one was moved.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">OldDomainMin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span>
@@ -164,11 +274,22 @@
         <span class="k">return</span> <span class="mi">1</span></div></div>
 
 <div class="viewcode-block" id="Constant1d"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d">[docs]</a><span class="k">class</span> <span class="nc">Constant1d</span><span class="p">(</span> <span class="n">Constant</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a 1d-function that has a constant value over its domain.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;constant1d&#39;</span>
     <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a :py:class:`Constant1d` that is *self* divided by *other* where *other* must be</span>
+<span class="sd">        a python int of float.</span>
+
+<span class="sd">        :param other:       A python int or float.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`Constant1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">Constant1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span>
@@ -177,6 +298,14 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dividing Constant1d by </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a :py:class:`Constant1d` that is *other* divided by *self* where *other* must be</span>
+<span class="sd">        a python int of float.</span>
+
+<span class="sd">        :param other:       A python int or float.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`Constant1d`&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">Constant1d</span><span class="p">(</span><span class="n">other</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span>
@@ -185,6 +314,13 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dividing Constant1d by </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__itruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method divides *self* by *other* where *other* must be a python int of float.</span>
+
+<span class="sd">        :param other:       A python int or float.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`Constant1d` which is *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">/=</span> <span class="n">other</span>
@@ -193,6 +329,14 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dividing Constant1d by </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a :py:class:`Constant1d` that is *self* multiplied by *other* where *other* must be</span>
+<span class="sd">        a python int of float.</span>
+
+<span class="sd">        :param other:       A python int or float.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`Constant1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">Constant1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span>
@@ -203,6 +347,13 @@
     <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
 
     <span class="k">def</span> <span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method multiplies *self* by *other* where *other* must be a python int of float.</span>
+
+<span class="sd">        :param other:       A python int or float.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`Constant1d` which is *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*=</span> <span class="n">other</span>
@@ -212,7 +363,9 @@
 
 <div class="viewcode-block" id="Constant1d.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        unitMap is a dictionary of the for { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }.</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span>
@@ -223,6 +376,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fixValuePerUnitChange</span><span class="p">(</span> <span class="n">factors</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Constant1d.convertAxisToUnit"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.convertAxisToUnit">[docs]</a>    <span class="k">def</span> <span class="nf">convertAxisToUnit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indexOrName</span><span class="p">,</span> <span class="n">newUnit</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method converts the axis at *indexOrName* to unit *newUnit* and returns a :py:class:`Constant1d` instance with </span>
+<span class="sd">        that axis data scaled to the new unit.</span>
+
+<span class="sd">        :param indexOrName:     The index or name of the axis to convert to the new unit.</span>
+<span class="sd">        :param newUnit:         New unit for axis *indexOrName*.</span>
+
+<span class="sd">        :returns:               An instance of :py:class:`Constant1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span>
@@ -239,16 +401,38 @@
         <span class="k">return</span> <span class="n">n</span></div>
 
 <div class="viewcode-block" id="Constant1d.evaluate"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the value of *self* at the point *x*.</span>
+
+<span class="sd">        :param x:           The domain point where *self* is evaluated.</span>
+
+<span class="sd">        :returns:           A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Constant1d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns an :py:class:`XYs1dModule.XYs1d` representation of *self*.</span>
+
+<span class="sd">        :param kwargs:      Not used but present to be compatible with other similar methods.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xys1d</span> <span class="o">=</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">]],</span>
                       <span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">xys1d</span></div>
 
 <div class="viewcode-block" id="Constant1d.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
         <span class="n">valueFormatter</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;valueFormatter&#39;</span><span class="p">,</span> <span class="n">floatToShortestString</span><span class="p">)</span>
@@ -264,6 +448,17 @@
 
 <div class="viewcode-block" id="Constant1d.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:            An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">attributes</span><span class="p">,</span> <span class="n">extraAttributes</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="n">parseBareNodeCommonAttributes</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">)</span>     <span class="c1"># parseBareNodeCommonAttributes adds to xPath.</span>
 

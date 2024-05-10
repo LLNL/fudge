@@ -6,7 +6,21 @@
 # <<END-copyright>>
 
 """
-This module contains the GNDS documentation child node endfCompatible class.
+This module contains the GNDS documentation child node that a instances of :py:class:`textModule.Text`.
+
+This module contains the following classes:
+
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | Abstract                          | This class represents a GNDS documentaion/abstract node.              |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Body                              | This class represents a GNDS documentaion/body node.                  |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | EndfCompatible                    | This class represents a GNDS documentaion/endfCompatible node.        |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Title                             | This class represents a GNDS documentaion/title node.                 |
+    +-----------------------------------+-----------------------------------------------------------------------+
 """
 
 from .. import text as textModule

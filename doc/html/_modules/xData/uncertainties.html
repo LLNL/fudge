@@ -45,15 +45,20 @@
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This module contains the class ``uncertainties``, which can appear inside other xData classes.</span>
+<span class="sd">This module contains the classes for representing an uncertainty instance that is a child node inside a GNDS function.</span>
 
-<span class="sd">    Multiple types of uncertainty are supported:</span>
-<span class="sd">        pointwise (stored in the XYs1d class),</span>
-<span class="sd">        links,</span>
-<span class="sd">        Covariances,</span>
-<span class="sd">        ...</span>
+<span class="sd">This module contains the following classes:</span>
 
-<span class="sd">    May contain more than one uncertainty, e.g. to support asymmetric uncertainties</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class                             | Description                                                           |</span>
+<span class="sd">    +===================================+=======================================================================+</span>
+<span class="sd">    | Uncertainty                       | This class represents the uncertainty instance that is a child node   |</span>
+<span class="sd">    |                                   | inside an xData function.                                             |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Covariance                        |                                                                       |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | ListOfCovariances                 |                                                                       |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
@@ -63,6 +68,17 @@
 
 
 <div class="viewcode-block" id="Uncertainty"><a class="viewcode-back" href="../../xData/index.html#xData.uncertainties.Uncertainty">[docs]</a><span class="k">class</span> <span class="nc">Uncertainty</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_bare</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents the uncertainty instance that is a child node inside an xData function.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member        | Description                                                   |</span>
+<span class="sd">    +===============+===============================================================+</span>
+<span class="sd">    | functional    | This is an xData function defining the uncertainty.           |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;uncertainty&#39;</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="kc">None</span>
@@ -72,6 +88,9 @@
     <span class="n">defaultRelation</span><span class="o">=</span><span class="s1">&#39;offset&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functional</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param functional:  The xData function defining the uncertainty.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -79,14 +98,30 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to *self*&#39;s functional.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__functional</span>
 
 <div class="viewcode-block" id="Uncertainty.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.uncertainties.Uncertainty.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__functional</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__functional</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Uncertainty.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.uncertainties.Uncertainty.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
 
@@ -103,7 +138,12 @@
 
 <div class="viewcode-block" id="Uncertainty.parseNode"><a class="viewcode-back" href="../../xData/index.html#xData.uncertainties.Uncertainty.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Translate &lt;uncertainty&gt; node into uncertainty instance.</span>
+<span class="sd">        This method sets data in *self* using the contents of *node*.</span>
+
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">XYs1d</span> <span class="k">as</span> <span class="n">XYs1dModule</span>
@@ -129,6 +169,9 @@
         <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div></div>
 
 <div class="viewcode-block" id="Covariance"><a class="viewcode-back" href="../../xData/index.html#xData.uncertainties.Covariance">[docs]</a><span class="k">class</span> <span class="nc">Covariance</span><span class="p">(</span><span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a link to a covariance instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;covariance&#39;</span></div>
 
@@ -151,6 +194,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ListOfCovariances.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.uncertainties.ListOfCovariances.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span><span class="s1">&#39;  &#39;</span><span class="p">)</span>
         <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)]</span>
@@ -161,6 +212,17 @@
 
 <div class="viewcode-block" id="ListOfCovariances.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.uncertainties.ListOfCovariances.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 

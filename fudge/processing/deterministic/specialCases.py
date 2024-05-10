@@ -16,11 +16,28 @@ def twoBodyPhotoNuclearAtThreshold(masses, Q, modifiedProductGroupBoundaries, cr
     writing of this function, Merced treats all particles relativistically when one of the particles has zero mass.
 
     This functions ignores any flux dependency on energy and only calculates the Legendre order 0 term, all other terms a returned a 0.0's.
+
+    :param masses:                          A python dictionary containing the masses of the two incoming and two outgoing particles.
+    :param Q:                               This is the Q-value for the two-body reaction.
+    :param modifiedProductGroupBoundaries:  A smaller set of the actual multi-group boundaries.
+    :param crossSection:                    This is the pointwise linear cross section for the reaction.
+    :param angularData:                     This is the angular distribution data for the product.
+    :param legendreMax:                     This is the maximum Legendre order to calculate the product matrices.
+    :param groupFlux:                       This is the multi-grouped flux for the group.
+    :param firstCall:                       A boolean that indicates if the function is calling itself.
+
+    :returns:                               The number and energy conserving product matices.
     """
 
     def K_boost(photonEnergy, m2, m3):
         """
-        Returns the kinetic energy the product has with its speed equal to the boost speed.
+        Returns the kinetic energy the product with its speed equal to the boost speed.
+
+        :param photonEnergy:    The energy of the incident photon.
+        :param m2:              The mass of the target.
+        :param m3:              The mass of the product.
+
+        :returns:               A python float.
         """
 
         v_boost = photonEnergy / ( m2 + photonEnergy )
@@ -29,6 +46,14 @@ def twoBodyPhotoNuclearAtThreshold(masses, Q, modifiedProductGroupBoundaries, cr
     def K_com(photonEnergy, m2, m3, m4, Q):
         """
         Returns the kinetic energy of the product in the center-of-mass frame.
+
+        :param photonEnergy:    The energy of the incident photon.
+        :param m2:              The mass of the target.
+        :param m3:              The mass of the product.
+        :param m4:              The mass of the residual.
+        :param Q:               The Q-value for the reaction.
+
+        :returns:               A python float.
         """
 
         return ( photonEnergy * math.sqrt( m2 / ( m2 + 2 * photonEnergy ) ) + K_boost(photonEnergy, m2, m2) + Q ) * m4 / ( m3 + m4 )
@@ -36,6 +61,15 @@ def twoBodyPhotoNuclearAtThreshold(masses, Q, modifiedProductGroupBoundaries, cr
     def findEgForK3(photonEnergy, m2, m3, m4, K3, sign):
         """
         Returns the incident photon energy where the minimum outgoing particle kinetic energy is K3.
+
+        :param photonEnergy:    The energy of the incident photon.
+        :param m2:              The mass of the target.
+        :param m3:              The mass of the product.
+        :param m4:              The mass of the residual.
+        :param K3:              The kinetic energy of the product.
+        :param sign:            -1 if lower photon energy is to be returned and 1 if upper photon energy is to be returned.
+
+        :returns:               A python float.
         """
 
         Eg = photonEnergy

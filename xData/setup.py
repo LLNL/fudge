@@ -8,6 +8,10 @@
 
 import glob
 
+"""
+This module is used to build and install the xData module.
+"""
+
 def setup():
     from setuptools import setup
 

@@ -44,6 +44,18 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains classes for handling a GNDS values container.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class                             | Description                                                           |</span>
+<span class="sd">    +===================================+=======================================================================+</span>
+<span class="sd">    | Values                            | This class represents a GNDS values container.                        |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">copy</span>
 
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">GNDS_formatVersion</span> <span class="k">as</span> <span class="n">GNDS_formatVersionModule</span>
@@ -57,10 +69,41 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
 
 <div class="viewcode-block" id="Values"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values">[docs]</a><span class="k">class</span> <span class="nc">Values</span><span class="p">(</span><span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is used to store a list of numbers. The type of the numbers (e.g., floats, ints) stored is specified by </span>
+<span class="sd">    the *valueType* member.  The list of all numbers the instance represents may be greater than the number of values </span>
+<span class="sd">    in the *values* member as leading and trailing zero values do not have to be stored in the *values* member. </span>
+<span class="sd">    The *start* member specifies the index of the first value in the *values* member with all values before *start* being zero. </span>
+<span class="sd">    The *length* member specifies the total number of values the instance represents, including leading and trailing zero values.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +---------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Member        | Description                                                                       |</span>
+<span class="sd">    +===============+===================================================================================+</span>
+<span class="sd">    | start         | The index of the data represented by the first data value in the values member.   |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | length        | The total number of data values the instance represents, including leading and    |</span>
+<span class="sd">    |               | trailing zero values that are not stored in the *values* member.                  |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | values        | A list of the values not including the first *start* values which are 0.0 or      |</span>
+<span class="sd">    |               | trailing 0.0 values.                                                              |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | valueType     | The type of data stored in the values member.                                     |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;values&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_values</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param _values:         The list of the values to store.</span>
+<span class="sd">        :param valueType:       The type of the data stored in the values member.</span>
+<span class="sd">        :param start:           The index of the data represented by the first data value in the values member.</span>
+<span class="sd">        :param length:          The total number of data values the instance represents, including leading and trailing zero values that are not stored in the *values* member.</span>
+<span class="sd">        :param index:           This is not used.</span>
+<span class="sd">        :param label:           The label of the values instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
@@ -79,18 +122,31 @@
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the number of stored values in *self*. The actual number of values that *self* represents is returned by **self.length** which</span>
-<span class="sd">        includes leading and trailing zeros not stored by *self*.</span>
+<span class="sd">        This method returns the number of stored values in *self*. The actual number of values that *self* represents is returned by the </span>
+<span class="sd">        *length* method which includes leading and trailing zeros not stored by *self*.</span>
+
+<span class="sd">        :returns:           A python int.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__values</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This returns the stored value a index *index* - 1. Note, this will not be the value represented by *self* if *start* is not 0.</span>
+
+<span class="sd">        :param index:   An index into the stored numbers.</span>
+
+<span class="sd">        :returns:       A number of type *valueType*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__values</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Values.copy"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">untrimZeros</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a **values** instance that is a copy of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a :py:class:`Values instance that is a copy of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`Values`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
         <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
@@ -106,31 +162,51 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of values not including the trailing zeros that are not stored.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the number of values not including the trailing zeros that are not stored. Ergo, returns *start* + the number of stored values.</span>
+
+<span class="sd">        :returns:       A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the actual number of values represent by *self* which includes leading and trailing zeros not stored by *self*.</span>
+<span class="sd">        This method returns the actual number of values represented by *self* which includes leading and trailing zeros not stored by *self*.</span>
+
+<span class="sd">        :returns:       A python int.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__length</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the index represent by the first value of *self*. All values before *start* are zeros and are not store by *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the index represent by the first value of *self*. All values before *start* are zeros and are not store by *self*.</span>
+
+<span class="sd">        :returns:       A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to *self*&#39;s values member.</span>
+
+<span class="sd">        :returns:       A python list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__values</span>
 
     <span class="nd">@values</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_values</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This member sets the *values* member of *self* to *_values*</span>
+
+<span class="sd">        :param _values:     The new list of values for *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valueType</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
             <span class="n">checker</span> <span class="o">=</span> <span class="nb">float</span>
@@ -144,20 +220,42 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">valueType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the type of numbers stored in *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__valueType</span>
 
 
 <div class="viewcode-block" id="Values.offsetScaleValues"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values.offsetScaleValues">[docs]</a>    <span class="k">def</span> <span class="nf">offsetScaleValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method multiplies each value of *self* by *scale* and then adds *offset* to the value.</span>
+
+<span class="sd">        :param offset:      The offset for each value.</span>
+<span class="sd">        :param scale:       The multiplying factor for each value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__values</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">__values</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">offset</span></div>
 
 <div class="viewcode-block" id="Values.toString"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a simple string representation of the stored values of *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">strList</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__values</span> <span class="p">]</span>
         <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">strList</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Values.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">intValueFormatter</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>     <span class="c1"># Ignores significantDigits.</span>
 
@@ -230,6 +328,17 @@
 
 <div class="viewcode-block" id="Values.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>      <span class="s1">&#39;valueType&#39;</span><span class="p">:</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>      <span class="s1">&#39;start&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>   <span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
         <span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;valueType&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                                <span class="s1">&#39;start&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="nb">str</span> <span class="p">}</span>
@@ -273,8 +382,13 @@
 <div class="viewcode-block" id="Values.sortAndThin"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values.sortAndThin">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">sortAndThin</span><span class="p">(</span><span class="n">_values</span><span class="p">,</span> <span class="n">rel_tol</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function sorts the list of _values into an ascending order and then thins the list. </span>
+<span class="sd">        This function sorts the list of float in *_values* into an ascending order and then thins the list. </span>
 <span class="sd">        If there are 2 or fewer points in _values, nothing is done.</span>
+
+<span class="sd">        :param rel_tol:     Relative tolerance used to determine if two consecutive points are too close.</span>
+<span class="sd">        :param abs_tol:     Abolute tolerance used to determine if two consecutive points are too close.</span>
+
+<span class="sd">        :returns:       A pythoh list of the sorted, thinned values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">__values</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">_values</span> <span class="p">]</span>
@@ -300,8 +414,10 @@
 <div class="viewcode-block" id="Values.valuesWithTrimmedZeros"><a class="viewcode-back" href="../../xData/index.html#xData.values.Values.valuesWithTrimmedZeros">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">valuesWithTrimmedZeros</span><span class="p">(</span><span class="n">values1</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method determines the *start* and *end* of the non-zero data in *values1* and returns a **values** instance with</span>
+<span class="sd">        This method determines the *start* and *end* of the non-zero data in *values1* and returns a :py:class`Values` instance with</span>
 <span class="sd">        *start* and *length* set accordingly.</span>
+
+<span class="sd">        :returns:       A :py:class`Values` instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values1</span><span class="p">)</span>

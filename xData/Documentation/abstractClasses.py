@@ -7,6 +7,20 @@
 
 """
 This module contains the Affiliation, Affiliations, Note and AuthorAbstract classes.
+
+This module contains the following classes:
+
+    +---------------------------+-------------------------------------------------------------------------------+
+    | Class                     | Description                                                                   |
+    +===========================+===============================================================================+
+    | Affiliation               | This class represents a GNDS author/affiliations/affiliation node.            |
+    +---------------------------+-------------------------------------------------------------------------------+
+    | Affiliations              | This is the suite class for the GNDS/documentation/authors affiliations node. |
+    +---------------------------+-------------------------------------------------------------------------------+
+    | Note                      | This is a class representing a GNDS authors/author/note node.                 |
+    +---------------------------+-------------------------------------------------------------------------------+
+    | AuthorAbstract            | TThis is an abstract class for GNDS/documentation author nodes.               |
+    +---------------------------+-------------------------------------------------------------------------------+
 """
 
 from LUPY import ancestry as ancestryModule
@@ -15,12 +29,28 @@ from .. import suite as suiteModule
 from .. import text as textModule
 
 class Affiliation( textModule.Text ) :
-    """A class representing a GNDS author/affiliations/affiliation node."""
+    """
+    This class represents a GNDS author/affiliations/affiliation node.
+
+    The following table list the primary members of this class:
+
+    +---------------+---------------------------------------------------------------+
+    | Member        | Description                                                   |
+    +===============+===============================================================+
+    | name          | The name of the institution.                                  |
+    +---------------+---------------------------------------------------------------+
+    | href          | The url for the institution.                                  |
+    +---------------+---------------------------------------------------------------+
+    """
 
     moniker = 'affiliation'
     keyName = 'label'
 
     def __init__( self, name = '', href = '' ) :
+        """
+        :param name:    The name of the institution.
+        :param href:    The url for the institution.
+        """
 
         textModule.Text.__init__( self )
 
@@ -50,6 +80,13 @@ class Affiliation( textModule.Text ) :
         self.__href = textModule.raiseIfNotString( value, 'href' )
 
     def XML_extraAttributes( self, **kwargs ) :
+        """
+        This methods returns the XML attributes for *self* as a single python str.
+
+        :kwargs:        This argument is not used.
+
+        :returns:       A python str.
+        """
 
         attributes = ''
         if( len( self.__name ) > 0 ) : attributes += ' name="%s"' % self.__name
@@ -66,6 +103,9 @@ class Affiliation( textModule.Text ) :
         return cls(name, href)
 
 class Affiliations( suiteModule.Suite ) :
+    """
+    This is the suite class for the GNDS/documentation/authors affiliations node.
+    """
 
     moniker = 'affiliations'
     suiteName = 'label'
@@ -75,15 +115,41 @@ class Affiliations( suiteModule.Suite ) :
         suiteModule.Suite.__init__( self, [ Affiliation ] )
 
 class Note( textModule.Text ) :
-    """A class representing a GNDS authors/author/note node."""
+    """
+    This is a class representing a GNDS authors/author/note node.
+    """
 
     moniker = 'note'
 
 class AuthorAbstract(ancestryModule.AncestryIO):
+    """
+    This is an abstract class for GNDS/documentation author nodes.
+
+    The following table list the primary members of this class:
+
+    +---------------+---------------------------------------------------------------+
+    | Member        | Description                                                   |
+    +===============+===============================================================+
+    | name          | The author's name.                                            |
+    +---------------+---------------------------------------------------------------+
+    | orcid         | The orcid of the author.                                      |
+    +---------------+---------------------------------------------------------------+
+    | email         | The email address of the author.                              |
+    +---------------+---------------------------------------------------------------+
+    | affiliations  | A suiite of auther affiliations.                              |
+    +---------------+---------------------------------------------------------------+
+    | note          | Notes about the author.                                       |
+    +---------------+---------------------------------------------------------------+
+    """
 
     ancestryMembers = ( 'affiliations', 'note' )
 
     def __init__( self, name, orcid, email ) :
+        """
+        :param name:    The author's name.
+        :param orcid:   The orcid of the author.
+        :param email:   The email address of the author.
+        """
 
         ancestryModule.AncestryIO.__init__(self)
 
@@ -99,34 +165,62 @@ class AuthorAbstract(ancestryModule.AncestryIO):
 
     @property
     def name( self ) :
-        """."""
+        """
+        This method returns that name of the author.
+
+        :returns:   A python str.
+        """
 
         return( self.__name )
 
     @property
     def orcid(self):
+        """
+        This method returns the orcid of the author.
+
+        :returns:   A python str.
+        """
 
         return self.__orcid
 
     @property
     def email( self ) :
-        """."""
+        """
+        This method returns that email of the author.
+
+        :returns:   A python str.
+        """
 
         return( self.__email )
 
     @property
     def affiliations( self ) :
-        """."""
+        """
+        This method returns a reference to the affiliations suite.
+
+        :returns:       A instance of :py:class:`Affiliations`.
+        """
 
         return( self.__affiliations )
 
     @property
     def note( self ) :
-        """."""
+        """
+        This method returns a reference to the note member.
+
+        :returns:       A instance of :py:class:`Note`.
+        """
 
         return( self.__note )
 
     def XML_extraAttributes( self, **kwargs ) :
+        """
+        This methods returns the XML attributes for *self* as a single python str.
+
+        :kwargs:        This argument is not used.
+
+        :returns:       A python str.
+        """
 
         attributes = ' name="%s"' % self.__name
         if len(self.__orcid) > 0: attributes += ' orcid="%s"' % self.__orcid
@@ -135,6 +229,14 @@ class AuthorAbstract(ancestryModule.AncestryIO):
         return attributes
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 

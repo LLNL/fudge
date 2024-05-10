@@ -91,28 +91,109 @@
 </section>
 <section id="module-fudge.processing.miscellaneous">
 <span id="fudge-processing-miscellaneous-module"></span><h2>fudge.processing.miscellaneous module<a class="headerlink" href="#module-fudge.processing.miscellaneous" title="Permalink to this heading">¶</a></h2>
+<p>This module contains functions used internally by FUDGE to multi-group 1d functions.</p>
+<p>This module contains the following functions:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>_toLinear</p></td>
+<td><p>This function returns an XYs1d linear version of its argument.</p></td>
+</tr>
+<tr class="row-odd"><td><p>_groupFunctionsAndFluxInit</p></td>
+<td><p>Takes raw transfer matrices and wraps them in a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">multiGroupModule.Form</span></code> instance.</p></td>
+</tr>
+<tr class="row-even"><td><p>_mutualifyGrouping3Data</p></td>
+<td><p>Reads in a file and returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">Groups</span></code> instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p>groupOneFunctionAndFlux</p></td>
+<td><p>Reads in a file and returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">Groups</span></code> instance.</p></td>
+</tr>
+<tr class="row-even"><td><p>groupTwoFunctionsAndFlux</p></td>
+<td><p>Reads in a file and returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">Groups</span></code> instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p>groupFunctionCrossSectionAndFlux</p></td>
+<td><p>Reads in a file and returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">Groups</span></code> instance.</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.miscellaneous.groupFunctionCrossSectionAndFlux">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.miscellaneous.</span></span><span class="sig-name descname"><span class="pre">groupFunctionCrossSectionAndFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printMutualDomainWarning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/miscellaneous.html#groupFunctionCrossSectionAndFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.miscellaneous.groupFunctionCrossSectionAndFlux" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function multi-groups <img class="math" src="../_images/math/642882586a4156f4e6d997709f5a68257de3153b.png" alt="f1"/> with the product of the cross section in <em>tempInfo</em>.
+This function if for internal use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> – The Gridded1d class to return that has the multi-group data.</p></li>
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>f1</strong> – One of the two functions that represent the product this is multi-grouped.</p></li>
+<li><p><strong>printMutualDomainWarning</strong> – If True, a warning is printed if the domain of <img class="math" src="../_images/math/642882586a4156f4e6d997709f5a68257de3153b.png" alt="f1"/> and <img class="math" src="../_images/math/0e284065ac9072ea96e09fd92665be307dd2ee4f.png" alt="f2"/> are not mutual.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of <em>cls</em>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.miscellaneous.groupOneFunctionAndFlux">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.miscellaneous.</span></span><span class="sig-name descname"><span class="pre">groupOneFunctionAndFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">styleFilter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/miscellaneous.html#groupOneFunctionAndFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.miscellaneous.groupOneFunctionAndFlux" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function mulit-groups <img class="math" src="../_images/math/642882586a4156f4e6d997709f5a68257de3153b.png" alt="f1"/>. This function if for internal use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>f1</strong> – The function that to multi-grouped.</p></li>
+<li><p><strong>styleFilter</strong> – See method findFormMatchingDerivedStyle of the class Style.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list like object of the multi-group values.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.miscellaneous.groupTwoFunctionsAndFlux">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.miscellaneous.</span></span><span class="sig-name descname"><span class="pre">groupTwoFunctionsAndFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printMutualDomainWarning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/miscellaneous.html#groupTwoFunctionsAndFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.miscellaneous.groupTwoFunctionsAndFlux" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function mulit-groups the product of two function, <img class="math" src="../_images/math/bf628593ebb669b7b7617882a973fe894a7b16ec.png" alt="f1 \times f2"/>. Typically, <img class="math" src="../_images/math/0e284065ac9072ea96e09fd92665be307dd2ee4f.png" alt="f2"/> is a cross section.
+This function if for internal use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>style</strong> – This is the multi-group style for the multi-group data.</p></li>
+<li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
+<li><p><strong>f1</strong> – One of the two functions that represent the product this is multi-grouped.</p></li>
+<li><p><strong>f2</strong> – One of the two functions that represent the product this is multi-grouped.</p></li>
+<li><p><strong>norm</strong> – A normalization to divided the multi-groups by.</p></li>
+<li><p><strong>printMutualDomainWarning</strong> – If True, a warning is printed if the domain of <img class="math" src="../_images/math/642882586a4156f4e6d997709f5a68257de3153b.png" alt="f1"/> and <img class="math" src="../_images/math/0e284065ac9072ea96e09fd92665be307dd2ee4f.png" alt="f2"/> are not mutual.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list like object of the multi-group values.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-fudge.processing.processingInfo">
 <span id="fudge-processing-processinginfo-module"></span><h2>fudge.processing.processingInfo module<a class="headerlink" href="#module-fudge.processing.processingInfo" title="Permalink to this heading">¶</a></h2>
+<p>Nothing in the module is being used so the module should be deleted.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="fudge.processing.processingInfo.ProcessInfo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.processing.processingInfo.</span></span><span class="sig-name descname"><span class="pre">ProcessInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#ProcessInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.processingInfo.ProcessInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is not used ans should be deleted.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.processing.processingInfo.ProcessInfo.addParticle">
 <span class="sig-name descname"><span class="pre">addParticle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#ProcessInfo.addParticle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.processingInfo.ProcessInfo.addParticle" title="Permalink to this definition">¶</a></dt>
@@ -154,6 +235,7 @@
 <dt class="sig sig-object py" id="fudge.processing.processingInfo.ProcessInfo2">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.processing.processingInfo.</span></span><span class="sig-name descname"><span class="pre">ProcessInfo2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reactionSuite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosityIndentStep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span>&#160; <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energyAccuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">momentumAccuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#ProcessInfo2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.processingInfo.ProcessInfo2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is not used ans should be deleted.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.processing.processingInfo.ProcessInfo2.checkStyle">
 <span class="sig-name descname"><span class="pre">checkStyle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#ProcessInfo2.checkStyle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.processingInfo.ProcessInfo2.checkStyle" title="Permalink to this definition">¶</a></dt>
@@ -205,18 +287,21 @@
 <dt class="sig sig-object py" id="fudge.processing.processingInfo.ProcessInfoLLNL">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.processing.processingInfo.</span></span><span class="sig-name descname"><span class="pre">ProcessInfoLLNL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LLNL_Pn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#ProcessInfoLLNL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.processingInfo.ProcessInfoLLNL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.processing.processingInfo.ProcessInfo" title="fudge.processing.processingInfo.ProcessInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessInfo</span></code></a></p>
+<p>This class is not used ans should be deleted.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="fudge.processing.processingInfo.ProcessInfoParticle">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.processing.processingInfo.</span></span><span class="sig-name descname"><span class="pre">ProcessInfoParticle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lMax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conservationFlag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'conserveParticle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#ProcessInfoParticle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.processingInfo.ProcessInfoParticle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is not used ans should be deleted.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="fudge.processing.processingInfo.TempInfo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.processing.processingInfo.</span></span><span class="sig-name descname"><span class="pre">TempInfo</span></span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#TempInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.processingInfo.TempInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is not used ans should be deleted.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.processing.processingInfo.TempInfo.get">
 <span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/processingInfo.html#TempInfo.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.processingInfo.TempInfo.get" title="Permalink to this definition">¶</a></dt>

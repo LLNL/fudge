@@ -51,6 +51,24 @@
 <span class="sd">contect a child node to its parent node.</span>
 
 <span class="sd">This module was mainly written to support linking and xpath referencing in a GNDS hierarchy.</span>
+
+<span class="sd">    This module contains the following classes:</span>
+<span class="sd">                             </span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+ </span>
+<span class="sd">    | Class             | Description                                                           |</span>
+<span class="sd">    +===================+=======================================================================+</span>
+<span class="sd">    | Ancestry          | Base class used by other ancestry classes.                            |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | AncestryIO_base   | This class adds reading and writing methods.                          |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | AncestryIO        | Base class for :py:class:`FSubform`, :py:class:`FSubform`,            |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | AncestryIO_bare   | This is an abstruct class that defined the abstract                   |</span>
+<span class="sd">    |                   | method :py:class:`AncestryIO_bare.parseNodeUsingClass`.               |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | AncestryIO_base   | This is an abstruct class that defined the abstract                   |</span>
+<span class="sd">    |                   | method :py:class:`AncestryIO_bare.parseNode`.                         |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -90,14 +108,13 @@
 <span class="sd">        | legacyMemberNameMapping   | A map whose keys are legacy member names and whose associated values are the current memeber names.       |</span>
 <span class="sd">        +---------------------------+-----------------------------------------------------------------------------------------------------------+</span>
 <span class="sd">        | monikerByFormat           | If the moniker had a different name for in a prior format version, then this is a dict of key/value where |</span>
-<span class="sd">        |                           | key it the format version and its associated value is the moniker used for that format version.           |</span>
 <span class="sd">        +---------------------------+-----------------------------------------------------------------------------------------------------------+</span>
 
-<span class="sd">    This class defines moniker to be abstract meaning that all classes that inherit from this class must define moniker.</span>
+<span class="sd">    This class defines the member moniker to be an abstract member, meaning that all classes that inherit from this class must define moniker.</span>
 <span class="sd">    The main reason for the **keyName** is that is it used by a **Suite** instance to reference (i.e., uniquely identify) its children.</span>
 
-<span class="sd">    An instance has the xlink &#39;/the/list/of/ancestors/andSelf&#39; if attribute is None or</span>
-<span class="sd">    &#39;/the/list/of/ancestors/andSelf[@attribute=&quot;value&quot;]&#39; if attribute is not None where each string</span>
+<span class="sd">    An instance has the xlink &#39;/the/list/of/ancestors/andSelf&#39; if its attribute member is None or</span>
+<span class="sd">    &#39;/the/list/of/ancestors/andSelf[@attribute=&quot;value&quot;]&#39; if its attribute member is not None where each string</span>
 <span class="sd">    part of the xpath the value of the moniker for that node. For example,</span>
 <span class="sd">    for a hierarchy consisting of::</span>
 
@@ -106,7 +123,7 @@
 <span class="sd">                member mC of class C and class C with moniker &#39;nameC&#39;,</span>
 
 <span class="sd">    then the xlink for an instance of a C class in the hierarchy is &#39;/nameA/nameB/nameC&#39;. If the mC instance</span>
-<span class="sd">    set attribute to be the member &#39;greeting&#39; that, for this example as value &#39;Hi&#39;, then the</span>
+<span class="sd">    set the attribute member to &#39;greeting&#39;, then for this example with value &#39;Hi&#39;, then the</span>
 <span class="sd">    xlink for the C class is &#39;/nameA/nameB/nameC[@greeting=&quot;Hi&quot;]&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -127,18 +144,19 @@
     <span class="nd">@property</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">moniker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Abstract method that must be defined by all classes that inherit this class. Must return the moniker of the instance.&quot;&quot;&quot;</span>
 
         <span class="k">pass</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ancestor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s ancestor.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s ancestor. That is, its parent.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ancestor</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">keyValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s keyValue. If keyName is *None*, then *None* is returned.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s keyValue as determined by the member *keyName*. If keyName is None, then None is returned.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyName</span><span class="p">)</span>
@@ -147,7 +165,7 @@
     <span class="k">def</span> <span class="nf">rootAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Traverse up the ancestry tree to the root ancestor and returns a reference to it. </span>
-<span class="sd">        The root ancestor is the instance whose ancestor is None.</span>
+<span class="sd">        The root ancestor is the ancestor instance whose ancestor is None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestor</span> <span class="o">=</span> <span class="bp">self</span>
@@ -156,7 +174,8 @@
 
 <div class="viewcode-block" id="Ancestry.checkAncestry"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.checkAncestry">[docs]</a>    <span class="k">def</span> <span class="nf">checkAncestry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method checks that all ancestryMembers are properly set up. This method checks *self* and all its child nodes.</span>
+<span class="sd">        This method checks that all ancestryMembers are properly set up. This method checks *self* and all its child nodes as</span>
+<span class="sd">        determined by the *ancestryMembers* member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">child</span><span class="p">):</span>
@@ -194,7 +213,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses deepcopy to make a copy of self.</span>
 
-<span class="sd">        :return: copy of self</span>
+<span class="sd">        :return:            A copy of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">link</span> <span class="k">as</span> <span class="n">linkModule</span>
@@ -231,12 +250,31 @@
                     <span class="n">child</span><span class="o">.</span><span class="n">_copyPost</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Ancestry.findAttributeInAncestry"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.findAttributeInAncestry">[docs]</a>    <span class="k">def</span> <span class="nf">findAttributeInAncestry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributeName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method checks if *self* has an member (i.e., attribute) with name *attributeName*. If so, it returns its value. If</span>
+<span class="sd">        not, this method recursively searches up the ancestry tree by calling :py:class:`Ancestry.findAttributeInAncestry` on its ancestor.</span>
+<span class="sd">        If root is reached and no member named *attributeName* is found, a raise is executed.</span>
+
+<span class="sd">        :param attributeName:   The name of the member whose value it to be returned.</span>
+
+<span class="sd">        :raise:                 If member with name *attributeName* is not found in self or its ancestry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributeName</span><span class="p">):</span> <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributeName</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ancestor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Could not find attribute name = </span><span class="si">%s</span><span class="s1"> in ancestry&#39;</span> <span class="o">%</span> <span class="n">attributeName</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ancestor</span><span class="o">.</span><span class="n">findAttributeInAncestry</span><span class="p">(</span><span class="n">attributeName</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ancestry.findClassInAncestry"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.findClassInAncestry">[docs]</a>    <span class="k">def</span> <span class="nf">findClassInAncestry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method checks if *self* has an member that is an instance of *class_*. If so, a reference to it is returned.</span>
+<span class="sd">        If not, this method recursively searches up the ancestry tree by calling :py:class:`Ancestry.findClassInAncestry` on its ancestor</span>
+<span class="sd">        until an instance of *class_* is found or root is reached. If root is reached and no instance of *class_* found,</span>
+<span class="sd">        a raise is executed.</span>
+
+<span class="sd">        :param class_:      The class to search for in self and its ancestors.</span>
+
+<span class="sd">        :raises:            If an instance of class *class_* is not found in self or its ancestry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ancestor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Could not find class name = </span><span class="si">%s</span><span class="s1"> in ancestry&#39;</span> <span class="o">%</span> <span class="n">class_</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
@@ -244,11 +282,17 @@
 
 <div class="viewcode-block" id="Ancestry.findEntity"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.findEntity">[docs]</a>    <span class="k">def</span> <span class="nf">findEntity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Default findEntity method. In general, sub-classes should over-ride this method.</span>
+<span class="sd">        This method takes one part of an xpath (e.g., the &#39;pathB&#39; in /pathA/pathB/pathC&#39;) and returns a </span>
+<span class="sd">        reference to the instance of *self* that match that part of the xpath.</span>
+<span class="sd">        Thie is a default findEntity method. In general, sub-classes should over-ride this method.</span>
 <span class="sd">        This method uses the following algorithm to find entity. Firstly, if &#39;attribute&#39; is None, then self is assumed</span>
 <span class="sd">        to have an attribute named entityName which is taken to be the desired entity. Otherwise, self is iterated</span>
-<span class="sd">        over until an item with an attribute named attribute with value value is found. In either case, if</span>
-<span class="sd">        an entity is found, its moniker value must be entityName. If no entity is found, raise AttributeError.</span>
+<span class="sd">        over until an item with an attribute named attribute with value *value* is found. In either case, if</span>
+<span class="sd">        an entity is found, its moniker value must be entityName. If no entity is found, a raise AttributeError is executed.</span>
+
+<span class="sd">        :param entityName:      ?</span>
+<span class="sd">        :param attribute:       ?</span>
+<span class="sd">        :param value:           ?</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">entityName</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">legacyMemberNameMapping</span><span class="p">:</span> <span class="n">entityName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">legacyMemberNameMapping</span><span class="p">[</span><span class="n">entityName</span><span class="p">]</span>
@@ -354,15 +398,23 @@
 
 <div class="viewcode-block" id="Ancestry.followXPath"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.followXPath">[docs]</a>    <span class="k">def</span> <span class="nf">followXPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xPath</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param xPath: string xPath, e.g. &quot;/reactionSuite/reactions/reaction[@label=&#39;2&#39;]&quot;</span>
+<span class="sd">        This method returns the instance referenced to by the xpath *xPath* starting at *self* if the xpath is relative.</span>
+<span class="sd">        This method uses Ancestry.findEntity to find each part of the xpath.</span>
 
-<span class="sd">        :return: class instance pointed to by xPath</span>
+<span class="sd">        :param xPath:   String xPath, e.g., &quot;/reactionSuite/reactions/reaction[@label=&#39;2&#39;]&quot;.</span>
 
-<span class="sd">        Uses Ancestry.findEntity to find each element</span>
+<span class="sd">        :return:        Class instance pointed to by xPath</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">follow2</span><span class="p">(</span><span class="n">xPathList</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;For internal use. Recursive helper function: descend the path to find the correct element.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            For internal use. Recursive helper function that descends the xpath starting at *node* to find the instance referenced by *xPathList*.</span>
+
+<span class="sd">            :param xPathList:       Python list of xpath parts.</span>
+<span class="sd">            :param node:            The current node to search for the first element of *xPathList*.</span>
+
+<span class="sd">            :returns:               The instance referenced by *xPathList*.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xPathList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">node</span>
 
@@ -461,19 +513,33 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class adds methods to read and write *self* to a file. Currently, its supports reading and writing to an XML file.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AncestryIO_base.toXML"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls self.toXML_strList and joins its returned list with &#39;\n&#39;.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls self.toXML_strList and joins its returned list with &#39;\n&#39;.</span>
+
+<span class="sd">        :param indent:              Amount of starting indentation.</span>
+<span class="sd">        :param kwargs:              A dictionary that contains data to control the way this method acts.</span>
+
+<span class="sd">        :returns:                   XML representation of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="AncestryIO_base.toXML_strList"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.toXML_strList">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of *self*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of *self*.</span>
+
+<span class="sd">        :param kwargs:              A dictionary that contains data to control the way this method acts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="AncestryIO_base.saveToOpenedFile"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.saveToOpenedFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveToOpenedFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fOut</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes an XML representation of *self* to the opened file *fOut*. This method uses *self.toXML* to construct *self*&#39;s XML representation.</span>
+<span class="sd">        Writes an XML representation of *self* to the opened file *fOut*. This method uses *self.toXML* to construct XML representation of *self*.</span>
+
+<span class="sd">        :param fOut:                File stream to write *self* to.</span>
+<span class="sd">        :param kwargs:              A dictionary that contains data to control the way this method acts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">fOut</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
@@ -481,7 +547,11 @@
 
 <div class="viewcode-block" id="AncestryIO_base.saveToFile"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.saveToFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveToFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes an XML representation of *self* to path *fileName*. This methods opens the file and calls **saveToOpenedFile** and then closes the file.</span>
+<span class="sd">        Writes an XML representation of *self* to path *fileName*. This method opens the file and calls **saveToOpenedFile** </span>
+<span class="sd">        and then closes the file.</span>
+
+<span class="sd">        :param fileName:            File path to write *self* to.</span>
+<span class="sd">        :param kwargs:              A dictionary that contains data to control the way this method acts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
@@ -494,8 +564,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Saves *self* to as two files, with most of the hierarchy in an XML file but most of the numerical data saved in an associated HDF file.</span>
 <span class="sd">        To construct the file names, the best is to leave *HDF_name* as None. However, if the HDF file should be put into a sub-directory</span>
-<span class="sd">        below where the XML file will be placed, then one can leave *HDF_name* as **None** and set *HDF_subDir*. For example, to</span>
-<span class="sd">        place the HDF file is the sub-directory &#39;HDF&#39;, set HDF_subDir=&#39;HDF&#39;. The following example will write the XMl to the file</span>
+<span class="sd">        below where the XML file will be placed, then one can leave *HDF_name* as None and set *HDF_subDir*. For example, to</span>
+<span class="sd">        place the HDF file is the sub-directory &#39;HDF&#39;, set HDF_subDir=&#39;HDF&#39;. The following example will write the XML to the file</span>
 <span class="sd">        &#39;path/to/n-Pu239.xml&#39; and the HDF data to the file &#39;path/to/HDF/n-Pu239.h5&#39;:</span>
 
 <span class="sd">        node.saveToHybrid(&#39;path/to/n-Pu239.xml&#39;, HDF_subDir=&#39;HDF&#39;)</span>
@@ -506,7 +576,7 @@
 <span class="sd">        :param minLength:   Minimum number of numerical values in a *Values* node before writing the *Values* node to HDF.</span>
 <span class="sd">        :param flatten:     If True, GNDS datasets are concatenated into flattened HDF5 datasets.</span>
 <span class="sd">        :param compress:    Enable gzip + shuffle compression for HDF5 datasets.</span>
-<span class="sd">        :param kwargs:      Extra keywork arguments passed to other functions.</span>
+<span class="sd">        :param kwargs:      A dictionary that contains data to control the way this method acts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">externalFile</span> <span class="k">as</span> <span class="n">externalFileModule</span>
@@ -564,13 +634,18 @@
 
 <div class="viewcode-block" id="AncestryIO_base.parseAncestryMembers"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.parseAncestryMembers">[docs]</a>    <span class="k">def</span> <span class="nf">parseAncestryMembers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The method parses all member of *self.ancestryMembers* found in *node*. If *kwargs* contains the key *membersToSkip*</span>
-<span class="sd">        then all members of *self* whose moniker is in the list *kwargs[&#39;membersToSkip&#39;] are not parsed. This, for example,</span>
-<span class="sd">        allows the calling instance to parse the *externalFiles* member and set up needed entries into *kwargs*.</span>
+<span class="sd">        The method parses all members defined in the ancestryMembers of *self* that are  found in *node*.  If *kwargs* contains </span>
+<span class="sd">        the key *membersToSkip* then all members of *self* whose moniker is in the list *kwargs[&#39;membersToSkip&#39;] are not parsed. </span>
+<span class="sd">        This, for example, allows the calling instance to parse the *externalFiles* member and set up needed entries into *kwargs*.</span>
 
 <span class="sd">        This method returns a dictionary and a list. The dictionary contains all child nodes of *node* not parsed, including </span>
 <span class="sd">        those specified by membersToSkip. The keys in the dictionary are the member monikers and the items are their associated </span>
 <span class="sd">        child node of *node*. The list contains all monikers for the *ancestryMembers* not in *node*.</span>
+
+<span class="sd">        :param node:        A :py:class:`xmlNodeMode.XML_node` instance.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary that contains data to control the way this method acts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">membersToSkip</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;membersToSkip&#39;</span><span class="p">,</span> <span class="p">[])</span>
@@ -592,6 +667,9 @@
 <div class="viewcode-block" id="AncestryIO_base.parseCleanup"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.parseCleanup">[docs]</a>    <span class="k">def</span> <span class="nf">parseCleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method does nothing. A place holder incase the derived class needs one.</span>
+
+<span class="sd">        :param node:        A :py:class:`xmlNodeMode.XML_node` instance.</span>
+<span class="sd">        :param kwargs:      A dictionary that contains data to control the way this method acts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">pass</span></div>
@@ -599,7 +677,12 @@
 <div class="viewcode-block" id="AncestryIO_base.parseXMLString"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.parseXMLString">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseXMLString</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parses a XML string using class *cls*.</span>
+<span class="sd">        This method parses a XML string to construct an instance of *cls*.</span>
+
+<span class="sd">        :param string:      String to parse.</span>
+<span class="sd">        :param kwargs:      A dictionary that contains data to control the way this method acts.</span>
+
+<span class="sd">        :returns:           An instance of *cls*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid string.&#39;</span><span class="p">)</span>
@@ -615,7 +698,13 @@
 <div class="viewcode-block" id="AncestryIO_base.readXML_file"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base.readXML_file">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">readXML_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads and parses an XML file using class *cls*.</span>
+<span class="sd">        This methods reads and parses the data in file *fileName* to construct an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         The class to construct from the data in file *fileName*.</span>
+<span class="sd">        :param fileName:    Path to the file used to construct an instance of *cls*.</span>
+<span class="sd">        :param kwargs:      A dictionary that contains data to control the way this method acts.</span>
+
+<span class="sd">        :returns:           An instance of *cls*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">):</span>
@@ -636,27 +725,48 @@
         <span class="k">return</span> <span class="n">instance</span></div></div>
 
 <div class="viewcode-block" id="AncestryIO"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO">[docs]</a><span class="k">class</span> <span class="nc">AncestryIO</span><span class="p">(</span><span class="n">AncestryIO_base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is an abstruct class that defined the abstract method :py:class:`AncestryIO_bare.parseNodeUsingClass`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AncestryIO.parseNodeUsingClass"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method must be overrwritten by the derived class.</span>
+<span class="sd">        The overrwritten method must construct a class of instance *cls* using *node* </span>
+
+<span class="sd">        :param node:        A :py:class:`xmlNodeMode.XML_node` instance.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary that contains data to control the way this method acts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">pass</span></div></div>
 
 <div class="viewcode-block" id="AncestryIO_bare"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_bare">[docs]</a><span class="k">class</span> <span class="nc">AncestryIO_bare</span><span class="p">(</span><span class="n">AncestryIO_base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is an abstruct class that defined the abstract method :py:class:`AncestryIO_bare.parseNode`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AncestryIO_bare.parseNode"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_bare.parseNode">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method must be overrwritten by the derived class.</span>
+<span class="sd">        The overrwritten method must fill in *self* with data in *node*.</span>
+
+<span class="sd">        :param node:        A :py:class:`xmlNodeMode.XML_node` instance.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary that contains data to control the way this method acts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">pass</span></div></div>
 
 <div class="viewcode-block" id="XPathNotFound"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.XPathNotFound">[docs]</a><span class="k">class</span> <span class="nc">XPathNotFound</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception class which is raised when the :py:func:`followXPath` cannot follow the path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
 </pre></div>

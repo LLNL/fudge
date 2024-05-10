@@ -5,6 +5,29 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+""" 
+This module contains functions used internally by FUDGE to multi-group 1d functions.
+        
+This module contains the following functions: 
+        
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Class                                 | Description                                                                       |
+    +=======================================+===================================================================================+
+    | _toLinear                             | This function returns an XYs1d linear version of its argument.                    |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | _groupFunctionsAndFluxInit            | Takes raw transfer matrices and wraps them in a                                   |
+    |                                       | :py:class:`multiGroupModule.Form` instance.                                       |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | _mutualifyGrouping3Data               | Reads in a file and returns a :py:class:`Groups` instance.                        |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | groupOneFunctionAndFlux               | Reads in a file and returns a :py:class:`Groups` instance.                        |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | groupTwoFunctionsAndFlux              | Reads in a file and returns a :py:class:`Groups` instance.                        |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | groupFunctionCrossSectionAndFlux      | Reads in a file and returns a :py:class:`Groups` instance.                        |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+"""
+
 accuracy = 1e-6
 
 from xData import enums as xDataEnumsModule
@@ -17,6 +40,14 @@ from xData import regions as regionsModule
 from . import group as groupModule
 
 def _toLinear(func):
+    """
+    This function returns an XYs1d linear version of :math:`func`.
+    This function if for internal use.
+
+    :param func:    Function to convert to a lin-lin XYs1d instance.
+
+    :returns:       An XYs1d instace.
+    """
 
     if isinstance(func, XYs1dModule.XYs1d):
         if func.interpolation == xDataEnumsModule.Interpolation.linlin:
@@ -30,6 +61,16 @@ def _toLinear(func):
     raise Exception( 'FIX ME' )
 
 def _groupFunctionsAndFluxInit( style, tempInfo, f1 ) :
+    """
+    This function returns the flux and multi-group boundaries from *style* and *tempInfo*, and domainSlices the
+    flux to the domain of :math:`f1` if it is not None.  This function if for internal use.
+
+    :param style:           This is the multi-group style for the multi-group data.
+    :param tempInfo:        This is a dictionary with needed data.
+    :param f1:              A 1-d function whose domain is used to set the domain limit of the returned flux.
+
+    :returns:               The multi-group boundaries and flux.
+    """
 
     reactionSuite = tempInfo['reactionSuite']
     groupBoundaries = style.transportables[reactionSuite.projectile].group.boundaries
@@ -40,6 +81,17 @@ def _groupFunctionsAndFluxInit( style, tempInfo, f1 ) :
     return( groupBoundaries, flux )
 
 def _mutualifyGrouping3Data( f1, f2, f3, printMutualDomainWarning = False ) :
+    r"""
+    This function returns versions of :math:`f1`, :math:`f2` and :math:`f3` whose domains are all mutual.
+    This function if for internal use.
+
+    :param f1:                          One of the two functions that represent the product this is multi-grouped.
+    :param f2:                          One of the two functions that represent the product this is multi-grouped.
+    :param f3:                          One of the two functions that represent the product this is multi-grouped.
+    :param printMutualDomainWarning:    If True, a warning is printed if the domain of :math:`f1`, :math:`f2` and :math:`f3` are not mutual.
+
+    :returns:                           Versions of :math:`f1`, :math:`f2` and :math:`f3` whose domains are all mutual.
+    """
 
     domainMin1, domainMax1 = f1.domainMin, f1.domainMax
     domainMin2, domainMax2 = f2.domainMin, f2.domainMax
@@ -57,6 +109,16 @@ def _mutualifyGrouping3Data( f1, f2, f3, printMutualDomainWarning = False ) :
     return( f1, f2, f3 )
 
 def groupOneFunctionAndFlux( style, tempInfo, f1, styleFilter = None ) :
+    r"""
+    This function mulit-groups :math:`f1`. This function if for internal use.
+
+    :param style:           This is the multi-group style for the multi-group data.
+    :param tempInfo:        This is a dictionary with needed data.
+    :param f1:              The function that to multi-grouped.
+    :param styleFilter:     See method findFormMatchingDerivedStyle of the class Style.
+
+    :returns:               A list like object of the multi-group values.
+    """
 
     if( isinstance( f1, linkModule.Link ) ) : f1 = style.findFormMatchingDerivedStyle( f1.link, styleFilter = styleFilter )
     f1 = _toLinear( f1 )
@@ -64,6 +126,19 @@ def groupOneFunctionAndFlux( style, tempInfo, f1, styleFilter = None ) :
     return( f1.groupTwoFunctions( groupBoundaries, flux, norm = tempInfo['groupedFlux'] ) )
 
 def groupTwoFunctionsAndFlux( style, tempInfo, f1, f2, norm = None, printMutualDomainWarning = False ) :
+    r"""
+    This function mulit-groups the product of two function, :math:`f1 \times f2`. Typically, :math:`f2` is a cross section.
+    This function if for internal use.
+
+    :param style:                       This is the multi-group style for the multi-group data.
+    :param tempInfo:                    This is a dictionary with needed data.
+    :param f1:                          One of the two functions that represent the product this is multi-grouped.
+    :param f2:                          One of the two functions that represent the product this is multi-grouped.
+    :param norm:                        A normalization to divided the multi-groups by.
+    :param printMutualDomainWarning:    If True, a warning is printed if the domain of :math:`f1` and :math:`f2` are not mutual.
+
+    :returns:                           A list like object of the multi-group values.
+    """
 
     f1 = _toLinear( f1 )
     f2 = _toLinear( f2 )
@@ -72,6 +147,18 @@ def groupTwoFunctionsAndFlux( style, tempInfo, f1, f2, norm = None, printMutualD
     return( f1.groupThreeFunctions( groupBoundaries, flux, f2, norm = norm ) )
 
 def groupFunctionCrossSectionAndFlux( cls, style, tempInfo, f1, printMutualDomainWarning = False ) :
+    """
+    This function multi-groups :math:`f1` with the product of the cross section in *tempInfo*.
+    This function if for internal use.
+
+    :param cls:                         The Gridded1d class to return that has the multi-group data.
+    :param style:                       This is the multi-group style for the multi-group data.
+    :param tempInfo:                    This is a dictionary with needed data.
+    :param f1:                          One of the two functions that represent the product this is multi-grouped.
+    :param printMutualDomainWarning:    If True, a warning is printed if the domain of :math:`f1` and :math:`f2` are not mutual.
+
+    :returns:                           An instance of *cls*.
+    """
 
     crossSection = tempInfo['crossSection']
     norm = tempInfo['groupedFlux']

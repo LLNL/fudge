@@ -5,27 +5,46 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module containes the class for storing a mathematical matrix (i.e., 2d-array), and support several matrix operations on the matrix.
+
+This module contains the following classes:
+
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | Matrix                            | This class stores a mathematical matrix.                              |
+    +-----------------------------------+-----------------------------------------------------------------------+
+"""
+
 import numpy
 
 from . import vector as vectorModule
 
 class Matrix():
-    """Class to store mathematical matrix that perform several matrix operations."""
+    """
+    This class stores a matrix (i.e., 2d-array) and can perform several matrix operations on the matrix.
+
+    The following table list the primary members of this class:
+
+    +-----------+---------------------------------------------------------------+
+    | Member    | Description                                                   |
+    +===========+===============================================================+
+    | matrix    | The data of the matrix.                                       |
+    +-----------+---------------------------------------------------------------+
+    """
 
     def __init__(self, numberRows=0, numberColumns=0, values=None):
         """
-        Initialize an instance of Matrix.
-
-        The input arguments are optional and the default behaviour is and instance of Matrix with self.matrix = None.
+        The input arguments are optional and the default behaviour is and instance of Matrix with an empty matrix.
         Either both or neither the numberRows and numberColumns arguments need to be speciified. If only the numberRows 
         and numberColumns arguments are provided, self.matrix is a 2-D numpy array with shape (numberRows, numberColumns). 
         If only the values argument is given, self.matriix is a 2-D numpy.array with these values as entries. If
         both the size and values arguments are given, the latter is expected to be a scalar.
 
-        The optional input arguments are as follows:
-        :numberRows: The number of rows of the matriix (default = 0).
-        :numberColumns: The number of columns of the matrix (default = 0).
-        :values: The values of the matrix (default = None).
+        :param numberRows:      The number of rows of the matriix.
+        :param numberColumns:   The number of columns of the matrix.
+        :param values:          The values of the matrix.
         """
 
         if values is None and 0 in (numberRows, numberColumns):
@@ -62,26 +81,35 @@ class Matrix():
                 raise TypeError(f'Invalid "values" named argument to {type(self)}. Either provide a list of lists, a 2-dimensional Numpy ndarray or another instance of {type(self)}.')
 
     def __len__(self):
-        """Returns the number of rows of *self*."""
+        """
+        This method returns the number of rows of *self*.
+
+        :returns:       A python int.
+        """
 
         return(len(self.matrix))
 
     def __getitem__(self, indexTuple):
         """
-        Return value of self.matrix at location specified by the input tuple.
+        This method returns the value of *self* at the location specified by the input *indexTuple*. If *indexTuple* is a number
+        (e.g., called as self[1]) then a row is returned. If *indexTuple* is a tuple with two integers (e.g., called as self[1,2]), 
+        then the value at that cell is returned. In general, any numpy indexing for a 2-d array is allowed.
 
-        :indexTuple: Row and column indices of the self.matrix value to return.
-        :returns: A numpy.float64 value.
+        :param indexTuple:  Row or cell index of the data to return.
+
+        :returns:           An instance of :py:class:`numpy.ndarray` or :py:class:`numpy.float64`.
         """
 
         return self.matrix[indexTuple]
 
     def __setitem__(self, indexTuple, newScalarValue):
         """
-        Replace value at specified location of self.matrix.
+        This method replace the value at specified cell. 
 
-        :indexTuple: Row and column indices of the self.matrix value to replace.
-        :newScalarValue: Replacement for value of self.matrix at given location.
+        :param indexTuple:      Row or cell index of the data to replace.
+        :param newScalarValue:  Replacement for value of self.matrix at given location.
+
+        :returns:               A reference to self.
         """
 
         vectorModule.checkScalarValidity(newScalarValue, 'item assignment')
@@ -92,10 +120,11 @@ class Matrix():
 
     def __add__(self, otherMatrixOrScalar):
         """
-        Add the matrix or scalar given in the input argument to self.matrix.
+        Thie method adds the matrix or scalar *otherMatrixOrScalar* to self.
 
-        :otherMatrixOrScalar: Vector or scalar to add.
-        :returns: A new instance of Matrix.
+        :param otherMatrixOrScalar: :py:class:`Matrix` or scalar to add.
+
+        :returns:                   A new instance of :py:class:`Matrix`.
         """
 
         if len(self) == 0:
@@ -119,7 +148,11 @@ class Matrix():
 
     def __iadd__(self, otherMatrixOrScalar):
         """
-        In-place addition.
+        Thie method adds a matrix or scalar to self (i.e., in-place addition).
+`
+        :param otherMatrixOrScalar:     :py:class:`Matrix` or scalar.
+
+        :returns:                       A reference to self.
         """
         self = self.__add__(otherMatrixOrScalar)
 
@@ -129,33 +162,39 @@ class Matrix():
 
     def __sub__(self, otherMatrixOrScalar):
         """
-        Subtract the matrix or scalar given in the input argument from self.matrix.
+        This method subtract the matrix or scalar given in the input argument from self.
 
-        :otherMatrixOrScalar: Matrix or scalar to subract.
-        :returns: A new instance of Matrix.
+        :param otherMatrixOrScalar:     :py:class:`Matrix` or scalar to subract.
+
+        :returns:                       A new instance of :py:class:`Matrix`.
         """
         return self.__add__(-otherMatrixOrScalar)
 
     def __rsub__(self, otherMatrixOrScalar):
         """
-        Subtract self.matrix from the matrix given in the input argument.
+        This method subtract self from the matrix or scalar given in the input argument.
+
+        :param otherMatrixOrScalar:     :py:class:`Matrix` or scalar.
+
+        :returns:                       A new instance of :py:class:`Matrix`.
         """
         return -self.__sub__(otherMatrixOrScalar)
 
     def __neg__(self):
         """
-        Negation of self.matrix.
+        This method returns the negations of all the value of self as a new :py:class:`Matrix` instance.
 
-        :returns: A new instance of Matrix.
+        :returns:           A new instance of :py:class:`Matrix`.
         """
         return Matrix(values=-self.matrix)
 
     def __mul__(self, scalarValue):
         """
-        Multiply a scalar to self.matrix.
+        This method returns a new :py:class:`Matrix` instance that is *self* multiplied by a scalar.
 
-        :scalarValue: Multiplication scalar.
-        :returns: A new instance of Matrix.
+        :param scalarValue:     Multiplication scalar.
+
+        :returns:               A new instance of :py:class:`Matrix`.
         """
         vectorModule.checkScalarValidity(scalarValue, 'multiplication')
 
@@ -165,9 +204,11 @@ class Matrix():
 
     def __imul__(self, scalarValue):
         """
-        In-place multiplication
+        This method multiplies all value in self by a scaler (i.e., in-place multiplication).
 
-        :scalarValue: Multiplication scalar.
+        :param scalarValue:     Multiplication scalar.
+
+        :returns:               A reference to self.
         """
         self = self.__mul__(scalarValue)
 
@@ -175,10 +216,11 @@ class Matrix():
 
     def __truediv__(self, scalarValue):
         """
-        True division of self.matrix by the input scalar argument.
+        This method returns a new :py:class:`Matrix` instance with its values being the values of *self* divided the scalar *scalarValue*.
 
-        :scalarValue: Division scalar.
-        :returns: A new instance of Matrix.
+        :param scalarValue:     Division scalar.
+
+        :returns:               A new instance of :py:class:`Matrix`.
         """
         vectorModule.checkScalarValidity(scalarValue, 'division')
         with numpy.errstate(divide='raise'):
@@ -186,7 +228,11 @@ class Matrix():
 
     def __itruediv__(self, scalarValue):
         """
-        In-place true division.
+        Thie method divides all values of *self* by the scalar *scalarValue* (i.e., in-place division).
+
+        :param scalarValue:     Division scalar.
+
+        :returns:               A reference to self.
         """
         self = self.__truediv__(scalarValue)
 
@@ -194,14 +240,18 @@ class Matrix():
 
     def __str__(self):
         """
-        Return a string representation of self.matrix.
+        Thie method returns a string representation of self.
+
+        :returns:           A python str)
         """
         return str(self.matrix)
 
     @property
     def shape(self):
         """
-        Return the shape of self.matrix.
+        This method returns the shape of *self*.
+
+        :returns:           A tuple of two integers.
         """
 
         return self.matrix.shape
@@ -209,22 +259,26 @@ class Matrix():
     @property
     def numberOfRows(self):
         """
-        Return the number of rows of self.matrix. This is the same as len(self).
+        This method returns the number of rows of *self*. This is the same as len(self).
+
+        :returns:           A python int.
         """
         return self.matrix.shape[0]
 
     @property
     def numberOfColumns(self):
         """
-        Return the number of columns of self.matrix.
+        This method returns the number of columns of *self*.
+
+        :returns:           A python int.
         """
         return self.matrix.shape[1]
 
     def append(self, newRow):
         """
-        Append row to self.matrix.
+        This method appends a row to self, increasing its number of rows by 1.
 
-        :newRow: New vector to append as a new row to self.matrix.
+        :param newRow:      New vector to append as a new row to self.
         """
 
         if isinstance(newRow, (list, tuple, numpy.ndarray)):
@@ -244,16 +298,16 @@ class Matrix():
 
     def transpose(self):
         """
-        Transpose self.matrix.
+        This method returns the transpose of self.
 
-        :returns: A new instance of Matrix
+        :returns:           A new instance of :py:class:`Matrix`.
         """
         return Matrix(values=numpy.transpose(self.matrix))
 
     def reverse(self):
         """
-        Reverse the order of elements long both the row and column dimensions.
+        This method returns a new :py:class:`Matrix` with its cells reversed along both the row and column dimensions.
 
-        :returns: A new instance of Matrix
+        :returns:           A new instance of :py:class:`Matrix`.
         """
         return Matrix(values=numpy.flipud(numpy.fliplr(self.matrix)))

@@ -6,7 +6,19 @@
 # <<END-copyright>>
 
 """
-This module contains the classes representing the GNDS documentation nodes author and authors.
+This module contains the classes representing the GNDS documentation contributors node and its child nodes.
+
+This module contains the following classes:
+
+    +---------------------------+-----------------------------------------------------------------------------------+
+    | Class                     | Description                                                                       |
+    +===========================+===================================================================================+
+    | ContributorType           | This enum class represents the allowed contributor types.                         |
+    +---------------------------+-----------------------------------------------------------------------------------+
+    | Contributor               | This is the class for the GNDS documentation/contributors/contributor node.       |
+    +---------------------------+-----------------------------------------------------------------------------------+
+    | Contributors              | This is the suite class for the GNDS documentation/contributors node.             |
+    +---------------------------+-----------------------------------------------------------------------------------+
 """
 
 from LUPY import enums as enumsModule
@@ -16,6 +28,9 @@ from .. import text as textModule
 from . import abstractClasses as abstractClassesModule
 
 class ContributorType(enumsModule.Enum):
+    """
+    This enum class represents the allowed contributor types.
+    """
 
     contactPerson = 'ContactPerson'
     dataCollector = 'DataCollector'
@@ -40,11 +55,34 @@ class ContributorType(enumsModule.Enum):
     other  = 'Other'
 
 class Contributor(abstractClassesModule.AuthorAbstract):
+    """
+    This is the class for the GNDS documentation/contributors/contributor node.
+
+    The following table list the primary members of this class:
+
+    +-------------------+---------------------------------------------------------------+
+    | Member            | Description                                                   |
+    +===================+===============================================================+
+    | name              | The author's name.                                            |
+    +-------------------+---------------------------------------------------------------+
+    | orcid             | The orcid of the author.                                      |
+    +-------------------+---------------------------------------------------------------+
+    | email             | The email address of the author.                              |
+    +-------------------+---------------------------------------------------------------+
+    | contributorType   | The contribution type.                                        |
+    +-------------------+---------------------------------------------------------------+
+    """
 
     moniker = 'contributor'
     keyName = 'name'
 
     def __init__(self, name, orcid, email, contributorType):
+        """
+        :param name:                The author's name.
+        :param orcid:               The orcid of the author.
+        :param email:               The email address of the author.
+        :param contributorType:     The contribution type.
+        """
 
         abstractClassesModule.AuthorAbstract.__init__(self, name, orcid, email)
 
@@ -52,11 +90,22 @@ class Contributor(abstractClassesModule.AuthorAbstract):
 
     @property
     def contributorType(self):
-        """."""
+        """
+        Thie method returns the contributorType.
+
+        :returns:       An instance of :py:class:`ContributorType`.
+        """
 
         return self.__contributorType
 
     def XML_extraAttributes(self, **kwargs):
+        """
+        This methods returns the XML attributes for *self* as a single python str.
+
+        :kwargs:        This argument is not used.
+
+        :returns:       A python str.
+        """
 
         attributes = abstractClassesModule.AuthorAbstract.XML_extraAttributes(self, **kwargs)
         attributes += ' contributorType="%s"' % self.__contributorType
@@ -64,6 +113,17 @@ class Contributor(abstractClassesModule.AuthorAbstract):
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
+        """
 
         name = node.get('name')
         orcid = node.get('orcid', '')
@@ -73,6 +133,9 @@ class Contributor(abstractClassesModule.AuthorAbstract):
         return cls(name, orcid, email, contributorType)
 
 class Contributors(suiteModule.Suite):
+    """
+    This is the suite class for the GNDS documentation/contributors node.
+    """
 
     moniker = 'contributors'
     suiteName = 'name'
