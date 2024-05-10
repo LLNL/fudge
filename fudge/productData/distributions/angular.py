@@ -1368,23 +1368,22 @@ class TwoBody( baseModule.Form ) :
             productMass, residualMass = residualMass, productMass
 
         comKineticEnergy = energyIn * targetMass / (projectileMass + targetMass) + projectileMass + targetMass - productMass - residualMass
-        comKineticEnergy *= residualMass / (productMass + residualMass)
         if comKineticEnergy < 0.0:
             return energyModule.XYs1d(axes=energyModule.defaultAxes(energyUnit))
+        productComEnergy = comKineticEnergy * residualMass / (productMass + residualMass)
 
         PofMu = self.angularSubform.evaluate(energyIn)
         if frame == xDataEnumsModule.Frame.centerOfMass:
             twoBodyCOMResolution = min(0.1, max(1e-6, kwargs.get('twoBodyCOMResolution', 1e-2)))
-            data = [[comKineticEnergy * (1 - twoBodyCOMResolution), 0.0],
-                    [comKineticEnergy, 1.0], 
-                    [comKineticEnergy * (1 + twoBodyCOMResolution), 0.0]]
+            data = [[productComEnergy* (1 - twoBodyCOMResolution), 0.0],
+                    [productComEnergy, 1.0], 
+                    [productComEnergy* (1 + twoBodyCOMResolution), 0.0]]
             return energyModule.XYs1d(data, axes=energyModule.defaultAxes(energyUnit)).normalize() * PofMu.integrate(domainMin=muMin, domainMax=muMax)
 
         projectileSpeed = math.sqrt(2.0 * energyIn / projectileMass)
         comSpeed = projectileMass / (projectileMass + targetMass) * projectileSpeed
 
         comSpeedProductEnergy = 0.5 * productMass * comSpeed * comSpeed
-        productComEnergy = comKineticEnergy * residualMass / (productMass + residualMass)
         productCOM_speed = math.sqrt(2.0 * productComEnergy / productMass)
         sqrtEnergiesTimes2 = 2.0 * math.sqrt(comSpeedProductEnergy * productComEnergy)
 
@@ -1403,6 +1402,8 @@ class TwoBody( baseModule.Form ) :
                 energyPrime = comSpeedProductEnergy + productComEnergy + mu * sqrtEnergiesTimes2
                 PatMu = PofMu.evaluate(mu)
                 PatE = PatMu / sqrtEnergiesTimes2
+                if mu == 1 and abs(energyPrime - energyIn) < 1e-8 * energyIn:   # Attempt to handle forward elastic scattering exactly.
+                    energyPrime = energyIn
                 PofEnergyPrime.append([energyPrime, PatE])
             if partialMuDomain:
                 norm += PofMu.integrate(domainMin=mu1, domainMax=mu2)

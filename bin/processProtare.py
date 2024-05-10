@@ -195,6 +195,8 @@ isThermalNeutronScatteringLaw = reactionSuite.isThermalNeutronScatteringLaw( )
 if( ( reactionSuite.projectile != IDsPoPsModule.neutron ) or ( reactionSuite.interaction == enumsModule.Interaction.LLNL_TNSL ) ) :
     args.UpScatter = False
     if( args.temperatures is not None ) : raise ValueError( 'Can only heat neutron as projectile cross sections.' )
+args.UpScatter = args.UpScatter and not isThermalNeutronScatteringLaw
+
 if( args.temperatures is None ) :
     args.temperatures = [ reactionSuite.styles[0].temperature.getValueAs( args.temperatureUnit ) ]
     if( isThermalNeutronScatteringLaw ) :
@@ -363,7 +365,7 @@ for temperatureIndex, temperatureValue in enumerate( args.temperatures ) : # Hea
             tar.add(workDir)
         shutil.rmtree(str(workDir))
 
-        if args.UpScatter and not(isThermalNeutronScatteringLaw or reactionSuite.target in reactionSuite.PoPs.unorthodoxes):
+        if args.UpScatter:
             if args.verbose > 1:
                 print('  Processing multi group upscattering')
             timerUp = timesModule.Times()

@@ -470,7 +470,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
                 'crossSectionOnly': False,
                 'crossSectionMaxDiff': 1e-3,
                 'multiplicityMaxDiff': 1e-3,
-                'transportables': ('n',),
+                'transportables': ('n', 'photon', 'H1', 'H2', 'H3', 'He3', 'He4'),
                 'normTolerance': 1e-5,
                 'checkEnergyBalance': True,
                 'reconstructResonances': True,

@@ -62,8 +62,7 @@ def toACE(self, styleLabel, cdf_style, fileName, evaluationId, productData, dela
     temperature_MeV = temperature.getValueAs( 'MeV/k' )
 
     processingTime = time.localtime( )
-    processingTime = [ 2014, 5, 10 ]
-    strRecords = [ "%6d.%.2dc%12.7f %11.5E %.2d/%.2d/%.2d" % ( targetZA, evaluationId, target2NeutronMass, 
+    strRecords = [ "%6d.%.2dc%12.7f %11.5E %.2d/%.2d/%.2d" % ( targetZA, evaluationId, target2NeutronMass,
             temperature_MeV, processingTime[1], processingTime[2], processingTime[0] ) ]
 
     nonFissionEnergyDependentNeutronMultiplicities = {}

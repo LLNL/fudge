@@ -22,6 +22,7 @@ from . import productYield as productYieldModule
 class FissionFragmentData(ancestryModule.AncestryIO_base):
 
     moniker = 'fissionFragmentData'
+    ancestryMembers = ('delayedNeutrons', 'fissionEnergyReleases', 'productYields')
 
     def __init__( self ) :
 

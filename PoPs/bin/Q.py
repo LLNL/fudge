@@ -9,7 +9,7 @@
 
 from LUPY import userFUDGE_defaults
 
-summaryDocStringPoPs = '''Calculates the Q-value for the list of ingoing and outgoing particles.'''
+summaryDocStringPoPs = '''Calculates the Q-value for the list of ingoing and outgoing particles (optionally, threshold).'''
 
 description = '''
     Calculates the Q-value for the list of ingoing and outgoing particles using data in a GNDS PoPs database.
@@ -18,6 +18,8 @@ description = '''
     "--unit 'amu*c**2'" as unit must be that of energy. Note, all ingoing particles 
     must be entered before the "-o" option is entered and only one "-o" option should be entered as all 
     particles entered after the "-o" option are added to the "-o" list.
+
+    If the option "-t" is present, the Newtonian and relativistic threholds are also printed.
     '''
 
 import pathlib
@@ -31,6 +33,7 @@ parser = argparse.ArgumentParser(description=description)
 userFUDGE_defaults.add_argument(parser, 'PoPs_path', True, '--pops',                help='GNDS PoPs file to use.')
 parser.add_argument('ingoingParticles', nargs='+',                                  help='List of ingoing particles.')
 parser.add_argument('-o', '--outgoingParticles', nargs='*', default=[],             help='List of outgoing particles.')
+parser.add_argument('-t', '--threshold', action='store_true',                       help='If present, the Newtonian and relativistic thresholds for the reaction are also printed.')
 parser.add_argument('-u', '--unit', default='MeV',                                  help='Energy unit.')
 parser.add_argument('--balanceZA', action='store_true',                             help='If present, this script will calculate the heavy residual (outgoing particle) to balance Z and A.')
 
@@ -77,4 +80,19 @@ if __name__ == '__main__':
     else:
         comment = '# Q-value for reaction "%s -> %s".' % (' + '.join(ingoingParticles), ' + '.join(outgoingParticles))
 
-    print(pops.QValue(ingoingParticles, outgoingParticles, unit=args.unit), args.unit, comment)
+    Q = pops.QValue(ingoingParticles, outgoingParticles, unit=args.unit)
+    print(Q, args.unit, comment)
+    if args.threshold:
+        massUnit = args.unit + '/ c**2'
+        if len(ingoingParticles) == 2:
+            projectileMass = pops[ingoingParticles[0]].getMass(massUnit)
+            targetMass = pops[ingoingParticles[1]].getMass(massUnit)
+            if Q > 0:
+                threshold = 0.0
+                thresholdRelativistic = 0.0
+            else:
+                threshold = Q * (projectileMass + targetMass) / targetMass
+                thresholdRelativistic = threshold - 0.5 * Q * Q / targetMass
+            print(threshold, args.unit, '# Newtonian threshold')
+            print(thresholdRelativistic, args.unit, '# Relativistic threshold')
+            print(thresholdRelativistic - threshold, args.unit, '# Relativistic threshold - Newtonian threshold')

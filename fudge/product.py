@@ -550,29 +550,29 @@ class Product( ancestryModule.AncestryIO ) :
 
         return productArray
 
-    def check( self, info ):
+    def check(self, info):
         """ check product multiplicity, distribution and breakup products (if applicable) """
         from fudge import warning
         warnings = []
 
-        multWarnings = self.multiplicity.check( info )
+        multWarnings = self.multiplicity.check(info)
         if multWarnings:
-            warnings.append( warning.Context("Multiplicity:", multWarnings) )
+            warnings.append(warning.Context("Multiplicity:", multWarnings))
 
-        if( ( self.label in info['transportables'] ) and ( not self.distribution.hasData( ) ) ) :
-            warnings.append( warning.MissingDistribution( self.label, self ) )
+        if self.label in info['transportables'] and not self.distribution.hasData():
+            warnings.append(warning.MissingDistribution(self.label, self))
 
-        distributionWarnings = self.distribution.check( info )
+        distributionWarnings = self.distribution.check(info)
         if distributionWarnings:
-            warnings.append( warning.Context("Distribution:", distributionWarnings) )
+            warnings.append(warning.Context("Distribution:", distributionWarnings))
 
         if self.__outputChannel is not None:
             parentIsTwoBody = info['isTwoBody']
             info['isTwoBody'] = self.__outputChannel.genre == enumsModule.Genre.twoBody
             for decayProduct in self.__outputChannel:
-                decayWarnings = decayProduct.check( info )
+                decayWarnings = decayProduct.check(info)
                 if decayWarnings:
-                    warnings.append( warning.Context("Decay product: %s" % decayProduct.label, decayWarnings) )
+                    warnings.append(warning.Context("Decay product: %s" % decayProduct.label, decayWarnings))
             info['isTwoBody'] = parentIsTwoBody # reset to parent channel
 
         return warnings

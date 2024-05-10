@@ -81,9 +81,12 @@ def mapFromMapOrProtarePath(path):
     :return:                A :py:class:`mapModule.Map` instance.
     """
 
-    if not isinstance(path, str):           # Support path being list with one map file (i.e., ['/path/to/map/file']).
-        if len(path) == 1:
-            path = [p for p in path][0]
+    if not isinstance(path, str):               # Support path being list with one map file (i.e., ['/path/to/map/file']).
+        try:
+            if len(path) == 1:
+                path = [p for p in path][0]
+        except:
+            pass
 
     if isinstance(path, (str, pathlib.Path)):
         name, data = GNDS_fileModule.type(path)

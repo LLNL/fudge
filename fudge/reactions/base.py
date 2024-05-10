@@ -135,7 +135,7 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         return self.ENDF_MT in [515, 516, 517]
 
-    def check( self, info ):
+    def check(self, info):
         """
         This method is usually not called directly. Use reactionSuite.check() instead.
 
@@ -157,19 +157,19 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         reactionSuite = self.rootAncestor
 
-        def particleZA( particleID ) :
+        def particleZA(particleID):
 
             particle = reactionSuite.PoPs[particleID]
             if hasattr(particle, 'id') and particle.id in reactionSuite.PoPs.aliases:
                 particle = reactionSuite.PoPs[ particle.pid ]
-            return( chemicalElementMiscPoPsModule.ZA( particle ) )
+            return chemicalElementMiscPoPsModule.ZA(particle)
 
         try:
 # BRB6 hardwired
             info['Q'] = self.getQ('eV', final=False)
         except ValueError:
             pass
-        cpcount = sum( [ ( particleZA( prod.pid ) // 1000 ) > 0 for prod in self.__outputChannel ] )
+        cpcount = sum([(particleZA(prod.pid) // 1000) > 0 for prod in self.__outputChannel])
         info['CoulombOutputChannel'] = cpcount > 1
         info['ContinuumOutputChannel'] = self.outputChannel.process == outputChannelModule.Processes.continuum
 
@@ -180,7 +180,7 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         crossSectionWarnings = self.crossSection.check(info)
         if crossSectionWarnings:
-            warnings.append( warning.Context("Cross section:", crossSectionWarnings) )
+            warnings.append(warning.Context("Cross section:", crossSectionWarnings))
 
         if 'Q' in info: del info['Q']
         del info['CoulombOutputChannel']
@@ -237,26 +237,18 @@ class Base_reaction(ancestryModule.AncestryIO):
             if ZAsum != info['compoundZA']:
                 warnings.append( warning.ZAbalanceWarning( self ) )
 
-        # disabling for now: only complain if distributions are missing for transportables:
-        """
-        if (not any( [product.distributions.components for product in self.__outputChannel] ) and not any(
-                [dProd.distributions.components for prod in [p for p in self.__outputChannel
-                    if p.outputChannel is not None] for dProd in prod.outputChannel] ) ):
-            # no distributions found for any reaction product or subsequent decay product
-            warnings.append( warning.NoDistributions( self ) )
-            return warnings """
-
         info['crossSectionDomain'] = self.crossSection.domainMin, self.crossSection.domainMax
         info['isTwoBody'] = self.__outputChannel.genre == enumsModule.Genre.twoBody
 
-        for product in self.__outputChannel:
-            productWarnings = product.check( info )
-            if productWarnings:
-                warnings.append( warning.Context("Product: %s" % product.label, productWarnings) )
+        if not isinstance(self, productionModule.Production):
+            for product in self.__outputChannel:
+                productWarnings = product.check(info)
+                if productWarnings:
+                    warnings.append(warning.Context("Product: %s" % product.label, productWarnings))
 
-        fissionFragmentWarnings = self.__outputChannel.fissionFragmentData.check( info )
+        fissionFragmentWarnings = self.__outputChannel.fissionFragmentData.check(info)
         if fissionFragmentWarnings:
-            warnings.append( warning.Context("Fission fragment info:", fissionFragmentWarnings) )
+            warnings.append(warning.Context("Fission fragment info:", fissionFragmentWarnings))
 
         del info['crossSectionDomain']
         del info['isTwoBody']

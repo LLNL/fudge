@@ -174,7 +174,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENDF_MT</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">515</span><span class="p">,</span> <span class="mi">516</span><span class="p">,</span> <span class="mi">517</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Base_reaction.check"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+<div class="viewcode-block" id="Base_reaction.check"><a class="viewcode-back" href="../../../fudge/fudge.reactions.html#fudge.reactions.base.Base_reaction.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method is usually not called directly. Use reactionSuite.check() instead.</span>
 
@@ -196,19 +196,19 @@
 
         <span class="n">reactionSuite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootAncestor</span>
 
-        <span class="k">def</span> <span class="nf">particleZA</span><span class="p">(</span> <span class="n">particleID</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">def</span> <span class="nf">particleZA</span><span class="p">(</span><span class="n">particleID</span><span class="p">):</span>
 
             <span class="n">particle</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">particleID</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
                 <span class="n">particle</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span> <span class="n">particle</span><span class="o">.</span><span class="n">pid</span> <span class="p">]</span>
-            <span class="k">return</span><span class="p">(</span> <span class="n">chemicalElementMiscPoPsModule</span><span class="o">.</span><span class="n">ZA</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">return</span> <span class="n">chemicalElementMiscPoPsModule</span><span class="o">.</span><span class="n">ZA</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
 <span class="c1"># BRB6 hardwired</span>
             <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="n">final</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">pass</span>
-        <span class="n">cpcount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span> <span class="p">[</span> <span class="p">(</span> <span class="n">particleZA</span><span class="p">(</span> <span class="n">prod</span><span class="o">.</span><span class="n">pid</span> <span class="p">)</span> <span class="o">//</span> <span class="mi">1000</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">cpcount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">particleZA</span><span class="p">(</span><span class="n">prod</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span> <span class="o">//</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">])</span>
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;CoulombOutputChannel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpcount</span> <span class="o">&gt;</span> <span class="mi">1</span>
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;ContinuumOutputChannel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">process</span> <span class="o">==</span> <span class="n">outputChannelModule</span><span class="o">.</span><span class="n">Processes</span><span class="o">.</span><span class="n">continuum</span>
 
@@ -219,7 +219,7 @@
 
         <span class="n">crossSectionWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">crossSectionWarnings</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Cross section:&quot;</span><span class="p">,</span> <span class="n">crossSectionWarnings</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Cross section:&quot;</span><span class="p">,</span> <span class="n">crossSectionWarnings</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="s1">&#39;Q&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span> <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
         <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;CoulombOutputChannel&#39;</span><span class="p">]</span>
@@ -276,26 +276,18 @@
             <span class="k">if</span> <span class="n">ZAsum</span> <span class="o">!=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compoundZA&#39;</span><span class="p">]:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">ZAbalanceWarning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
 
-        <span class="c1"># disabling for now: only complain if distributions are missing for transportables:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        if (not any( [product.distributions.components for product in self.__outputChannel] ) and not any(</span>
-<span class="sd">                [dProd.distributions.components for prod in [p for p in self.__outputChannel</span>
-<span class="sd">                    if p.outputChannel is not None] for dProd in prod.outputChannel] ) ):</span>
-<span class="sd">            # no distributions found for any reaction product or subsequent decay product</span>
-<span class="sd">            warnings.append( warning.NoDistributions( self ) )</span>
-<span class="sd">            return warnings &quot;&quot;&quot;</span>
-
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMax</span>
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;isTwoBody&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">genre</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Genre</span><span class="o">.</span><span class="n">twoBody</span>
 
-        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
-            <span class="n">productWarnings</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
-            <span class="k">if</span> <span class="n">productWarnings</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Product: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">product</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">productWarnings</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">productionModule</span><span class="o">.</span><span class="n">Production</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
+                <span class="n">productWarnings</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">productWarnings</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Product: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">product</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">productWarnings</span><span class="p">))</span>
 
-        <span class="n">fissionFragmentWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">fissionFragmentData</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+        <span class="n">fissionFragmentWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">fissionFragmentData</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">fissionFragmentWarnings</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Fission fragment info:&quot;</span><span class="p">,</span> <span class="n">fissionFragmentWarnings</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Fission fragment info:&quot;</span><span class="p">,</span> <span class="n">fissionFragmentWarnings</span><span class="p">))</span>
 
         <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]</span>
         <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;isTwoBody&#39;</span><span class="p">]</span>

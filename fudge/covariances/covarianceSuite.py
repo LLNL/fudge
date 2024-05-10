@@ -11,6 +11,7 @@ Module with containers for covariances in several different forms
 
 import sys
 import os
+import pathlib
 
 from LUPY import ancestry as ancestryModule
 from fudge import GNDS_formatVersion as GNDS_formatVersionModule
@@ -116,6 +117,8 @@ class CovarianceSuite(ancestryModule.AncestryIO):
         :param path:        The new *sourcePath*.
         """
 
+        if isinstance(path, pathlib.Path):
+            path = str(path)
         if path is not None:
             if not isinstance(path, str):
                 raise ValueError('Path must be a str or None, got "%s"' % type(path))

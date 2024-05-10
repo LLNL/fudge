@@ -191,7 +191,9 @@ class XDataFunctional(XDataCoreMembers):
         """
 
         XML_strList = startTag
-        if self.isPrimaryXData() and len(self.axes) > 0: XML_strList += self.axes.toXML_strList(indent=indent, **kwargs)
+        if self.isPrimaryXData():
+            if len(self.axes) > 0 or kwargs.get('showEmpty', False):
+                XML_strList += self.axes.toXML_strList(indent=indent, **kwargs)
         XML_strList += extraData
         XML_strList += self.uncertainty.toXML_strList(indent=indent, **kwargs)
         XML_strList[-1] += '</%s>' % self.moniker

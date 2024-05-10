@@ -353,6 +353,17 @@ def nuclideIDFromIsotopeSymbolAndIndex( isotopeSymbol, index ) :
     if( index == 0 ) : return( isotopeSymbol )
     return( "%s_e%s" % ( isotopeSymbol, index ) )
 
+def nuclideIDFromZ_A_AndIndex(Z, A, index):
+    """
+    This function returns the nuclide id from a nuclide's Z, A and nuclear level index.
+
+    :param Z:       The atomic number of the nuclide.
+    :param A:       The atomic mass number of the nuclide.
+    :param index:   The nuclear level index of the nuclide.
+    """
+
+    return nuclideIDFromIsotopeSymbolAndIndex( idFromZAndA(Z, A), index )
+
 def nucleusIDFromNuclideID(nuclideID):
     '''
     Returns the nucleus PoPs id from a nuclide PoPs id by converting 1st letter to lower case.

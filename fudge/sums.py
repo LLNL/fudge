@@ -93,6 +93,9 @@ class Sums(ancestryModule.AncestryIO_bare):
             val = getattr(self, child)
             xmlStringList += val.toXML_strList(indent2, **kwargs)
 
+        if len(xmlStringList) == 1:
+            return []
+
         xmlStringList[-1] += '</%s>' % self.moniker
 
         return xmlStringList

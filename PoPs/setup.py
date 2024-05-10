@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+import glob
 
 def setup():
     from setuptools import setup
@@ -22,6 +23,7 @@ def setup():
             'PoPs.quantities',
         ],
         package_dir={'PoPs': '.'},
+        scripts = glob.glob('bin/*.py'),
         install_requires=['pqu', 'xData',],
         description='',
         license=''

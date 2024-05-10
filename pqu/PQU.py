@@ -2948,7 +2948,7 @@ def convertUnits( unit, unitMap ) :
             __unit = unitMap[_unit]
         except :
             __unit = _unit
-        unitString += "%s%s**%d" % ( operator, __unit, PU.symbols[_unit] )
+        unitString += "%s%s**(%s)" % ( operator, __unit, PU.symbols[_unit] )
         operator = ' * '
     newUnit = _findUnit( unitString )
     factor = PU.conversionFactorTo( newUnit )

@@ -537,7 +537,7 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
         return warnings + self.matrix.fix( **kw )
         
     def group( self, groupBoundaries = ( None, None ), groupUnit = ( None, None ) ):
-        """
+        r"""
         Group the matrix in self
 
         :param groupBoundaries: a 2 element list containing the group boundaries for the rows

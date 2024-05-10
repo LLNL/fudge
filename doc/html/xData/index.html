@@ -2738,11 +2738,17 @@ reconstruction (hence the number of points in the returned XYs1d) is determined 
 <dd><p>Bases: <a class="reference internal" href="#xData.series1d.Series1d" title="xData.series1d.Series1d"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series1d</span></code></a></p>
 <p>This class is a simple linear spline.  It basically wraps the XYs1d class.
 Linear interpolation uses the linear spline or the “hat” basis.  The first basis function looks like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span>        <span class="o">|</span>         <span class="o">|</span>          <span class="o">----</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span>\
+<span class="o">|</span> \
+<span class="o">|</span>  \
+<span class="o">----</span>
 </pre></div>
 </div>
 <p>The second basis function looks like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span>         <span class="o">/</span>          <span class="o">/</span>            <span class="o">------</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">/</span>\
+ <span class="o">/</span>  \
+<span class="o">/</span>    \
+<span class="o">------</span>
 </pre></div>
 </div>
 <p>and so on.  Together y(x) = sum_i B_i(x) y_i such that y_i = y(x_i)</p>

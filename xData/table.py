@@ -95,7 +95,7 @@ class Table(ancestryModule.AncestryIO):
             column = column[0]
             index = self.columns.index( column )
         if unit:
-            cf = PQUModule.PQU(1, column.unit).convertToUnit( unit ).getValue()
+            cf = PQUModule.convertUnits(column.unit, {column.unit: unit})[1]
             return [cf * v for v in self[:,index]]
         return self[:,index]
 

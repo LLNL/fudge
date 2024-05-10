@@ -69,7 +69,7 @@
 <span class="n">SQRTTWOPI</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
 
 <div class="viewcode-block" id="coulombNormalizationFactor"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.coulombNormalizationFactor">[docs]</a><span class="k">def</span> <span class="nf">coulombNormalizationFactor</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Coulomb wavefunction normalization factor (see DLMF Eq. 33.2.5 or Abramowitz &amp; Stegun Eq. 14.1.7),</span>
 <span class="sd">    :math:`C_\\ell(\\eta)={2^\\ell e^{2\pi\\eta}|\Gamma(\\ell+1+i\\eta)|}/{(2\\ell+1)!}`</span>
 
@@ -111,7 +111,7 @@
     <span class="k">return</span> <span class="n">cnorm</span></div>
 
 <div class="viewcode-block" id="coulombPenetrationFactor"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.coulombPenetrationFactor">[docs]</a><span class="k">def</span> <span class="nf">coulombPenetrationFactor</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the Coulomb penetrability, :math:`P_\\ell`,</span>
 <span class="sd">    :math:`P_\\ell(\\rho,\\eta)={\\rho}/{(A_\\ell(\\rho,\\eta))^2}`</span>
 <span class="sd">    where :math:`(A_\\ell(\\rho,\\eta))^2=(G_\\ell(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2`</span>
@@ -156,7 +156,7 @@
     <span class="k">return</span> <span class="n">pen</span></div>
 
 <div class="viewcode-block" id="coulombPhi"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.coulombPhi">[docs]</a><span class="k">def</span> <span class="nf">coulombPhi</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the Coulomb phase, :math:`\\varphi_\\ell`, :math:`\\varphi_\\ell(\\rho,\\eta)=\\arg(G_\\ell(\\rho,\\eta)+iF_\\ell(\\rho,\\eta))`</span>
 
 <span class="sd">    Because we&#39;re working with numpy arrays of :math:`\\eta` (for parallelization ala&#39; Caleb&#39;s tricks), the logic</span>
@@ -216,7 +216,7 @@
     <span class="k">return</span> <span class="n">phi</span></div>
 
 <div class="viewcode-block" id="coulombShiftFactor"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.coulombShiftFactor">[docs]</a><span class="k">def</span> <span class="nf">coulombShiftFactor</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the Coulomb shift, :math:`S_\ell`, :math:`S_\\ell(\\rho,\\eta)=({\\rho}/{A_\\ell(\\rho,\\eta)})({\partial A_\\ell(\\rho,\\eta)}/{\partial\\rho})`</span>
 <span class="sd">    where :math:`(A_\\ell(\\rho,\\eta))^2=(G_\\ell(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2`</span>
 

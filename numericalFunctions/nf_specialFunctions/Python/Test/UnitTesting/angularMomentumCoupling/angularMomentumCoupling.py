@@ -153,7 +153,7 @@ class Test_RacahCoefficient(unittest.TestCase):
 class Test_ZCoefficient(unittest.TestCase):
 
     def test_easy(self):
-        '''
+        r'''
         For L=0, have analytic form from Froehner p. 49, eq. (149) (F. Froehner "Evaluation and Analysis of Nuclear Resonance Data", JEFF Report 18, OECD (2000)):
             ..math::
                 \bar{Z}( \ell_1, J_1, \ell_2, J_2, s, 0 ) = (-)^{ J_1 + s }\sqrt{ 2 J_1 + 1 }\delta_{J_1 J_2}\delta_{\ell_1 \ell_2}

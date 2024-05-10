@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+import glob
 
 def setup():
     from setuptools import setup
@@ -22,7 +23,7 @@ def setup():
             'xData.interactivePlot'
         ],
         package_dir={'xData': '.'},
-        scripts=['bin/convolute1d.py'],
+        scripts = glob.glob('bin/*.py'),
         install_requires=[
             'numericalFunctions',
             'pqu',

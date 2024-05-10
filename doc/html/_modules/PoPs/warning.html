@@ -97,10 +97,10 @@
 <span class="sd">        Note that if both &#39;include&#39; and &#39;exclude&#39; lists are provided, exclude is ignored.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span>
         <span class="n">newWarningList</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">screened</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">,</span> <span class="n">screened</span>
         <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">warning</span><span class="p">,</span> <span class="ne">Warning</span><span class="p">):</span>
                 <span class="n">newContext</span><span class="p">,</span> <span class="n">newScreened</span> <span class="o">=</span> <span class="n">warning</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="p">)</span>

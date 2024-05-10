@@ -392,6 +392,17 @@
     <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">isotopeSymbol</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_e</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">isotopeSymbol</span><span class="p">,</span> <span class="n">index</span> <span class="p">)</span> <span class="p">)</span>
 
+<div class="viewcode-block" id="nuclideIDFromZ_A_AndIndex"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nuclideIDFromZ_A_AndIndex">[docs]</a><span class="k">def</span> <span class="nf">nuclideIDFromZ_A_AndIndex</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns the nuclide id from a nuclide&#39;s Z, A and nuclear level index.</span>
+
+<span class="sd">    :param Z:       The atomic number of the nuclide.</span>
+<span class="sd">    :param A:       The atomic mass number of the nuclide.</span>
+<span class="sd">    :param index:   The nuclear level index of the nuclide.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">nuclideIDFromIsotopeSymbolAndIndex</span><span class="p">(</span> <span class="n">idFromZAndA</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">),</span> <span class="n">index</span> <span class="p">)</span></div>
+
 <div class="viewcode-block" id="nucleusIDFromNuclideID"><a class="viewcode-back" href="../../../PoPs/groups.html#PoPs.chemicalElements.misc.nucleusIDFromNuclideID">[docs]</a><span class="k">def</span> <span class="nf">nucleusIDFromNuclideID</span><span class="p">(</span><span class="n">nuclideID</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Returns the nucleus PoPs id from a nuclide PoPs id by converting 1st letter to lower case.</span>

@@ -21,6 +21,7 @@ class DelayedNeutron( ancestryModule.AncestryIO ) :
 
     moniker = 'delayedNeutron'
     keyName = 'label'
+    ancestryMembers = ('rate', 'product')
 
     def __init__(self, label, product):
 
