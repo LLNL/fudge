@@ -819,7 +819,7 @@ class LegendreSeries( Series1d ) :
         if( xys1d.domainMax !=  1 ) : raise ValueError( "Domain max must be 1. It is %e" % xys1d.domainMax )
 
         axes = xys1d.axes
-        return( LegendreSeries( Legendre_C.from_pointwiseXY_C( xys1d, maxOrder ), axes = axes ) )
+        return( LegendreSeries( Legendre_C.from_pointwiseXY_C( xys1d.nf_pointwiseXY, maxOrder ), axes = axes ) )
 
 class Polynomial1d( Series1d ) :
     r"""
