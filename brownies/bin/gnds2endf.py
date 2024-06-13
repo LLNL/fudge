@@ -21,7 +21,7 @@ import brownies.legacy.toENDF6.toENDF6
 
 description = """Translate a GNDS file to ENDF-6.
 Sample use: python gnds2endf.py n-001_H_001.xml n-001_H_002.endf
-If file n-001_H_001-covar.xml exists, covariances will automatically be read from it.
+If file n-001_H_001.gndsCov.xml exists, covariances will automatically be read from it.
 The output file name is optional, defaults to the input file with '.endf' appended."""
 
 __doc__ = description
@@ -38,7 +38,8 @@ parser.add_argument('--useRedsFloatFormat', action='store_true',            help
 parser.add_argument('gnds',                                                 help='GNDS file to translate.')
 parser.add_argument('output', nargs='?', default=None,                      help='The translated ENDF file.')
 
-if( __name__ == '__main__' ) :
+
+if __name__ == '__main__':
     args = parser.parse_args( )
 
     gndsCov = None
