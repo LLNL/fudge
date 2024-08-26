@@ -6,7 +6,7 @@
 # <<END-copyright>>
 
 SHELL = /bin/sh
-PYTHON = $(shell which python)
+PYTHON = python3
 
 .PHONY: default doc check doctest clean realclean
 

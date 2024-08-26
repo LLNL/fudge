@@ -102,7 +102,7 @@
     <xs:attribute name="label" type="xs:NCName" use="required"/>
     <xs:attribute name="library" type="xs:string" use="required"/>
     <xs:attribute name="version" use="required"/>
-    <xs:attribute name="date" type="xs:date" use="required"/>
+    <xs:attribute name="date" type="DateAttribute" use="required"/>
     <xs:attribute name="derivedFrom" type="xs:string"/>
   </xs:complexType>
 
@@ -112,7 +112,7 @@
       <xs:element name="documentation" type="DocumentationType" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="label" type="xs:NCName" use="required"/>
-    <xs:attribute name="date" type="xs:date" use="required"/>
+    <xs:attribute name="date" type="DateAttribute" use="required"/>
     <xs:attribute name="derivedFrom" type="xs:string" use="required"/>
   </xs:complexType>
 
@@ -122,7 +122,7 @@
       <xs:element name="documentation" type="DocumentationType" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="label" type="xs:NCName" use="required"/>
-    <xs:attribute name="date" type="xs:date" use="required"/>
+    <xs:attribute name="date" type="DateAttribute" use="required"/>
     <xs:attribute name="derivedFrom" type="xs:string" use="required"/>
   </xs:complexType>
 
@@ -132,7 +132,7 @@
       <xs:element name="documentation" type="DocumentationType" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="label" type="xs:NCName" use="required"/>
-    <xs:attribute name="date" type="xs:date" use="required"/>
+    <xs:attribute name="date" type="DateAttribute" use="required"/>
     <xs:attribute name="derivedFrom" type="xs:string" use="required"/>
   </xs:complexType>
  
@@ -153,17 +153,17 @@
 
   <xs:complexType name="DocumentationType">
     <xs:all>
-      <xs:element name="authors" type="AuthorListType"/>
+      <xs:element name="authors" type="AuthorListType" minOccurs="0"/>
       <xs:element name="contributors" type="ContributorListType" minOccurs="0"/>
       <xs:element name="collaborations" type="CollaborationListType" minOccurs="0"/>
-      <xs:element name="dates" type="DateListType"/>
+      <xs:element name="dates" type="DateListType" minOccurs="0"/>
       <xs:element name="copyright" type="CopyrightType" minOccurs="0"/>
       <xs:element name="acknowledgements" type="AcknowledgementListType" minOccurs="0"/>
       <xs:element name="keywords" type="KeywordListType" minOccurs="0"/>
       <xs:element name="relatedItems" type="RelatedItemListType" minOccurs="0"/>
-      <xs:element name="title" type="nodeWithText"/>
+      <xs:element name="title" type="nodeWithText" minOccurs="0"/>
       <xs:element name="abstract" type="nodeWithText" minOccurs="0"/>
-      <xs:element name="body" type="nodeWithText"/>
+      <xs:element name="body" type="nodeWithText" minOccurs="0"/>
       <xs:element name="computerCodes" type="ComputerCodeListType" minOccurs="0"/>
       <xs:element name="experimentalDataSets" type="ExperimentalDataSetListType" minOccurs="0"/>
       <xs:element name="bibliography" type="BibliographyType" minOccurs="0"/>
@@ -373,9 +373,12 @@
       <xs:element name="executionArguments" type="nodeWithText" minOccurs="0"/>
       <xs:element name="codeRepo" type="CodeRepoType" minOccurs="0"/>
       <xs:element name="note" type="nodeWithText" minOccurs="0"/>
-      <xs:element name="inputDecks" type="InputDeckListType"/>
-      <xs:element name="outputDecks" type="OutputDeckListType"/>
+      <xs:element name="inputDecks" type="InputDeckListType" minOccurs="0"/>
+      <xs:element name="outputDecks" type="OutputDeckListType" minOccurs="0"/>
     </xs:sequence>
+    <xs:attribute name="label" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="version" type="xs:string" use="required"/>
   </xs:complexType>
 
   <xs:complexType name="CodeRepoType">
@@ -465,7 +468,7 @@
     <xs:attribute name="label" type="xs:NCName" use="required"/>
     <xs:attribute name="library" type="xs:string" use="required"/>
     <xs:attribute name="version" use="required"/>
-    <xs:attribute name="date" type="xs:date" use="required"/>
+    <xs:attribute name="date" type="DateAttribute" use="required"/>
   </xs:complexType>
  
   <xs:complexType name="PoPs_AliasesType">
@@ -1207,7 +1210,7 @@
   <xs:complexType name="DDCS_CoulombPlusNuclearElasticType">
     <xs:sequence>
       <xs:element name="RutherfordScattering" type="DDCS_RutherfordScatteringType"/>
-      <xs:choice>
+      <xs:choice minOccurs="0">
         <xs:element name="nuclearAmplitudeExpansion" type="DDCS_NuclearAmplitudeExpansionType"/>
         <xs:element name="nuclearPlusInterference" type="DDCS_NuclearPlusInterferenceType"/>
       </xs:choice>
@@ -1859,12 +1862,12 @@
     <xs:sequence>
       <xs:element name="uncertainty" type="PQU_uncertainty" minOccurs="0"/>
     </xs:sequence>
-    <xs:attribute name="value" type="xs:double"/>
+    <xs:attribute name="value" type="xs:double" use="required"/>
     <xs:attribute name="unit" type="xs:string"/>
   </xs:complexType>
 
   <xs:complexType name="PoPs_DoubleQuantityTypeSimple2">
-    <xs:attribute name="value" type="xs:double"/>
+    <xs:attribute name="value" type="xs:double" use="required"/>
     <xs:attribute name="unit" type="xs:string"/>
   </xs:complexType>
  

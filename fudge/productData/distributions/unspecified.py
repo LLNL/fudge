@@ -79,7 +79,7 @@ class Form( baseModule.Form ) :
         """
         Returns a copy of *self*.
 
-        :return:            :py:class`Form` instance.
+        :return:            :py:class:`Form` instance.
         """
 
         return Form( self.label, self.productFrame )

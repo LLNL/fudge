@@ -46,49 +46,95 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains the GNDS documentation child node endfCompatible class.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                     | Description                                                                       |</span>
+<span class="sd">    +===========================+===================================================================================+</span>
+<span class="sd">    | Acknowledgement           | This class represents a GNDS documentation/acknowledgements/acknowledgement node. |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Acknowledgements          | This is the suite class for the GNDS documentation/acknowledgements node.         |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">text</span> <span class="k">as</span> <span class="n">textModule</span>
 
-<div class="viewcode-block" id="Acknowledgement"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.acknowledgement.Acknowledgement">[docs]</a><span class="k">class</span> <span class="nc">Acknowledgement</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS authors/acknowledgement node.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Acknowledgement"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.acknowledgement.Acknowledgement">[docs]</a><span class="k">class</span> <span class="nc">Acknowledgement</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a GNDS documentation/acknowledgements/acknowledgement node.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member        | Description                                                   |</span>
+<span class="sd">    +===============+===============================================================+</span>
+<span class="sd">    | label         | The unique label for the acknowledgement.                     |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;acknowledgement&#39;</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_label</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_label</span><span class="p">):</span>
+        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">_label</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">_label</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the label.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
+<span class="sd">        :returns:   A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Acknowledgement.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.acknowledgement.Acknowledgement.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+<div class="viewcode-block" id="Acknowledgement.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.acknowledgement.Acknowledgement.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the XML attributes for *self* as a single python str.</span>
+
+<span class="sd">        :kwargs:        This argument is not used.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">return</span> <span class="s1">&#39; label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span></div>
 
 <div class="viewcode-block" id="Acknowledgement.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.acknowledgement.Acknowledgement.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
 
-        <span class="n">label</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+<span class="sd">        :param cls:        Form class to return.</span>
+<span class="sd">        :param node:       Node to parse.</span>
+<span class="sd">        :param xPath:      List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:   dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:          An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">label</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">label</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="Acknowledgements"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.acknowledgement.Acknowledgements">[docs]</a><span class="k">class</span> <span class="nc">Acknowledgements</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="Acknowledgements"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.acknowledgement.Acknowledgements">[docs]</a><span class="k">class</span> <span class="nc">Acknowledgements</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the suite class for the GNDS documentation/acknowledgements node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;acknowledgements&#39;</span>
     <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">Acknowledgement</span> <span class="p">]</span> <span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">Acknowledgement</span><span class="p">])</span></div>
 </pre></div>
 
             <div class="clearer"></div>

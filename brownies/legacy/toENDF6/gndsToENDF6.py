@@ -174,11 +174,16 @@ def gammasToENDF6_MF6(MT, endfMFList, flags, targetInfo, gammas):
                             discreteLEP = 1
         else:
             if LEP < 0:
+                # determine outgoing energy interpolation
+                # FIXME outgoing interpolation must be consistent for all incident energies
                 if isinstance(component, energyAngularModule.Form):
                     energy1 = component.energyAngularForm[0]
                     LEP = gndsToENDF2PlusDInterpolationFlag(energy1.interpolation, energy1.interpolationQualifier)
                 else:
-                    EpForm = energySubform[0]
+                    if isinstance(energySubform, energyModule.XYs2d):
+                        EpForm = energySubform[0]
+                    elif isinstance(energySubform, energyModule.Regions2d):
+                        EpForm = energySubform[0][0]
                     if isinstance(EpForm, energyModule.Regions1d): EpForm = EpForm[0]
                     LEP = gndsToENDF2PlusDInterpolationFlag(
                         EpForm.interpolation, xDataEnumsModule.InterpolationQualifier.none)

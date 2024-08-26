@@ -9,7 +9,7 @@
 
 from LUPY import userFUDGE_defaults
 
-summaryDocStringPoPs = '''Calculates the Q-value for the list of ingoing and outgoing particles (optionally, threshold).'''
+summaryDocString__PoPs = '''Calculates the Q-value for the list of ingoing and outgoing particles (optionally, threshold).'''
 
 description = '''
     Calculates the Q-value for the list of ingoing and outgoing particles using data in a GNDS PoPs database.

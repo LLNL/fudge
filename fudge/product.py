@@ -589,7 +589,7 @@ class Product( ancestryModule.AncestryIO ) :
 
         pid = self.pid
         pops = self.findAttributeInAncestry('PoPs')
-        particle = pops.final(pid)
+        pid = pops.final(pid).id                # Some legacy files have meta-stable as a product instead of a particle (e.g., Sc46_m1 instead of Sc46_e2).
 
         if pid not in _reactionProducts: _reactionProducts[pid] = reactionProductsModule.ReactionProduct(category, 0)
         _reactionProducts[pid].multiplicity += multiplicity

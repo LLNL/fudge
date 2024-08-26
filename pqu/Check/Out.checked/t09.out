@@ -19,4 +19,4 @@ value = 1.100000000000000e+01, significantDigits = 3, order = 1, isPercent = Fal
 uncertainty = value = 3.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
 1.10 +/- 0.04
 value = 1.100000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = ""
-uncertainty = value = 3.720698859085482e-02, significantDigits = 1, order = -2, isPercent = False
+uncertainty = value = 3.720215047547656e-02, significantDigits = 1, order = -2, isPercent = False

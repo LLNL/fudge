@@ -14,6 +14,8 @@ import xml.sax
 
 from fudge import map as mapModule, GNDS_file as GNDS_fileModule
 
+summaryDocString__FUDGE = """This script examines all map files in the specified directory and prints the minimun list of map files that covers all map files in the specified directory."""
+
 description = """
 This script examines all map files in the specified directory and prints the minimun list of map files that
 covers all map files in the specified directory. No map files in sub-directories are examined. This script

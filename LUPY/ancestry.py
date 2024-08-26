@@ -12,6 +12,24 @@ from one of the ancestry classes and the method :py:func:`Ancestry.setAncestor` 
 contect a child node to its parent node.
 
 This module was mainly written to support linking and xpath referencing in a GNDS hierarchy.
+
+    This module contains the following classes:
+                             
+    +-------------------+-----------------------------------------------------------------------+ 
+    | Class             | Description                                                           |
+    +===================+=======================================================================+
+    | Ancestry          | Base class used by other ancestry classes.                            |
+    +-------------------+-----------------------------------------------------------------------+
+    | AncestryIO_base   | This class adds reading and writing methods.                          |
+    +-------------------+-----------------------------------------------------------------------+
+    | AncestryIO        | Base class for :py:class:`FSubform`, :py:class:`FSubform`,            |
+    +-------------------+-----------------------------------------------------------------------+
+    | AncestryIO_bare   | This is an abstruct class that defined the abstract                   |
+    |                   | method :py:class:`AncestryIO_bare.parseNodeUsingClass`.               |
+    +-------------------+-----------------------------------------------------------------------+
+    | AncestryIO_base   | This is an abstruct class that defined the abstract                   |
+    |                   | method :py:class:`AncestryIO_bare.parseNode`.                         |
+    +-------------------+-----------------------------------------------------------------------+
 """
 
 import sys
@@ -51,14 +69,13 @@ class Ancestry(abc.ABC):
         | legacyMemberNameMapping   | A map whose keys are legacy member names and whose associated values are the current memeber names.       |
         +---------------------------+-----------------------------------------------------------------------------------------------------------+
         | monikerByFormat           | If the moniker had a different name for in a prior format version, then this is a dict of key/value where |
-        |                           | key it the format version and its associated value is the moniker used for that format version.           |
         +---------------------------+-----------------------------------------------------------------------------------------------------------+
 
-    This class defines moniker to be abstract meaning that all classes that inherit from this class must define moniker.
+    This class defines the member moniker to be an abstract member, meaning that all classes that inherit from this class must define moniker.
     The main reason for the **keyName** is that is it used by a **Suite** instance to reference (i.e., uniquely identify) its children.
 
-    An instance has the xlink '/the/list/of/ancestors/andSelf' if attribute is None or
-    '/the/list/of/ancestors/andSelf[@attribute="value"]' if attribute is not None where each string
+    An instance has the xlink '/the/list/of/ancestors/andSelf' if its attribute member is None or
+    '/the/list/of/ancestors/andSelf[@attribute="value"]' if its attribute member is not None where each string
     part of the xpath the value of the moniker for that node. For example,
     for a hierarchy consisting of::
 
@@ -67,7 +84,7 @@ class Ancestry(abc.ABC):
                 member mC of class C and class C with moniker 'nameC',
 
     then the xlink for an instance of a C class in the hierarchy is '/nameA/nameB/nameC'. If the mC instance
-    set attribute to be the member 'greeting' that, for this example as value 'Hi', then the
+    set the attribute member to 'greeting', then for this example with value 'Hi', then the
     xlink for the C class is '/nameA/nameB/nameC[@greeting="Hi"]'.
     """
 
@@ -88,18 +105,19 @@ class Ancestry(abc.ABC):
     @property
     @abc.abstractmethod
     def moniker(self):
+        """Abstract method that must be defined by all classes that inherit this class. Must return the moniker of the instance."""
 
         pass
 
     @property
     def ancestor(self):
-        """Returns self's ancestor."""
+        """Returns self's ancestor. That is, its parent."""
 
         return self.__ancestor
 
     @property
     def keyValue(self):
-        """Returns self's keyValue. If keyName is *None*, then *None* is returned."""
+        """Returns self's keyValue as determined by the member *keyName*. If keyName is None, then None is returned."""
 
         if self.keyName is None: return None
         return getattr(self, self.keyName)
@@ -108,7 +126,7 @@ class Ancestry(abc.ABC):
     def rootAncestor(self):
         """
         Traverse up the ancestry tree to the root ancestor and returns a reference to it. 
-        The root ancestor is the instance whose ancestor is None.
+        The root ancestor is the ancestor instance whose ancestor is None.
         """
 
         ancestor = self
@@ -117,7 +135,8 @@ class Ancestry(abc.ABC):
 
     def checkAncestry(self, verbose = 0, level = 0):
         """
-        This method checks that all ancestryMembers are properly set up. This method checks *self* and all its child nodes.
+        This method checks that all ancestryMembers are properly set up. This method checks *self* and all its child nodes as
+        determined by the *ancestryMembers* member.
         """
 
         def check(child):
@@ -155,7 +174,7 @@ class Ancestry(abc.ABC):
         """
         Uses deepcopy to make a copy of self.
 
-        :return: copy of self
+        :return:            A copy of self.
         """
 
         from xData import link as linkModule
@@ -192,12 +211,31 @@ class Ancestry(abc.ABC):
                     child._copyPost()
 
     def findAttributeInAncestry(self, attributeName):
+        """
+        This method checks if *self* has an member (i.e., attribute) with name *attributeName*. If so, it returns its value. If
+        not, this method recursively searches up the ancestry tree by calling :py:class:`Ancestry.findAttributeInAncestry` on its ancestor.
+        If root is reached and no member named *attributeName* is found, a raise is executed.
+
+        :param attributeName:   The name of the member whose value it to be returned.
+
+        :raise:                 If member with name *attributeName* is not found in self or its ancestry.
+        """
 
         if hasattr(self, attributeName): return getattr(self, attributeName)
         if self.__ancestor is None: raise Exception('Could not find attribute name = %s in ancestry' % attributeName)
         return self.__ancestor.findAttributeInAncestry(attributeName)
 
     def findClassInAncestry(self, class_):
+        """
+        This method checks if *self* has an member that is an instance of *class_*. If so, a reference to it is returned.
+        If not, this method recursively searches up the ancestry tree by calling :py:class:`Ancestry.findClassInAncestry` on its ancestor
+        until an instance of *class_* is found or root is reached. If root is reached and no instance of *class_* found,
+        a raise is executed.
+
+        :param class_:      The class to search for in self and its ancestors.
+
+        :raises:            If an instance of class *class_* is not found in self or its ancestry.
+        """
 
         if isinstance(self, class_): return self
         if self.__ancestor is None: raise Exception('Could not find class name = %s in ancestry' % class_.__name__)
@@ -205,11 +243,17 @@ class Ancestry(abc.ABC):
 
     def findEntity(self, entityName, attribute = None, value = None):
         """
-        Default findEntity method. In general, sub-classes should over-ride this method.
+        This method takes one part of an xpath (e.g., the 'pathB' in /pathA/pathB/pathC') and returns a 
+        reference to the instance of *self* that match that part of the xpath.
+        Thie is a default findEntity method. In general, sub-classes should over-ride this method.
         This method uses the following algorithm to find entity. Firstly, if 'attribute' is None, then self is assumed
         to have an attribute named entityName which is taken to be the desired entity. Otherwise, self is iterated
-        over until an item with an attribute named attribute with value value is found. In either case, if
-        an entity is found, its moniker value must be entityName. If no entity is found, raise AttributeError.
+        over until an item with an attribute named attribute with value *value* is found. In either case, if
+        an entity is found, its moniker value must be entityName. If no entity is found, a raise AttributeError is executed.
+
+        :param entityName:      ?
+        :param attribute:       ?
+        :param value:           ?
         """
 
         if entityName in self.legacyMemberNameMapping: entityName = self.legacyMemberNameMapping[entityName]
@@ -315,15 +359,23 @@ class Ancestry(abc.ABC):
 
     def followXPath(self, xPath):
         """
-        :param xPath: string xPath, e.g. "/reactionSuite/reactions/reaction[@label='2']"
+        This method returns the instance referenced to by the xpath *xPath* starting at *self* if the xpath is relative.
+        This method uses Ancestry.findEntity to find each part of the xpath.
 
-        :return: class instance pointed to by xPath
+        :param xPath:   String xPath, e.g., "/reactionSuite/reactions/reaction[@label='2']".
 
-        Uses Ancestry.findEntity to find each element
+        :return:        Class instance pointed to by xPath
         """
 
         def follow2(xPathList, node):
-            """For internal use. Recursive helper function: descend the path to find the correct element."""
+            """
+            For internal use. Recursive helper function that descends the xpath starting at *node* to find the instance referenced by *xPathList*.
+
+            :param xPathList:       Python list of xpath parts.
+            :param node:            The current node to search for the first element of *xPathList*.
+
+            :returns:               The instance referenced by *xPathList*.
+            """
 
             if len(xPathList) == 0: return node
 
@@ -422,19 +474,33 @@ class AncestryIO_base(Ancestry):
     """This class adds methods to read and write *self* to a file. Currently, its supports reading and writing to an XML file."""
 
     def toXML(self, indent = '', **kwargs):
-        """Calls self.toXML_strList and joins its returned list with '\n'."""
+        """
+        Calls self.toXML_strList and joins its returned list with '\n'.
+
+        :param indent:              Amount of starting indentation.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :returns:                   XML representation of *self*.
+        """
 
         return '\n'.join(self.toXML_strList(indent=indent, **kwargs))
 
     @abc.abstractmethod
     def toXML_strList(self, indent = '', **kwargs):
-        """This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of *self*."""
+        """
+        This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+        """
 
         pass
 
     def saveToOpenedFile(self, fOut, **kwargs):
         """
-        Writes an XML representation of *self* to the opened file *fOut*. This method uses *self.toXML* to construct *self*'s XML representation.
+        Writes an XML representation of *self* to the opened file *fOut*. This method uses *self.toXML* to construct XML representation of *self*.
+
+        :param fOut:                File stream to write *self* to.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
         """
 
         fOut.write(self.toXML(**kwargs))
@@ -442,7 +508,11 @@ class AncestryIO_base(Ancestry):
 
     def saveToFile(self, fileName, **kwargs):
         """
-        Writes an XML representation of *self* to path *fileName*. This methods opens the file and calls **saveToOpenedFile** and then closes the file.
+        Writes an XML representation of *self* to path *fileName*. This method opens the file and calls **saveToOpenedFile** 
+        and then closes the file.
+
+        :param fileName:            File path to write *self* to.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
         """
 
         dirname = os.path.dirname(fileName)
@@ -455,8 +525,8 @@ class AncestryIO_base(Ancestry):
         """
         Saves *self* to as two files, with most of the hierarchy in an XML file but most of the numerical data saved in an associated HDF file.
         To construct the file names, the best is to leave *HDF_name* as None. However, if the HDF file should be put into a sub-directory
-        below where the XML file will be placed, then one can leave *HDF_name* as **None** and set *HDF_subDir*. For example, to
-        place the HDF file is the sub-directory 'HDF', set HDF_subDir='HDF'. The following example will write the XMl to the file
+        below where the XML file will be placed, then one can leave *HDF_name* as None and set *HDF_subDir*. For example, to
+        place the HDF file is the sub-directory 'HDF', set HDF_subDir='HDF'. The following example will write the XML to the file
         'path/to/n-Pu239.xml' and the HDF data to the file 'path/to/HDF/n-Pu239.h5':
 
         node.saveToHybrid('path/to/n-Pu239.xml', HDF_subDir='HDF')
@@ -467,7 +537,7 @@ class AncestryIO_base(Ancestry):
         :param minLength:   Minimum number of numerical values in a *Values* node before writing the *Values* node to HDF.
         :param flatten:     If True, GNDS datasets are concatenated into flattened HDF5 datasets.
         :param compress:    Enable gzip + shuffle compression for HDF5 datasets.
-        :param kwargs:      Extra keywork arguments passed to other functions.
+        :param kwargs:      A dictionary that contains data to control the way this method acts.
         """
 
         from fudge import externalFile as externalFileModule
@@ -525,13 +595,18 @@ class AncestryIO_base(Ancestry):
 
     def parseAncestryMembers(self, node, xPath, linkData, **kwargs):
         """
-        The method parses all member of *self.ancestryMembers* found in *node*. If *kwargs* contains the key *membersToSkip*
-        then all members of *self* whose moniker is in the list *kwargs['membersToSkip'] are not parsed. This, for example,
-        allows the calling instance to parse the *externalFiles* member and set up needed entries into *kwargs*.
+        The method parses all members defined in the ancestryMembers of *self* that are  found in *node*.  If *kwargs* contains 
+        the key *membersToSkip* then all members of *self* whose moniker is in the list *kwargs['membersToSkip'] are not parsed. 
+        This, for example, allows the calling instance to parse the *externalFiles* member and set up needed entries into *kwargs*.
 
         This method returns a dictionary and a list. The dictionary contains all child nodes of *node* not parsed, including 
         those specified by membersToSkip. The keys in the dictionary are the member monikers and the items are their associated 
         child node of *node*. The list contains all monikers for the *ancestryMembers* not in *node*.
+
+        :param node:        A :py:class:`xmlNodeMode.XML_node` instance.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary that contains data to control the way this method acts.
         """
 
         membersToSkip = kwargs.get('membersToSkip', [])
@@ -553,6 +628,9 @@ class AncestryIO_base(Ancestry):
     def parseCleanup(self, node, **kwargs):
         """
         This method does nothing. A place holder incase the derived class needs one.
+
+        :param node:        A :py:class:`xmlNodeMode.XML_node` instance.
+        :param kwargs:      A dictionary that contains data to control the way this method acts.
         """
 
         pass
@@ -560,7 +638,12 @@ class AncestryIO_base(Ancestry):
     @classmethod
     def parseXMLString(cls, string, **kwargs):
         """
-        Parses a XML string using class *cls*.
+        This method parses a XML string to construct an instance of *cls*.
+
+        :param string:      String to parse.
+        :param kwargs:      A dictionary that contains data to control the way this method acts.
+
+        :returns:           An instance of *cls*.
         """
 
         if not isinstance(string, str): raise TypeError('Invalid string.')
@@ -576,7 +659,13 @@ class AncestryIO_base(Ancestry):
     @classmethod
     def readXML_file(cls, fileName, **kwargs):
         """
-        Reads and parses an XML file using class *cls*.
+        This methods reads and parses the data in file *fileName* to construct an instance of *cls*.
+
+        :param cls:         The class to construct from the data in file *fileName*.
+        :param fileName:    Path to the file used to construct an instance of *cls*.
+        :param kwargs:      A dictionary that contains data to control the way this method acts.
+
+        :returns:           An instance of *cls*.
         """
 
         if isinstance(fileName, pathlib.Path):
@@ -597,26 +686,47 @@ class AncestryIO_base(Ancestry):
         return instance
 
 class AncestryIO(AncestryIO_base):
+    """
+    This is an abstruct class that defined the abstract method :py:class:`AncestryIO_bare.parseNodeUsingClass`.
+    """
 
     @classmethod
     @abc.abstractmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
         This method must be overrwritten by the derived class.
+        The overrwritten method must construct a class of instance *cls* using *node* 
+
+        :param node:        A :py:class:`xmlNodeMode.XML_node` instance.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary that contains data to control the way this method acts.
         """
 
         pass
 
 class AncestryIO_bare(AncestryIO_base):
+    """
+    This is an abstruct class that defined the abstract method :py:class:`AncestryIO_bare.parseNode`.
+    """
 
     @abc.abstractmethod
     def parseNode(self, node, xPath, linkData, **kwargs):
         """
         This method must be overrwritten by the derived class.
+        The overrwritten method must fill in *self* with data in *node*.
+
+        :param node:        A :py:class:`xmlNodeMode.XML_node` instance.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary that contains data to control the way this method acts.
         """
 
         pass
 
 class XPathNotFound(Exception):
+    """
+    Exception class which is raised when the :py:func:`followXPath` cannot follow the path.
+    """
 
     pass

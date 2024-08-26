@@ -5,6 +5,32 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module containes all the classes for handling GNDS array containers.
+
+This module contains the following classes:
+
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | Symmetry                          | This class is an enum of the supported symmetries for an array.       |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Permutation                       | This class is an enum of the supported premutations for an array.     |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | ArrayBase                         | This class is the base class for the array classes.                   |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Full                              | This class represents an array with all cells containing data.        |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Diagonal                          | This class represents an array where the data are stored in the       |
+    |                                   | compact GNDS diagaonal array format.                                  |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Flattened                         | This class represents an array where the data are stored in the       |
+    |                                   | compact GNDS flattened array format.                                  |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Embedded                          | This class represents an array that contains other arrays.            |
+    +-----------------------------------+-----------------------------------------------------------------------+
+"""
+
 import numpy
 
 from LUPY import enums as LUPY_enumsModule
@@ -16,23 +42,61 @@ from . import vector as vectorModule
 from . import matrix as matrixModule
 
 class Symmetry(LUPY_enumsModule.Enum):
+    """
+    This class is an enum of the supported symmetries for an array.
+    """
 
     none = LUPY_enumsModule.auto()
     lower = LUPY_enumsModule.auto()
     upper = LUPY_enumsModule.auto()
 
 class Permutation(LUPY_enumsModule.Enum):
+    """
+    This class is an enum of the supported premutations for an array.
+    """
 
     plus = '+'
     minus = '-'
 
 class ArrayBase( baseModule.XDataCoreMembers ) :
+    """
+    This class is the base class for the array classes.
+
+    The following table list the primary members of this class:
+
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | Member            | Description                                                                                   |
+    +===================+===============================================================================================+
+    | shape             | This is the shape of the array.                                                               |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | symmetry          | This is the symmtry (none, lower or upper) for the data in the array.                         |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | storageOrder      | This is the storage order (row or column) for the data in the arrary.                         |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | offset            | This is the offset index where the first data value in the array starts.                      |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | permutation       | This is the permutation for the data in the array.                                            |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | index             | This is index of the array inside of other xData function.                                    |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | label             | This is the label for the array.                                                              |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    """
 
     moniker = 'array'
 
     def __init__( self, shape = None, symmetry = None, storageOrder=enumsModule.StorageOrder.rowMajor, 
                 offset = None, permutation = Permutation.plus,
                 index = None, label = None ) :
+        """
+        :param shape:               This is the shape of the array.
+        :param symmetry:            This is the symmtry (none, lower or upper) for the data in the array.
+        :param storageOrder:        This is the storage order (row or column) for the data in the arrary.
+        :param offset:              This is the offset index where the first data value in the array starts.
+        :param permutation:         This is the permutation for the data in the array.
+        :param index:               This is index of the array inside of other xData function.
+        :param label:               This is the label for the array.
+        """
 
         if( not( isinstance( self.compression, str ) ) ) : raise TypeError( 'compression must be a string' )
         baseModule.XDataCoreMembers.__init__(self, index=index, label=label)
@@ -60,21 +124,41 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
         self.__offset = offset
 
     def __len__( self ) :
+        """
+        This method returns the dimension of the array.
+
+        :returns:           A python int.
+        """
 
         return( self.dimension )
 
     @property
     def dimension( self ) :
+        """
+        This method returns the dimension of the array.
+
+        :returns:           A python int.
+        """
 
         return( len( self.__shape ) )
 
     @property
     def shape( self ) :
+        """
+        This method returns a reference to the shape member.
+
+        :returns:            A python tuple.
+        """
 
         return( self.__shape )
 
     @property
     def size( self ) :
+        """
+        This method returns the number of cells in a full representation of *self*.
+
+        :returns:            A python int.
+        """
 
         size = 1
         for length in self.__shape : size *= length
@@ -82,40 +166,72 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
 
     @property
     def symmetry( self ) :
+        """
+        This method returns the symmetry of *self*.
+
+        :returns:            An instance of :py:class:`Symmetry`.
+        """
 
         return( self.__symmetry )
 
     @property
     def permutation( self ) :
+        """
+        This method returns the permutation of *self*.
+
+        :returns:            An instance of :py:class:`Permutation`.
+        """
 
         return( self.__permutation )
 
     @property
     def compression( self ) :
+        """
+        This method returns the compression of *self*.
+
+        :returns:            A python str.
+        """
 
         return( self.compression )
 
     @property
     def storageOrder( self ) :
+        """
+        This method returns the storageOrder of *self*.
+
+        :returns:            An instance of :py:class:`enumsModule.StorageOrder`.
+        """
 
         return( self.__storageOrder )
 
     @property
     def offset( self ) :
+        """
+        This method returns the offset of *self*.
+
+        :returns:            A python tuple.
+        """
 
         return( self.__offset )
 
     def offsetScaleValues( self, offset, scale ):
-        """Modify every element in the array: multiply by scale and add offset."""
+        """
+        This method modifies every cell in the array by multiply it by *scale* and adding *offset*.
+
+        :param offset:      The offset to apply to each cell.
+        :param scale:       The multiplicative scale factor to apply to each cell.
+        """
 
         self.values.offsetScaleValues( offset, scale )
 
     def constructVector(self, secondIndex=None):
         """
-        Convert the output of the xData.xDataArray.arrayBase.constructArray() to an instancce of xData.vector.Vector.
+        This method only works for 1d and 2d arrays. For a 1d array, its returns the data as an instancce of :py:class:`vectorModule.Vector`.
+        For a 2d array, it returns the data for row *secondIndex* as an instancce of :py:class:`vectorModule.Vector`.
 
-        :param secondIndex: Index along the third dimension from which to extract 1d-array.
-        :returns: instance of xData.vector.Vector.
+        :param secondIndex:     Index along the second dimension from which to extract 1d-array.
+
+        :returns:               An instance of :py:class:`vectorModule.Vector`.
         """
 
         if self.dimension == 2:
@@ -135,10 +251,12 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
 
     def constructMatrix(self, thirdIndex=None):
         """
-        Generate an xData.matrix.Matrix object from an xData.xDataArray.arrayBase instance.
+        This method only works for 3d array.
+        This method returns the data at dimension *thirdIndex* as a :py:class:`matrixModule.Matrix` instance.
 
-        :param thirdIndex: Index along the third dimension from which to extract 2d-array.
-        :returns: instance of xData.matrix.Matrix.
+        :param thirdIndex:      Index along the third dimension from which to extract 2d-array.
+
+        :returns:               An instance of :py:class:`matrixModule.Matrix`.
         """
 
         if self.dimension != 3:
@@ -152,6 +270,11 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
             return matrixModule.Matrix(values=self.constructArray()[:, :, thirdIndex])
 
     def attributesToXMLAttributeStr( self ) :
+        """
+        This method converts all the attributes of *self* into an XML attribute string.
+
+        :returns:       A python string.
+        """
 
         attributeStr = ' shape="%s"' % ','.join( [ "%d" % length for length in self.shape ] )
         if self.compression != Full.compression: attributeStr += ' compression="%s"' % self.compression
@@ -164,6 +287,17 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
+        """
 
         xPath.append(node.tag)
 
@@ -204,6 +338,14 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
 
     @staticmethod
     def parseNodeAttributes(node, **kwargs):
+        """
+        This static method parses the attributes for an array.
+
+        :param node:        Node whose attributes are parsed.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           A python dict.
+        """
 
         attributes = {  'shape'         : (None, str),
                         'symmetry'      : (Symmetry.none, str),
@@ -228,6 +370,14 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
 
     @staticmethod
     def indicesToFlatIndices( shape, indices ) :
+        """
+        This static method converts each index in *indices* into a flat index.
+
+        :param shape:       The shape of the array.
+        :param indices:     The list of indices within *shape*.
+
+        :returns:           A python list.
+        """
 
         flatIndices = []
         for index in indices :
@@ -243,6 +393,14 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
 
     @staticmethod
     def flatIndicesToIndices( shape, flatIndices ) :
+        """
+        This static method converts each flat index in *flatIndices* into an index in an array with shape *shape*.
+
+        :param shape:       The shape of the array.
+        :param indices:     The list of flat indices.
+
+        :returns:           A python list.
+        """
 
         indices = []
         products = [ 1 ]
@@ -258,12 +416,34 @@ class ArrayBase( baseModule.XDataCoreMembers ) :
         return( indices )
 
 class Full( ArrayBase ) :
+    """
+    This class store the array without any compression.
+
+    The following table list the primary members of this class that are not specified in the primary members
+    table in :py:class:`ArrayBase`:
+
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | Member            | Description                                                                                   |
+    +===================+===============================================================================================+
+    | data              | This is a :py:class:`valuesModule.Values` instance that has the data of the array.            |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    """
 
     compression = 'full'
     ancestryMembers = baseModule.XDataCoreMembers.ancestryMembers + ( 'values', )
 
     def __init__(self, shape=None, data=None, symmetry=Symmetry.none, storageOrder=enumsModule.StorageOrder.rowMajor, 
                 offset=None, permutation=Permutation.plus, index=None, label=None):
+        """
+        :param shape:               This is the shape of the array.
+        :param data:                This is a :py:class:`valuesModule.Values` instance that has the data of the array.
+        :param symmetry:            This is the symmtry (none, lower or upper) for the data in the array.
+        :param storageOrder:        This is the storage order (row or column) for the data in the arrary.
+        :param offset:              This is the offset index where the first data value in the array starts.
+        :param permutation:         This is the permutation for the data in the array.
+        :param index:               This is index of the array inside of other xData function.
+        :param label:               This is the label for the array.
+        """
 
         ArrayBase.__init__( self, shape, symmetry = symmetry, storageOrder = storageOrder, 
                 offset = offset, permutation = permutation,
@@ -282,6 +462,11 @@ class Full( ArrayBase ) :
         self.values.setAncestor( self )
 
     def constructArray( self ) :
+        """
+        This method returns a numpy array that represents the data in *self* with all cells fulled.
+
+        :returns:       An instance of :py:class:`numpy.array`.
+        """
 
         import numpy
 
@@ -341,6 +526,11 @@ class Full( ArrayBase ) :
         return( array1.reshape( self.shape, order = order ) )
 
     def copy( self ) :
+        """
+        This method returns a copy of *self*.
+
+        :returns:       An instance of :py:class:`Full`.
+        """
 
         return( Full( self.shape, self.values.copy( ), 
                 symmetry = self.symmetry, storageOrder = self.storageOrder, 
@@ -348,6 +538,14 @@ class Full( ArrayBase ) :
                 index = self.index, label = self.label ) )
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
@@ -359,6 +557,22 @@ class Full( ArrayBase ) :
         return XML_strList
 
 class Diagonal( ArrayBase ) :
+    """
+    This class store the array with GNDS diagonal compression where ohly some of the diagonals have non-zero data. 
+    Multiple diagonals can be stored. If more than the main diagonal is represented, the starting point of each 
+    diagaonal by me specified by the *startingIndices* member as per the GNDS specifications.
+
+    The following table list the primary members of this class that are not specified in the primary members
+    table in :py:class:`ArrayBase`:
+
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | Member            | Description                                                                                   |
+    +===================+===============================================================================================+
+    | data              | This is a :py:class:`valuesModule.Values` instance that has the data of the array.            |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | startingIndices   | This is a :py:class:`valuesModule.Values` instance specifies where each diagonal starts.      |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    """
 
     compression = 'diagonal'
     ancestryMembers = baseModule.XDataCoreMembers.ancestryMembers + ( 'values', )
@@ -366,6 +580,17 @@ class Diagonal( ArrayBase ) :
     def __init__( self, shape = None, data = None, startingIndices = None, symmetry = Symmetry.none, storageOrder = enumsModule.StorageOrder.rowMajor, 
                 offset = None, permutation = Permutation.plus,
                 index = None, label = None ) :
+        """
+        :param shape:               This is the shape of the array.
+        :param data:                This is a :py:class:`valuesModule.Values` instance that has the data of the array.
+        :param startingIndices:     This is a :py:class:`valuesModule.Values`
+        :param symmetry:            This is the symmtry (none, lower or upper) for the data in the array.
+        :param storageOrder:        This is the storage order (row or column) for the data in the arrary.
+        :param offset:              This is the offset index where the first data value in the array starts.
+        :param permutation:         This is the permutation for the data in the array.
+        :param index:               This is index of the array inside of other xData function.
+        :param label:               This is the label for the array.
+        """
 
         ArrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder,
                 offset = offset, permutation = permutation,
@@ -406,6 +631,11 @@ class Diagonal( ArrayBase ) :
         self.values.setAncestor( self )
 
     def constructArray( self ) :
+        """
+        This method returns a numpy array that represents the data in *self* with all cells fulled.
+
+        :returns:       An instance of :py:class:`numpy.array`.
+        """
 
         import numpy
         import itertools
@@ -438,6 +668,11 @@ class Diagonal( ArrayBase ) :
         return( array1.reshape( self.shape, order = order ) )
 
     def copy( self ) :
+        """
+        This method returns a copy of *self*.
+
+        :returns:       An instance of :py:class:`Diagonal`.
+        """
 
         startingIndicesOriginal = self.startingIndicesOriginal
         if( startingIndicesOriginal is not None ) : startingIndicesOriginal = self.startingIndicesOriginal.copy( )
@@ -447,6 +682,14 @@ class Diagonal( ArrayBase ) :
                 index = self.index, label = self.label ) )
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -460,6 +703,25 @@ class Diagonal( ArrayBase ) :
         return XML_strList
 
 class Flattened( ArrayBase ) :
+    """
+    This class store the array with GNDS flattened compression. This array is good for storing an array where the
+    non-zero parts of the array (called chunk herein) are sparse with many zero cells between each chunk.
+    In addition to each chunk, the starting position and length of each chunk is needed. A starting position is
+    is the flat index of the start of the chunk.
+
+    The following table list the primary members of this class that are not specified in the primary members
+    table in :py:class:`ArrayBase`:
+
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | Member            | Description                                                                                   |
+    +===================+===============================================================================================+
+    | data              | This is a :py:class:`valuesModule.Values` instance that has the data of the array.            |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | starts            | This is a :py:class:`valuesModule.Values` instance that specifies where each chuck starts.    |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    | lengths           | This is a :py:class:`valuesModule.Values` instance that specifies the length of each chunk.   |
+    +-------------------+-----------------------------------------------------------------------------------------------+
+    """
 
     compression = 'flattened'
     ancestryMembers = baseModule.XDataCoreMembers.ancestryMembers + ( 'values', 'lengths', 'starts' )
@@ -469,6 +731,18 @@ class Flattened( ArrayBase ) :
                 offset = None, permutation = Permutation.plus,
                 index = None, label = None, 
                 dataToString = None ) :
+        """
+        :param shape:               This is the shape of the array.
+        :param data:                This is a :py:class:`valuesModule.Values` instance that has the data of the array.
+        :param starts:              This is a :py:class:`valuesModule.Values` instance that contains the start flat index of each data chunk.
+        :param lengths:             This is a :py:class:`valuesModule.Values` instance that contains the length of each data chunk.
+        :param symmetry:            This is the symmtry (none, lower or upper) for the data in the array.
+        :param storageOrder:        This is the storage order (row or column) for the data in the arrary.
+        :param offset:              This is the offset index where the first data value in the array starts.
+        :param permutation:         This is the permutation for the data in the array.
+        :param index:               This is index of the array inside of other xData function.
+        :param label:               This is the label for the array.
+        """
 
         ArrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder,
                 offset = offset, permutation = permutation,
@@ -512,6 +786,11 @@ class Flattened( ArrayBase ) :
         self.values.setAncestor( self )
 
     def constructArray( self ) :
+        """
+        This method returns a numpy array that represents the data in *self* with all cells fulled.
+
+        :returns:       An instance of :py:class:`numpy.array`.
+        """
 
         import numpy
 
@@ -532,6 +811,11 @@ class Flattened( ArrayBase ) :
         return array1
 
     def copy( self ) :
+        """
+        This method returns a copy of *self*.
+
+        :returns:       An instance of :py:class:`Flattened`.
+        """
 
         return( Flattened( self.shape, self.values.copy( ), self.starts.copy( ), self.lengths.copy( ), 
                 symmetry = self.symmetry, storageOrder = self.storageOrder,
@@ -541,12 +825,14 @@ class Flattened( ArrayBase ) :
     @staticmethod
     def fromNumpyArray( array, symmetry = Symmetry.none, nzeroes = 4 ):
         """
-        Generate a sparse flattened array that represents an arbitrary numpy array.
-        Only supports 'full' or 'lower-symmetric' matrices, with row-major data storage.
-        :param array: input numpy array
-        :param symmetry: allowed values are 'none' or 'lower'
-        :param nzeroes: how many zeroes to allow before adding a new 'start' and 'length' 
-        :return: 
+        This static method generates a sparse flattened array that represents an arbitrary numpy array.
+        Tjios method currently only supports 'full' or 'lower-symmetric' matrices, with row-major data storage.
+
+        :param array:           Input numpy array to flatten.
+        :param symmetry:        Allowed values are 'none' or 'lower'
+        :param nzeroes:         How many zeroes to allow before adding a new 'start' and 'length' 
+
+        :return:                An instance of :py:class:`Flattened`.
         """
 
         starts, lengths, sparseData = [], [], []
@@ -585,6 +871,14 @@ class Flattened( ArrayBase ) :
 
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
@@ -597,11 +891,25 @@ class Flattened( ArrayBase ) :
         return XML_strList
 
 class Embedded( ArrayBase ) :
+    """
+    This class store the array with GNDS embeeded compression where the array is stores as a list of sub-arrays.
+
+    The primary members of this class are list in the primary members table in :py:class:`ArrayBase`:
+    """
 
     compression = 'embedded'
 
     def __init__(self, shape=None, symmetry=Symmetry.none, storageOrder=enumsModule.StorageOrder.rowMajor,
                 offset=None, permutation=Permutation.plus, index=None, label=None):
+        """
+        :param shape:               This is the shape of the array.
+        :param storageOrder:        This is the storage order (row or column) for the data in the arrary.
+        :param symmetry:            This is the symmtry (none, lower or upper) for the data in the array.
+        :param offset:              This is the offset index where the first data value in the array starts.
+        :param permutation:         This is the permutation for the data in the array.
+        :param index:               This is index of the array inside of other xData function.
+        :param label:               This is the label for the array.
+        """
 
         ArrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder, 
                 offset = offset, permutation = permutation,
@@ -610,6 +918,11 @@ class Embedded( ArrayBase ) :
         self.arrays = []
 
     def addArray( self, array ) :
+        """
+        Thie method adds an :py:class:`ArrayBase` instance to *self*.
+
+        :param array:       An :py:class:`ArrayBase` instance.
+        """
 
         if( not( isinstance( array, ArrayBase ) ) ) : raise TypeError( 'variable not an array instance' )
         if( self.dimension < array.dimension ) : raise ValueError( 'cannot embedded array into a smaller dimensional array: %s %s' %
@@ -626,6 +939,11 @@ class Embedded( ArrayBase ) :
         self.arrays.append( array )
 
     def constructArray( self ) :
+        """
+        This method returns a numpy array that represents the data in *self* with all cells fulled.
+
+        :returns:       An instance of :py:class:`numpy.array`.
+        """
 
         import numpy
 
@@ -640,6 +958,11 @@ class Embedded( ArrayBase ) :
         return( array1 )
 
     def copy( self ) :
+        """
+        This method returns a copy of *self*.
+
+        :returns:       An instance of :py:class:`Embedded`.
+        """
 
         array1 = Embedded( self.shape, 
                 symmetry = self.symmetry, storageOrder = self.storageOrder,
@@ -649,11 +972,24 @@ class Embedded( ArrayBase ) :
         return array1
 
     def offsetScaleValues( self, offset, scale ):
-        """Modify every sub-array: multiply by scale and add offset."""
+        """
+        This method class *offsetScaleValues* for each sub-array of *self*.
+
+        :param offset:      The offset to apply to each cell of each sub-array.
+        :param scale:       The multiplicative scale factor to apply to each cell of each sub-array.
+        """
 
         for subarray in self.arrays: subarray.offsetScaleValues( offset, scale )
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 

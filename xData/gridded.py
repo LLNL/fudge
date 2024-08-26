@@ -5,16 +5,67 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module contains gridded functions. Gridded functions are functions that store the dependent data on 
+a regular grid for each indenpendent axis. Each independent axis can have a grid indenpendent of the other axis grids.
+These are GNDS gridded1d, gridded2d and gridded3d functions.
+
+This module contains the following classes:
+
+    +---------------------------+-------------------------------------------------------------------------------+
+    | Class                     | Description                                                                   |
+    +===========================+===============================================================================+
+    | Gridded                   | This class is the base class for the gridded classes.                         |
+    +---------------------------+-------------------------------------------------------------------------------+
+    | Gridded1d                 | This class represents a 1-d gridded function.                                 |
+    +---------------------------+-------------------------------------------------------------------------------+
+    | Gridded2d                 | This class represents a 2-d gridded function.                                 |
+    +---------------------------+-------------------------------------------------------------------------------+
+    | Gridded3d                 | This class represents a 3-d gridded function.                                 |
+    +---------------------------+-------------------------------------------------------------------------------+
+"""
+
 from . import enums as enumsModule
 from . import base as baseModule
 from . import axes as axesModule
 from . import xDataArray as arrayModule
 
 class Gridded( baseModule.XDataFunctional ) :
+    """
+    This class is the base class for the gridded classes.
+
+    The following table list the primary members of this class:
+
+    +-------------------+---------------------------------------------------------------+
+    | Member            | Description                                                   |
+    +===================+===============================================================+
+    | axes              | This is the axes member.                                      |
+    +-------------------+---------------------------------------------------------------+
+    | array             | This member stores the dependent data.                        |
+    +-------------------+---------------------------------------------------------------+
+    | outerDomainValue  | This is the domain value for the next higher dimension for    |
+    |                   | a function that is embedded in a high dimensional functions.  |
+    +-------------------+---------------------------------------------------------------+
+    | index             | This is the index member use by some xData classes.           |
+    +-------------------+---------------------------------------------------------------+
+    | label             | This is the label member use by some xData classes.           |
+    +-------------------+---------------------------------------------------------------+
+    | valueType         | This describes the type of data in array (i.e., float, int).  |
+    +-------------------+---------------------------------------------------------------+
+    """
 
     ancestryMembers = baseModule.XDataFunctional.ancestryMembers + ( 'array', )
 
     def __init__( self, axes, array, index = None, valueType = enumsModule.ValueType.float64, outerDomainValue = None, label = None ) :
+        """
+        :param axes:                This is the axes member.
+        :param array:               This stores the dependent data.
+        :param index:               This is the index member.
+        :param valueType:           This describes the type of data (i.e., float, int) returned by the function.
+        :param outerDomainValue:    This is the domain value for the next higher dimension for a function that is
+                                    embedded in a high dimensional function.
+        :param label:               This is the label member.
+        """
 
         for axis in axes[:self.dimension+1]:
             if( axis.index == 0 ) :
@@ -32,13 +83,19 @@ class Gridded( baseModule.XDataFunctional ) :
         self.array.setAncestor( self )
 
     def __len__( self ) :
-        """Returns the number of regions in self."""
+        """
+        This method returns the number of data in *self*'s array.
+
+        :returns:       A python int.
+        """
 
         return( len( self.array ) )
 
     def convertUnits( self, unitMap ) :
         """
-        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         if( self.axes is None ) : return
@@ -47,6 +104,11 @@ class Gridded( baseModule.XDataFunctional ) :
         self.fixValuePerUnitChange( factors )
 
     def copy( self ):
+        """
+        This method returns a copy of self.
+
+        :returns:           A new instance of *self*.
+        """
 
         return self.__class__( self.axes.copy( ), self.array.copy( ), index = self.index, valueType = self.valueType,
             outerDomainValue = self.outerDomainValue, label = self.label )
@@ -54,15 +116,37 @@ class Gridded( baseModule.XDataFunctional ) :
     __copy__ = copy
 
     def getGrid( self, index ) :
+        """
+        This method returns the values for the grid for the *index* axis.
+
+        :param index:       The index of the axis whose grid is requested.
+
+        :returns            A python list of numbers.
+        """
 
         if( 0 < index <= len( self ) ) : return( self.axes[index].values )
         raise IndexError( 'index = %d out of range [1,%s]' % (index, len( self ) ) )
 
     def getGridUnit( self, index ) :
+        """
+        This method returns the unit for the *index* axis.
+
+        :param index:       The index of the axis whose unit is requested.
+
+        :returns            A python str.
+        """
 
         return( self.axes[index].unit )
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
@@ -76,6 +160,17 @@ class Gridded( baseModule.XDataFunctional ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:            An instance of *cls* representing *node*.
+        """
 
         attributes, extraAttributes = baseModule.XDataFunctional.parseBareNodeCommonAttributes(node, xPath)     # parseBareNodeCommonAttributes adds to xPath.
         if len(extraAttributes) > 0: raise Exception('Invalid attributes: %s.' % ( ', '.join(list(extraAttributes.keys())) ))
@@ -92,6 +187,9 @@ class Gridded( baseModule.XDataFunctional ) :
         return instance
 
 class Gridded1d( Gridded ) :
+    """
+    This class stores a 1-d gridded function.
+    """
 
     moniker = 'gridded1d'
     dimension = 1
@@ -115,11 +213,17 @@ class Gridded1d( Gridded ) :
         return xs, ys
 
 class Gridded2d( Gridded ) :
+    """
+    This class stores a 2-d gridded function.
+    """
 
     moniker = 'gridded2d'
     dimension = 2
 
 class Gridded3d( Gridded ) :
+    """
+    This class stores a 3-d gridded function.
+    """
 
     moniker = 'gridded3d'
     dimension = 3

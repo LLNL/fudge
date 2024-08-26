@@ -465,8 +465,8 @@ class ReactionSuite(ancestryModule.AncestryIO):
                 'branchingRatioSumTolerance': 1e-6,
                 'dQ': '1e-3 MeV',
                 'dThreshold': '1e-3 MeV',
-                'crossSectionEnergyMin': '1e-5 eV',
-                'crossSectionEnergyMax': '20 MeV',
+                'crossSectionEnergyMin': f'{self.domainMin} {self.domainUnit}',
+                'crossSectionEnergyMax': f'{self.domainMax} {self.domainUnit}',
                 'crossSectionOnly': False,
                 'crossSectionMaxDiff': 1e-3,
                 'multiplicityMaxDiff': 1e-3,
@@ -498,7 +498,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
         warnings = []
 
         if isinstance(self.target, PoPsModule.unorthodoxModule.Particle):
-            warnings.append( warning.UnorthodoxParticleNotImplemented( self.target))
+            warnings.append(warning.UnorthodoxParticleNotImplemented(self.target))
             return warning.Context('ReactionSuite: %s + %s' % (self.projectile, self.target), warnings)
 
         evaluatedStyle = self.styles.getEvaluatedStyle()
@@ -511,16 +511,14 @@ class ReactionSuite(ancestryModule.AncestryIO):
         massUnit = 'eV/c**2'
         projectile = self.PoPs[self.projectile]
         projectileZ, projectileA, projectileZA, projectileLevelIndex = chemicalElementMiscPoPsModule.ZAInfo(projectile)
-        target = self.PoPs[self.target]
-        if hasattr(target,'id') and target.id in self.PoPs.aliases:
-            target = self.PoPs[target.pid]
+        target = self.PoPs.final(self.target)
         targetZ, targetA, targetZA, targetLevelIndex = chemicalElementMiscPoPsModule.ZAInfo(target)
         if targetA == 0:
             compoundZA = 1000 * (projectileZ + targetZ)     # elemental target
         else:
             compoundZA = targetZA + projectileZA
         CoulombChannel = (targetZ != 0) and (projectileZ != 0)
-        elementalTarget = targetA==0
+        elementalTarget = targetA == 0
         if not elementalTarget:
             projectileMass_amu = projectile.getMass('amu')
             targetMass_amu = target.getMass('amu')
@@ -531,13 +529,14 @@ class ReactionSuite(ancestryModule.AncestryIO):
             availableEnergy_eV = projectileMass + targetMass
         else:
             # For elemental targets, calculating these factors doesn't make sense since there is no defined target mass
-            warnings.append(warning.ElementalTarget(self.target))
+            if self.interaction is enumsModule.Interaction.nuclear:
+                warnings.append(warning.ElementalTarget(self.target))
             kinematicFactor = 1.0
             availableEnergy_eV = None
 
         info = {'reactionSuite': self, 'kinematicFactor': kinematicFactor, 'compoundZA': compoundZA,
                 'availableEnergy_eV': availableEnergy_eV, 'CoulombChannel': CoulombChannel, 'style': evaluatedStyle,
-                'reconstructedStyleName': None, 'elementalTarget': elementalTarget}
+                'reconstructedStyleName': None, 'elementalTarget': elementalTarget, 'interaction': self.interaction}
         info.update(options)
         if elementalTarget:
             # For elemental targets, calculating energy balance isn't possible
@@ -563,6 +562,25 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
         if externalFileWarnings:
             warnings.append(warning.Context('externalFiles', externalFileWarnings))
+
+        # does evaluation start at an appropriate incident energy?
+        # FIXME these limits may differ by library. Move to config file?
+        expectedDomainMin = {
+            IDsPoPsModule.neutron: '1e-5 eV',
+            IDsPoPsModule.photon: '1 MeV',
+            'H1': '1 MeV',
+            'H2': '1 MeV',
+            'H3': '1 MeV',
+            'He3': '1 MeV',
+            'He4': '1 MeV',
+        }.get(self.projectile, '1 MeV')
+        if self.interaction is enumsModule.Interaction.atomic:
+            expectedDomainMin = {
+                IDsPoPsModule.photon: '1 eV',
+                IDsPoPsModule.electron: '10 eV'
+            }.get(self.projectile, '10 eV')
+        if PQUModule.PQU(self.domainMin, self.domainUnit) > PQUModule.PQU(expectedDomainMin):
+            warnings.append(warning.EvaluationDomainMinTooHigh(expectedDomainMin, self))
 
         if self.resonances is not None:
             resonanceWarnings = self.resonances.check(info)
@@ -1821,11 +1839,14 @@ class ReactionSuite(ancestryModule.AncestryIO):
         averageProductEnergy = product.averageProductEnergy
         axes = averageProductEnergyModule.defaultAxes( energyUnit = incidentEnergyUnit )
         averageEnergy = averageProductEnergyModule.XYs1d( data = averageEnergy, axes = axes, label = style.label )
-        averageEnergy = averageEnergy.processMultiGroup( style, tempInfo, indent )
-        grouped = averageEnergy.array.constructArray( )
+        averageEnergyMultiGroup = averageEnergy.processMultiGroup( style, tempInfo, indent )
+        grouped = averageEnergyMultiGroup.array.constructArray( )
         array = averageProductEnergy[style.derivedFrom].array.constructArray( )
         for incidentGroup in range( style.upperCalculatedGroup + 1, len( array ) ) : grouped[incidentGroup] = array[incidentGroup]
-        averageProductEnergy.add( groupModule.toMultiGroup1d( averageProductEnergyModule.Gridded1d, style, tempInfo, averageEnergy.axes, grouped, zeroPerTNSL = tempInfo['zeroPerTNSL'] ) )
+        averageProductEnergy.add(groupModule.toMultiGroup1d(averageProductEnergyModule.Gridded1d, style, 
+                tempInfo, averageEnergyMultiGroup.axes, grouped, zeroPerTNSL=tempInfo['zeroPerTNSL']))
+
+        return averageEnergy
 
     def removeStyles( self, styleLabels ) :
         """
@@ -1896,7 +1917,19 @@ class ReactionSuite(ancestryModule.AncestryIO):
                         if( reaction is self.getReaction( possibleChannel ) ) : RRxsec = xsecs[possibleChannel]
                     if( RRxsec is not None ) : break
             if RRxsec is None:
-                raise ValueError("Couldn't find appropriate reconstructed cross section to add to reaction '%s'!" % reaction)
+                found = False
+                if isinstance(reaction, sumsModule.CrossSectionSum):
+                    from fudge.reactions import base as baseModule
+                    RRxsec = 0
+                    for summand in reaction.summands:
+                        rlabel = summand.link.findClassInAncestry(baseModule.Base_reaction).label
+                        if rlabel in xsecs:
+                            RRxsec += xsecs[rlabel]
+                            found = True
+
+                if not found:
+                    raise ValueError("Couldn't find appropriate reconstructed cross section to add to reaction '%s'!"
+                                     % reaction)
 
             background = evaluatedCrossSection.background
             try:
@@ -2217,7 +2250,10 @@ class ReactionSuite(ancestryModule.AncestryIO):
         return( temperatures )
 
     def toXML_strList(self, indent="", **kwargs):
-        """Returns a list of GNDS/XML strings representing self."""
+        """
+        Returns a list of GNDS/XML strings representing self. To see all child suites created, including empty ones, 
+        call with argument 'showEmptySuite=True'.
+        """
 
         incrementalIndent = kwargs.get('incrementalIndent', '  ')
         indent2 = indent + incrementalIndent

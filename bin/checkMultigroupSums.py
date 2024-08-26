@@ -15,6 +15,8 @@ from fudge import reactionSuite as reactionSuiteModule
 from fudge import styles as stylesModule
 from fudge.processing.deterministic import tokens as tokensModule
 
+summaryDocString__FUDGE = """This script checks the multi-group sums data in the list of specified protares and prints the xlink of the data where issues are found."""
+
 description = '''
 This script checks the multi-group sums data in the list of specified protares and prints the xlink of the data where issues are found.
 If the option "--outputDir" is specfied and a protare has issues, then the protare with its issues fixed is written into the directory 

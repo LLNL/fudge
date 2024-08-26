@@ -44,6 +44,88 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module is for FUDGE internal use.</span>
+<span class="sd">This module calculates the multi-group products matrices for various types of districtions. Many of the functions in this</span>
+<span class="sd">module interface between various distribution classes and Merced.</span>
+
+<span class="sd">This module contains the following functions:</span>
+<span class="sd">            </span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Function                              | Description                                                                       |</span>
+<span class="sd">    +=======================================+===================================================================================+</span>
+<span class="sd">    | twoBodyTransferMatrix                 |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | twoBodyTransferMatrix2                |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | wholeAtomScattering                   |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | comptonScattering                     |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | ENDFEMuEpP_TransferMatrix             |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | ENDLEMuEpP_TransferMatrix             |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | ELEpP_TransferMatrix                  |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | EEpMuP_TransferMatrix                 |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Legendre_TransferMatrix               |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | doubleDifferential_EEpMuP             |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | uncorrelated_EMuP_EEpP_TransferMatrix |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | discreteGammaAngularData              |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | primaryGammaAngularData               |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | NBodyPhaseSpace                       |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | KalbachMann_TransferMatrix            |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | executeCommand                        |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | parseOutputFile                       |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | commonDataToString                    |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | GBToString                            |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | fluxToString                          |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | crossSectionToString                  |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | multiplicityToString                  |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | angularToString                       |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | energyFunctionToString                |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | EEpPDataToString                      |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | LEEpPDataToString                     |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | LegendreDataToString                  |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | EMuEpPDataToString                    |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | EEpMuPDataToString                    |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | KalbachMannDataToString               |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | oneDToString                          |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | twoDToString                          |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | threeDToString                        |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | threeDListToString                    |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | addTMs                                |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
@@ -95,9 +177,20 @@
 
 <div class="viewcode-block" id="twoBodyTransferMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix">[docs]</a><span class="k">def</span> <span class="nf">twoBodyTransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate input and call processing code to generate a transfer matrix for two-body angular distribution.</span>
-<span class="sd">    If the distribution is actually made up of two different forms in different energy regions, this function</span>
-<span class="sd">    calls itself in the two regions and sums the result.</span>
+<span class="sd">    This function calculates multi-group product matices from a two-body distribution which must be in the center-of-mass frame. </span>
+<span class="sd">    This function allows for the distribution to have different incident energy regions. It calls :py:func:`twoBodyTransferMatrix2` </span>
+<span class="sd">    for each region and sums the resuts.</span>
+
+<span class="sd">    :param style:           This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:        This is a dictionary with needed data.</span>
+<span class="sd">    :param productFrame:    This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param crossSection:    This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param angularData:     This is the angular distribution data for the product.</span>
+<span class="sd">    :param Q:               This is the Q-value for the two-body reaction.</span>
+<span class="sd">    :param weight:          This is the pointwise linear weight to multiply the kernal of the integral by.</span>
+<span class="sd">    :param comment:         This is a comment that is written to the Merced input file.</span>
+
+<span class="sd">    :returns:               The number and energy conserving product matices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">Isotropic2d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">angularData</span> <span class="o">=</span> <span class="n">angularData</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="p">)</span>
@@ -143,8 +236,19 @@
         
 <div class="viewcode-block" id="twoBodyTransferMatrix2"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2">[docs]</a><span class="k">def</span> <span class="nf">twoBodyTransferMatrix2</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper function for twoBodyTransferMatrix. This should be called separately for every interpolation </span>
-<span class="sd">    region within a Regions2d form.</span>
+<span class="sd">    This function calculates multi-group product matices from a two-body distribution which must be in the center-of-mass frame. </span>
+<span class="sd">    This function is called by :py:func:`twoBodyTransferMatrix` to handle one region of the distrition. This function is for internal use.</span>
+
+<span class="sd">    :param style:           This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:        This is a dictionary with needed data.</span>
+<span class="sd">    :param crossSection:    This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param angularData:     This is the angular distribution data for the product.</span>
+<span class="sd">    :param Q:               This is the Q-value for the two-body reaction.</span>
+<span class="sd">    :param productFrame:    This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param weight:          This is the pointwise linear weight to multiply the kernal of the integral by.</span>
+<span class="sd">    :param comment:         This is a comment that is written to the Merced input file.</span>
+
+<span class="sd">    :returns:               The number and energy conserving product matices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
@@ -213,6 +317,19 @@
     <span class="k">return</span> <span class="n">TM1</span><span class="p">,</span> <span class="n">TME</span></div>
 
 <div class="viewcode-block" id="wholeAtomScattering"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.wholeAtomScattering">[docs]</a><span class="k">def</span> <span class="nf">wholeAtomScattering</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">formFactor</span><span class="p">,</span> <span class="n">realAnomalousFactor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">imaginaryAnomalousFactor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for photo-atomic coherent scattering.</span>
+
+<span class="sd">    :param style:                       This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:                    This is a dictionary with needed data.</span>
+<span class="sd">    :param productFrame:                This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param formFactor:                  This is the coherent scattering form factor.</span>
+<span class="sd">    :param realAnomalousFactor:         This is the real part of the anomalous factor.</span>
+<span class="sd">    :param imaginaryAnomalousFactor:    This is the imaginary part of the anomalous factor.</span>
+<span class="sd">    :param comment:                     This is a comment that is written to the Merced input file.</span>
+
+<span class="sd">    :returns:                           The number and energy conserving product matices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
     <span class="n">workDir</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workDir&#39;</span><span class="p">]</span>
@@ -240,6 +357,17 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">executeCommand</span><span class="p">(</span> <span class="n">logFile</span><span class="p">,</span> <span class="n">transferMatrixExecute</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;restart&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="comptonScattering"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.comptonScattering">[docs]</a><span class="k">def</span> <span class="nf">comptonScattering</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">scatteringFactor</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for photo-atomic incoherent scattering.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param scatteringFactor:    This is the incoherent scattering function.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.</span>
+
+<span class="sd">    :returns:                   The number and energy conserving product matices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
     <span class="n">workDir</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workDir&#39;</span><span class="p">]</span>
@@ -260,7 +388,17 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">executeCommand</span><span class="p">(</span> <span class="n">logFile</span><span class="p">,</span> <span class="n">transferMatrixExecute</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;restart&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ENDFEMuEpP_TransferMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.ENDFEMuEpP_TransferMatrix">[docs]</a><span class="k">def</span> <span class="nf">ENDFEMuEpP_TransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">angularEnergyData</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is ENDF MF = 6, LAW = 7 type data.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for ENDF MF = 6, LAW = 7 type data.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param scatteringFactor:    This is the incoherent scattering function.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.</span>
+
+<span class="sd">    :returns:                   The number and energy conserving product matices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
     <span class="n">workDir</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workDir&#39;</span><span class="p">]</span>
@@ -273,7 +411,20 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">executeCommand</span><span class="p">(</span> <span class="n">logFile</span><span class="p">,</span> <span class="n">transferMatrixExecute</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;restart&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ENDLEMuEpP_TransferMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.ENDLEMuEpP_TransferMatrix">[docs]</a><span class="k">def</span> <span class="nf">ENDLEMuEpP_TransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">EMuEpPData</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is LLNL I = 1, 3 type data.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for ENDL I = 1, 3 type data.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param crossSection:        This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param angularData:         This is the angular distribution data for the product (i.e., ENDL I = 1 data).</span>
+<span class="sd">    :param EMuEpPData:          This is the energy distribution data for the product (i.e., ENDL I = 3 data).</span>
+<span class="sd">    :param multiplicity:        This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.</span>
+
+<span class="sd">    :returns:                   The number and energy conserving product matices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
     <span class="n">workDir</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workDir&#39;</span><span class="p">]</span>
@@ -288,7 +439,17 @@
 
 <div class="viewcode-block" id="ELEpP_TransferMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.ELEpP_TransferMatrix">[docs]</a><span class="k">def</span> <span class="nf">ELEpP_TransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">LEEpPData</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This is for ENDL I = 4 data with l &gt; 0. This form is deprecated.</span>
+<span class="sd">    This function calculates multi-group product matices for ENDL I = 4 data with l &gt; 0.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param crossSection:        This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param LEEpPData:           This is the distribution data for the product (i.e., ENDL I = 4 data).</span>
+<span class="sd">    :param multiplicity:        This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.</span>
+
+<span class="sd">    :returns:                   The number and energy conserving product matices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
@@ -302,7 +463,20 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">executeCommand</span><span class="p">(</span> <span class="n">logFile</span><span class="p">,</span> <span class="n">transferMatrixExecute</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;restart&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="EEpMuP_TransferMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.EEpMuP_TransferMatrix">[docs]</a><span class="k">def</span> <span class="nf">EEpMuP_TransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">energyAngularData</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is ENDF MT=6 LAW=1, LANG=1,11-15 type data.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for MT = 6 LAW = 1, LANG = 1, 11-15 data.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param crossSection:        This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param energyAngularData:   This is the distribution data for the product.</span>
+<span class="sd">    :param multiplicity:        This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.</span>
+<span class="sd">    </span>
+<span class="sd">    :returns:                   The number and energy conserving product matices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
 
     <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">energyAngularData</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">energyAngularModule</span><span class="o">.</span><span class="n">Legendre</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">Legendre_TransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> 
@@ -314,6 +488,19 @@
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;Unsupported P(mu) for P(E&#39;,mu|E) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">energyAngularData</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Legendre_TransferMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.Legendre_TransferMatrix">[docs]</a><span class="k">def</span> <span class="nf">Legendre_TransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">LegendreData</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for MT = 6 LAW = 1, LANG = 1 data. This function is for internal use.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param crossSection:        This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param LegendreData:        This is the distribution data for the product.</span>
+<span class="sd">    :param multiplicity:        This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.</span>
+<span class="sd">    </span>
+<span class="sd">    :returns:                   The number and energy conserving product matices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
     <span class="n">workDir</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workDir&#39;</span><span class="p">]</span>
@@ -327,7 +514,20 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">executeCommand</span><span class="p">(</span> <span class="n">logFile</span><span class="p">,</span> <span class="n">transferMatrixExecute</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;restart&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="doubleDifferential_EEpMuP"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.doubleDifferential_EEpMuP">[docs]</a><span class="k">def</span> <span class="nf">doubleDifferential_EEpMuP</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">EEpMuPData</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-    
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for MT = 6 LAW = 1, LANG = 11-15 data. This function is for internal use. </span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.                                         </span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param crossSection:        This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param EEpMuPData:          This is the distribution data for the product.                                                  </span>
+<span class="sd">    :param multiplicity:        This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.                                     </span>
+<span class="sd">    </span>
+<span class="sd">    :returns:                   The number and energy conserving product matices.                                               </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
     <span class="n">workDir</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workDir&#39;</span><span class="p">]</span>
     
@@ -341,6 +541,21 @@
 
 <div class="viewcode-block" id="uncorrelated_EMuP_EEpP_TransferMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.uncorrelated_EMuP_EEpP_TransferMatrix">[docs]</a><span class="k">def</span> <span class="nf">uncorrelated_EMuP_EEpP_TransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">energyData</span><span class="p">,</span> 
         <span class="n">multiplicity</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for uncorrelated energy and angular distributions.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.                                         </span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.</span>
+<span class="sd">    :param crossSection:        This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param angularData:         This is the angular distribution data for the product.                                                  </span>
+<span class="sd">    :param energyData:          This is the energy distribution data for the product.                                                  </span>
+<span class="sd">    :param multiplicity:        This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.                                     </span>
+<span class="sd">    :param weight:              This is the pointwise linear weight to multiply the kernal of the integral by.</span>
+<span class="sd">    </span>
+<span class="sd">    :returns:                   The number and energy conserving product matices.                                               </span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
     <span class="n">workDir</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workDir&#39;</span><span class="p">]</span>
@@ -398,8 +613,21 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">executeCommand</span><span class="p">(</span> <span class="n">logFile</span><span class="p">,</span> <span class="n">transferMatrixExecute</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;restart&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="discreteGammaAngularData"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.discreteGammaAngularData">[docs]</a><span class="k">def</span> <span class="nf">discreteGammaAngularData</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">gammaEnergy</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used</span>
-<span class="sd">    for pair-production which pass angularData as None.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for a discrete photon distribution.</span>
+<span class="sd">    Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used</span>
+<span class="sd">    for pair-production which pass angularData as None.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.                                         </span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param gammaEnergy:         This is the energy of the discrete photon.</span>
+<span class="sd">    :param crossSection:        This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param angularData:         This is the angular distribution data for the product.                                                  </span>
+<span class="sd">    :param multiplicity:        This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.                                     </span>
+<span class="sd">    </span>
+<span class="sd">    :returns:                   The number and energy conserving product matices.                                               </span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="kn">import</span> <span class="n">miscellaneous</span> <span class="k">as</span> <span class="n">miscellaneousModule</span>
 
@@ -438,19 +666,31 @@
 
 <div class="viewcode-block" id="primaryGammaAngularData"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.primaryGammaAngularData">[docs]</a><span class="k">def</span> <span class="nf">primaryGammaAngularData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">energyData</span><span class="p">,</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for a primary photon distribution from a capture reaction.</span>
 <span class="sd">    Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. massRatio is the</span>
 <span class="sd">    target mass divide by the sum of the projectile and target masses.</span>
 
 <span class="sd">    This function perform the integration </span>
 
-<span class="sd">        TM = \int_g dE \int_h dE&#39; S(E) M(E) f(E) P(E -&gt; E&#39;) / \int_g dE f(E)</span>
+<span class="sd">        :math:`TM = \int_g dE \int_h dE&#39; S(E) M(E) f(E) P(E -&gt; E&#39;) / \int_g dE f(E)`</span>
 
-<span class="sd">    where \int_g is the integral of E from E_i to E_{i+1}, \int_g is the integral of E&#39; from E&#39;_j to E&#39;_{j+1}, S(E) is the cross section,</span>
-<span class="sd">    M(E) is the products multiplicity, f(E) is the flux weighting and P(E -&gt; E&#39;) is the probability for a projectile of energy E producing</span>
-<span class="sd">    a primary gamma of energy E&#39; for binding energy bindingEnergy. This function assumes that M(E) is a constant. For primary gamma&#39;s captured</span>
-<span class="sd">    into binding energy bindingEnergy P(E -&gt; E&#39;) = deltaFunction( E&#39; - ( bindingEnergy + massRatio E ) ) where massRatio = mt / ( mp + mt ),</span>
-<span class="sd">    mp is the projectile&#39;s mass and mt is the target&#39;s mass. Note, this formula is from the ENDF manual which ignores the recoil of the residual</span>
-<span class="sd">    nucleus.</span>
+<span class="sd">    where :math:`\int_g` is the integral of :math:`E` from :math:`E_i` to :math:`E_{i+1}`, :math:`\int_g` is the integral of :math:`E&#39;`</span>
+<span class="sd">    from :math:`E&#39;_j` to :math:`E&#39;_{j+1}`, :math:`S(E)` is the cross section, :math:`M(E)` is the products multiplicity, </span>
+<span class="sd">    :math:`f(E)` is the flux weighting and :math:`P(E -&gt; E&#39;)` is the probability for a projectile of energy :math:`E producing`</span>
+<span class="sd">    a primary gamma of energy :math:`E&#39;` for binding energy bindingEnergy. This function assumes that :math:`M(E)` is a constant. </span>
+<span class="sd">    For primary gamma&#39;s captured into binding energy bindingEnergy :math:`P(E -&gt; E&#39;)` = deltaFunction( E&#39; - ( bindingEnergy + massRatio E ) ) </span>
+<span class="sd">    where massRatio = :math:`mt / ( mp + mt )`, mp is the projectile&#39;s mass and mt is the target&#39;s mass. Note, this formula is </span>
+<span class="sd">    from the ENDF manual which ignores the recoil of the residual nucleus.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.                                         </span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param crossSection:        This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param energyData:          This is the energy of the discrete photon.</span>
+<span class="sd">    :param angularData:         This is the angular distribution data for the product.                                                  </span>
+<span class="sd">    :param multiplicity:        This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.                                     </span>
+
+<span class="sd">    :returns:                   The number and energy conserving product matices.                                               </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
@@ -502,6 +742,20 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="NBodyPhaseSpace"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.NBodyPhaseSpace">[docs]</a><span class="k">def</span> <span class="nf">NBodyPhaseSpace</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">numberOfProducts</span><span class="p">,</span> <span class="n">mTotal</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for an n-body phase space distribution.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.                                         </span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param crossSection:        This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param numberOfProducts:    This is the number of products.</span>
+<span class="sd">    :param mTotal:              This is total mass of the particles.</span>
+<span class="sd">    :param Q:                   This is the Q-value.</span>
+<span class="sd">    :param multiplicity:        This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.                                     </span>
+<span class="sd">    </span>
+<span class="sd">    :returns:                   The number and energy conserving product matices.                                               </span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
     <span class="n">workDir</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workDir&#39;</span><span class="p">]</span>
@@ -516,6 +770,18 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">executeCommand</span><span class="p">(</span> <span class="n">logFile</span><span class="p">,</span> <span class="n">transferMatrixExecute</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;restart&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="KalbachMann_TransferMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.KalbachMann_TransferMatrix">[docs]</a><span class="k">def</span> <span class="nf">KalbachMann_TransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">particlesData</span><span class="p">,</span> <span class="n">KalbachMannData</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates multi-group product matices for a Kalbach/Mann distribution.</span>
+
+<span class="sd">    :param style:               This is the multi-group style for the multi-group data.                                         </span>
+<span class="sd">    :param tempInfo:            This is a dictionary with needed data.</span>
+<span class="sd">    :param crossSection:        This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param KalbachMannData:     This is the Kalbach/Mann data.</span>
+<span class="sd">    :param multiplicity:        This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param comment:             This is a comment that is written to the Merced input file.                                     </span>
+
+<span class="sd">    :returns:                   The number and energy conserving product matices.                                               </span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">],</span> 
     <span class="n">workDir</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workDir&#39;</span><span class="p">]</span>
@@ -533,23 +799,37 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">executeCommand</span><span class="p">(</span> <span class="n">logFile</span><span class="p">,</span> <span class="n">transferMatrixExecute</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">],</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;restart&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="executeCommand"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.executeCommand">[docs]</a><span class="k">def</span> <span class="nf">executeCommand</span><span class="p">(</span> <span class="n">logFile</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">workFile</span><span class="p">,</span> <span class="n">restart</span><span class="p">,</span> <span class="n">productOffset</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="c1"># FIXME remove unused argument logFile?</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Runs executable (presumably Merced) on a single input, parses resulting output file and returns two transfer matrices:</span>
-<span class="sd">     - 1st has constant weight (conserves number of particles)</span>
-<span class="sd">     - 2nd is weighted by E&#39; (conserves energy)</span>
+<span class="sd">    This function runs *executable* (presumably Merced) on a single input, parses resulting output file and returns two transfer matrices:</span>
 
-<span class="sd">    If executable fails, create a &#39;.err&#39; file in the working directory (for easier searching)</span>
+<span class="sd">     - the first returned matric has weight 1 (i.e., conserves number of particles)</span>
+<span class="sd">     - the second returned matrix has weight E&#39; (i.e., conserves energy)</span>
 
-<span class="sd">    @param logFile: currently unused! Remove argument?</span>
-<span class="sd">    @param executable: compiled executable to run, generally FUDGE/bin/merced</span>
-<span class="sd">    @param cmd: full text of executable input file</span>
-<span class="sd">    @param workDir: directory where executable will be run. processProtare creates new workDir for each projectile/target/temperature</span>
-<span class="sd">    @param workFile: list of form [reaction identifier, product identifier], e.g. [&#39;r0001&#39;,&#39;n&#39;] or [&#39;r0045&#39;,&#39;photon__b&#39;]. Used to generate unique file names.</span>
-<span class="sd">    @param restart: boolean. If True, check whether executable was previously run for this input and if so skip re-running (useful for resuming jobs that timed out).</span>
+<span class="sd">    If executable fails, a file named workFile + &#39;_in.err&#39; is created in the working directory for easier searching.</span>
+
+<span class="sd">    :param logFile:         Currently unused! Remove argument?</span>
+<span class="sd">    :param executable:      Executable to run which is generally Merced.</span>
+<span class="sd">    :param cmd:             String which will be written as the input file for *executable*.</span>
+<span class="sd">    :param workDir:         Directory where executable will be run. processProtare.py creates new workDir for each projectile/target/temperature.</span>
+<span class="sd">    :param workFile:        List of form [reaction identifier, product identifier] (e.g., [&#39;r0001&#39;,&#39;n&#39;] or [&#39;r0045&#39;,&#39;photon__b&#39;])</span>
+<span class="sd">                            used to generate unique file name for the input and output files.</span>
+<span class="sd">    :param restart:         boolean. If True, check whether executable was previously run for this input and if so skip re-running </span>
+<span class="sd">                            (useful for resuming jobs that timed out).</span>
+<span class="sd">    :param productOffset:   The product energy group where the reaction threshold energy resides.</span>
+
+<span class="sd">    :returns:               The number and energy conserving product matices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">checkNegative_l0</span><span class="p">(</span> <span class="n">TM_EEpL</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">f</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function counts the number of negative l=0 elements in the product matrix *TM_EEpL*.</span>
+
+<span class="sd">        :param TM_EEpL:     The product matrix to check.</span>
+<span class="sd">        :param weight:      A string indicating if the weight is 1 or E&#39;. Oops, need to fix the calling string.</span>
+<span class="sd">        :param f:           Oops, this needs to be changed to fOut which is a stream where issues are written.</span>
+
+<span class="sd">        :returns:           int that is the number of negative l=0 elements found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">negative_l0Counter</span><span class="p">,</span> <span class="n">largestNegative</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.</span>
         <span class="k">for</span> <span class="n">ig</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">TM_EEpL</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
@@ -623,8 +903,26 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">TM1</span><span class="p">,</span> <span class="n">TME</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="parseOutputFile"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.parseOutputFile">[docs]</a><span class="k">def</span> <span class="nf">parseOutputFile</span><span class="p">(</span> <span class="n">file</span><span class="p">,</span> <span class="n">productOffset</span><span class="p">,</span> <span class="n">firstLine</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function parses the Merced output file that contains the product matrices.</span>
+
+<span class="sd">    :param file:            Path to the Merced output file.</span>
+<span class="sd">    :param productOffset:   The product energy group where the reaction threshold energy resides.</span>
+<span class="sd">    :param firstLine:       This is the first list that should be in output file which is use to verify that the file can be read.</span>
+
+<span class="sd">    :returns:               The tuple (number product matrices, energy weighted product matrices, dictionary ).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">checkKeyValue</span><span class="p">(</span> <span class="n">lineNumber</span><span class="p">,</span> <span class="n">keyValue</span><span class="p">,</span> <span class="n">_key</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function parses a key/value string (e.g., &#39;EinBin = 87&#39;) where the value is a python int.</span>
+
+<span class="sd">        :param lineNumber:  The line number where *keyValue* string was read.</span>
+<span class="sd">        :param keyValue:    The key/value string.</span>
+<span class="sd">        :param _key:        The expect name of the key.</span>
+
+<span class="sd">        :returns:           The value which is a python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span> <span class="p">:</span>
             <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">keyValue</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s1">&#39;=&#39;</span> <span class="p">)</span>
@@ -638,6 +936,16 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;bad value type </span><span class="si">%s</span><span class="s1"> at line </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">lineNumber</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">parseCrossSection</span><span class="p">(</span> <span class="n">paras</span><span class="p">,</span> <span class="n">lineNumber</span><span class="p">,</span> <span class="n">ls</span><span class="p">,</span> <span class="n">file</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function skips over a multi-group cross section in the merced output file.</span>
+
+<span class="sd">        :param paras:           Dictionary with the number of Legendre orders, the number of projectile groups and the number of product groups.</span>
+<span class="sd">        :param lineNumber:      Next line number in *ls* to parse.</span>
+<span class="sd">        :param ls:              A python list of lines in the Merced output file.</span>
+<span class="sd">        :param file:            Path to the Merced output file.</span>
+
+<span class="sd">        :returns:               Next line number to parse in *ls*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">s1</span> <span class="o">=</span> <span class="n">ls</span><span class="p">[</span><span class="n">lineNumber</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s1">&#39;:&#39;</span> <span class="p">)</span>                        <span class="c1"># This line should start as &#39;Cross section: n = &#39;</span>
         <span class="n">n1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">s1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s1">&#39;=&#39;</span> <span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
@@ -647,6 +955,17 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">lineNumber</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">parseTransferMatrix</span><span class="p">(</span> <span class="n">paras</span><span class="p">,</span> <span class="n">lineNumber</span><span class="p">,</span> <span class="n">ls</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">productOffset</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function parses a product matrix from the output file *file*.</span>
+
+<span class="sd">        :param paras:           Dictionary with the number of Legendre orders, the number of projectile groups and the number of product groups.</span>
+<span class="sd">        :param lineNumber:      Next line number in *ls* to parse.</span>
+<span class="sd">        :param ls:              A python list of lines in the Merced output file.</span>
+<span class="sd">        :param file:            Path to the Merced output file.</span>
+<span class="sd">        :param productOffset:   The product energy group where the reaction threshold energy resides.</span>
+
+<span class="sd">        :returns:               Product matrix and next line number to parse in *ls*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">s1</span> <span class="o">=</span> <span class="n">ls</span><span class="p">[</span><span class="n">lineNumber</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s2">&quot;:&quot;</span> <span class="p">)</span>                      <span class="c1"># This line should start as &#39;Integrals, weight = ...&#39;</span>
         <span class="n">EBins</span> <span class="o">=</span> <span class="n">checkKeyValue</span><span class="p">(</span> <span class="n">lineNumber</span><span class="p">,</span> <span class="n">s1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;numEinBins&#39;</span> <span class="p">)</span>
@@ -717,6 +1036,23 @@
 
 <div class="viewcode-block" id="commonDataToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.commonDataToString">[docs]</a><span class="k">def</span> <span class="nf">commonDataToString</span><span class="p">(</span> <span class="n">comment</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">energy_in_unit</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">photonFrame</span> <span class="o">=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">lab</span><span class="p">,</span> <span class="n">legendreMax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">modifiedProductGroup</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function converts common data needed to calculate any of the distribution product matrices to a list of string and returns the list.</span>
+
+<span class="sd">    :param comment:                 This is a comment that is written to the Merced input file.</span>
+<span class="sd">    :param style:                   This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:                This is a dictionary with needed data.</span>
+<span class="sd">    :param crossSection:            This is the pointwise linear cross section for the reaction.</span>
+<span class="sd">    :param productFrame:            This is the frame the product data are in.</span>
+<span class="sd">    :param multiplicity:            This is the product&#39;s multiplicity.</span>
+<span class="sd">    :param energy_in_unit:          The unit that the energy will be converted to before processing.</span>
+<span class="sd">    :param weight:                  This is the pointwise linear weight to multiply the kernal of the integral by.</span>
+<span class="sd">    :param photonFrame:             This is the frame of the photon data.</span>
+<span class="sd">    :param legendreMax:             This is the maximum Legendre order that the product matrices are to be calculated to.</span>
+<span class="sd">    :param modifiedProductGroup:    This is a subset of the product groups to handle an issue in Merced.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the common data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
     <span class="n">projectileName</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span>
@@ -747,6 +1083,15 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GBToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.GBToString">[docs]</a><span class="k">def</span> <span class="nf">GBToString</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="n">gb</span><span class="p">,</span> <span class="n">energy_in_unit</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the multi-group boundaries that will be writted to the Merced input file.</span>
+
+<span class="sd">    :param name:                Either the string &#39;Projectile&#39; or &#39;Product&#39;.</span>
+<span class="sd">    :param gb:                  The list of multi-group boundaries.</span>
+<span class="sd">    :param energy_in_unit:      The unit that the boundaries will be converted to before processing.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the multi-group boundaries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">boundaries</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">boundaries</span>
     <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
@@ -757,6 +1102,14 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="fluxToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.fluxToString">[docs]</a><span class="k">def</span> <span class="nf">fluxToString</span><span class="p">(</span> <span class="n">flux</span><span class="p">,</span> <span class="n">energy_in_unit</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the flux that will be writted to the Merced input file.</span>
+
+<span class="sd">    :param flux:                The flux function.</span>
+<span class="sd">    :param energy_in_unit:      The unit that the flux energies will be converted to before processing.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the flux.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">flux0</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">getFluxAtLegendreOrder</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>
     <span class="k">if</span><span class="p">(</span> <span class="n">energy_in_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">flux0</span> <span class="o">=</span> <span class="n">flux0</span><span class="o">.</span><span class="n">convertAxisToUnit</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="n">energy_in_unit</span> <span class="p">)</span>
@@ -769,11 +1122,29 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">startOfNewData</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="crossSectionToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.crossSectionToString">[docs]</a><span class="k">def</span> <span class="nf">crossSectionToString</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">energy_in_unit</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the cross section that will be writted to the Merced input file.</span>
+
+<span class="sd">    :param style:               This is not used.</span>
+<span class="sd">    :param crossSection:        The cross section for the reaction.</span>
+<span class="sd">    :param energy_in_unit:      The unit that the cross section energies will be converted to before processing.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the cross section.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="n">energy_in_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">crossSection</span> <span class="o">=</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">convertAxisToUnit</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="n">energy_in_unit</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">startOfNewData</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">twoDToString</span><span class="p">(</span> <span class="s2">&quot;Cross section&quot;</span><span class="p">,</span> <span class="n">crossSection</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="multiplicityToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.multiplicityToString">[docs]</a><span class="k">def</span> <span class="nf">multiplicityToString</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">_multiplicity</span><span class="p">,</span> <span class="n">energy_in_unit</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the cross section that will be writted to the Merced input file.</span>
+
+<span class="sd">    :param style:               The style of the multiplicity to process.</span>
+<span class="sd">    :param _multiplicity:       The cross section function.</span>
+<span class="sd">    :param energy_in_unit:      The unit that the multiplicity energies will be converted to before processing.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the multiplicity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">form</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="n">_multiplicity</span> <span class="p">)</span>
     <span class="n">multiplicity</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span>
@@ -781,6 +1152,17 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">startOfNewData</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">twoDToString</span><span class="p">(</span> <span class="s2">&quot;Multiplicity&quot;</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="angularToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.angularToString">[docs]</a><span class="k">def</span> <span class="nf">angularToString</span><span class="p">(</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">twoBody</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">changeInterpolationQualifierWarning</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the angular data that will be writted to the Merced input file.</span>
+
+<span class="sd">    :param angularData:                         The angular data.</span>
+<span class="sd">    :param crossSection:                        The cross section for the reaction.</span>
+<span class="sd">    :param weight:                              This is the pointwise linear weight to multiply the kernal of the integral by.</span>
+<span class="sd">    :param twoBody:                             A boolean indicating if the interaction is two-body.</span>
+<span class="sd">    :param changeInterpolationQualifierWarning: A boolean indicating if a warning message should be printed if the angular data&#39;s interpolation qualifier is not used.</span>
+
+<span class="sd">    :returns:                                   A python list of strings representing the angular distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">weightString</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="k">if</span><span class="p">(</span> <span class="n">weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">weightString</span> <span class="o">=</span> <span class="n">startOfNewData</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">twoDToString</span><span class="p">(</span> <span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">addExtraBlankLine</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -857,8 +1239,25 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">startOfNewData</span> <span class="o">+</span> <span class="n">weightString</span> <span class="o">+</span> <span class="n">s</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="energyFunctionToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.energyFunctionToString">[docs]</a><span class="k">def</span> <span class="nf">energyFunctionToString</span><span class="p">(</span> <span class="n">energyData</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the energy data for an uncorrelated distribution that will </span>
+<span class="sd">    be writted to the Merced input file.</span>
+
+<span class="sd">    :param energyData:          The energy data.</span>
+<span class="sd">    :param weight:              This is the pointwise linear weight to multiply the kernal of the integral by.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the energy distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">getParameter</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function returns a string representation of the energy parameter data that will be writted to the Merced input file.</span>
+
+<span class="sd">        :param data:        The parameter&#39;s data.</span>
+<span class="sd">        :param label:       The name of the parameter.</span>
+
+<span class="sd">        :returns:                   A python list of strings representing the parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">_linlin</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="n">upperEps</span> <span class="p">)</span>
         <span class="n">sData</span> <span class="o">=</span> <span class="p">[</span> <span class="n">startOfNewData</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: n = </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">_linlin</span> <span class="p">)</span> <span class="p">)</span> <span class="p">]</span>
@@ -912,6 +1311,15 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">sProcess</span><span class="p">,</span> <span class="n">sSpecific</span><span class="p">,</span> <span class="n">startOfNewData</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">sData</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="EEpPDataToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.EEpPDataToString">[docs]</a><span class="k">def</span> <span class="nf">EEpPDataToString</span><span class="p">(</span> <span class="n">EEpPData</span><span class="p">,</span> <span class="n">changeInterpolationQualifierWarning</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the energy data for an uncorrelated distribution that will </span>
+<span class="sd">    be writted to the Merced input file.</span>
+
+<span class="sd">    :param energyData:          The energy data.</span>
+<span class="sd">    :param changeInterpolationQualifierWarning: A boolean indicating if a warning message should be printed if the angular data&#39;s interpolation qualifier is not used.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the energy distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">s</span>  <span class="o">=</span> <span class="n">startOfNewData</span>
     <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;EEpPData: n = </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="n">EEpPData</span> <span class="p">)</span>
@@ -942,6 +1350,14 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LEEpPDataToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.LEEpPDataToString">[docs]</a><span class="k">def</span> <span class="nf">LEEpPDataToString</span><span class="p">(</span> <span class="n">LEEpPData</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the ENDL I = 4 data with l &gt; 0 distribution data </span>
+<span class="sd">    that will be writted to the Merced input file.</span>
+
+<span class="sd">    :param LEEpPData:           The ENDL I = 4 data.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">s</span>  <span class="o">=</span> <span class="n">startOfNewData</span>
     <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;LEEpPData: n = </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="n">LEEpPData</span> <span class="p">)</span>
@@ -954,6 +1370,15 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LegendreDataToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.LegendreDataToString">[docs]</a><span class="k">def</span> <span class="nf">LegendreDataToString</span><span class="p">(</span> <span class="n">LegendreData</span><span class="p">,</span> <span class="n">changeInterpolationQualifierWarning</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the MT = 6 LAW = 1, LANG = 1 distribution data </span>
+<span class="sd">    that will be writted to the Merced input file.</span>
+
+<span class="sd">    :param LegendreData:                        The distribution data.</span>
+<span class="sd">    :param changeInterpolationQualifierWarning: A boolean indicating if a warning message should be printed if the angular data&#39;s interpolation qualifier is not used.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">s</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;Legendre data by incident energy:  n = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="n">LegendreData</span> <span class="p">)</span> <span class="p">]</span>
 
@@ -981,6 +1406,14 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">startOfNewData</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="EMuEpPDataToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.EMuEpPDataToString">[docs]</a><span class="k">def</span> <span class="nf">EMuEpPDataToString</span><span class="p">(</span> <span class="n">EMuEpPData</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the MF = 6, LAW = 7 distribution data </span>
+<span class="sd">    that will be writted to the Merced input file.</span>
+
+<span class="sd">    :param EMuEpPData:          The distribution data.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">s</span>  <span class="o">=</span> <span class="n">startOfNewData</span>
     <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;EMuEpPData: n = </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="n">EMuEpPData</span> <span class="p">)</span>
@@ -1004,6 +1437,14 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="EEpMuPDataToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.EEpMuPDataToString">[docs]</a><span class="k">def</span> <span class="nf">EEpMuPDataToString</span><span class="p">(</span> <span class="n">EEpMuPData</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the MT = 6 LAW = 1, LANG = 11-15 distribution data </span>
+<span class="sd">    that will be writted to the Merced input file.</span>
+
+<span class="sd">    :param EMuEpPData:          The distribution data.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">s</span>  <span class="o">=</span> <span class="n">startOfNewData</span>
     <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;EEpMuPData: n = </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="n">EEpMuPData</span> <span class="p">)</span>
@@ -1027,6 +1468,15 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="KalbachMannDataToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.KalbachMannDataToString">[docs]</a><span class="k">def</span> <span class="nf">KalbachMannDataToString</span><span class="p">(</span> <span class="n">KalbachMannData</span><span class="p">,</span> <span class="n">energy_in_unit</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string representation of the Kalbach/Mann distribution data </span>
+<span class="sd">    that will be writted to the Merced input file.</span>
+
+<span class="sd">    :param EMuEpPData:          The distribution data.</span>
+<span class="sd">    :param energy_in_unit:      The unit that the energies will be converted to before processing.</span>
+
+<span class="sd">    :returns:                   A python list of strings representing the distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">nForm</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="k">if</span><span class="p">(</span> <span class="n">KalbachMannData</span><span class="o">.</span><span class="n">aSubform</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">nForm</span> <span class="o">=</span> <span class="mi">3</span>
@@ -1060,6 +1510,15 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="oneDToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.oneDToString">[docs]</a><span class="k">def</span> <span class="nf">oneDToString</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function takes a list of floats and returns a list of strings representations of the floats that will be </span>
+<span class="sd">    written to the Merced input file.</span>
+
+<span class="sd">    :oaram data:        A list of floats.</span>
+<span class="sd">    :oaram factor:      A number to scale each value in *data* by.</span>
+
+<span class="sd">    :returns:           A python list of strings representing *data*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">a</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;&quot;</span> <span class="p">]</span>
@@ -1071,6 +1530,17 @@
     <span class="k">return</span><span class="p">(</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="twoDToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.twoDToString">[docs]</a><span class="k">def</span> <span class="nf">twoDToString</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">addHeader</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">addExtraBlankLine</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function takes a list of points (x,y) and returns a list of strings representations of the floats that will be </span>
+<span class="sd">    written to the Merced input file.</span>
+
+<span class="sd">    :param label:               A string indicating the type of data.</span>
+<span class="sd">    :param data:                The data to convert to strings.</span>
+<span class="sd">    :param addHeader:           A boolean indicating if a header is written that contains *label* and the number of data points.</span>
+<span class="sd">    :param addExtraBlankLine:   A boolean indicating if an extra blank line is added at the end.</span>
+
+<span class="sd">    :returns:           A python list of strings representing *data*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">interpolation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span> <span class="n">linlin</span><span class="p">,</span> <span class="n">flat</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
@@ -1092,6 +1562,15 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="threeDToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.threeDToString">[docs]</a><span class="k">def</span> <span class="nf">threeDToString</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">linearizeXYs</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function takes a pointwise 2d function (i.e., f(x,y)) and returns a list of strings representations of the data that will be </span>
+<span class="sd">    written to the Merced input file.</span>
+
+<span class="sd">    :param data:                The pointwise 2d data (i.e., f(x,y)).</span>
+<span class="sd">    :param linearizeXYs:        A boolean indicating if the data are to be converted to poinwise data and linearized.</span>
+
+<span class="sd">    :returns:           A python list of strings representing *data*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">a</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">wFmt</span> <span class="o">=</span> <span class="s2">&quot; </span><span class="si">%s</span><span class="s2"> : n = </span><span class="si">%%</span><span class="s2">d&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">doubleFmt</span> <span class="p">)</span>
@@ -1111,6 +1590,15 @@
     <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="threeDListToString"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.threeDListToString">[docs]</a><span class="k">def</span> <span class="nf">threeDListToString</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">linearizeXYs</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function takes a pointwise 2d function (i.e., f(x,y)) and returns a list of strings representations of the data that will be </span>
+<span class="sd">    written to the Merced input file.</span>
+
+<span class="sd">    :param data:</span>
+<span class="sd">    :param linearizeXYs:        A boolean indicating if the data are to be converted to poinwise data and linearized.</span>
+
+<span class="sd">    :returns:               A python list of strings representing *data*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">a</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">wFmt</span> <span class="o">=</span> <span class="s2">&quot; </span><span class="si">%s</span><span class="s2"> : n = </span><span class="si">%%</span><span class="s2">d&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">doubleFmt</span> <span class="p">)</span>
@@ -1125,6 +1613,13 @@
     <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="addTMs"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.transferMatrices.addTMs">[docs]</a><span class="k">def</span> <span class="nf">addTMs</span><span class="p">(</span> <span class="n">TMs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the sum of the product matrices in *TMs*.</span>
+
+<span class="sd">    :param TMs:             A list of product matrices.</span>
+
+<span class="sd">    :returns:               Returns a product matrix that is the sum of the product matrices in *TMs*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">TM</span> <span class="o">=</span> <span class="n">TMs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>
     <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">TM</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>

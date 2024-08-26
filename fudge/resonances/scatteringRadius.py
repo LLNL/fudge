@@ -16,28 +16,49 @@ from xData import XYs1d as XYs1dModule
 class BaseRadius(ancestryModule.AncestryIO):
     """
     Base class for ScatteringRadius and HardSphereRadius. Contains a radius that may be constant or energy-dependent.
+
+    ScatteringRadius and HardSphereRadius forms require a label attribute when they appear inside a 'resonances' node,
+    but not when they appear inside the resolved or unresolved region. This class handles both cases.
     """
 
     def __init__(self, form):
 
         ancestryModule.AncestryIO.__init__(self)
-        if not isinstance(form, (constantModule.Constant1d, XYs1dModule.XYs1d, regionsModule.Regions1d)):
-            raise TypeError(f"{self.moniker} form must be constant1d, XYs1d or Regions1d, but received {type(form)}")
-        form.setAncestor(self)
-        self.form = form
+        self.evaluated = form
 
     def __eq__(self, other):
         if not isinstance(other, ScatteringRadius): return False
-        return self.form == other.form
+        return self.evaluated == other.evaluated
 
     def __str__(self):
-        return self.form.moniker
+        return self.evaluated.moniker
 
     def __bool__(self):
 
-        return bool(self.form)
+        return bool(self.evaluated)
+
+    def __getitem__(self, key):
+        if key == self.evaluated.label:
+            return self.evaluated
+        raise KeyError(key)
 
     __nonzero__ = __bool__
+
+    @property
+    def evaluated(self):
+        return self.__evaluated
+
+    @evaluated.setter
+    def evaluated(self, form):
+        if not isinstance(form, (constantModule.Constant1d, XYs1dModule.XYs1d, regionsModule.Regions1d)):
+            raise TypeError(f"{self.moniker} form must be constant1d, XYs1d or Regions1d, but received {type(form)}")
+        form.setAncestor(self)
+        self.__evaluated = form
+
+    @property
+    def form(self):
+        print("WARNING: scatteringRadius.form is deprecated. Use scatteringRadius.evaluated instead")
+        return self.evaluated
 
     def toString(self, simpleString=False):
         """Returns a string representation of self. simpleString option included for compatibility."""
@@ -45,7 +66,7 @@ class BaseRadius(ancestryModule.AncestryIO):
 
     def copy(self):
 
-        return self.__class__(self.form.copy())
+        return self.__class__(self.evaluated.copy())
 
     def check(self, info):
         """
@@ -67,45 +88,45 @@ class BaseRadius(ancestryModule.AncestryIO):
         expectedAP = 10.0 * (0.123 * target.getMass('amu') ** (1. / 3.) + 0.08)  # expected radius in fm
         factor = 3.0
         if self.isEnergyDependent():
-            egrid = self.form.domainGrid
+            egrid = self.evaluated.domainGrid
             APs = self.getValueAs('fm', energy_grid=egrid)
             for iE, AP in enumerate(APs):
                 if AP / expectedAP > factor or AP / expectedAP < 1. / factor:
                     warning.BadScatteringRadius(factor=factor, gotAP=AP, expectedAP=expectedAP, E=egrid[iE])
         else:
-            AP = self.form.value
-            if self.form.rangeUnit != 'fm':
-                AP *= PQU.PQU(1, self.form.rangeUnit).getValueAs('fm')
+            AP = self.evaluated.value
+            if self.evaluated.rangeUnit != 'fm':
+                AP *= PQU.PQU(1, self.evaluated.rangeUnit).getValueAs('fm')
             if AP / expectedAP > factor or AP / expectedAP < 1. / factor:
                 warning.BadScatteringRadius(factor=factor, gotAP=AP, expectedAP=expectedAP)
         return warnings
 
     def convertUnits(self, unitMap):
 
-        self.form.convertUnits(unitMap)
+        self.evaluated.convertUnits(unitMap)
 
     def isEnergyDependent(self):
-        return isinstance(self.form, XYs1dModule.XYs1d)
+        return isinstance(self.evaluated, XYs1dModule.XYs1d)
 
     def getValueAs(self, unit, energy_grid=None):
         if self.isEnergyDependent():
             if energy_grid is None:
                 raise NameError("Missing: energy_grid to evaluate E-dependent scattering radius")
-            energy_unit = self.form.axes[-1].unit
-            xScale = self.form.domainUnitConversionFactor(energy_unit)
-            yScale = self.form.rangeUnitConversionFactor(unit)
-            return [yScale * self.form.evaluate(xScale * e) for e in energy_grid]
+            energy_unit = self.evaluated.axes[-1].unit
+            xScale = self.evaluated.domainUnitConversionFactor(energy_unit)
+            yScale = self.evaluated.rangeUnitConversionFactor(unit)
+            return [yScale * self.evaluated.evaluate(xScale * e) for e in energy_grid]
         else:
-            oldUnit = self.form.rangeUnit
+            oldUnit = self.evaluated.rangeUnit
             factor = PQU.PQU(1, oldUnit).getValueAs(unit)
-            return self.form.value * factor
+            return self.evaluated.value * factor
 
     def toXML_strList(self, indent='', **kwargs):
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
         xml = ['%s<%s>' % (indent, self.moniker)]
-        xml += self.form.toXML_strList(indent2, **kwargs)
+        xml += self.evaluated.toXML_strList(indent2, **kwargs)
         xml[-1] += '</%s>' % self.moniker
         return xml
 

@@ -44,14 +44,41 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a class and a function for handling equal probable bins.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                                 | Description                                                                       |</span>
+<span class="sd">    +=======================================+===================================================================================+</span>
+<span class="sd">    | EqualProbableBinnedData               | This class stores data for an instance of equal probable bins                     |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+
+<span class="sd">This module contains the following functions:</span>
+
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                                 | Description                                                                       |</span>
+<span class="sd">    +=======================================+===================================================================================+</span>
+<span class="sd">    | equalProbableBins                     |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">math</span> 
 <span class="kn">from</span> <span class="nn">fudge.core.math</span> <span class="kn">import</span> <span class="n">fudgemath</span>
 
 
 <div class="viewcode-block" id="EqualProbableBinnedData"><a class="viewcode-back" href="../../../../fudge/fudge.processing.montecarlo.html#fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData">[docs]</a><span class="k">class</span> <span class="nc">EqualProbableBinnedData</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is for storing and modifing equal probable bins.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for the EqualProbableBinnedData class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the EqualProbableBinnedData class.</span>
+
+<span class="sd">        :param data:        The qual probable bins to store.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
 
@@ -71,7 +98,7 @@
         <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="EqualProbableBinnedData.getData"><a class="viewcode-back" href="../../../../fudge/fudge.processing.montecarlo.html#fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData.getData">[docs]</a>    <span class="k">def</span> <span class="nf">getData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the data of self.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the data member of self.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span></div>
 
@@ -86,6 +113,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="equalProbableBins"><a class="viewcode-back" href="../../../../fudge/fudge.processing.montecarlo.html#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBins">[docs]</a><span class="k">def</span> <span class="nf">equalProbableBins</span><span class="p">(</span> <span class="n">nBins</span><span class="p">,</span> <span class="n">xy</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates *nBins* equal probable bins for the pdf given by *xy*.</span>
+
+<span class="sd">    :param nBins:       The number of desired equal probable bins.</span>
+<span class="sd">    :param xy:          The pdf whose equal probable bins are returned.</span>
+
+<span class="sd">    :returns:           An instance of :py:class:`EqualProbableBinnedData`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">S</span> <span class="o">=</span> <span class="n">fudgemath</span><span class="o">.</span><span class="n">runningYSum</span><span class="p">(</span> <span class="n">xy</span> <span class="p">)</span>
     <span class="n">SMax</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>

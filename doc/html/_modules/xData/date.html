@@ -44,12 +44,48 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains classes and functions for storing a date/time per GNDS specifications. A data/time can be in one of the </span>
+<span class="sd">following three forms::</span>
+
+<span class="sd">    -) date only (e.g., &quot;2021-01-21&quot;),</span>
+<span class="sd">    -) date and time (e.g., &quot;2021-01-21T08:42:04&quot;) or</span>
+<span class="sd">    -) date and time with UTC offset (e.g., &quot;2021-01-21T08:42:04-08:00&quot;).</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class                             | Description                                                           |</span>
+<span class="sd">    +===================================+=======================================================================+</span>
+<span class="sd">    | Resolution                        | This class is an enum of the supported resolutions for a data/time.   |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Date                              | This class represents a GNDS date/time.                               |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+
+<span class="sd">This module contains the following functions:</span>
+
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Function                          | Description                                                           |</span>
+<span class="sd">    +===================================+=======================================================================+</span>
+<span class="sd">    | raiseIfNotDate                    | This function checks the type of *date* and executes a raise if it    |</span>
+<span class="sd">    |                                   | is not a :py:class:`Date` instance.                                   |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | raiseIfNotPythonDateTime          | This function checks the type of *_datetime* and executes a raise     |</span>
+<span class="sd">    |                                   |if it is not a :py:class:`datetime.datetime` instance.  If *_datetime* |</span>
+<span class="sd">    |                                   | is an instance of :py:class:`datetime.datetime`, a :py:class:`Date`   |</span>
+<span class="sd">    |                                   | representation of it is returned.                                     |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
 
 <div class="viewcode-block" id="Resolution"><a class="viewcode-back" href="../../xData/index.html#xData.date.Resolution">[docs]</a><span class="k">class</span> <span class="nc">Resolution</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is an enum of the supported resolutions for a data/time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">date</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
@@ -57,14 +93,37 @@
 
 <div class="viewcode-block" id="Date"><a class="viewcode-back" href="../../xData/index.html#xData.date.Date">[docs]</a><span class="k">class</span> <span class="nc">Date</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The class supports a date or datetime in one of 3 forms. The forms are</span>
+<span class="sd">    The class supports a date/time in one of following three3 forms::</span>
 
 <span class="sd">        -) date only (e.g., &quot;2021-01-21&quot;),</span>
 <span class="sd">        -) date and time (e.g., &quot;2021-01-21T08:42:04&quot;) or</span>
 <span class="sd">        -) date and time with UTC offset (e.g., &quot;2021-01-21T08:42:04-08:00&quot;).</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member        | Description                                                   |</span>
+<span class="sd">    +===============+===============================================================+</span>
+<span class="sd">    | datetime      | This is an instance of :py:class:`datetime`.                  |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | resolution    | This is an instance of :py:class:`Resolution`.                |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+
+<span class="sd">    If *resolution* is **undefined** then *datetime* is None. If *resolution* is **date**, then</span>
+<span class="sd">    the time part of *datetime* is set to &quot;00:00:00&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">resolution</span> <span class="o">=</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">UTC</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If *resolution* is &quot;undefied&quot;, *datetime* is set to None, independent of *_datetime*.</span>
+<span class="sd">        If *_datetime* is None, the current date/time is used.</span>
+<span class="sd">        If *resolution* is **date**, then the time part of *datetime* is set to &quot;00:00:00&quot;.</span>
+<span class="sd">        The microsecond part of *datetime* is always set to 0.</span>
+
+<span class="sd">        :param _datetime:   User supplied date/time.</span>
+<span class="sd">        :param resolution:  An instance of :py:class:`Resolution`.</span>
+<span class="sd">        :param UTC:         If True, then the date/time has a UTC offset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__resolution</span> <span class="o">=</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
 
@@ -83,6 +142,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__datetime</span> <span class="o">=</span> <span class="n">_datetime</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The method converts the interal data/time into a python str to the specified *resolution*.</span>
+<span class="sd">        If *resolution* is &quot;undefined&quot;, and empty string is returned.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolution</span> <span class="o">==</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">undefined</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
 
@@ -93,11 +158,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">date</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to *self*&#39;s *datatime* memeber.</span>
+
+<span class="sd">        :returns:       A :py:class:`datetime.datetime` instance or None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__datetime</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">resolution</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to *self*&#39;s *resolution* memeber.</span>
+
+<span class="sd">        :returns:       A :py:class:`Resolution` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolution</span> <span class="p">)</span>
 
@@ -108,6 +183,13 @@
 
 <div class="viewcode-block" id="Date.parse"><a class="viewcode-back" href="../../xData/index.html#xData.date.Date.parse">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span> <span class="n">stringDate</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method converts a python str into a :py:class:`Date` instance.</span>
+
+<span class="sd">        :param stringDate:      A data/time str.</span>
+
+<span class="sd">        :returns:               An instance of :py:class:`Date`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">resolution</span> <span class="o">=</span> <span class="n">Resolution</span><span class="o">.</span><span class="n">date</span>
         <span class="n">datetime1</span> <span class="o">=</span> <span class="kc">None</span>
@@ -127,16 +209,40 @@
 
 <div class="viewcode-block" id="Date.fromYearMonthDay"><a class="viewcode-back" href="../../xData/index.html#xData.date.Date.fromYearMonthDay">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">fromYearMonthDay</span><span class="p">(</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method converts *year*, *month* and *day* into a :py:class:`Date` instance.</span>
+
+<span class="sd">        :param year:        The year for the date.</span>
+<span class="sd">        :param month:       The month for the date.</span>
+<span class="sd">        :param day:         The day for the date.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`Date`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">Date</span><span class="p">(</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="raiseIfNotDate"><a class="viewcode-back" href="../../xData/index.html#xData.date.raiseIfNotDate">[docs]</a><span class="k">def</span> <span class="nf">raiseIfNotDate</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
-    
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function checks the type of *date* and executes a raise if it is not a :py:class:`Date` instance.</span>
+
+<span class="sd">    :param date:            The instance to check.</span>
+
+<span class="sd">    :returns:               The instance *date*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">Date</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid date instance.&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">date</span></div>
 
 <div class="viewcode-block" id="raiseIfNotPythonDateTime"><a class="viewcode-back" href="../../xData/index.html#xData.date.raiseIfNotPythonDateTime">[docs]</a><span class="k">def</span> <span class="nf">raiseIfNotPythonDateTime</span><span class="p">(</span><span class="n">_datetime</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function checks the type of *_datetime* and executes a raise if it is not a :py:class:`datetime.datetime` instance.</span>
+<span class="sd">    If *_datetime* is an instance of :py:class:`datetime.datetime`, a :py:class:`Date` representation of it is returned.</span>
+
+<span class="sd">    :param _datetime:       The instance to check.</span>
+
+<span class="sd">    :returns:               An instance of :py:class:`Date`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_datetime</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid python datetime instance.&#39;</span><span class="p">)</span>
 

@@ -510,12 +510,12 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                             tmp.append(backgroundForm)
                             backgroundForm = tmp
 
-                        if MT == 3 and backgroundForm.domainMin > resonances.scatteringRadius.form.domainMin:
+                        if MT == 3 and backgroundForm.domainMin > resonances.scatteringRadius.evaluated.domainMin:
                             # Address error appearing in several JEFF evaluations
                             warningList.append("MT3 background cross section does not span resonance region. Assuming background == 0")
                             backgroundForm.prepend(crossSectionModule.XYs1d(
                                 axes=backgroundForm.axes,
-                                data=[[resonances.scatteringRadius.form.domainMin, 0], [backgroundForm.domainMin, 0]])
+                                data=[[resonances.scatteringRadius.evaluated.domainMin, 0], [backgroundForm.domainMin, 0]])
                             )
 
                         if haveUnresolved:

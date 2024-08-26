@@ -7,6 +7,22 @@
 
 """
 This module contains several functions that are useful for creating sub-processes using :py:class:`subprocess.Popen`.
+
+This module contains the following functions:
+        
+    +-----------------------+-----------------------------------------------------------------------+
+    | Function              | Description                                                           |
+    +=======================+=======================================================================+
+    | _getSTDStreamOpen     | This function is for internal use by :py:func:`executeCommand`.       |
+    +-----------------------+-----------------------------------------------------------------------+
+    | _getSTDStreamClose    | This function is for internal use by :py:func:`executeCommand`.       |
+    +-----------------------+-----------------------------------------------------------------------+
+    | executeCommand        | This function executes a command using :py:class:`subprocess.Popen`   |
+    +-----------------------+-----------------------------------------------------------------------+
+    | spawn                 | This function calls :py:class:`subprocess.Popen`                      |
+    +-----------------------+-----------------------------------------------------------------------+
+    | deleteFilesUsingGlob  | This function deletes file(s) matching patterns.                      |
+    +-----------------------+-----------------------------------------------------------------------+
 """
 
 import os
@@ -103,6 +119,8 @@ def spawn(args):
     returns the id of the created process.
 
     :param args:        Argument passed to :py:class:`subprocess.Popen`.
+
+    :returns:           The id of the created.
     """
 
     os.environ.update({'PYTHONPATH': ':'.join(sys.path)})
@@ -111,7 +129,7 @@ def spawn(args):
 
 def deleteFilesUsingGlob(patterns):
     """
-    Deletes file(s) matching patterns. Skips deleting directories.
+    This function deletes file(s) matching patterns. Skips deleting directories.
     The function is currently not used anywhere in FUDGE so probably should be deleted.
 
     :param patterns:        Any objected that can be passed to :py:func:`glob.glob`.

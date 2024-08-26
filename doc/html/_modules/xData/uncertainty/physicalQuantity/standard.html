@@ -45,16 +45,40 @@
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module contains the standard uncertainty class.</span>
+<span class="sd">This module contains the standard uncertainty class that is a Gaussian distribution (pdf) about the mean with a specified standard deviation.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                     | Description                                                                                   |</span>
+<span class="sd">    +===========================+===============================================================================================+</span>
+<span class="sd">    | Standard                  | This is the class for storing an uncertainty as a Gaussian distribution with a specified      |</span>
+<span class="sd">    |                           | standard deviation.                                                                           |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">uncertainty</span> <span class="k">as</span> <span class="n">uncertaintyModule</span>
 
 <div class="viewcode-block" id="Standard"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.standard.Standard">[docs]</a><span class="k">class</span> <span class="nc">Standard</span><span class="p">(</span> <span class="n">uncertaintyModule</span><span class="o">.</span><span class="n">Base</span> <span class="p">)</span> <span class="p">:</span>
 
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents an uncertainty as a Gaussian distribution with a specified standard deviation.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | Member                | Description                                                               |</span>
+<span class="sd">    +=======================+===========================================================================+</span>
+<span class="sd">    | value                 | This is the standard deviation of the Gaussian distribution.              |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">moniker</span> <span class="o">=</span> <span class="s2">&quot;standard&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param value:       Ths standard deviation of the Gaussian distributed uncertainty.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">uncertaintyModule</span><span class="o">.</span><span class="n">Base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
@@ -64,18 +88,41 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method return the *value* member of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`uncertaintyModule.Quantity`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Standard.copy"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.standard.Standard.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *this*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`Standard`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Standard.parentConvertingUnits"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.standard.Standard.parentConvertingUnits">[docs]</a>    <span class="k">def</span> <span class="nf">parentConvertingUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">factors</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is call by the parent with the conversion factors used to change units.</span>
+
+<span class="sd">        :param factors:     A list of python floats.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="o">.</span><span class="n">parentConvertingUnits</span><span class="p">(</span> <span class="n">factors</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Standard.toXML_strList"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.standard.Standard.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
 
@@ -87,6 +134,17 @@
 
 <div class="viewcode-block" id="Standard.parseNodeUsingClass"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.standard.Standard.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 

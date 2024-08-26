@@ -28,7 +28,7 @@ from fudge.outputChannelData.fissionFragmentData import delayedNeutron as delaye
 
 indentIncrement = '  '
 
-summaryDocStringFUDGE = '''Prints an outlines of the reactions, and their energy domain and products for a GNDS reactionSuite file.'''
+summaryDocString__FUDGE = '''Prints an outlines of the reactions, and their energy domain and products for a GNDS reactionSuite file.'''
 
 description = '''
 Prints each reaction and brief information about each reaction's products. Product information include its id, label, and distribution type and frame.

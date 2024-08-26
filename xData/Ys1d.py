@@ -6,10 +6,18 @@
 # <<END-copyright>>
 
 """
-This module defines the Ys1d class, used to store union-grid functions such as gridded cross sections.
-When multiple functions can be mapped onto the same independent axis grid, the Ys1d class saves space by
-linking to the common independent grid rather than repeating it.
+This module defines the :py:class:`Ys1d` class, used to store union-grid functions such as gridded cross sections.
+When multiple functions can be mapped onto the same independent axis grid, the :py:class:`Ys1d` class can saves 
+space by linking to the common independent grid (i.e., x-values) rather than repeating them.
 Otherwise, Ys1d functions should behave like XYs1d.
+
+This module contains the following classes:
+
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | Ys1d                              | This class represents a 1d function as a list of y-value.             |
+    +-----------------------------------+-----------------------------------------------------------------------+
 """
 
 from pqu import PQU as PQUModule
@@ -22,6 +30,24 @@ from . import XYs1d as XYs1dModule
 
 
 class Ys1d(baseModule.XDataFunctional):
+    r"""
+    This class presents a 1d function :math:`y(x)` as a list of y-values with the x-values specified by a :py:class:`axesModule.Grid` axis.
+    Also an interpolation rule is used to determine :math:`y(x)` between to consecutive x-values. This class has methods
+    for adding, subtracting, multipling and dividing a :py:class:`XYs1d` by a number or another :py:class:`XYs1d` instance,
+    as well as other operations common to a 1d function.
+
+    In addition to the members in the inherited class :py:class:`baseModule.XDataFunctional`, 
+    the following table list the primary members of this class:
+
+    +---------------+-----------------------------------------------------------------------------------+
+    | Member        | Description                                                                       |
+    +===============+===================================================================================+
+    | Ys            | This is the list of :math:`y_i` points representing the y-value of the function.  |
+    +---------------+-----------------------------------------------------------------------------------+
+    | interpolation | The interpolation rule used to determine :math:`y(x)` between to consecutive      |
+    |               | x-values.                                                                         |
+    +---------------+-----------------------------------------------------------------------------------+
+    """
 
     moniker = 'Ys1d'
     dimension = 1
@@ -30,6 +56,10 @@ class Ys1d(baseModule.XDataFunctional):
 
     def __init__(self, Ys=None, interpolation=enumsModule.Interpolation.linlin, axes=None,
                  index=None, valueType=enumsModule.ValueType.float64, outerDomainValue=None, label=None):
+        """
+        :param Ys:                  An instance of :py:class:`valuesModule.Values` representing the y-values of *self.*
+        :param interpolation:       The interpolation rule used to determine :math:`y(x)` between to consecutive x-values.
+        """
 
         baseModule.XDataFunctional.__init__(self, axes, index=index, valueType=valueType,
                                             outerDomainValue=outerDomainValue, label=label)
@@ -43,20 +73,34 @@ class Ys1d(baseModule.XDataFunctional):
         self.__Ys.setAncestor(self)
 
     def __len__(self):
+        """
+        This method returns the number of y-values started in *self*.
+
+        :returns:       A python int.
+        """
         # FIXME should this account for self.__Ys.start?
 
         return len(self.__Ys)
 
     def __getitem__(self, index):
+        """
+        This method returned the y-value at index *index*.
+
+        :param index:       The index of the requested y-value.
+
+        :returns:           A python float.
+        """
         # FIXME should this account for self.__Ys.start?
 
         return self.__Ys[index]
 
     def __add__(self, other):
         """
-        Add two Ys1d instances, checking to ensure they are on the same x grid.
-        @param other: must be Ys1d instance or 0
-        @return: new Ys1d instance
+        This method adds two Ys1d instances, checking to ensure they are on the same x grid.
+
+        :param other:   An instance of :py:class:`Ys1d` to added to *self*.
+
+        :return:        A new :py:class:`Ys1d` instance
         """
 
         if len(self.__Ys) == 0: return other.copy()
@@ -85,8 +129,9 @@ class Ys1d(baseModule.XDataFunctional):
     @property
     def grid(self):
         """
-        Access the X-grid (following link if necessary). Raises AttributeError if no grid found.
-        @return: axesModule.Grid
+        This method returns the X-grid (following link if necessary). Raises AttributeError if no grid found.
+
+        @return:    An instance of :py:class:`axesModule.Grid`.
         """
 
         if isinstance(self.axes[1], axesModule.Grid):
@@ -99,15 +144,18 @@ class Ys1d(baseModule.XDataFunctional):
     @property
     def Ys(self):
         """
-        Access the Values container storing y-values
-        @return: xData.values.Values instance
+        This method returns a reference to the *Ys* member of *self*.
+
+        :returns:       An instance of :py:class:`valuesModule.Values`.
         """
 
         return self.__Ys
 
     def convertUnits(self, unitMap):
         """
-        unitMap is a dictionary of the form { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         factors = self.axes.convertUnits(unitMap)
@@ -117,6 +165,11 @@ class Ys1d(baseModule.XDataFunctional):
         self.fixValuePerUnitChange(factors)
 
     def copy(self):
+        """
+        This method returns a copy of *self*.
+
+        :returns:       An instance of class of *self*.
+        """
 
         axes = self.axes
         if axes is not None: axes = axes.copy()
@@ -128,54 +181,123 @@ class Ys1d(baseModule.XDataFunctional):
     __copy__ = copy
 
     def evaluate(self, domainValue, extrapolation=enumsModule.Extrapolation.none, epsilon=0):
+        """
+        This method returns the y-value of *self* evaluated at *domainValue*. This method is currently not implemented and instead
+        execute a 'raise NotImplementedError'..
+
+        :param domainValue:     python float.
+        :param extrapolation:   TBD.
+        :param epsilon:         TBD.
+
+        :returns:               A python float.
+        """
+
 
         raise NotImplementedError("Still TBD. As a temporary work-around, call toPointwise_withLinearXYs to get XYs1d")
 
     @property
     def domainMin(self):
+        """
+        This method returns the minimum domain value for *self*.
+
+        :returns:               A python float.
+        """
 
         return self.grid.domainMin
 
     @property
     def domainMax(self):
+        """
+        This method returns the maximum domain value for *self*.
+
+        :returns:               A python float.
+        """
 
         return self.grid.domainMax
 
     @property
     def domainUnit(self):
+        """
+        This method returns the domain unit for *self*.
+
+        :returns:       A python str.
+        """
 
         return self.grid.domainUnit
 
     def domainUnitConversionFactor(self, unitTo):
+        """
+        This method returns the factor needed to convert self's domain to unit *unitTo*.
+
+        :param unitTo:      The unit for converting self's domain.
+
+        :returns:           A python float.
+        """
 
         return self.grid.domainUnitConversionFactor(unitTo)
 
     @property
     def domainGrid(self):
+        """
+        This method returns all domain values for *self* as a python list.
+
+        :returns:           A python list.
+        """
 
         return self.grid.domainGrid
 
     @property
     def rangeMin(self):
+        """
+        This method returns the minimum y-value of *self*.
+
+        :returns:           A python float.
+        """
 
         return min(self.__Ys.values)
 
     @property
     def rangeMax(self):
+        """
+        This method returns the maximum y-value of *self*.
+
+        :returns:           A python float.
+        """
 
         return max(self.__Ys.values)
 
     @property
     def rangeUnit(self):
+        """
+        This method returns the unit for the y-values of *self*. 
+ 
+        :returns:       A python str.
+        """
+
 
         return self.getAxisUnitSafely(0)
 
     def rangeUnitConversionFactor(self, unitTo):
+        """
+         This method returns the factor needed to convert self' y-values to unit *unitTo*.
+        
+        :param unitTo:      The unit for converting self's y-values.
+
+        :returns:           A python float.
+        """
 
         if unitTo is None: return 1.
         return PQUModule.PQU('1 ' + self.rangeUnit).getValueAs(unitTo)
 
     def toPointwise_withLinearXYs(self, **kwargs):
+        """
+        This method returns an :py:class:`XYs1dModule.XYs1d` representation of *self*'.
+        The returned class can be changed by the 'cls' key in *kwargs*.
+
+        :param kwargs:      A dictionary.
+
+        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.
+        """
 
         cls = kwargs.pop('cls', XYs1dModule.XYs1d)
 
@@ -184,6 +306,14 @@ class Ys1d(baseModule.XDataFunctional):
                    valueType=self.valueType, outerDomainValue=self.outerDomainValue, label=self.label)
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
         outline = kwargs.get('outline', False)
@@ -203,7 +333,15 @@ class Ys1d(baseModule.XDataFunctional):
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
-        Translates XML Ys1d into a Ys1d instance.
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
         """
 
         attributes, extraAttributes = baseModule.XDataFunctional.parseBareNodeCommonAttributes(node, xPath, True) # parseBareNodeCommonAttributes adds to xPath.
@@ -228,9 +366,15 @@ class Ys1d(baseModule.XDataFunctional):
     @staticmethod
     def defaultAxes(labelsUnits=None):
         """
-        :param labelsUnits: dictionary of form { 0 : ( 'dependent label',   'dependent unit' ),
-                                                 1 : ( 'independent label', 'independent unit' ) }
-        :return: new axes instance
+        This static method returns an instance of :py:class:`axesModule.Axes` with two :py:class:`axesModule.Axis` instances.
+        The argument *labelsUnits* is of the form::
+
+            { 0: ( 'dependent label',   'dependent unit' ),
+              1: ( 'independent label', 'independent unit' ) }
+
+        :param labelsUnits:     A python dict of the x and y labels.
+
+        :return:                An instance of :py:class:`axesModule.Axes`.
         """
 
         return axesModule.Axes(2, labelsUnits=labelsUnits)

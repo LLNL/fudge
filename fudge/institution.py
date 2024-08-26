@@ -21,6 +21,7 @@ from LUPY import ancestry as ancestryModule
 from fudge.reactions import reaction as reactionModule
 from fudge import outputChannel as outputChannelModule
 from fudge import product as productModule
+from fudge.productData import averageProductEnergy as averageProductEnergyModule
 from fudge.processing import nuclearPlusCoulombInterference as nuclearPlusCoulombInterferenceModule
 from fudge.processing.deterministic import tokens as deterministicTokensModule
 
@@ -113,6 +114,13 @@ class Institution(ancestryModule.AncestryIO):
             for child in node:
                 if child.tag == outputChannelModule.OutputChannel.moniker:
                     institution.append(outputChannelModule.OutputChannel.parseNodeUsingClass(child, xPath, linkData))
+                else:                       # This should not happen.
+                    raise Exception('Unsupported child "%s" for institution "%s".' % (child.tag, label))
+        elif label == deterministicTokensModule.pointwiseAverageProductEnergies:
+            institution = cls(label)
+            for child in node:
+                if child.tag == averageProductEnergyModule.Component.moniker:
+                    institution.append(averageProductEnergyModule.Component.parseNodeUsingClass(child, xPath, linkData))
                 else:                       # This should not happen.
                     raise Exception('Unsupported child "%s" for institution "%s".' % (child.tag, label))
         else :

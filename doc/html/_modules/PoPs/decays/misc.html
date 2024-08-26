@@ -86,6 +86,44 @@
         <span class="n">completePhotons</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">branchingRatio</span> <span class="o">*</span> <span class="n">probability</span> <span class="o">*</span> <span class="n">photonEmissionProbability</span>
         <span class="n">completePhotonBranchingData</span><span class="p">(</span><span class="n">finalState</span><span class="p">,</span> <span class="n">branchingData</span><span class="p">,</span> <span class="n">branchingRatio</span> <span class="o">*</span> <span class="n">probability</span><span class="p">,</span> <span class="n">completePhotons</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="angleBiasingPhotonBranchingData"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.misc.angleBiasingPhotonBranchingData">[docs]</a><span class="k">def</span> <span class="nf">angleBiasingPhotonBranchingData</span><span class="p">(</span><span class="n">initialState</span><span class="p">,</span> <span class="n">branchingData</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">angleBiasingData</span><span class="p">,</span> <span class="n">photonDecayChain</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculations transition probabilities for each decay transition and the data needed to calculate</span>
+<span class="sd">    the photon multiplicity for each transition. The results are stored in *angleBiasingData*. For decay transition *trans*</span>
+<span class="sd">    the following::</span>
+
+<span class="sd">    photonDecayChain[trans][0] is the probabiltity for emitting this photon. The sum of the this for all transistions (i.e., photons) is 1.</span>
+<span class="sd">    photonDecayChain[trans][1] is the probability for emitting this photon for one decay path.</span>
+<span class="sd">    photonDecayChain[trans][2] is the probability weighted multiplicity for emitting this photon for one decay path.</span>
+
+<span class="sd">    :param initialState:            The current state (nuclide) the decaying isotope is in.</span>
+<span class="sd">    :param branchingData:           Branching data calculated by the function **photonBranchingData**.</span>
+<span class="sd">    :param probability:             The probability of reaching level *initialState*.</span>
+<span class="sd">    :param angleBiasingData:        A python dict of all emitted photon data by transition.</span>
+<span class="sd">    :param photonDecayChain:        A list of length two. The first item is the photon multiplicity and the second</span>
+<span class="sd">                                    is the list of decay transitions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gammas</span> <span class="o">=</span> <span class="n">branchingData</span><span class="p">[</span><span class="n">initialState</span><span class="p">][</span><span class="s1">&#39;photons&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gammas</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">transition</span> <span class="ow">in</span> <span class="n">photonDecayChain</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">transition</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">angleBiasingData</span><span class="p">:</span>
+                <span class="n">angleBiasingData</span><span class="p">[</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">photonDecayChain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">angleBiasingData</span><span class="p">[</span><span class="n">transition</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">probability</span> <span class="o">/</span> <span class="n">photonDecayChain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="c1"># Add probability for emitting this photon (i.e., transition).</span>
+                <span class="n">angleBiasingData</span><span class="p">[</span><span class="n">transition</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">probability</span>
+                <span class="n">angleBiasingData</span><span class="p">[</span><span class="n">transition</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">photonDecayChain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">probability</span>    <span class="c1"># Multiplicity * probability.</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">branchingRatio</span><span class="p">,</span> <span class="n">gammaEnergy</span><span class="p">,</span> <span class="n">finalState</span><span class="p">,</span> <span class="n">photonEmissionProbability</span> <span class="ow">in</span> <span class="n">gammas</span><span class="p">:</span>
+        <span class="n">photonDecayChain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">photonEmissionProbability</span>    <span class="c1"># If all photonEmissionProbability&#39;s are 1, this is the number of photons emitted by this decay path.</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">initialState</span><span class="p">,</span> <span class="n">finalState</span><span class="p">)</span>
+        <span class="n">photonDecayChain</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">angleBiasingPhotonBranchingData</span><span class="p">(</span><span class="n">finalState</span><span class="p">,</span> <span class="n">branchingData</span><span class="p">,</span> <span class="n">branchingRatio</span> <span class="o">*</span> <span class="n">probability</span><span class="p">,</span> <span class="n">angleBiasingData</span><span class="p">,</span> <span class="n">photonDecayChain</span><span class="p">)</span>
+        <span class="n">photonDecayChain</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">photonDecayChain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="n">photonEmissionProbability</span></div>
+
 <div class="viewcode-block" id="photonBranchingData"><a class="viewcode-back" href="../../../PoPs/decays.html#PoPs.decays.misc.photonBranchingData">[docs]</a><span class="k">def</span> <span class="nf">photonBranchingData</span><span class="p">(</span><span class="n">pops</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This function summarizes all photon branches for the specified nuclide. The returned object is a dictionary with </span>
@@ -143,6 +181,16 @@
         <span class="n">completePhotons</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">completePhotonBranchingData</span><span class="p">(</span><span class="n">nuclideId</span><span class="p">,</span> <span class="n">branchingData</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">completePhotons</span><span class="p">)</span>
         <span class="n">nuclideData</span><span class="p">[</span><span class="s1">&#39;completePhotons&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">completePhotons</span>
+
+        <span class="n">_angleBiasingData</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">angleBiasingPhotonBranchingData</span><span class="p">(</span><span class="n">nuclideId</span><span class="p">,</span> <span class="n">branchingData</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">_angleBiasingData</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">[]])</span>
+        <span class="n">angleBiasingData</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">_angleBiasingData</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">multiplicity</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">multiplicity</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">angleBiasingData</span><span class="p">[</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;probability&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;multiplicity&#39;</span><span class="p">:</span> <span class="n">multiplicity</span><span class="p">}</span>
+        <span class="n">nuclideData</span><span class="p">[</span><span class="s1">&#39;angleBiasingData&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">angleBiasingData</span>
 
     <span class="k">return</span> <span class="n">branchingData</span></div>
 </pre></div>

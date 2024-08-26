@@ -7,8 +7,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-summaryDocStringPoPs = '''Builds TNSL target ids and intids to an intid file.'''
-
 description = '''
     Builds TNSL target ids and intids to an intid file.
 

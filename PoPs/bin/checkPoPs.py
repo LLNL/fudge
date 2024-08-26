@@ -15,7 +15,7 @@ from PoPs.families import nuclide as nuclideModule
 from PoPs.families import nucleus as nucleusModule
 from PoPs.families import unorthodox as unorthodoxModule
 
-summaryDocStringPoPs = '''This script does some rudimentary checking of a GNDS PoPs file.'''
+summaryDocString__PoPs = '''This script does some rudimentary checking of a GNDS PoPs file.'''
 
 description = '''Checks a GNDS PoPs file for the following:
 

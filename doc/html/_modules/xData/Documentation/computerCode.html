@@ -46,6 +46,32 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains the GNDS documentation child node computerCodes and its child nodes classes.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                     | Description                                                                       |</span>
+<span class="sd">    +===========================+===================================================================================+</span>
+<span class="sd">    | Version                   | This is the class for the GNDS computerCode version attribute.                    |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | CodeRepo                  | This is the class for the GNDS computerCode/codeRepo node.                        |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | ExecutionArguments        | This is the class for the GNDS computerCode/executionArguments node.              |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Note                      | This is the class for the GNDS computerCode/note node.                            |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | InputDeck                 | This is the class for the GNDS computerCode/inputDecks/inputDeck node.            |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | InputDecks                | This is the suite class for the GNDS computerCode/inputDecks node.                |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | OutputDeck                | This is the class for the GNDS computerCode/outputDecks/outputDeck node.          |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | OutputDecks               | This is the suite class for the GNDS computerCode/outputDecks node.               |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | ComputerCode              | This is the class for the GNDS documentation/computerCodes/computerCode node.     |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | ComputerCodes             | This is the suite class for the GNDS documentation/computerCodes node.            |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">datetime</span>
@@ -56,125 +82,268 @@
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">text</span> <span class="k">as</span> <span class="n">textModule</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">date</span> <span class="k">as</span> <span class="n">dateModule</span>
 
-<div class="viewcode-block" id="Version"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.Version">[docs]</a><span class="k">class</span> <span class="nc">Version</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="Version"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.Version">[docs]</a><span class="k">class</span> <span class="nc">Version</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the class for the GNDS computerCode version attribute.</span>
+
+<span class="sd">    The following table list the primary members of this class added by this derived class:</span>
+
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | Member                | Description                                                               |</span>
+<span class="sd">    +=======================+===========================================================================+</span>
+<span class="sd">    | date                  | This is the date the code was checkout of the repo.                       |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;version&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param date:        An instance of :py:class:`dateModule.Date`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">markup</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Markup</span><span class="o">.</span><span class="n">none</span> <span class="p">)</span>
+        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="n">textModule</span><span class="o">.</span><span class="n">Markup</span><span class="o">.</span><span class="n">none</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__date</span> <span class="o">=</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">Date</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">date</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *date* member of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__date</span> <span class="p">)</span>
+<span class="sd">        :returns:       An instance of :py:class:`dateModule.Date`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__date</span>
 
     <span class="nd">@date</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">date</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">date</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set version date.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the *date* member of *self* to *date*.</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__date</span> <span class="o">=</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">raiseIfNotDate</span><span class="p">(</span> <span class="n">date</span> <span class="p">)</span>
+<span class="sd">        :param date:   An instance of :py:class:`dateModule.Date`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Version.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.Version.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__date</span> <span class="o">=</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">raiseIfNotDate</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;addExtraAttributes&#39;</span><span class="p">]</span> <span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+<div class="viewcode-block" id="Version.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.Version.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the XML attributes for *self* as a python str.</span>
+
+<span class="sd">        :kwargs:        A python dict with key &#39;addExtraAttributes&#39;, used to determine if the *date* attribute is added.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;addExtraAttributes&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
         <span class="k">return</span> <span class="s1">&#39; date=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span></div>
 
 <div class="viewcode-block" id="Version.parseNode"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.Version.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parses a version node.</span>
+<span class="sd">        This method fills *self* by parsing the data in *node*.</span>
+
+<span class="sd">        :param node:       Node to parse.</span>
+<span class="sd">        :param xPath:      List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:   dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;date&#39;</span> <span class="p">),</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">),</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span></div></div>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div></div>
+
 
 <div class="viewcode-block" id="CodeRepo"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.CodeRepo">[docs]</a><span class="k">class</span> <span class="nc">CodeRepo</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_bare</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the class for the GNDS computerCode/codeRepo node.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | Member                | Description                                                               |</span>
+<span class="sd">    +=======================+===========================================================================+</span>
+<span class="sd">    | revisionSystem        | The name of the repo system used (e.g., git, subversion).                 |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | href                  | A url to the repo.                                                        |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | revisionID            | A unique identifier of the checkout version of the code.                  |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;codeRepo&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_revisionSystem</span><span class="p">,</span> <span class="n">_href</span><span class="p">,</span> <span class="n">_revisionID</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param _revisionSystem:     The name of the repo system used (e.g., git, subversion). </span>
+<span class="sd">        :param _href:               URL to the repo.</span>
+<span class="sd">        :param _revisionID:         A unique identifier of the checkout version of the code.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_bare</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__revisionSystem</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">_revisionSystem</span><span class="p">,</span> <span class="s1">&#39;revisionSystem&#39;</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">_href</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__revisionID</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">_revisionID</span><span class="p">,</span> <span class="s1">&#39;revisionID&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__revisionSystem</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">_revisionSystem</span><span class="p">,</span> <span class="s1">&#39;revisionSystem&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">_href</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__revisionID</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">_revisionID</span><span class="p">,</span> <span class="s1">&#39;revisionID&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">revisionSystem</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">revisionSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *revisionSystem* member of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionSystem</span> <span class="p">)</span>
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionSystem</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">href</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">href</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *href* member of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span>
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">revisionID</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">revisionID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *revisionID* member of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionID</span> <span class="p">)</span>
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CodeRepo.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.CodeRepo.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionID</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionSystem</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionID</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span>
+<div class="viewcode-block" id="CodeRepo.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.CodeRepo.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> revisionSystem=&quot;</span><span class="si">%s</span><span class="s1">&quot; href=&quot;</span><span class="si">%s</span><span class="s1">&quot; revisionID=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionSystem</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionID</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span></div>
+<span class="sd">        :param indent:     The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:           List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__revisionSystem</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionID</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmpty&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;!-- code repo --&gt;&#39;</span> <span class="o">%</span> <span class="n">indent</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> revisionSystem=&quot;</span><span class="si">%s</span><span class="s1">&quot; href=&quot;</span><span class="si">%s</span><span class="s1">&quot; revisionID=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionSystem</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__revisionID</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="CodeRepo.parseNode"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.CodeRepo.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method fills *self* by parsing the data in *node*.</span>
 
-        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+<span class="sd">        :param node:       Node to parse.</span>
+<span class="sd">        :param xPath:      List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:   dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__revisionSystem</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;revisionSystem&#39;</span> <span class="p">),</span> <span class="s1">&#39;revisionSystem&#39;</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;href&#39;</span> <span class="p">),</span> <span class="s1">&#39;href&#39;</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__revisionID</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;revisionID&#39;</span> <span class="p">),</span> <span class="s1">&#39;revisionID&#39;</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 
-        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__revisionSystem</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;revisionSystem&#39;</span><span class="p">),</span> <span class="s1">&#39;revisionSystem&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">),</span> <span class="s1">&#39;href&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__revisionID</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;revisionID&#39;</span><span class="p">),</span> <span class="s1">&#39;revisionID&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ExecutionArguments"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.ExecutionArguments">[docs]</a><span class="k">class</span> <span class="nc">ExecutionArguments</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="ExecutionArguments"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.ExecutionArguments">[docs]</a><span class="k">class</span> <span class="nc">ExecutionArguments</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the class for the GNDS computerCode/executionArguments node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;executionArguments&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="n">textModule</span><span class="o">.</span><span class="n">Markup</span><span class="o">.</span><span class="n">none</span><span class="p">)</span></div>
 
-        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">markup</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Markup</span><span class="o">.</span><span class="n">none</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Note"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.Note">[docs]</a><span class="k">class</span> <span class="nc">Note</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Note"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.Note">[docs]</a><span class="k">class</span> <span class="nc">Note</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the class for the GNDS computerCode/note node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;note&#39;</span></div>
 
-<div class="viewcode-block" id="InputDeck"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.InputDeck">[docs]</a><span class="k">class</span> <span class="nc">InputDeck</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="InputDeck"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.InputDeck">[docs]</a><span class="k">class</span> <span class="nc">InputDeck</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the class for the GNDS computerCode/inputDecks/inputDeck node.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | Member                | Description                                                               |</span>
+<span class="sd">    +=======================+===========================================================================+</span>
+<span class="sd">    | label                 | A unique label for an instance within a inputDecks suite.                 |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | filename              | The path of the output file.                                              |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | text                  | Optional text to describe the contents of the output file.                |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;inputDeck&#39;</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param label:       A unique label for an instance within a inputDecks suite.</span>
+<span class="sd">        :param filename:    The path of the output file.</span>
+<span class="sd">        :param text:        Optional text to describe the contents of the output file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Markup</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span>
+        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="n">textModule</span><span class="o">.</span><span class="n">Markup</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *filename* member of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="p">)</span>
+<span class="sd">        :returns:       An instance of :py:class:`textModule.Tex`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="InputDeck.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.InputDeck.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+<div class="viewcode-block" id="InputDeck.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.InputDeck.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the XML attributes for *self* as a single python str.</span>
+
+<span class="sd">        :kwargs:        This argument is not used.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">return</span> <span class="s1">&#39; filename=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span></div>
 
 <div class="viewcode-block" id="InputDeck.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.InputDeck.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
 
-        <span class="n">_label</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span>
+<span class="sd">        :param cls:        Form class to return.</span>
+<span class="sd">        :param node:       Node to parse.</span>
+<span class="sd">        :param xPath:      List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:   dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:          An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">_label</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
         <span class="n">_filename</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
         <span class="n">inputDeck</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_label</span><span class="p">,</span> <span class="n">_filename</span><span class="p">)</span>
@@ -182,170 +351,312 @@
 
         <span class="k">return</span> <span class="n">inputDeck</span></div></div>
 
-<div class="viewcode-block" id="InputDecks"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.InputDecks">[docs]</a><span class="k">class</span> <span class="nc">InputDecks</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="InputDecks"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.InputDecks">[docs]</a><span class="k">class</span> <span class="nc">InputDecks</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the suite class for the GNDS computerCode/inputDecks node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;inputDecks&#39;</span>
     <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">InputDeck</span><span class="p">])</span></div>
 
-        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">InputDeck</span> <span class="p">]</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="OutputDeck"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.OutputDeck">[docs]</a><span class="k">class</span> <span class="nc">OutputDeck</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="OutputDeck"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.OutputDeck">[docs]</a><span class="k">class</span> <span class="nc">OutputDeck</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the class for the GNDS computerCode/outputDecks/outputDeck node.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | Member                | Description                                                               |</span>
+<span class="sd">    +=======================+===========================================================================+</span>
+<span class="sd">    | filename              | The path of the output file.                                              |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | text                  | Optional text to describe the contents of the output file.                |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;outputDeck&#39;</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param filename:    The path of the output file.</span>
+<span class="sd">        :param text:        Optional text to describe the contents of the output file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Markup</span><span class="o">.</span><span class="n">none</span> <span class="p">)</span>
+        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="n">textModule</span><span class="o">.</span><span class="n">Markup</span><span class="o">.</span><span class="n">none</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *filename* member of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span> <span class="p">)</span>
+<span class="sd">        :returns:       An instance of :py:class:`textModule.Tex`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="OutputDeck.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.OutputDeck.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filename</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+<div class="viewcode-block" id="OutputDeck.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.OutputDeck.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the XML attributes for *self* as a single python str.</span>
+
+<span class="sd">        :kwargs:        This argument is not used.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">return</span> <span class="s1">&#39; filename=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span></div>
 
 <div class="viewcode-block" id="OutputDeck.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.OutputDeck.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:        Form class to return.</span>
+<span class="sd">        :param node:       Node to parse.</span>
+<span class="sd">        :param xPath:      List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:   dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:          An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">_filename</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span> <span class="n">_filename</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_filename</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="OutputDecks"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.OutputDecks">[docs]</a><span class="k">class</span> <span class="nc">OutputDecks</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="OutputDecks"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.OutputDecks">[docs]</a><span class="k">class</span> <span class="nc">OutputDecks</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the suite class for the GNDS computerCode/outputDecks node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;outputDecks&#39;</span>
     <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">OutputDeck</span><span class="p">])</span></div>
 
-        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">OutputDeck</span> <span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ComputerCode"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.ComputerCode">[docs]</a><span class="k">class</span> <span class="nc">ComputerCode</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS documentation/computerCodes/computerCode node.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the class for the GNDS documentation/computerCodes/computerCode node.</span>
 
-<span class="c1"># Also need buildParameters as a text node.</span>
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | Member                | Description                                                               |</span>
+<span class="sd">    +=======================+===========================================================================+</span>
+<span class="sd">    | label                 | A unique label for an instance within a computerCodes suite.              |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | name                  | The name of the code.                                                     |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | version               | The version of the code.                                                  |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | codeRepo              | A url to the repo for the code.                                           |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | executionArguments    | A suite containing a list of :py:class:`ExecutionArgument` instances.     |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | note                  | A text node with note about the code.                                     |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | inputDecks            | A suite containing a list of :py:class:`InputDeck` instances.             |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | outputDecks           | A suite containing a list of :py:class:`OutputDeck` instances.            |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Also need buildParameters as a text node.</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;computerCode&#39;</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
-    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;codeRepo&#39;</span><span class="p">,</span> <span class="s1">&#39;executionArguments&#39;</span><span class="p">,</span> <span class="s1">&#39;note&#39;</span><span class="p">,</span> <span class="s1">&#39;inputDecks&#39;</span><span class="p">,</span> <span class="s1">&#39;outputDecks&#39;</span> <span class="p">)</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;codeRepo&#39;</span><span class="p">,</span> <span class="s1">&#39;executionArguments&#39;</span><span class="p">,</span> <span class="s1">&#39;note&#39;</span><span class="p">,</span> <span class="s1">&#39;inputDecks&#39;</span><span class="p">,</span> <span class="s1">&#39;outputDecks&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param label:       A unique label for an instance within a computerCodes suite.</span>
+<span class="sd">        :param name:        The name of the code.</span>
+<span class="sd">        :param version:     The version of the code.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__version</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">version</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__version</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">codeRepo</span> <span class="o">=</span> <span class="n">CodeRepo</span><span class="p">(</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">codeRepo</span> <span class="o">=</span> <span class="n">CodeRepo</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__executionArguments</span> <span class="o">=</span> <span class="n">ExecutionArguments</span><span class="p">(</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__executionArguments</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__executionArguments</span> <span class="o">=</span> <span class="n">ExecutionArguments</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__executionArguments</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__note</span> <span class="o">=</span> <span class="n">Note</span><span class="p">(</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__note</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__note</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__note</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__inputDecks</span> <span class="o">=</span> <span class="n">InputDecks</span><span class="p">(</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__inputDecks</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__inputDecks</span> <span class="o">=</span> <span class="n">InputDecks</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__inputDecks</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__outputDecks</span> <span class="o">=</span> <span class="n">OutputDecks</span><span class="p">(</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__outputDecks</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the label instance.&quot;&quot;&quot;</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputDecks</span> <span class="o">=</span> <span class="n">OutputDecks</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outputDecks</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name instance.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the *label* member of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="p">)</span>
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the versioninstance.&quot;&quot;&quot;</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__version</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">codeRepo</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the *name* member of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__codeRepo</span> <span class="p">)</span>
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the *version* member of *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__version</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">codeRepo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the *codeRepo* member of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`CodeRepo`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__codeRepo</span>
 
     <span class="nd">@codeRepo</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">codeRepo</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_codeRepo</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">codeRepo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_codeRepo</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the *codeRepo* member of *self* to *_codeRepo*.</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_codeRepo</span><span class="p">,</span> <span class="n">CodeRepo</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid codeRepo instance.&#39;</span> <span class="p">)</span>
+<span class="sd">        :param _codeRepo:   An instance of :py:class:`CodeRepo`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">_codeRepo</span><span class="p">,</span> <span class="n">CodeRepo</span><span class="p">)):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid codeRepo instance.&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__codeRepo</span> <span class="o">=</span> <span class="n">_codeRepo</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__codeRepo</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__codeRepo</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">executionArguments</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">executionArguments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the *executionArguments* member of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__executionArguments</span> <span class="p">)</span>
+<span class="sd">        :returns:       An instance of :py:class:`ExecutionArguments`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">note</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__note</span> <span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">inputDecks</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__inputDecks</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__executionArguments</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">outputDecks</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">note</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the *note* member of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputDecks</span> <span class="p">)</span>
+<span class="sd">        :returns:       An instance of :py:class:`Note`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ComputerCode.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.ComputerCode.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__note</span>
 
-        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inputDecks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the *inputDecks* member of *self*.</span>
 
-        <span class="n">XMLList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot; name=&quot;</span><span class="si">%s</span><span class="s1">&quot; version=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__version</span> <span class="p">)</span> <span class="p">]</span>
-        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__codeRepo</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+<span class="sd">        :returns:       An instance of :py:class:`InputDecks`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__executionArguments</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
-        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__note</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
-        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__inputDecks</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
-        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputDecks</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__inputDecks</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">outputDecks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the *outputDecks* member of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`OutputDecks`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputDecks</span>
+
+<div class="viewcode-block" id="ComputerCode.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.ComputerCode.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:     The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:           List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+
+        <span class="n">XMLList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot; name=&quot;</span><span class="si">%s</span><span class="s1">&quot; version=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__version</span><span class="p">)]</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__codeRepo</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__executionArguments</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__note</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__inputDecks</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputDecks</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">XMLList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="n">XMLList</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">XMLList</span></div>
 
 <div class="viewcode-block" id="ComputerCode.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.ComputerCode.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
 
-        <span class="n">label</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;name&#39;</span> <span class="p">)</span>
-        <span class="n">version</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+<span class="sd">        :param cls:        Form class to return.</span>
+<span class="sd">        :param node:       Node to parse.</span>
+<span class="sd">        :param xPath:      List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:   dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:          An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">label</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
         <span class="n">computerCode</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="n">computerCode</span><span class="o">.</span><span class="n">parseAncestryMembers</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">computerCode</span></div></div>
 
-<div class="viewcode-block" id="ComputerCodes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.ComputerCodes">[docs]</a><span class="k">class</span> <span class="nc">ComputerCodes</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="ComputerCodes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.computerCode.ComputerCodes">[docs]</a><span class="k">class</span> <span class="nc">ComputerCodes</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the suite class for the GNDS documentation/computerCodes node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;computerCodes&#39;</span>
     <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">ComputerCode</span> <span class="p">]</span> <span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">ComputerCode</span><span class="p">])</span></div>
 </pre></div>
 
             <div class="clearer"></div>

@@ -262,6 +262,18 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
 
         return( [ item.label for item in self.__items ] )
 
+    def printAllowedChildren(self):
+        """
+        This method prints all the allowed classes that can be a added as a child of *self*.
+        """
+
+        for cls in self.allowedClasses:
+            try:
+                location = str(cls).split("'")[1]
+            except:
+                location = str(cls)
+            print('    %s' % location)
+
     def remove( self, label ) :
         """
         Remove item by label. Returns True if label was present, otherwise returns False

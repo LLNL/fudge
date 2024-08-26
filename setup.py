@@ -45,8 +45,8 @@ class CustomInstall(install):
 class CustomBuildExt(build_ext):
     def run(self):
         # find numpy include path:
-        numpyPath = os.path.split( numpy.__file__ )[0]
-        numpyPath = os.path.join( numpyPath, 'core/include/numpy' )
+        numpyPath = numpy.get_include()
+        numpyPath = os.path.join(numpyPath, 'numpy')
         assert os.path.isdir(numpyPath), 'Numpy path "%s" NOT FOUND' % numpyPath
 
         for ext in self.extensions:

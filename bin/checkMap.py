@@ -20,7 +20,7 @@ from fudge import suites as suitesModule
 from fudge import reactionSuite as reactionSuiteModule
 from fudge.covariances import covarianceSuite as covarianceSuiteModule
 
-summaryDocStringFUDGE = '''Checks a GNDS map file and its contents for consistency.'''
+summaryDocString__FUDGE = '''Checks a GNDS map file and its contents for consistency.'''
 
 description = """
 This script checks a map file for consistency. In the following description a protare is considered 

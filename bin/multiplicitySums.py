@@ -14,7 +14,9 @@ from LUPY import argumentsForScripts as argumentsForScriptsModule
 from fudge import sums as sumsModule
 from PoPs import IDs as PoPsIDsModule
 
-description = '''Creates multiplicitySum nodes for delayed and total fission neutron multiplicity if needed.'''
+summaryDocString__FUDGE = """This script creates multiplicitySum nodes for delayed and total fission neutron multiplicity if needed."""
+
+description = summaryDocString__FUDGE
 
 parser = argparse.ArgumentParser(description=description)
 singleProtareArguments = argumentsForScriptsModule.SingleProtareArguments(parser)

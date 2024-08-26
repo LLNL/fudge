@@ -5,13 +5,38 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module contains the classes for ProductArray.
+
+This module contains the following classes:
+    
+    +-------------------+-------------------------------------------------------------------------------------------------------+
+    | Class             | Description                                                                                           |
+    +===================+=======================================================================================================+
+    | ProductArray      | This is a class designed to support adding the multi-group distribution data.                         |
+    +-------------------+-------------------------------------------------------------------------------------------------------+
+"""
+
 import numpy
 
 class ProductArray:
+    """
+    This class is designed to support adding the multi-group distribution data which are a 3 dimensional array. The outer
+    most array dimension represents the projectile's energy, the next dimension represents the product's energy
+    and the intermost dimension represents the angular data as Legendre coefficients.
+    
+    The following table list the primary members of this class:
+
+    +---------------------------+---------------------------------------------------------------+
+    | Member                    | Description                                                   |
+    +===========================+===============================================================+
+    | array                     | A 3d array that contains the multi-group data.                |
+    +---------------------------+---------------------------------------------------------------+
+    """
 
     def __init__(self, array=None):
         """
-        Constructor. If the dimension of array is 2, then it is converted to a 3 dimensional array.
+        If the dimension of array is 2, then it is converted to a 3 dimensional array.
 
         :param array: A 2 or 3 dimensional numpy array containing the data.
         """
@@ -31,12 +56,22 @@ class ProductArray:
         self.__array = array
 
     def __len__(self):
-        """Returns the size of the 3rd dimension of the array."""
+        """
+        Returns the size of the 3rd dimension of the array.
+
+        :returns:       A python int.
+        """
 
         return len(self.__array)
 
     def __add__(self, other):
-        """Returns a new **ProductArray** instance that is the sum of *self* and *other*."""
+        """
+        Returns a new :py:class:`ProductArray` instance that is the sum of *self* and *other*.
+
+        :param other:   An instance of :py:class:`ProductArray` whose data are added with *self*'s data.
+
+        :returns:       An instance of :py:class:`ProductArray`.
+        """
 
         if not isinstance(other, ProductArray):
             raise TypeError('Supported other of type "%s".' % type(other))
@@ -65,12 +100,20 @@ class ProductArray:
 
     @property
     def array(self):
-        """Returns a reference to data of self."""
+        """
+        Returns a reference to *self*'s array.
+
+        :returns:       An instance of :py:class:`numpy.ndarray`.
+        """
 
         return self.__array
 
     @property
     def shape(self):
-        """Returns the shape of the internally stored numpy array."""
+        """
+        Returns the shape of the internally stored numpy array.
+
+        :returns:       A tuple of 3 python ints.
+        """
 
         return self.__array.shape

@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-summaryDocStringPoPs = '''Given a particle id, prints its intid.'''
+summaryDocString__PoPs = '''Given a particle id, prints its intid.'''
 
 description = '''Given a particle id, this script prints its intid. This script requires a GNDS PoPs file as its first argument and the 
 PoPs file must contain the requested id.

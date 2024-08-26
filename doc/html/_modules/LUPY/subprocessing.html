@@ -46,6 +46,22 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains several functions that are useful for creating sub-processes using :py:class:`subprocess.Popen`.</span>
+
+<span class="sd">This module contains the following functions:</span>
+<span class="sd">        </span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Function              | Description                                                           |</span>
+<span class="sd">    +=======================+=======================================================================+</span>
+<span class="sd">    | _getSTDStreamOpen     | This function is for internal use by :py:func:`executeCommand`.       |</span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | _getSTDStreamClose    | This function is for internal use by :py:func:`executeCommand`.       |</span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | executeCommand        | This function executes a command using :py:class:`subprocess.Popen`   |</span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | spawn                 | This function calls :py:class:`subprocess.Popen`                      |</span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | deleteFilesUsingGlob  | This function deletes file(s) matching patterns.                      |</span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
@@ -142,6 +158,8 @@
 <span class="sd">    returns the id of the created process.</span>
 
 <span class="sd">    :param args:        Argument passed to :py:class:`subprocess.Popen`.</span>
+
+<span class="sd">    :returns:           The id of the created.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;PYTHONPATH&#39;</span><span class="p">:</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">)})</span>
@@ -150,7 +168,7 @@
 
 <div class="viewcode-block" id="deleteFilesUsingGlob"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.subprocessing.deleteFilesUsingGlob">[docs]</a><span class="k">def</span> <span class="nf">deleteFilesUsingGlob</span><span class="p">(</span><span class="n">patterns</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Deletes file(s) matching patterns. Skips deleting directories.</span>
+<span class="sd">    This function deletes file(s) matching patterns. Skips deleting directories.</span>
 <span class="sd">    The function is currently not used anywhere in FUDGE so probably should be deleted.</span>
 
 <span class="sd">    :param patterns:        Any objected that can be passed to :py:func:`glob.glob`.</span>

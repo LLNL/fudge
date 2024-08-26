@@ -155,7 +155,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             MLS = 1     # currently don't handle energy-dependent DAP
             DAP = PQUModule.PQU(
                 numpy.sqrt(self.matrix.constructArray()[0, 0]),
-                self.parameters[0].link.form.axes[0].unit).getValueAs('10*fm')
+                self.parameters[0].link.evaluated.axes[0].unit).getValueAs('10*fm')
             endf.append(endfFormatsModule.endfContLine(0, DAP, 0, 0, 0, 0))
 
         # MF32 repeats the resonance parameter information.
@@ -289,7 +289,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             if len(DAP_default) == 1:
                 index = DAP_default[0].matrixStartIndex
                 DAP.append(PQUModule.PQU(
-                    numpy.sqrt(matrix[index, index]), DAP_default[0].link.form.axes[0].unit).getValueAs('10*fm'))
+                    numpy.sqrt(matrix[index, index]), DAP_default[0].link.evaluated.axes[0].unit).getValueAs('10*fm'))
             else:
                 DAP.append(0)
 
@@ -301,7 +301,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
                         uncertaintyPerL.append([])
                     index = radius.matrixStartIndex
                     DAP_now = PQUModule.PQU(
-                        numpy.sqrt(matrix[index, index]), radius.link.form.axes[0].unit).getValueAs('10*fm')
+                        numpy.sqrt(matrix[index, index]), radius.link.evaluated.axes[0].unit).getValueAs('10*fm')
                     uncertaintyPerL[L].append(DAP_now)
                 for Lvals in uncertaintyPerL:
                     if not Lvals:

@@ -5,11 +5,42 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module containes all the classes for handling GNDS table instance.
+
+This module contains the following classes:
+
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | Table                             | This class represents                                                 |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | ColumnHeader                      | This class represents                                                 |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Blank                             | This class represents                                                 |
+    +-----------------------------------+-----------------------------------------------------------------------+
+"""
+
 from . import enums as enumsModule
 from LUPY import ancestry as ancestryModule
 from pqu import PQU as PQUModule
 
 class Table(ancestryModule.AncestryIO):
+    """
+    This class defines one column heaader in a :py:class:`Table` instance.
+
+    The following table list the primary members of this class:
+
+    +---------------+---------------------------------------------------------------+
+    | Member        | Description                                                   |
+    +===============+===============================================================+
+    | columns       | The index of the column in the table.                         |
+    +---------------+---------------------------------------------------------------+
+    | data          | The name for the column.                                      |
+    +---------------+---------------------------------------------------------------+
+    | storageOrder  | The storage order of the data in the table.                   |
+    +---------------+---------------------------------------------------------------+
+    """
 
     moniker = 'table'
 
@@ -30,20 +61,44 @@ class Table(ancestryModule.AncestryIO):
 
     @property
     def storageOrder(self):
-        """Returns to value of storageOrder."""
+        """
+        Returns to value of the storageOrder.
+        """
 
         return self.__storageOrder
 
     @property
-    def nColumns(self): return len(self.columns)
+    def nColumns(self):
+        """
+        This method returns the number of column in the table.
+        """
+
+        return len(self.columns)
 
     @property
-    def nRows(self): return len(self.data)
+    def nRows(self):
+        """
+        This method returns the number of rows in the table.
+        """
+
+        return len(self.data)
 
     def __len__( self ):
+        """
+        This method returns the number of rows in the table.
+        """
+
         return self.nRows
 
     def __getitem__( self, indices ):
+        """
+        This method returns the contents of a cell of *self* or a slice of *self*.
+
+        :param indices:     A slice of the data to return.
+
+        :returns:           A cells or a slice of the table.
+        """
+
         if type(indices) is int: return self.data[ indices ]
         if len(indices)==2:
             i,j = indices
@@ -53,12 +108,24 @@ class Table(ancestryModule.AncestryIO):
         raise IndexError("invalid index")
 
     def addRow( self, dataRow ):
+        """
+        This method adds a row to *self*.
+
+        :param dataRow:     The row to add.
+        """
+
         if not len(dataRow) == self.nColumns:
             raise ValueError("New row has %i columns, should have %i!" % (len(dataRow),self.nColumns))
         self.data.append( dataRow )
 
     def addColumn( self, columnHeader, index=None ):
-        """ add another column, either at 'index' or at the end of the table """
+        """
+        This method insert the column *columnHeader* into *self* at *index* or at the end of the table if *index* is None.
+
+        :param columnHeader:    The column to add.
+        :param index:           The index of the
+        """
+
         if not isinstance(columnHeader, ColumnHeader):
             raise TypeError("addColumn requires a ColumnHeader instance but got %s" % type(columnHeader))
         if index:
@@ -71,8 +138,9 @@ class Table(ancestryModule.AncestryIO):
 
     def convertUnits( self, unitMap ):
         """
-        unitMap is a dictionary of the form { 'eV' : 'MeV', 'b' : 'mb' }.
-        Converts all columns whose units appear as keys in unitMap
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         for idx, column in enumerate(self.columns):
@@ -83,8 +151,16 @@ class Table(ancestryModule.AncestryIO):
                     row[idx] *= factor
 
     def getColumn( self, columnNameOrIndex, unit=None ):
-        """ get data from one column, identified by the column 'name' attribute.
-        Convert results to desired unit if specified """
+        """This method returns a column of self.
+
+        Convert results to desired unit if specified.
+
+        :param columnNameOrIndex:   This can be an index (python int) or name (str) for the column to return.
+        :param unit:                The unit of the returned data.
+
+        :returns:                   A column.
+        """
+
         if isinstance(columnNameOrIndex, int):
             index = columnNameOrIndex
             column = self.columns[index]
@@ -100,7 +176,12 @@ class Table(ancestryModule.AncestryIO):
         return self[:,index]
 
     def removeColumn( self, columnName ):
-        """ remove one column from the table """
+        """
+        This methods removes a column from *self*.
+
+        :param columnName:  The name of the column to remove.
+        """
+
         column = [a for a in self.columns if a.name==columnName]
         if not column: raise ValueError("column '%s' isn't present in the table!" % columnName)
         if len(column) > 1: raise Exception("Column named '%s' is not unique!" % columnName)
@@ -110,6 +191,15 @@ class Table(ancestryModule.AncestryIO):
         for idx, col in enumerate(self.columns): col.index = idx
 
     def toStringList(self, indent='',**kwargs):
+        """
+        Returns a list of str instances representing the data of *self* as XML lines.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of *self*'s data.
+        """
+
         addHeader = kwargs.get( 'addHeader', True )
         addHeaderUnit = kwargs.get( 'addHeaderUnit', False )
         outline = kwargs.get( 'outline', False )
@@ -163,6 +253,14 @@ class Table(ancestryModule.AncestryIO):
         return xml
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
         indent3 = indent2 + kwargs.get('incrementalIndent', '  ')
@@ -186,8 +284,18 @@ class Table(ancestryModule.AncestryIO):
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
         """
-        Read a table element from xml into python. To convert a column or attribute from string to some other type,
-        enter the new type in the conversionTable: {'index':int, 'scatteringRadius':PhysicalQuantityWithUncertainty, etc}.
+        Parse *node* into an instance of *cls*. To convert a column or attribute from string to some other type,
+        enter the new type in a dictionary in the key "conversionTable" of *kwargs*. For example::
+
+            kwargs['conversionTable'] = {'index': int, 'scatteringRadius': PhysicalQuantityWithUncertainty}).
+
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *element*.
         """
 
         xPath.append(element.tag)
@@ -230,25 +338,63 @@ class Table(ancestryModule.AncestryIO):
         return table
 
 class ColumnHeader:
-    """ defines one column in a table """
+    """
+    This class defines one column heaader in a :py:class:`Table` instance.
+
+    The following table list the primary members of this class:
+
+    +-----------+---------------------------------------------------------------+
+    | Member    | Description                                                   |
+    +===========+===============================================================+
+    | index     | The index of the column in the table.                         |
+    +-----------+---------------------------------------------------------------+
+    | name      | The name for the column.                                      |
+    +-----------+---------------------------------------------------------------+
+    | unit      | The unit for the data for the column.                         |
+    +-----------+---------------------------------------------------------------+
+    """
 
     def __init__( self, index, name, unit ):
+        """
+        :param index:       The index of the column in the table.
+        :param name:        The name for the column.
+        :param unit:        The unit for the data for the column.
+        """
+
         self.index = index
         self.name = name
         self.unit = unit
 
     def __str__(self):
+        """
+        This method returns a simple string representation of *self*.
+        """
+
         return '%s (%s)'%(self.name,self.unit)
 
     def __eq__(self, other):
+        """
+        This method returns True if the name and unit of *self* is the same as *other*, and False otherwise.
+
+        :param other:       Another :py:class:`ColumnHeader` instance.
+        """
+
         return self.name == other.name and self.unit == other.unit
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         return [ '%s<column index="%d" name="%s" unit="%s"/>' % ( indent, self.index, self.name, self.unit ) ]
 
 class Blank:
-    """Blank table entry, to indicate missing data."""
+    """This class represents a blank table entry, to indicate missing data. This class has not members."""
 
     def __init__( self ): pass
     def __str__( self ): return '_'

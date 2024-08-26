@@ -29,7 +29,7 @@ def makeHistoXYs(listOfPoints, nBins, normfactor=1.0, xLabel="Ex", xUnit='eV', y
 def function_to_XYs(func, fpars,
                     Egrid=equal_lethargy_bins(1000),
                     domainUnit='eV', domainName='energy_in', rangeUnit='1/eV', rangeName='flux',
-                    accuracy=upperEps):
+                    accuracy=1e-3):
     """
     Helper function to convert a user-created function (OK, one of the spectra below) into an XYs instance
     that can be integrated, grouped, whatever.  We pre-defined a energy grid (in eV) that should work well

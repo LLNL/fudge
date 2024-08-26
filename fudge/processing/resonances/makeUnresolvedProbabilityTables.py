@@ -220,7 +220,7 @@ class ProbabilityTableGenerator:
 
         # extrapolate local copies of widths, densities and scattering radius, all as lin-lin functions
         self.scatteringRadius = self.URR.URR.getScatteringRadius().copy()
-        self.scatteringRadius.form = addPoints(self.scatteringRadius.form, newDomainMin, newDomainMax)
+        self.scatteringRadius.evaluated = addPoints(self.scatteringRadius.evaluated, newDomainMin, newDomainMax)
 
         self.levelSpacings = {}
         self.levelDensities = {}

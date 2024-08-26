@@ -1044,6 +1044,11 @@ def readMF2(info, MF2, warningList):
                     commonResonanceModule.ResonanceReaction(
                         label=channelName, link=reactionLink, ejectile=pA, Q=Qval, eliminated=eliminated))
 
+            if 51 in resonanceMTs:
+                resonanceMTs.add(4)
+            if 600 in resonanceMTs:
+                resonanceMTs.add(103)
+
             # next we have NJS spin groups, each containing channels and resonances
             spinGroups = resolvedResonanceModule.SpinGroups()
             radii = {}
@@ -1486,7 +1491,7 @@ def readMF2(info, MF2, warningList):
             label=info.style))
     if 2 in scatteringRadii:    # unresolved radius may be redundant
         if (1 not in scatteringRadii) or (scatteringRadii[2] == scatteringRadii[1]):
-            if not isinstance(unresolved.evaluated.scatteringRadius.form, XYs1dModule.XYs1d):
+            if not isinstance(unresolved.evaluated.scatteringRadius.evaluated, XYs1dModule.XYs1d):
                 unresolved.evaluated.scatteringRadius = None
 
     resonances = resonancesModule.Resonances(scatteringRadius, resolved=resolved, unresolved=unresolved)
@@ -1790,10 +1795,11 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
                             else :      # Now we need to match level energies (aka binding energies) from prior with Ein's with current Ein.
                                         # This is needed since for different Ein's, the calculation of Epg will vary slightly (hopefully less than 1e-4).
                                 if( len( discretePrimaryGammas ) != len( discretePrimaryGammasAtE ) ) :
-                                    raise Exception( 'number of primary gammas at Ein = %s is different then first incident energy' % Ein )
+                                    raise Exception( 'number of primary gammas at Ein = %s is different than first incident energy' % Ein )
                                 for index, Eg in enumerate( discretePrimaryGammas ) :
                                     if( abs( Eg[0] - discretePrimaryGammasAtE[index][0] ) > 1e-4 * Eg[0] ) :
-                                        raise Exception( 'primary energy of %s is not close to primary energy %s' % ( Eg[0], discretePrimaryGammasAtE[index][0] ) )
+                                        raise Exception( 'For Ein = %s, primary energy of %s is not close to primary energy %s'
+                                                         % ( Ein, Eg[0], discretePrimaryGammasAtE[index][0] ) )
                                     Eg.append( discretePrimaryGammasAtE[index][1] )
                     else :
                         EoutData = endfFileToGNDSMiscModule.nFunkyFloatStringsToFloats(
@@ -2473,8 +2479,8 @@ def readMF8(info, MT, MTData, warningList):
                             f"to MF{LMF}'s value = {ELFS9or10} for MT = {MT}")
                         info.doRaise.append(warningList[-1])
                 if LFS != LFS9or10:
-                    warningList.append("For MT%d, MF8 claims level index = %d but MF9/10 claim level index = %d"
-                                       % (MT, LFS, LFS9or10))
+                    warningList.append("For MT%d, MF8 claims level index = %d for ZA = %d but MF9/10 claim level index = %d"
+                                       % (MT, LFS, ZAP, LFS9or10))
                     info.doRaise.append( warningList[-1] )
 
             radioactiveDatas.append( [ ZAP, ELFS, LFS, multiplicity, crossSection, LFS, QI ] )
@@ -3373,7 +3379,7 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                     else:
                         # L-dependent scattering radius uncertainty, only supported for LRF=3 or 7
                         RMatrix = resonances.resolved.evaluated
-                        radius = scatteringRadius.form
+                        radius = scatteringRadius.evaluated
                         DAPS_per_L = []
                         uniqueId = 0
                         for lidx, DAPnow in enumerate(DAP[1:]):
@@ -3917,32 +3923,34 @@ def parseMF6FissionData(info, MT, MF6Data, fissionNeutronsAndGammasDataFromMF6, 
 
     print("    WARNING: parseMF6FissionData function not complete.")
     dataLine = 0
-    ZA, AWR, JP, LCT, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats( MF6Data[dataLine], intIndices = [ 0, 2, 3, 4 ],
-            logFile = info.logs )
+    ZA, AWR, JP, LCT, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
+        MF6Data[dataLine], intIndices=[0, 2, 3, 4], logFile=info.logs)
     info.ZA_massLineInfo.add(ZA, AWR, MT, 6, 0)
     dataLine += 1
 
     JPP = JP // 10
     JPN = JP - 10 * JPP
-    for particleIndex in range( NK ) :
-        dataLine = parseMF6FissionParticle( info, dataLine, MT, MF6Data, JPN, JPP, fissionNeutronsAndGammasDataFromMF6, warningList )
+    for particleIndex in range(NK):
+        dataLine = parseMF6FissionParticle(
+            info, dataLine, MT, MF6Data, JPN, JPP, fissionNeutronsAndGammasDataFromMF6, warningList)
 
 
 def parseMF6FissionParticle(info, dataLine, MT, MF6Data, JPN, JPP, fissionNeutronsAndGammasDataFromMF6, warningList):
     # The work on this is incomplete.
 
-    dataLine, productData, multiplicityRegions = endfFileToGNDSMiscModule.getTAB1Regions( dataLine, MF6Data, logFile = info.logs,
-            axes = multiplicityAxes )
-    ZAP, AWP, LIP, LAW, NP = int( productData['C1'] ), productData['C2'], productData['L1'], productData['L2'], productData['NR']
+    dataLine, productData, multiplicityRegions = endfFileToGNDSMiscModule.getTAB1Regions(
+        dataLine, MF6Data, logFile=info.logs, axes=multiplicityAxes)
+    ZAP, AWP = int(productData['C1']), productData['C2']
+    LIP, LAW, NP = productData['L1'], productData['L2'], productData['NR']
     info.ZA_massLineInfo.add(ZAP, AWP, MT, 6, 0)
 
     energyDistribution = None
     JP = JPP
-    if( ZAP == 1 ) : JP = JPN
-    if( JP != 1 ) : raise ValueError( 'JP = %s not suppported' % JP )
-    fissionNeutronsAndGammasDataFromMF6[ZAP].append( [ multiplicityRegions, energyDistribution ] )
+    if ZAP == 1: JP = JPN
+    if JP != 1: raise ValueError('JP = %s not suppported' % JP)
+    fissionNeutronsAndGammasDataFromMF6[ZAP].append([multiplicityRegions, energyDistribution])
 
-    return( dataLine )
+    return dataLine
 
 
 def fillRemainingProductsResidualForBreakup(info, decayChannel, lightIsotopeNames, breakupProducts, residualZA, crossSection):

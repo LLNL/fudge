@@ -344,7 +344,19 @@ class WrongExternalFileChecksum(Warning):
         return s
 
 
+class EvaluationDomainMinTooHigh(Warning):
+
+    def __init__(self, expected, obj):
+        Warning.__init__(self, Level.Severe, obj)
+        self.expected = expected
+
+    def __str__(self):
+        s = f"Evaluation starts at incident energy {self.obj.domainMin} {self.obj.domainUnit}, expected {self.expected}"
+        return s
+
+
 # resonance region:
+
 
 class BadScatteringRadius(Warning):
 

@@ -827,7 +827,7 @@ class Base_reaction(ancestryModule.AncestryIO):
         """
 
         if self.isFission():
-            fissionMatrix = self.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, popsIDsModule.neutron, legendreOrder)
+            fissionMatrix = self.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, IDsPoPsModule.neutron, legendreOrder)
     
         else:
             fissionMatrix = matrixModule.Matrix()
@@ -849,7 +849,7 @@ class Base_reaction(ancestryModule.AncestryIO):
         if self.isPairProduction():
             if productID == IDsPoPsModule.photon:
                 matrix = self.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, productID, 0)
-                productArray = productArray.Array(matrix)
+                productArray = productArrayModule.ProductArray(matrix.matrix[:,:,None])
         else:
             productArray = self.outputChannel.multiGroupProductArray(multiGroupSettings, temperatureInfo, particleIDs, productID)
 

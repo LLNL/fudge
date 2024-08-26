@@ -625,7 +625,7 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
         Es.sort( )
         while( Es[0] < EMin ) : del Es[0]
         while( Es[-1] > EMax ) : del Es[-1]
-        return( valuesModule.Values.sortAndThin( Es, 1e-6 ) )
+        return( valuesModule.Values.sortAndThin( Es, 1e-12 ) )
 
     def calculateAverageEnergy( self, Ein ) :
 

@@ -5,6 +5,25 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""         
+This module contains functions for running tasks in parallel mainly through :py:func:`execute`
+and :py:func:`executeMultiThreaded`.
+                
+    This module contains the following functions:
+
+    +-----------------------+-----------------------------------------------------------------------+
+    | Function              | Description                                                           |
+    +=======================+=======================================================================+
+    | executeOne            | This function is mainly for an example.                               | 
+    +-----------------------+-----------------------------------------------------------------------+
+    | addProcess            | This functions is internal use by :py:func:`execute`.                 |
+    +-----------------------+-----------------------------------------------------------------------+
+    | execute               | This function is used to run many processes in parallel.              |
+    +-----------------------+-----------------------------------------------------------------------+
+    | executeMultiThreaded  | This function is used to run many tasks in parallel as threads.       |
+    +-----------------------+-----------------------------------------------------------------------+
+"""     
+
 import sys
 import os
 import multiprocessing
@@ -12,8 +31,10 @@ import time
 
 def executeOne( command ) :
     """
-    This function is mainly for an example of what the target argument of multiprocessing.Process may look.
+    This function is mainly for an example of what the target argument of :py:class:`multiprocessing.Process` may look.
     The main thing is to call sys.exit with a status and to properly handle the status returned by os.system.
+
+    :param command:     System comannd to execute.
     """
 
     status = os.system( command )
@@ -21,7 +42,18 @@ def executeOne( command ) :
     sys.exit( status )
 
 def addProcess( numberLaunched, processes, items, callback ) :
-    """Added a process."""
+    """
+    This function calls :py:func:`multiprocessing.Proces` with target of *callback* and args of items[numberLaunched] to create 
+    a new process, and then calls start on that process. The created process is appended to *processes*.
+    This function is for internal use by :py:class:`execute`.
+
+    :param numberLaunched:  Index into *items* which contains the arguments for the callback function.
+    :param processes:       The list of processes which the created process will be added to.
+    :param items:           The list of args for all processes to create.
+    :param callback:        That function called by :py:class:`multiprocessing.Process`.
+
+    :returns:               *numberLaunched* incremented by one.
+    """
 
     process = multiprocessing.Process( target = callback, args = ( items[numberLaunched], ) )
     process.start( )
@@ -30,10 +62,17 @@ def addProcess( numberLaunched, processes, items, callback ) :
 
 def execute(numberOfParallelProcesses, items, callback, percentNotifications=100):
     """
-    This function loops over each item in *items* and processes it by calling user's callback function. At most *numberOfParallelProcesses* of
-    processes can run in parallel. The user's callback must create a command to execute and call function **executeOne**.
+    This function loops over each item in *items*, and creates and runs each with a :py:func:`multiprocessing.Proces` process.
+    Also see function :py:func:`addProcess`.  At most *numberOfParallelProcesses* of
+    processes can run in parallel. The user's callback must create a command to execute and a backcall function similar
+    to the example :py:func:`executeOne`.
 
     percentNotifications is in percent of number to do and for every percent of number done a message is sent to sys.syserr.
+
+    :param numberOfParallelProcesses:   The maximum number of process to have running at one time.
+    :param items:                       A python list where each element contains the arguments for one process.
+    :param callback:                    The target passed to :py:class:`multiprocessing.Process`.
+    :param percentNotifications:        This parameter determines how often a progress message is printed.
     """
 
     numberOfFailures = 0
@@ -75,22 +114,21 @@ def execute(numberOfParallelProcesses, items, callback, percentNotifications=100
 
 def executeMultiThreaded(taskList, runner, nThreads=multiprocessing.cpu_count(), sleepTime=0.2, verbose=False):
     """
-    General-purpose multi-threading code. Applies 'runner' to each task in the taskList,
-    returns list of completed runners once all tasks are complete.
-    Note: order of returned list may not match order of submitted taskList.
-
-    TODO: add index to each thread in case we need to sort results? Could use thread.name too...
+    The function runs the items in *taskList* as separate threads. Applies *runner* to each task in the taskList and
+    returns list of completed runners once all tasks are complete.  Note: order of returned list may not match order of taskList.
 
     Due to the Python GIL, this should be most efficient for runners that spend most of their time
-    in compiled code e.g. C extensions rather than in interpreted Python code.
+    in compiled code e.g., C extensions rather than in interpreted Python code.
 
-    @param taskList: list of tasks.
-    @param runner: class (inheriting from threading.Thread) with a run() method that completes each task.
-    @param nThreads: maximum number of concurrent threads.
-    @param sleepTime: how long (in seconds) to wait between polling for finished threads.
-    @param verbose: if True, print updates as each task starts.
-    @return list of finished tasks.
+    :param taskList:    List of tasks to run.
+    :param runner:      Class (inheriting from threading.Thread) with a run() method that completes each task.
+    :param nThreads:    Maximum number of concurrent threads.
+    :param sleepTime:   How long (in seconds) to wait between polling for finished threads.
+    :param verbose:     If True, print updates as each task starts.
+
+    :returns:           List of finished tasks.
     """
+#   TODO: add index to each thread in case we need to sort results? Could use thread.name.
 
     nTasks = len(taskList)
     if verbose:

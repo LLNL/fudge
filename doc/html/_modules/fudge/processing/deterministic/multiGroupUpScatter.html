@@ -44,6 +44,31 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module is for FUDGE internal use.</span>
+<span class="sd">The functions in this module are used to calculate product matrices for neutron elastic scattering including a non-zero</span>
+<span class="sd">temperature of the target.</span>
+
+<span class="sd">This module contains the following functions:</span>
+<span class="sd">            </span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Function                              | Description                                                                       |</span>
+<span class="sd">    +=======================================+===================================================================================+</span>
+<span class="sd">    | SnElasticUpScatter                    |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | executeCommand                        | This function is used internally to call                                          |</span>
+<span class="sd">    |                                       | :py:func:`subprocessingModule.executeCommand`                                     |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | checkNegative_l0                      | This function counts the number of negative elements in the l=0 product matrix.   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | parseAveEnergyOutputFile              | This function parses the average product data in the file *fileName*.             |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | rescaleCrossSection                   |                                                                                   |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | analyzeMatrix                         | This function is not used.                                                        |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">subprocess</span>
 
 <span class="kn">import</span> <span class="nn">fudge</span> <span class="k">as</span> <span class="nn">fudgeModule</span>
@@ -53,9 +78,12 @@
 
 <div class="viewcode-block" id="SnElasticUpScatter"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.SnElasticUpScatter">[docs]</a><span class="k">def</span> <span class="nf">SnElasticUpScatter</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate input and call processing code to generate a transfer matrix for two-body angular distribution.</span>
-<span class="sd">    If the distribution is actually made up of two different forms in different energy regions, this function</span>
-<span class="sd">    calls itself in the two regions and sums the result.</span>
+<span class="sd">    This function generates input for and calls the code which includes a target temperature when calculating product matrices for</span>
+<span class="sd">    neutron elastic scattering.</span>
+
+<span class="sd">    :param style:       This is not used.</span>
+<span class="sd">    :param tempInfo:    This is a dictionary with needed data.</span>
+<span class="sd">    :param comment:     This is not used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logFile</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span>
@@ -90,6 +118,15 @@
     <span class="k">return</span> <span class="n">TM1</span><span class="p">,</span> <span class="n">TME</span><span class="p">,</span> <span class="n">APE</span><span class="p">,</span> <span class="n">paras</span><span class="p">[</span><span class="s1">&#39;maxIncidentEnergyGroup&#39;</span><span class="p">]</span></div>
         
 <div class="viewcode-block" id="executeCommand"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.executeCommand">[docs]</a><span class="k">def</span> <span class="nf">executeCommand</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">workFile</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This functions sets up stuff and executes *cmd* using :py:func:`ubprocessingModule.executeCommand`..</span>
+
+<span class="sd">    :param cmd:         The system command to execute.</span>
+<span class="sd">    :param workDir:     The directory where input and output files are written to.</span>
+<span class="sd">    :param workFile:    Path to file where infomation about the calculations is written.</span>
+
+<span class="sd">    :returns:           The number of negative l=0 product matrix elements.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">transferMatrixExecute</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">transferMatrixExecute</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
@@ -135,6 +172,15 @@
 
 <span class="c1">### checker for resulting legendre matrices</span>
 <div class="viewcode-block" id="checkNegative_l0"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.checkNegative_l0">[docs]</a><span class="k">def</span> <span class="nf">checkNegative_l0</span><span class="p">(</span> <span class="n">TM_EEpL</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">infoFile</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function counts the number of negative l=0 elements in the product matrix *TM_EEpL*.</span>
+
+<span class="sd">    :param TM_EEpL:     The product matrix to check.</span>
+<span class="sd">    :param weight:      A string indicating if the weight is &#39;1&#39; or &#39;E&#39;. Oops, need to fix the calling string of &#39;0&#39; should be &#39;1&#39;.</span>
+<span class="sd">    :param infoFile:    Path to log file.</span>
+
+<span class="sd">    :returns:           int that is the number of negative l=0 elements found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">fOut</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="n">infoFile</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span> <span class="p">)</span>
     <span class="n">negative_l0Counter</span><span class="p">,</span> <span class="n">largestNegative</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.</span>
@@ -151,6 +197,13 @@
 
 
 <div class="viewcode-block" id="parseAveEnergyOutputFile"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.parseAveEnergyOutputFile">[docs]</a><span class="k">def</span> <span class="nf">parseAveEnergyOutputFile</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For interal use. This function parses the average product data in the file *fileName* and returns the values as a list of floats.</span>
+
+<span class="sd">    :param fileName:        The path of the file to parse.</span>
+
+<span class="sd">    :returns:               A python list of floats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span> <span class="p">:</span>
         <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="n">fileName</span> <span class="p">)</span>
     <span class="k">except</span> <span class="p">:</span>
@@ -167,6 +220,15 @@
 
 
 <div class="viewcode-block" id="rescaleCrossSection"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.rescaleCrossSection">[docs]</a><span class="k">def</span> <span class="nf">rescaleCrossSection</span><span class="p">(</span> <span class="n">groupedCrossSec</span><span class="p">,</span> <span class="n">UpScatterMatrix</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For each incident group in *UpScatterMatrix*, this function scales each element so that sum of the l=0 component is equal to </span>
+<span class="sd">    the corresponding element in *groupedCrossSec*.</span>
+
+<span class="sd">    :param groupedCrossSec:     The multi-group cross sections.</span>
+<span class="sd">    :param UpScatterMatrix:     The product matrices to scale to match *groupedCrossSec*.</span>
+
+<span class="sd">    :returns:                   The scaled *UpScatterMatrix*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">for</span> <span class="n">g</span><span class="p">,</span><span class="n">sigma</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">groupedCrossSec</span><span class="p">):</span>
         <span class="n">summedarray</span> <span class="o">=</span> <span class="p">[</span> <span class="n">UpScatterMatrix</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">h</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">UpScatterMatrix</span><span class="p">[</span><span class="n">g</span><span class="p">]))</span> <span class="p">]</span>
@@ -182,6 +244,9 @@
 
     
 <div class="viewcode-block" id="analyzeMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.processing.deterministic.html#fudge.processing.deterministic.multiGroupUpScatter.analyzeMatrix">[docs]</a><span class="k">def</span> <span class="nf">analyzeMatrix</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is not used and should be deleted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#import numpy as np</span>
         
     <span class="k">def</span> <span class="nf">plotMatrix</span><span class="p">(</span><span class="n">TM</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">lastElement</span><span class="p">):</span>

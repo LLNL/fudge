@@ -45,10 +45,18 @@
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module defines the Ys1d class, used to store union-grid functions such as gridded cross sections.</span>
-<span class="sd">When multiple functions can be mapped onto the same independent axis grid, the Ys1d class saves space by</span>
-<span class="sd">linking to the common independent grid rather than repeating it.</span>
+<span class="sd">This module defines the :py:class:`Ys1d` class, used to store union-grid functions such as gridded cross sections.</span>
+<span class="sd">When multiple functions can be mapped onto the same independent axis grid, the :py:class:`Ys1d` class can saves </span>
+<span class="sd">space by linking to the common independent grid (i.e., x-values) rather than repeating them.</span>
 <span class="sd">Otherwise, Ys1d functions should behave like XYs1d.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class                             | Description                                                           |</span>
+<span class="sd">    +===================================+=======================================================================+</span>
+<span class="sd">    | Ys1d                              | This class represents a 1d function as a list of y-value.             |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
@@ -61,6 +69,24 @@
 
 
 <div class="viewcode-block" id="Ys1d"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d">[docs]</a><span class="k">class</span> <span class="nc">Ys1d</span><span class="p">(</span><span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class presents a 1d function :math:`y(x)` as a list of y-values with the x-values specified by a :py:class:`axesModule.Grid` axis.</span>
+<span class="sd">    Also an interpolation rule is used to determine :math:`y(x)` between to consecutive x-values. This class has methods</span>
+<span class="sd">    for adding, subtracting, multipling and dividing a :py:class:`XYs1d` by a number or another :py:class:`XYs1d` instance,</span>
+<span class="sd">    as well as other operations common to a 1d function.</span>
+
+<span class="sd">    In addition to the members in the inherited class :py:class:`baseModule.XDataFunctional`, </span>
+<span class="sd">    the following table list the primary members of this class:</span>
+
+<span class="sd">    +---------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Member        | Description                                                                       |</span>
+<span class="sd">    +===============+===================================================================================+</span>
+<span class="sd">    | Ys            | This is the list of :math:`y_i` points representing the y-value of the function.  |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | interpolation | The interpolation rule used to determine :math:`y(x)` between to consecutive      |</span>
+<span class="sd">    |               | x-values.                                                                         |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;Ys1d&#39;</span>
     <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
@@ -69,6 +95,10 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">ValueType</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param Ys:                  An instance of :py:class:`valuesModule.Values` representing the y-values of *self.*</span>
+<span class="sd">        :param interpolation:       The interpolation rule used to determine :math:`y(x)` between to consecutive x-values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">valueType</span><span class="o">=</span><span class="n">valueType</span><span class="p">,</span>
                                             <span class="n">outerDomainValue</span><span class="o">=</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
@@ -82,20 +112,34 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__Ys</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the number of y-values started in *self*.</span>
+
+<span class="sd">        :returns:       A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># FIXME should this account for self.__Ys.start?</span>
 
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__Ys</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returned the y-value at index *index*.</span>
+
+<span class="sd">        :param index:       The index of the requested y-value.</span>
+
+<span class="sd">        :returns:           A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># FIXME should this account for self.__Ys.start?</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Ys</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add two Ys1d instances, checking to ensure they are on the same x grid.</span>
-<span class="sd">        @param other: must be Ys1d instance or 0</span>
-<span class="sd">        @return: new Ys1d instance</span>
+<span class="sd">        This method adds two Ys1d instances, checking to ensure they are on the same x grid.</span>
+
+<span class="sd">        :param other:   An instance of :py:class:`Ys1d` to added to *self*.</span>
+
+<span class="sd">        :return:        A new :py:class:`Ys1d` instance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__Ys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -124,8 +168,9 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Access the X-grid (following link if necessary). Raises AttributeError if no grid found.</span>
-<span class="sd">        @return: axesModule.Grid</span>
+<span class="sd">        This method returns the X-grid (following link if necessary). Raises AttributeError if no grid found.</span>
+
+<span class="sd">        @return:    An instance of :py:class:`axesModule.Grid`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Grid</span><span class="p">):</span>
@@ -138,15 +183,18 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">Ys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Access the Values container storing y-values</span>
-<span class="sd">        @return: xData.values.Values instance</span>
+<span class="sd">        This method returns a reference to the *Ys* member of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`valuesModule.Values`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Ys</span>
 
 <div class="viewcode-block" id="Ys1d.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        unitMap is a dictionary of the form { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }.</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">factors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span>
@@ -156,6 +204,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fixValuePerUnitChange</span><span class="p">(</span><span class="n">factors</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ys1d.copy"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self*.</span>
+
+<span class="sd">        :returns:       An instance of class of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span>
         <span class="k">if</span> <span class="n">axes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -167,54 +220,123 @@
     <span class="n">__copy__</span> <span class="o">=</span> <span class="n">copy</span>
 
 <div class="viewcode-block" id="Ys1d.evaluate"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainValue</span><span class="p">,</span> <span class="n">extrapolation</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Extrapolation</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the y-value of *self* evaluated at *domainValue*. This method is currently not implemented and instead</span>
+<span class="sd">        execute a &#39;raise NotImplementedError&#39;..</span>
+
+<span class="sd">        :param domainValue:     python float.</span>
+<span class="sd">        :param extrapolation:   TBD.</span>
+<span class="sd">        :param epsilon:         TBD.</span>
+
+<span class="sd">        :returns:               A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
 
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Still TBD. As a temporary work-around, call toPointwise_withLinearXYs to get XYs1d&quot;</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the minimum domain value for *self*.</span>
+
+<span class="sd">        :returns:               A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">domainMin</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the maximum domain value for *self*.</span>
+
+<span class="sd">        :returns:               A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">domainMax</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the domain unit for *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">domainUnit</span>
 
 <div class="viewcode-block" id="Ys1d.domainUnitConversionFactor"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.domainUnitConversionFactor">[docs]</a>    <span class="k">def</span> <span class="nf">domainUnitConversionFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the factor needed to convert self&#39;s domain to unit *unitTo*.</span>
+
+<span class="sd">        :param unitTo:      The unit for converting self&#39;s domain.</span>
+
+<span class="sd">        :returns:           A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">domainUnitConversionFactor</span><span class="p">(</span><span class="n">unitTo</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainGrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns all domain values for *self* as a python list.</span>
+
+<span class="sd">        :returns:           A python list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">domainGrid</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rangeMin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the minimum y-value of *self*.</span>
+
+<span class="sd">        :returns:           A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__Ys</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rangeMax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the maximum y-value of *self*.</span>
+
+<span class="sd">        :returns:           A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__Ys</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rangeUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the unit for the y-values of *self*. </span>
+<span class="sd"> </span>
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAxisUnitSafely</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Ys1d.rangeUnitConversionFactor"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.rangeUnitConversionFactor">[docs]</a>    <span class="k">def</span> <span class="nf">rangeUnitConversionFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         This method returns the factor needed to convert self&#39; y-values to unit *unitTo*.</span>
+<span class="sd">        </span>
+<span class="sd">        :param unitTo:      The unit for converting self&#39;s y-values.</span>
+
+<span class="sd">        :returns:           A python float.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">unitTo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="mf">1.</span>
         <span class="k">return</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="s1">&#39;1 &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">rangeUnit</span><span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">unitTo</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ys1d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns an :py:class:`XYs1dModule.XYs1d` representation of *self*&#39;.</span>
+<span class="sd">        The returned class can be changed by the &#39;cls&#39; key in *kwargs*.</span>
+
+<span class="sd">        :param kwargs:      A dictionary.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">cls</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cls&#39;</span><span class="p">,</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">)</span>
 
@@ -223,6 +345,14 @@
                    <span class="n">valueType</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">valueType</span><span class="p">,</span> <span class="n">outerDomainValue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ys1d.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
         <span class="n">outline</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outline&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -242,7 +372,15 @@
 <div class="viewcode-block" id="Ys1d.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Translates XML Ys1d into a Ys1d instance.</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">attributes</span><span class="p">,</span> <span class="n">extraAttributes</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span><span class="o">.</span><span class="n">parseBareNodeCommonAttributes</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="c1"># parseBareNodeCommonAttributes adds to xPath.</span>
@@ -267,9 +405,15 @@
 <div class="viewcode-block" id="Ys1d.defaultAxes"><a class="viewcode-back" href="../../xData/index.html#xData.Ys1d.Ys1d.defaultAxes">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">defaultAxes</span><span class="p">(</span><span class="n">labelsUnits</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param labelsUnits: dictionary of form { 0 : ( &#39;dependent label&#39;,   &#39;dependent unit&#39; ),</span>
-<span class="sd">                                                 1 : ( &#39;independent label&#39;, &#39;independent unit&#39; ) }</span>
-<span class="sd">        :return: new axes instance</span>
+<span class="sd">        This static method returns an instance of :py:class:`axesModule.Axes` with two :py:class:`axesModule.Axis` instances.</span>
+<span class="sd">        The argument *labelsUnits* is of the form::</span>
+
+<span class="sd">            { 0: ( &#39;dependent label&#39;,   &#39;dependent unit&#39; ),</span>
+<span class="sd">              1: ( &#39;independent label&#39;, &#39;independent unit&#39; ) }</span>
+
+<span class="sd">        :param labelsUnits:     A python dict of the x and y labels.</span>
+
+<span class="sd">        :return:                An instance of :py:class:`axesModule.Axes`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">labelsUnits</span><span class="o">=</span><span class="n">labelsUnits</span><span class="p">)</span></div></div>

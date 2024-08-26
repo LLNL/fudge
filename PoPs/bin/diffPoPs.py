@@ -12,7 +12,7 @@ import argparse
 from PoPs import database as databaseModule
 from PoPs.families import nucleus as nucleusModule
 
-summaryDocStringPoPs = '''Simple diff of two GNDS PoPs files.'''
+summaryDocString__PoPs = '''Simple diff of two GNDS PoPs files.'''
 
 description = '''
 Diffs two GNDS PoPs files. Currently, only prints:

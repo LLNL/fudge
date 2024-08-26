@@ -39,7 +39,7 @@ outputLog = None
 accuracy = 1e-3
 lowerUpperEpsilon = -1e-7
 
-summaryDocStringFUDGE = '''For the specified projectile energy and product, outputs energy spectra by reaction and also summed spectra.'''
+summaryDocString__FUDGE = '''For the specified projectile energy and product, outputs energy spectra by reaction and also summed spectra.'''
 
 description = '''
     Outputs the energy spectrum for the specified outgoing particle at the specified incident energy from 

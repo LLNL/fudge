@@ -13,7 +13,7 @@ import shutil
 
 from xData import XYs1d as XYs1dModule
 
-summaryDocStringxData = '''Reads 1d data from each file listed into an XYs1d instance, sums them and prints the sum.'''
+summaryDocString__xData = '''Reads 1d data from each file listed into an XYs1d instance, sums them and prints the sum.'''
 
 description = '''
 Reads 1d data from each file listed into an XYs1d instance, sums them and prints the sum. If the files do not 

@@ -11,8 +11,10 @@ import argparse
 
 from fudge import map as mapModule
 
+summaryDocString__FUDGE = """This script reads the specified map file, and prints all protares matching the specified projectile, target and evaluation."""
+
 description = '''
-Reads the specified map file, and prints all protares matching the specified projectile, 
+This script reads the specified map file, and prints all protares matching the specified projectile, 
 target and evaluation. This script recursively scans all imported map files. If a target 
 for any projectile is desired, specify the projectile as a blank string (e.g., ''). A 
 specified projectile, target or evaluation can be a Python re expression.

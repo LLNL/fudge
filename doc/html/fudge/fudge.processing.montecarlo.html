@@ -58,14 +58,46 @@
 </section>
 <section id="module-fudge.processing.montecarlo.fudge2dEqualProbableBinning">
 <span id="fudge-processing-montecarlo-fudge2dequalprobablebinning-module"></span><h2>fudge.processing.montecarlo.fudge2dEqualProbableBinning module<a class="headerlink" href="#module-fudge.processing.montecarlo.fudge2dEqualProbableBinning" title="Permalink to this heading">¶</a></h2>
+<p>This module contains a class and a function for handling equal probable bins.</p>
+<p>This module contains the following classes:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>EqualProbableBinnedData</p></td>
+<td><p>This class stores data for an instance of equal probable bins</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>This module contains the following functions:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>equalProbableBins</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 <dl class="py class">
 <dt class="sig sig-object py" id="fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.processing.montecarlo.fudge2dEqualProbableBinning.</span></span><span class="sig-name descname"><span class="pre">EqualProbableBinnedData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#EqualProbableBinnedData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is for storing and modifing equal probable bins.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData.getData">
 <span class="sig-name descname"><span class="pre">getData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#EqualProbableBinnedData.getData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData.getData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the data of self.</p>
+<dd><p>Returns the data member of self.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -85,7 +117,19 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBins">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.montecarlo.fudge2dEqualProbableBinning.</span></span><span class="sig-name descname"><span class="pre">equalProbableBins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nBins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/montecarlo/fudge2dEqualProbableBinning.html#equalProbableBins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.equalProbableBins" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This function calculates <em>nBins</em> equal probable bins for the pdf given by <em>xy</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nBins</strong> – The number of desired equal probable bins.</p></li>
+<li><p><strong>xy</strong> – The pdf whose equal probable bins are returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of <a class="reference internal" href="#fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData" title="fudge.processing.montecarlo.fudge2dEqualProbableBinning.EqualProbableBinnedData"><code class="xref py py-class docutils literal notranslate"><span class="pre">EqualProbableBinnedData</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-fudge.processing.montecarlo">

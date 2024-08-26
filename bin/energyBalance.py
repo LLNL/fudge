@@ -25,7 +25,7 @@ from fudge import enums as enumsModule
 from fudge.reactionData import crossSection as crossSectionModule
 from fudge.productData import averageProductEnergy as averageProductEnergyModule
 
-summaryDocStringFUDGE = '''For each reaction of a protare, writes available energy, each product's outgoing energy, energy balance, etc. to files.'''
+summaryDocString__FUDGE = '''For each reaction of a protare, writes available energy, each product's outgoing energy, energy balance, etc. to files.'''
 
 description = '''
 This script calculates, for each reaction, the available energy, the energy to each product and the energy balance. The results are

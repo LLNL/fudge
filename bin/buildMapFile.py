@@ -23,7 +23,7 @@ from fudge import map as mapModule
 from fudge import reactionSuite as reactionSuiteModule
 from fudge import GNDS_file as GNDS_fileModule
 
-summaryDocStringFUDGE = '''Creates a map file from a list of GNDS reactionSuite and map files.'''
+summaryDocString__FUDGE = '''Creates a map file from a list of GNDS reactionSuite and map files.'''
 
 description = '''
 This module creates a GNDS map file from a list of GNDS files. Required options are '--path', '--library'. The option
