@@ -110,11 +110,11 @@ setup(
     },
     ext_modules=[
         Extension( 'fudge.processing.resonances._getBreitWignerSums',
-            sources = ['fudge/processing/resonances/getBreitWignerSums.c'], ),
+            sources = ['fudge/processing/resonances/getBreitWignerSums.c'], include_dirs=[numpy.get_include()], ),
         Extension( 'fudge.processing.resonances._getScatteringMatrices',
-            sources = ['fudge/processing/resonances/getScatteringMatrices.c'], ),
+            sources = ['fudge/processing/resonances/getScatteringMatrices.c'], include_dirs=[numpy.get_include()], ),
         Extension( 'fudge.processing.resonances._getCoulombWavefunctions',
-            sources = ['fudge/processing/resonances/getCoulombWavefunctions.c', 'fudge/processing/resonances/coulfg2.c'], ),
+            sources = ['fudge/processing/resonances/getCoulombWavefunctions.c', 'fudge/processing/resonances/coulfg2.c'], include_dirs=[numpy.get_include()], ),
     ],
     url = 'https://github.com/llnl/fudge',
     install_requires=[
