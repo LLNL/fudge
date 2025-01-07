@@ -1,4 +1,4 @@
-name: FUDGE
+name: FUDGE pip install
 
 on: [push]
 

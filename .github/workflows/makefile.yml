@@ -1,4 +1,4 @@
-name: Makefile CI
+name: FUDGE make + make check
 
 on:
   push:
