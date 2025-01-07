@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-import os, sys, glob, shutil
+import os, sys, glob, shutil, pathlib
 import setuptools
 from setuptools.command.install import install
 from setuptools.command.build_ext import build_ext
@@ -32,13 +32,13 @@ class CustomInstall(install):
         binFolder = os.path.join(sys.prefix, 'bin')
         os.chdir('Merced')
         subprocess.check_call('make -j', shell=True)
-        print("After building:")
-        shutil.copy('bin/merced', binFolder)
+        print("After building, copy to", binFolder)
+        shutil.copy(pathlib.Path("bin") / "merced", binFolder)
         os.chdir(workingFolder)
 
         os.chdir('fudge/processing/deterministic/upscatter')
         subprocess.check_call('make -j', shell=True)
-        shutil.copy('bin/calcUpscatterKernel', binFolder)
+        shutil.copy(pathlib.Path("bin") / "calcUpscatterKernel", binFolder)
         os.chdir(workingFolder)
 
         super().run()
