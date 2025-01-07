@@ -26,11 +26,13 @@ except (ImportError, ModuleNotFoundError):
 class CustomInstall(install):
     """Custom handler for the 'install' command."""
     def run(self):
+        print("In CustomInstall run:")
         # copy C executables Merced/bin/merced and fudge/processing/deterministic/upscatter/bin/calcUpscatterKernel to Python environment bin folder
         workingFolder = os.getcwd()
         binFolder = os.path.join(sys.prefix, 'bin')
         os.chdir('Merced')
         subprocess.check_call('make -j', shell=True)
+        print("After building:")
         shutil.copy('bin/merced', binFolder)
         os.chdir(workingFolder)
 
@@ -46,7 +48,6 @@ class CustomBuildExt(build_ext):
     def run(self):
         # find numpy include path:
         numpyPath = numpy.get_include()
-        numpyPath = os.path.join(numpyPath, 'numpy')
         assert os.path.isdir(numpyPath), 'Numpy path "%s" NOT FOUND' % numpyPath
 
         for ext in self.extensions:
