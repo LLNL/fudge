@@ -10,13 +10,13 @@
 #ifndef specialFunctions_h_included
 #define specialFunctions_h_included
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <float.h>
 #include <nf_utilities.h>
 
 #ifdef WIN32
 #define isfinite _finite
-#define M_PI 3.141592653589793238463
 #define INFINITY (DBL_MAX+DBL_MAX)
 #endif
 
