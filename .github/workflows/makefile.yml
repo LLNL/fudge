@@ -31,3 +31,5 @@ jobs:
             else
                 make check PYTHON=python PYTHONPATH=$PYTHONPATH:$PWD
             fi
+      shell: bash
+
