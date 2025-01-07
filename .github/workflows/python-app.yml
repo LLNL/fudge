@@ -19,7 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Display environment
-        run: python -c "import os, platform; print(platform.system()); print(sys.version)"
+        run: python -c "import sys, platform; print(platform.system()); print(sys.version)"
 
       - name: Install dependencies
         run: python -m pip install --upgrade pip setuptools wheel numpy h5py
