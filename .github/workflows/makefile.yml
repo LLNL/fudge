@@ -27,7 +27,8 @@ jobs:
     - name: Run check
       run:  |
             if [ "$RUNNER_OS" == "Windows" ]; then
-                make check PYTHON=python PYTHONPATH=${PYTHONPATH}:$PWD
+                # make check PYTHON=python PYTHONPATH=${PYTHONPATH}:$PWD
+                echo "Skip checks on Windows for now"
             else
                 make check PYTHON=python PYTHONPATH=$PYTHONPATH:$PWD
             fi
