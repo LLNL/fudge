@@ -25,5 +25,5 @@ jobs:
       run: make PYTHON=python
 
     - name: Run check
-      run: make check PYTHON=python
+      run: make check PYTHON=python PYTHONPATH=$PYTHONPATH:$PWD
 
