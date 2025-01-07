@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-import os, sys, glob, shutil, pathlib
+import os, sys, glob, shutil
 import setuptools
 from setuptools.command.install import install
 from setuptools.command.build_ext import build_ext
@@ -26,25 +26,23 @@ except (ImportError, ModuleNotFoundError):
 class CustomInstall(install):
     """Custom handler for the 'install' command."""
     def run(self):
-        print("In CustomInstall run:")
         # copy C executables Merced/bin/merced and fudge/processing/deterministic/upscatter/bin/calcUpscatterKernel to Python environment bin folder
         workingFolder = os.getcwd()
         binFolder = os.path.join(sys.prefix, 'bin')
         os.chdir('Merced')
         subprocess.check_call('make -j', shell=True)
-
-        sbd = pathlib.Path("Src")
-        print("Contents of Src:", list(sbd.iterdir()))
-        bbd = pathlib.Path("bin")
-        print("Contents of bin:", list(bbd.iterdir()))
-
-        print("After building, copy to", binFolder)
-        shutil.copy(pathlib.Path("bin") / "merced", binFolder)
+        executable = "bin/merced"
+        if sys.platform.startswith('win'):
+            executable = "bin/merced.exe"
+        shutil.copy(executable, binFolder)
         os.chdir(workingFolder)
 
         os.chdir('fudge/processing/deterministic/upscatter')
         subprocess.check_call('make -j', shell=True)
-        shutil.copy(pathlib.Path("bin") / "calcUpscatterKernel", binFolder)
+        executable = "bin/calcUpscatterKernel"
+        if sys.platform.startswith('win'):
+            executable = "bin/calcUpscatterKernel.exe"
+        shutil.copy(executable, binFolder)
         os.chdir(workingFolder)
 
         super().run()

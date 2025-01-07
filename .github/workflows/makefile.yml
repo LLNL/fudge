@@ -25,5 +25,9 @@ jobs:
       run: make PYTHON=python
 
     - name: Run check
-      run: make check PYTHON=python PYTHONPATH=$PYTHONPATH:$PWD
-
+      run:  |
+            if [ "$RUNNER_OS" == "Windows" ]; then
+                make check PYTHON=python PYTHONPATH=${PYTHONPATH}:$PWD
+            else
+                make check PYTHON=python PYTHONPATH=$PYTHONPATH:$PWD
+            fi
