@@ -32,6 +32,12 @@ class CustomInstall(install):
         binFolder = os.path.join(sys.prefix, 'bin')
         os.chdir('Merced')
         subprocess.check_call('make -j', shell=True)
+
+        sbd = pathlib.Path("Src")
+        print("Contents of Src:", list(sbd.iterdir()))
+        bbd = pathlib.Path("bin")
+        print("Contents of bin:", list(bbd.iterdir()))
+
         print("After building, copy to", binFolder)
         shutil.copy(pathlib.Path("bin") / "merced", binFolder)
         os.chdir(workingFolder)
