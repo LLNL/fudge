@@ -7,7 +7,7 @@
 
 from LUPY import enums as enumsModule
 
-class Type(enumsModule.Enum):
 
+class Type(enumsModule.Enum):
     relative = enumsModule.auto()
     absolute = enumsModule.auto()

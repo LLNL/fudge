@@ -118,14 +118,14 @@ class Form( baseModule.Form ):
 
     @property
     def etaCoefficient( self ) :
-        """This function returns the parameter :math:`\eta \, \sqrt{E} = Z_1 \, Z_2 \, sqrt{\alpha^2 \mu m_1 / 2}`."""
+        r"""This function returns the parameter :math:`\eta \, \sqrt{E} = Z_1 \, Z_2 \, sqrt{\alpha^2 \mu m_1 / 2}`."""
 
         self.initialize( )
         return( self.__etaCoefficient  )
 
     @property
     def kCoefficient( self ) :
-        """This function returns the coefficient for the particle wave number (i.e., :math:`k(E) / \sqrt{E}`)."""
+        r"""This function returns the coefficient for the particle wave number (i.e., :math:`k(E) / \sqrt{E}`)."""
 
         self.initialize( )
         return( self.__kCoefficient )
@@ -219,7 +219,7 @@ class Form( baseModule.Form ):
         self.__kCoefficient = (A / (A + 1)) * math.sqrt( 2 * mass1 ) / hbar_c * 1e-14        # 1e-14 = sqrt( barn )
 
     def dSigma_dMu(self, energy, muCutoff, accuracy=1e-3, epsilon=1e-6, excludeRutherfordScattering=False, probability=False):
-        """
+        r"""
         This function returns :math:`d\sigma / d\mu` at the specified incident energy if *probability* is False and :math:`P(\mu)` otherwise
         if True..  The :math:`\mu` domain goes from muMin to *muCutoff*. For identical particles, muMin is set to -*muCutoff* otherwise it is -1.
 
@@ -289,7 +289,7 @@ class Form( baseModule.Form ):
         raise CoulombDepositionNotSupported( "Cannot compute average product data for %s distribution" % self.moniker )
 
     def processCoulombPlusNuclearMuCutoff( self, style, energyMin = None, accuracy = 1e-3, epsilon = 1e-6, excludeRutherfordScattering = False ) :
-        """
+        r"""
         This function returns the cross section and angular distribution for :math:`\mu` from muMin to muMax.
         For identical particles, muMin is set to -muMax otherwise it is -1. The value of muMax is the *muCufoff* 
         member of *style*.

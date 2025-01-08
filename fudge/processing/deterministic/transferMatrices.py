@@ -626,8 +626,8 @@ def discreteGammaAngularData(style, tempInfo, gammaEnergy, crossSection, angular
     return TM_1, TM_E
 
 def primaryGammaAngularData( style, tempInfo, crossSection, energyData, angularData, multiplicity = 1, comment = None ) :
-    """
-    This function calculates multi-group product matices for a primary photon distribution from a capture reaction.
+    r"""
+    This function calculates multi-group product matrices for a primary photon distribution from a capture reaction.
     Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. massRatio is the
     target mass divide by the sum of the projectile and target masses.
 

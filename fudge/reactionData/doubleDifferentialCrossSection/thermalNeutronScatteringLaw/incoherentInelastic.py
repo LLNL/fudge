@@ -43,6 +43,15 @@ class Mass( physicalQuantityModule.PhysicalQuantity ) :
 class BoundAtomCrossSection( physicalQuantityModule.PhysicalQuantity ) :
 
     moniker = 'boundAtomCrossSection'
+    keyName = 'pid'
+
+    @property
+    def pid(self):
+        return self.label
+
+    @pid.setter
+    def pid(self, value):
+        self.__label = value
 
 
 class CoherentAtomCrossSection( physicalQuantityModule.PhysicalQuantity ) :
@@ -59,7 +68,15 @@ class E_max( physicalQuantityModule.PhysicalQuantity ) :
 
     moniker = 'e_max'
 
-class T_effective( ancestryModule.AncestryIO ) :
+
+class BoundAtomCrossSectionByNuclide(suitesModule.ExclusiveSuite):
+    moniker = 'boundAtomCrossSectionByNuclide'
+
+    def __init__(self):
+        suitesModule.ExclusiveSuite.__init__(self, [BoundAtomCrossSection])
+
+
+class T_effective(ancestryModule.AncestryIO):
     """
     In incoherent inelastic sections, each scattering atom using the short collision time (SCT)
     approximation needs an effective temperature.
@@ -533,8 +550,8 @@ class ScatteringAtom(ancestryModule.AncestryIO):
     attributes = {'pid': None, 'numberPerMolecule': None, 'primaryScatterer': False}
 
     def __init__(self, pid, numberPerMolecule, mass, e_max, boundAtomCrossSection, selfScatteringKernel, *,
-                 primaryScatterer = False, e_critical = None, coherentAtomCrossSection = None,
-                 distinctScatteringKernel = None, T_effective = None):
+                 primaryScatterer=False, e_critical=None, coherentAtomCrossSection=None,
+                 distinctScatteringKernel=None, T_effective=None, boundAtomCrossSectionByNuclide=None):
 
         ancestryModule.AncestryIO.__init__(self)
         self.pid = pid
@@ -549,6 +566,9 @@ class ScatteringAtom(ancestryModule.AncestryIO):
 
         self.boundAtomCrossSection = boundAtomCrossSection
         self.boundAtomCrossSection.setAncestor(self)
+
+        self.boundAtomCrossSectionByNuclide = boundAtomCrossSectionByNuclide
+        if self.boundAtomCrossSectionByNuclide is not None: self.boundAtomCrossSectionByNuclide.setAncestor(self)
 
         self.selfScatteringKernel = selfScatteringKernel
         self.selfScatteringKernel.setAncestor(self)
@@ -571,20 +591,20 @@ class ScatteringAtom(ancestryModule.AncestryIO):
 
         return self.pid
 
-    def convertUnits( self, unitMap ) :
+    def convertUnits(self, unitMap):
         """
         Converts all data in *self* per *unitMap*.
         
         :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
-        self.mass.convertUnits( unitMap )
-        self.e_max.convertUnits( unitMap )
-        self.boundAtomCrossSection.convertUnits( unitMap )
-        self.selfScatteringKernel.convertUnits( unitMap )
-        if self.e_critical is not None: self.e_critical.convertUnits( unitMap )
-        if self.e_max is not None: self.e_max.convertUnits( unitMap )
-        if self.T_effective is not None: self.T_effective.convertUnits( unitMap )
+        self.mass.convertUnits(unitMap)
+        self.e_max.convertUnits(unitMap)
+        self.boundAtomCrossSection.convertUnits(unitMap)
+        self.selfScatteringKernel.convertUnits(unitMap)
+        for term in (self.boundAtomCrossSectionByNuclide, self.e_critical, self.e_max, self.T_effective):
+            if term is not None:
+                term.convertUnits(unitMap)
 
     def shortCollisionTime( self, alpha, beta, T ):
         """
@@ -639,9 +659,15 @@ class ScatteringAtom(ancestryModule.AncestryIO):
             if self.primaryScatterer:
                 attrs += ' primaryScatterer="true"'
             xmlStringList = ['%s<%s%s>' % (indent, self.moniker, attrs)]
-            for child in ('mass', 'e_critical', 'e_max', 'boundAtomCrossSection', 'coherentAtomCrossSection',
-                          'distinctScatteringKernel', 'selfScatteringKernel', 'T_effective') :
+            for child in ('mass', 'e_critical', 'e_max', 'boundAtomCrossSection', 'boundAtomCrossSectionByNuclide',
+                          'coherentAtomCrossSection', 'distinctScatteringKernel', 'selfScatteringKernel',
+                          'T_effective'):
                 if getattr(self, child) is not None:
+                    if child == 'boundAtomCrossSectionByNuclide':
+                        formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
+                        versionTuple = GNDS_formatVersionModule.versionComponents(formatVersion)
+                        if versionTuple[:2] < (2, 1):
+                            continue    # boundAtomCrossSectionPerNuclide was introduced in GNDS-2.1
                     xmlStringList += getattr(self, child).toXML_strList(indent2, **kwargs)
         xmlStringList[-1] += '</%s>' % self.moniker
         return xmlStringList
@@ -668,16 +694,18 @@ class ScatteringAtom(ancestryModule.AncestryIO):
             'primaryScatterer': readBool(element.get('primaryScatterer', 'false'))
         }
         for child in element:
-            _class = {  Mass.moniker : Mass,
-                        E_critical.moniker : E_critical,
-                        E_max.moniker : E_max,
-                        BoundAtomCrossSection.moniker: BoundAtomCrossSection,
-                        CoherentAtomCrossSection.moniker: CoherentAtomCrossSection,
-                        SelfScatteringKernel.moniker: SelfScatteringKernel,
-                        DistinctScatteringKernel.moniker: DistinctScatteringKernel,
-                        T_effective.moniker : T_effective }.get( child.tag, None )
+            _class = {Mass.moniker: Mass,
+                      E_critical.moniker: E_critical,
+                      E_max.moniker: E_max,
+                      BoundAtomCrossSection.moniker: BoundAtomCrossSection,
+                      BoundAtomCrossSectionByNuclide.moniker: BoundAtomCrossSectionByNuclide,
+                      CoherentAtomCrossSection.moniker: CoherentAtomCrossSection,
+                      SelfScatteringKernel.moniker: SelfScatteringKernel,
+                      DistinctScatteringKernel.moniker: DistinctScatteringKernel,
+                      T_effective.moniker: T_effective}.get(child.tag, None)
             if _class is None:
-                if not (child.tag == 'freeAtomCrossSection' and formatVersion in [GNDS_formatVersionModule.version_1_10, GNDS_formatVersionModule.version_2_0_LLNL_4]):
+                if not (child.tag == 'freeAtomCrossSection' and formatVersion in
+                        [GNDS_formatVersionModule.version_1_10, GNDS_formatVersionModule.version_2_0_LLNL_4]):
                     print("Warning: encountered unexpected element '%s' in scatteringAtom!" % child.tag)
                 continue
             attrs[child.tag] = _class.parseNodeUsingClass(child, xPath, linkData, **kwargs)
@@ -704,8 +732,8 @@ class ScatteringAtom(ancestryModule.AncestryIO):
             attrs[BoundAtomCrossSection.moniker] = BoundAtomCrossSection(
                 freeAtomCrossSection * (massAMU + neutronMassAMU) / massAMU**2, 'b')
 
-        SA = ScatteringAtom( **attrs )
-        xPath.pop( )
+        SA = ScatteringAtom(**attrs)
+        xPath.pop()
         return SA
 
 

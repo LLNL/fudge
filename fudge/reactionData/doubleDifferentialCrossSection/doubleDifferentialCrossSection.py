@@ -13,6 +13,7 @@ from fudge import abstractClasses as abstractClassesModule
 
 from .photonScattering import coherent as coherentModule
 from .photonScattering import incoherent as incoherentModule
+from .photonScattering import incoherentDoppler as incoherentDopplerModule
 from .chargedParticleElastic import CoulombPlusNuclearElastic as CoulombPlusNuclearElasticModule
 from .thermalNeutronScatteringLaw import coherentElastic as TNSL_coherentElasticModule
 from .thermalNeutronScatteringLaw import incoherentElastic as TNSL_incoherentElasticModule
@@ -27,7 +28,7 @@ class Component( abstractClassesModule.Component ) :
 
     def __init__( self ) :
 
-        abstractClassesModule.Component.__init__( self, ( coherentModule.Form, incoherentModule.Form, CoulombPlusNuclearElasticModule.Form,
+        abstractClassesModule.Component.__init__( self, ( coherentModule.Form, incoherentModule.Form, incoherentDopplerModule.Form, CoulombPlusNuclearElasticModule.Form,
                 TNSL_coherentElasticModule.Form, TNSL_incoherentElasticModule.Form, TNSL_incoherentInelasticModule.Form ) )
 
     def domainUnitConversionFactor( self, unitTo ) :

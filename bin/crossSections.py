@@ -22,6 +22,7 @@ from fudge import styles as stylesModule
 from fudge.reactionData import crossSection as crossSectionModule
 from fudge.reactionData.doubleDifferentialCrossSection.photonScattering import coherent as coherentModule
 from fudge.reactionData.doubleDifferentialCrossSection.photonScattering import incoherent as incoherentModule
+from fudge.reactionData.doubleDifferentialCrossSection.photonScattering import incoherentDoppler as incoherentDopplerModule
 
 summaryDocString__FUDGE = '''Outputs the evaluated cross section for each reaction and total for a GNDS reactionSuite.  The processed data are written to files if the "-o" and "--processed" options are used.'''
 
@@ -171,7 +172,7 @@ if outputDir is not None:
 
 crossSections = []
 if args.verbose > 0: print(protare.sourcePath)
-total = crossSectionModule.XYs1d(axes=protare.reactions[0].crossSection[-1].axes)
+total = crossSectionModule.XYs1d(axes=crossSectionModule.defaultAxes(energyUnit=protare.domainUnit))
 for reactionCounter, reaction in enumerate(protare.reactions):
     if args.verbose > 1: print('    %s' % reaction)
     crossSection = reaction.crossSection.toPointwise_withLinearXYs(lowerEps=1e-6, upperEps=1e-6)
@@ -192,7 +193,8 @@ for reactionCounter, reaction in enumerate(protare.reactions):
 reactionCounterOffset = reactionCounter + 1
 
 if len(protare.sums.crossSectionSums) > 0:
-    outputLog.write('\nData in crossSectionSums:\n')
+    if outputDir is not None:
+        outputLog.write('\nData in crossSectionSums:\n')
 
 for reactionCounter2, reaction in enumerate(protare.sums.crossSectionSums):
     reactionCounter = reactionCounterOffset + reactionCounter2
@@ -224,6 +226,10 @@ if outputDir is not None:
                 prefix = 'incoherentScatteringFactor'
                 formClass = incoherentModule.Form
                 dataName = 'scatteringFactor'
+            elif reaction.ENDF_MT >= 1534 and reaction.ENDF_MT <= 1572:
+                prefix = 'incoherentDoppler'
+                formClass = incoherentDopplerModule.Form
+                dataName = 'ComptonProfile'
             else:
                 continue
             for form in reaction.doubleDifferentialCrossSection:

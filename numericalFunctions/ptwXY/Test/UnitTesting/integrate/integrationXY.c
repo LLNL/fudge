@@ -7,6 +7,7 @@
 # <<END-copyright>>
 */
 
+#define _USE_MATH_DEFINES
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>

@@ -21,7 +21,7 @@ from fudge.productData.distributions import uncorrelated as uncorrelatedModule
 from . import base as baseModule
 
 def calculatePofMu( energy, index, SofE, epsilon ) :
-    """
+    r"""
     This function calculates :math:`P(\mu)` for projectile energy *energy*.
 
     :param energy:      The projectile energy.
@@ -33,8 +33,8 @@ def calculatePofMu( energy, index, SofE, epsilon ) :
     """
 
     def addDeltaFunction( PofMu, energy, energy_i, S_i, S_im1, epsilon ) :
-        """
-        This function adds a triangle to *PofMu* to represent a delta functtion.
+        r"""
+        This function adds a triangle to *PofMu* to represent a delta function.
 
         :param PofMu:       The :math:`P(\mu)` the triangle is added to.
         :param energy:      The energy of the projectile.

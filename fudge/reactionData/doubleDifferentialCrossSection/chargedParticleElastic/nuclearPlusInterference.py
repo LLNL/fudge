@@ -35,7 +35,7 @@ from fudge.productData.distributions import angular as angularModule
 from . import misc as miscModule
 
 class CrossSection(miscModule.ChargedParticleElasticTerm):
-    """
+    r"""
     This class represents the :math:`\sigma(E)` part of :math:`\sigma(E) \, P(\mu|E)`
     """
 
@@ -44,7 +44,7 @@ class CrossSection(miscModule.ChargedParticleElasticTerm):
     allowedDataForms = (crossSectionModule.XYs1d, crossSectionModule.Regions1d)
 
 class Distribution( miscModule.ChargedParticleElasticTerm):
-    """
+    r"""
     This class represents the :math:`P(\mu|E)` part of :math:`\sigma(E) \, P(\mu|E)`.
     """
 
@@ -54,7 +54,7 @@ class Distribution( miscModule.ChargedParticleElasticTerm):
 
 
 class NuclearPlusInterference( ancestryModule.AncestryIO ):
-    """
+    r"""
     This class represents the nuclear + interference term of the elastic scattering of two nuclei and
     stores the double differential cross section as the product :math:`\sigma(E) \, P(\mu|E)`.
     In :math:`P(\mu|E)` the :math:`\mu` ranges from muMin to muCutoff where muCutoff is a member of this
@@ -76,7 +76,7 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
     moniker = "nuclearPlusInterference"
 
     def __init__( self, muCutoff, crossSection = None, distribution = None ):
-        """
+        r"""
         :param muCutoff:        The maximum :math:`\mu` value the data represent.
         :param crossSection:    The cross section part of the nuclear + interference term.
         :param distribution:    The distribution part of the nuclear + interference term.
@@ -174,8 +174,8 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
         self.distribution.convertUnits( unitMap )
 
     def dSigma_dMu(self, energy, accuracy=1e-3, muMax=None, probability=False):
-        """
-        Returns :math:`d\sigma / d\mu` at the specified projdctile energy.
+        r"""
+        Returns :math:`d\sigma / d\mu` at the specified projectile energy.
                 
         :param energy:          Energy of the projectile.
         :param accuracy:        This argument is not used.
