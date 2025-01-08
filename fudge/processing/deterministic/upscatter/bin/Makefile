@@ -10,7 +10,7 @@
 default: build
 
 build: 
-	cd ../Src; $(MAKE) CC=gcc
+	cd ../Src; $(MAKE)
 	cp ../Src/calcUpscatterKernel .
 
 check:
