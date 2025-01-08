@@ -303,7 +303,7 @@ def generatePlot(observable, dataSets, xyData=None, xydyData=None, xdxydyData=No
 
 def getEXFORSets(sym, A, metastable, reaction=None, quantity="SIG", nox4evals=True, nox4legend=False,
                  forceLegend=False, plotSyle=None, verbose=True):
-exforData = []
+    exforData = []
     try:
         from x4i import exfor_manager, exfor_entry
     except ImportError:
