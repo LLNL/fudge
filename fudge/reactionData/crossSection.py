@@ -1309,7 +1309,7 @@ class Component(abstractClassesModule.Component):
 
         # Compute the uncertainty itself
         import numpy
-        phi = numpy.mat( phi )
+        phi = numpy.asmatrix( phi )
         theArray = theCovariance.matrix.array.constructArray()
         try:
             coco = (phi * theArray * phi.T)[0,0]
