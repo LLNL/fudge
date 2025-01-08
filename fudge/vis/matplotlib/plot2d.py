@@ -664,7 +664,7 @@ def __makePlot2d(datasets, xAxisSettings=None, yAxisSettings=None, theTitle=None
         else:
             thePlot.set_xscale('linear')
         if yAxisSettings.isLog:
-            thePlot.set_yscale('log')
+            thePlot.set_yscale('log', nonposy="clip")
         else:
             thePlot.set_yscale('linear')
         if xAxisSettings.autoscale:
