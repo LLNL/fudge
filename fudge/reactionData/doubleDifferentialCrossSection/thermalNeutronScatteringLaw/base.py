@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""
+r"""
 This module contains the base form for all thermal neutron scattering law forms and some common functions.
 
 This module contains the following classes: 
@@ -101,7 +101,7 @@ def processedToForms( label, crossSection, averageProductEnergy, averageProductM
     return( crossSection, averageProductEnergy, averageProductMomentum )
 
 def energyDelta2d( energyMin, energyMax, epsilon, incidentEnergyUnit ) :
-    """
+    r"""
     This function creates a pointwise energy representation of elastic scattering where :math:`P(E'|E) = \delta(E' - E)` by
     creating small triangles at the minimum and maximum projectile energies.
 

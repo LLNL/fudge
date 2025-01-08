@@ -144,7 +144,8 @@ def toENDF6(self, styleLabel, flags, verbosityIndent='', covarianceSuite=None, u
     targetInfo['LIS'] = levelIndex
     targetInfo['metastables'] = {}
     targetInfo['LISO'] = 0
-    if levelIndex > 0: targetInfo['LISO'] = 1
+    if levelIndex > 0:
+        targetInfo['LISO'] = self.PoPs[self.target].metaStableIndex
     # BRBBRB
     for alias in self.PoPs.aliases:
         if hasattr(alias, 'metaStableIndex'):

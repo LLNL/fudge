@@ -96,7 +96,7 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
 
     @property
     def etaCoefficient( self ) :
-        """This method returns the parameter :math:`\eta \, \sqrt{E} = Z_1 \, Z_2 \, sqrt{\alpha^2 \mu m_1 / 2}`."""
+        r"""This method returns the parameter :math:`\eta \, \sqrt{E} = Z_1 \, Z_2 \, sqrt{\alpha^2 \mu m_1 / 2}`."""
 
         return( self.ancestor.etaCoefficient )
 
@@ -206,7 +206,7 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
         self.imaginaryInterferenceTerm.convertUnits( unitMap )
 
     def dSigma_dMu(self, energy, accuracy=1e-3, muMax=0.999, probability=False):
-        """
+        r"""
         This function returns :math:`d\sigma / d\mu` at the specified incident energy.
 
         :param energy:      Energy of the projectile.
@@ -218,7 +218,7 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
         """
 
         class Tester :
-            """
+            r"""
             This class is used to added point to :math:`d\sigma / d\mu` until the desired lin-lin interpolation is met. 
             This class is for internal use.
             """
@@ -237,7 +237,7 @@ class NuclearAmplitudeExpansion( ancestryModule.AncestryIO):
                 self.absoluteTolerance = absoluteTolerance
 
             def evaluateAtX( self, mu ) :
-                """
+                r"""
                 This function returns *self* evaluated at a projectile energy and outgoing :math:`\mu`.
 
                 :param mu:  The mu point to evaluate *self* at.

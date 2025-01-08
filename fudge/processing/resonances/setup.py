@@ -13,19 +13,19 @@ from setuptools import setup, Extension
 numpyPath = numpy.get_include()
 
 getBreitWignerSums = Extension('_getBreitWignerSums',
-        sources=['getBreitWignerSums.c'],
-        include_dirs=['./', numpyPath])
+                               sources=['getBreitWignerSums.c'],
+                               include_dirs=['./', numpyPath])
 
 getScatteringMatrices = Extension('_getScatteringMatrices',
-        sources=['getScatteringMatrices.c'],
-        include_dirs=['./', numpyPath])
+                                  sources=['getScatteringMatrices.c'],
+                                  include_dirs=['./', numpyPath])
 
 getCoulombWavefunctions = Extension('_getCoulombWavefunctions',
-        sources = ['getCoulombWavefunctions.c','coulfg2.c'],
-        include_dirs = ['./', numpyPath])
+                                    sources=['getCoulombWavefunctions.c', 'coulfg2.c'],
+                                    include_dirs=['./', numpyPath])
 
 if __name__ == '__main__':
     setup(name='extensions',
-            version='1.0',
-            description='Extensions (written in c) for better performance in reconstructing resonances',
-            ext_modules=[getBreitWignerSums, getScatteringMatrices, getCoulombWavefunctions])
+          version='1.0',
+          description='Extensions (written in c) for better performance in reconstructing resonances',
+          ext_modules=[getBreitWignerSums, getScatteringMatrices, getCoulombWavefunctions])

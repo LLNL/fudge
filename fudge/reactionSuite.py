@@ -407,6 +407,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
         self.productions.convertUnits(unitMap)
         self.PoPs.convertUnits(unitMap)
         self.fissionComponents.convertUnits(unitMap)
+        self.applicationData.convertUnits(unitMap)
 
     def fixDomains(self, energyMax):
         """
@@ -507,8 +508,9 @@ class ReactionSuite(ancestryModule.AncestryIO):
             return warning.Context('ReactionSuite: %s + %s' % (self.projectile, self.target), warnings)
 
         # assemble some useful info, to be handed down to children's check() functions:
-        incidentEnergyUnit = 'eV'
-        massUnit = 'eV/c**2'
+        incidentEnergyUnit = self.domainUnit
+        # FIXME warn if incidentEnergyUnit not one of 'eV', 'MeV'?
+        massUnit = f'{incidentEnergyUnit}/c**2'
         projectile = self.PoPs[self.projectile]
         projectileZ, projectileA, projectileZA, projectileLevelIndex = chemicalElementMiscPoPsModule.ZAInfo(projectile)
         target = self.PoPs.final(self.target)
@@ -526,16 +528,16 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
             projectileMass = projectile.getMass(massUnit)
             targetMass = target.getMass(massUnit)
-            availableEnergy_eV = projectileMass + targetMass
+            availableEnergy = projectileMass + targetMass
         else:
             # For elemental targets, calculating these factors doesn't make sense since there is no defined target mass
             if self.interaction is enumsModule.Interaction.nuclear:
                 warnings.append(warning.ElementalTarget(self.target))
             kinematicFactor = 1.0
-            availableEnergy_eV = None
+            availableEnergy = None
 
         info = {'reactionSuite': self, 'kinematicFactor': kinematicFactor, 'compoundZA': compoundZA,
-                'availableEnergy_eV': availableEnergy_eV, 'CoulombChannel': CoulombChannel, 'style': evaluatedStyle,
+                'availableEnergy': availableEnergy, 'CoulombChannel': CoulombChannel, 'style': evaluatedStyle,
                 'reconstructedStyleName': None, 'elementalTarget': elementalTarget, 'interaction': self.interaction}
         info.update(options)
         if elementalTarget:
@@ -832,7 +834,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
             if not mult: mult = 1
             if (symbol == IDsPoPsModule.neutron) and not A: A = 1
             if A != '_natural': A = int(A)
-            if name == IDsPoPsModule.neutron:
+            if symbol == IDsPoPsModule.neutron:
                 Z = 0
             else:
                 Z = chemicalElementMiscPoPsModule.ZFromSymbol[symbol]
@@ -1022,6 +1024,31 @@ class ReactionSuite(ancestryModule.AncestryIO):
         for reaction in self.orphanProducts : reaction.calculateAverageProductData( style, indent = indent2, **kwargs )
         for reaction in additionalReactions : reaction.calculateAverageProductData( style, indent = indent2, **kwargs )
 
+        if institutionModule.photoAtomicIncoherentDoppler in self.applicationData:
+            MT504 = self.getReaction(504)
+            totalCrossSection = MT504.crossSection[0]
+
+            photon = MT504.outputChannel.products[IDsPoPsModule.photon]
+            totalAverageProductEnergy = photon.averageProductEnergy[style.label]
+            totalAverageProductMomentum = photon.averageProductMomentum[style.label]
+
+            reactions = self.applicationData[institutionModule.photoAtomicIncoherentDoppler][0]
+            for reaction in reactions:
+                crossSection = reaction.crossSection[0]
+                MT504_data = {}
+
+                averageProductEnergy = crossSection * totalAverageProductEnergy / totalCrossSection
+                averageProductEnergy = averageProductEnergy.thin(2e-3)
+                MT504_data['averageProductEnergy'] = averageProductEnergy
+
+                averageProductMomentum = crossSection * totalAverageProductMomentum  / totalCrossSection
+                averageProductMomentum = averageProductMomentum.thin(2e-3)
+                MT504_data['averageProductMomentum'] = averageProductMomentum
+
+                kwargs['MT504_data'] = MT504_data
+                reaction.calculateAverageProductData(style, indent=indent2, **kwargs)
+                del kwargs['MT504_data']
+
     def buildCrossSectionSum( self, sumLabel, ENDF_MT, styleLabel, reactionKeys, Q ) :
         """
         For the list of indices and/or labels in reactionKeys, calcualate the summed crosstions and create a crossSectionSum
@@ -1060,6 +1087,38 @@ class ReactionSuite(ancestryModule.AncestryIO):
     def inputParticlesToReactionString( self, prefix = "", suffix = "" ) :
 
         return( "%s%s + %s%s" % ( prefix, self.projectile, self.target, suffix ) )
+
+    def cullProcessedData(self):
+        """
+        This method removes all processed data from *self*.
+        """
+
+        from fudge import institution as institutionModule
+        from fudge.resonances import probabilityTables as probabilityTablesModule
+        from fudge.processing.deterministic import tokens as deterministicTokensModule
+
+        preProcessedStyles = self.styles.preProcessingStyles()
+
+        stylesToRemove = []
+        for style in self.styles:
+            if not isinstance(style, preProcessedStyles):
+                stylesToRemove.append(style.label)
+        self.removeStyles(stylesToRemove)
+
+        applicationDataLabels = (deterministicTokensModule.multiGroupReactions,
+            deterministicTokensModule.multiGroupDelayedNeutrons,
+            deterministicTokensModule.multiGroupIncompleteProducts,
+            probabilityTablesModule.LLNLProbabilityTablesToken)
+
+        for label in applicationDataLabels: # applicationData requires special handling.
+            if label in self.applicationData:
+                self.applicationData.pop(label)
+
+        try:
+            photoAtomicIncoherentDoppler = self.applicationData[institutionModule.photoAtomicIncoherentDoppler]
+            photoAtomicIncoherentDoppler.data[0].removeStyles(stylesToRemove)
+        except:
+            pass
 
     def cullStyles( self, styleName, removeDocumentation, removeApplicationData ) :
         """
@@ -1292,6 +1351,11 @@ class ReactionSuite(ancestryModule.AncestryIO):
         for reaction in self.orphanProducts : reaction.processMC_cdf( style, tempInfo, indent + incrementalIndent )
         for reaction in additionalReactions : reaction.processMC_cdf( style, tempInfo, indent + incrementalIndent )
 
+        if institutionModule.photoAtomicIncoherentDoppler in self.applicationData:
+            reactions = self.applicationData[institutionModule.photoAtomicIncoherentDoppler][0]
+            for reaction in reactions:
+                reaction.processMC_cdf(style, tempInfo, indent + incrementalIndent)
+
         for original, newReference in tempInfo['brokenLinks']:
             newReference.link = original.referenceInstance.ancestor[ newReference.label ]
 
@@ -1392,6 +1456,11 @@ class ReactionSuite(ancestryModule.AncestryIO):
         for reaction in additionalReactions :
             reaction.processGriddedCrossSections( style, verbosity = verbosity, indent = indent, incrementalIndent = incrementalIndent )
 
+        if institutionModule.photoAtomicIncoherentDoppler in self.applicationData:
+            reactions = self.applicationData[institutionModule.photoAtomicIncoherentDoppler][0]
+            for reaction in reactions:
+                reaction.processGriddedCrossSections(style, verbosity=verbosity, indent=indent, incrementalIndent=incrementalIndent)
+
     def processMultiGroup( self, style, legendreMax, verbosity = 0, indent = '', incrementalIndent = '  ', logFile = None, workDir = None,
                 restart = False, additionalReactions = [] ) :
         """
@@ -1481,6 +1550,11 @@ class ReactionSuite(ancestryModule.AncestryIO):
             for i1, reaction in enumerate( additionalReactions ) :
                 kwargs['reactionIndex'] = "a%.4d" % i1
                 reaction.processMultiGroup( style, kwargs, indent + incrementalIndent )
+
+            if institutionModule.photoAtomicIncoherentDoppler in self.applicationData:
+                reactions = self.applicationData[institutionModule.photoAtomicIncoherentDoppler][0]
+                for reaction in reactions:
+                    reaction.processMultiGroup(style, kwargs, indent + incrementalIndent)
 
         if logFile is not None: logFile.write( '    ' + str( t0 ) + '\n' )
         if( kwargs['failures'] > 0 ) : raise ValueError( "kwargs['failures'] = %d  > 0" % kwargs['failures'] )
@@ -2315,7 +2389,7 @@ class ReactionSuite(ancestryModule.AncestryIO):
             sourcePath = kwargs.get('sourcePath', './')     # This (i.e., './') may not be the correct default.
             if not isinstance(sourcePath, str):
                 sourcePath = sourcePath.name
-            path = os.path.dirname(sourcePath)
+            path = pathlib.Path(sourcePath).resolve().parent
 
             formatVersion = node.get( 'format' )
             kwargs['formatVersion'] = formatVersion
@@ -2349,8 +2423,8 @@ class ReactionSuite(ancestryModule.AncestryIO):
                 if not HDF5_present:
                     raise ImportError("Missing module 'h5py' must be installed for HDF5 support.")
                 HDF_externalFile = rs.externalFiles.pop('HDF')
-                h5FilePath = os.path.join( path, HDF_externalFile.path )
-                if not os.path.exists(h5FilePath):
+                h5FilePath = path / HDF_externalFile.path
+                if not path.exists():
                     raise IOError("External HDF file %s not found" % h5FilePath)
 
                 h5File = h5py.File( h5FilePath, 'r', libver='latest' )
@@ -2405,7 +2479,6 @@ class ReactionSuite(ancestryModule.AncestryIO):
                 if verbosity > 0:
                     if unresolvedLinksCounter < numberOfBrokenLinksToPrint: print( '    Cannot resolve link "%s".' % quant )
                     unresolvedLinksCounter += 1
-                raise
             except :
                 raise
 

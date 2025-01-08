@@ -413,6 +413,8 @@ class Form( baseModule.Form ) :
 
         _angularSubform = self.angularSubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
         _energySubform = self.energySubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        if isinstance(self.energySubform.data, energyModule.SimpleMaxwellianFission) and tempInfo.get('viaReference',  False):
+            _energySubform = self.energySubform.copy()
         if( ( _angularSubform is not None ) or ( _energySubform is not None ) ) :
             if( _angularSubform is None ) : _angularSubform = self.angularSubform.copy( )
             if( _energySubform is None ) : _energySubform = self.energySubform.copy( )

@@ -88,4 +88,7 @@ if not made_a_plot:
         otherMT = args.crossMT
     elif c.columnData is None:
         otherMT = args.MT
+    else:
+        otherMT = args.MT
+
     raise KeyError("(MF0,MT0)x(MF1,MT1) = (%s,%s)x(%s,%s) not found" % (args.MF, args.MT, args.MF, otherMT))

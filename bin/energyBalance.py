@@ -131,6 +131,8 @@ def output(reactionOutputDir, fileName, curve, crossSection=None):
                 priorEnergy = energy
             if priorEnergy is not None:                     # Add a point at the last zero cross section point.
                 curve.setValue(priorEnergy, curve.evaluate(priorEnergy))
+        elif fileName == 'Q.dat':
+            curve = curve * crossSection.domainSlice(domainMin=curve.domainMin)
 
         weighted = []
         for index, (xValue, yValue) in enumerate(curve):
@@ -216,14 +218,17 @@ def process(reaction, isReaction):
     crossSection = reaction.crossSection.toPointwise_withLinearXYs(lowerEps=1e-6)
     output(reactionOutputDir, 'crossSection.dat', crossSection)
 
+    outputChannel = reaction.outputChannel
     if isReaction:
+        Q = outputChannel.Q[0].toPointwise_withLinearXYs(accuracy=1e-5, lowerEps=1e-6)
+        output(reactionOutputDir, 'Q.dat', Q, crossSection)
         availableEnergy = reaction.availableEnergy[apdLabel]
         output(reactionOutputDir, 'availableEnergy.dat', availableEnergy, crossSection)
 
-        checkTwoBody(reactionOutputDir, crossSection, reaction.outputChannel)
+        checkTwoBody(reactionOutputDir, crossSection, outputChannel)
 
     productSums = {}
-    outputProductData(reactionOutputDir, crossSection, reaction.outputChannel, productSums, 0)
+    outputProductData(reactionOutputDir, crossSection, outputChannel, productSums, 0)
 
     totalProductEnergy = XYs1dModule.XYs1d(axes=averageProductEnergyAxes)
     for pid in productSums:

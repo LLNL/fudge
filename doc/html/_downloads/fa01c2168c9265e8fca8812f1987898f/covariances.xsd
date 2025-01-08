@@ -34,7 +34,7 @@
         </xs:element>
       </xs:sequence>
       <xs:attribute name="projectile" type="xs:NCName" use="required"/>
-      <xs:attribute name="target" type="xs:NCName" use="required"/>
+      <xs:attribute name="target" type="xs:string" use="required"/>
       <xs:attribute name="evaluation" type="xs:string" use="required"/>
       <xs:attribute name="interaction" type="xs:string" use="required"/>
       <xs:attribute name="format" type="xs:string" use="required"/>

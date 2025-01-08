@@ -980,6 +980,16 @@ class PrimaryGammaEnergyTooLarge(Warning):
                 and self.fraction == other.fraction)
 
 
+class UnphysicalDiscreteOrPrimaryPhotonMultiplicity(Warning):
+    """Max multiplicity for discrete or primary photons should be 1"""
+
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
+    def __str__(self):
+        return ("Multiplicity > 1 for primary or discrete photon")
+
+
 class MadlandNixBadParameters(Warning):
     def __init__(self, EFL, EFH, minTm, obj=None):
         Warning.__init__(self, Level.Severe, obj)

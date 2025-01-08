@@ -38,29 +38,35 @@ from xData import values as valuesModule
 from xData import xDataArray as arrayModule
 
 TEST_DATA_PATH, this_filename = os.path.split(__file__)
-FeEvaluation =  reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'n-026_Fe_056-endfbvii.1.endf.gnds.xml')
-FeCovariance =  covarianceSuite.CovarianceSuite.readXML_file(TEST_DATA_PATH+os.sep+'n-026_Fe_056-endfbvii.1.endf.gndsCov.xml', reactionSuite=FeEvaluation)
+FeEvaluation = reactionSuite.ReactionSuite.readXML_file(
+    TEST_DATA_PATH + os.sep + 'n-026_Fe_056-endfbvii.1.endf.gnds.xml')
+FeCovariance = covarianceSuite.CovarianceSuite.readXML_file(
+    TEST_DATA_PATH + os.sep + 'n-026_Fe_056-endfbvii.1.endf.gndsCov.xml', reactionSuite=FeEvaluation)
 
 
-class TestCaseBase( unittest.TestCase ):
+class TestCaseBase(unittest.TestCase):
 
-    def assertXMLListsEqual(self,x1,x2):
+    def assertXMLListsEqual(self, x1, x2):
 
-        listAssertEqual = getattr( self, 'assertCountEqual', None )
-        if( listAssertEqual is None ) : listAssertEqual = getattr( self, 'assertItemsEqual' )
+        listAssertEqual = getattr(self, 'assertCountEqual', None)
+        if listAssertEqual is None: listAssertEqual = getattr(self, 'assertItemsEqual')
 
         x1List = []
         for line in x1:
-            if '\n' in line: x1List += [x.strip() for x in line.split('\n')]
-            else: x1List.append(line.strip())
+            if '\n' in line:
+                x1List += [x.strip() for x in line.split('\n')]
+            else:
+                x1List.append(line.strip())
         x2List = []
         for line in x2:
-            if '\n' in line: x2List += [x.strip() for x in line.split('\n')]
-            else: x2List.append(line.strip())
-        return listAssertEqual( x1List, x2List )
+            if '\n' in line:
+                x2List += [x.strip() for x in line.split('\n')]
+            else:
+                x2List.append(line.strip())
+        return listAssertEqual(x1List, x2List)
 
 
-class Test_mixed( TestCaseBase ):
+class Test_mixed(TestCaseBase):
 
     def setUp(self):
         # The COMMARA-2.0 33 group structure
@@ -75,41 +81,49 @@ class Test_mixed( TestCaseBase ):
         self.__groupUnit = 'eV'
 
         # ...................... example matrix 'a' ......................
-        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
+                                               2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=valuesModule.Values([1.0000E-07, 1.1109E-01, 1.3534E+00, 1.9640E+01]))
         axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.none,
                                   values=linkModule.Link(link=axes[2].values, relative=True))
         myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.Symmetry.lower)
         self.a = covariances.covarianceMatrix.CovarianceMatrix('eval',
-                            matrix=griddedModule.Gridded2d(axes, myMatrix), type=covarianceEnumsModule.Type.relative)
+                                                               matrix=griddedModule.Gridded2d(axes, myMatrix),
+                                                               type=covarianceEnumsModule.Type.relative)
 
         # ...................... example matrix 'b' ......................
-        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
+                                               2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=valuesModule.Values([1.0e-5, 0.100, 1.0, 20.0]))
         axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.none,
                                   values=linkModule.Link(link=axes[2].values, relative=True))
         myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.Symmetry.lower)
         self.b = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
-                                         type=covarianceEnumsModule.Type.relative)
+                                                               type=covarianceEnumsModule.Type.relative)
 
         # ...................... example matrix 'c' ......................
-        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
+                                               2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=valuesModule.Values([1.0000E-07, 6.7380E-02, 1.1109E-01, 1.3534E+00]))
         axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.none,
                                   values=linkModule.Link(link=axes[2].values, relative=True))
         myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.Symmetry.lower)
         self.c = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
-                                         type=covarianceEnumsModule.Type.relative)
+                                                               type=covarianceEnumsModule.Type.relative)
 
         self.abc = covariances.mixed.MixedForm(components=[self.a, self.b, self.c])
 
     def test__getitem__(self):
-        self.maxDiff=None
+        self.maxDiff = None
         self.assertXMLListsEqual(
-            FeCovariance.covarianceSections[36]['eval'].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), '''<mixed label="eval">
+            FeCovariance.covarianceSections[36]['eval'].toXML_strList(
+                formatVersion=GNDS_formatVersionModule.version_1_10), '''<mixed label="eval">
       <covarianceMatrix label="0" type="absolute">
         <gridded2d>
           <axes>
@@ -149,15 +163,17 @@ class Test_mixed( TestCaseBase ):
               <link href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit="b**2"/></axes>
           <array shape="5,5" compression="diagonal">
-            <values>0 7.2e-14 1.5335e-14 2.9892e-12 1.9177e-9</values></array></gridded2d></shortRangeSelfScalingVariance></mixed>'''.split('\n') )
+            <values>0 7.2e-14 1.5335e-14 2.9892e-12 1.9177e-9</values></array></gridded2d></shortRangeSelfScalingVariance></mixed>'''.split(
+                '\n'))
 
     def test__len__(self):
-        self.assertEqual( len(FeCovariance.covarianceSections), 60 )
+        self.assertEqual(len(FeCovariance.covarianceSections), 60)
 
     def test_toXML_strList_11(self):
-        '''This covariance in the Fe56 file is of mixed form and is made of 4 diagonal subspaces.'''
-        self.maxDiff=None
-        self.assertXMLListsEqual( FeCovariance.covarianceSections[11].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), '''  <section label="n + (Fe56_e5 -> Fe56 + photon)">
+        """This covariance in the Fe56 file is of mixed form and is made of 4 diagonal subspaces."""
+        self.maxDiff = None
+        self.assertXMLListsEqual(
+            FeCovariance.covarianceSections[11].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), '''  <section label="n + (Fe56_e5 -> Fe56 + photon)">
     <rowData ENDF_MFMT="33,55" href="$reactions#/reactionSuite/reactions/reaction[@label='n + (Fe56_e5 -> Fe56 + photon)']/crossSection/XYs1d[@label='eval']"/>
     <mixed label="eval">
       <covarianceMatrix label="0" type="absolute">
@@ -199,12 +215,14 @@ class Test_mixed( TestCaseBase ):
               <link href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit="b**2"/></axes>
           <array shape="7,7" compression="diagonal">
-            <values>0 3.5972e-6 7.369e-6 3.8185e-6 1.376e-6 1.353e-7 1.1602e-8</values></array></gridded2d></shortRangeSelfScalingVariance></mixed></section>'''.split('\n') )
+            <values>0 3.5972e-6 7.369e-6 3.8185e-6 1.376e-6 1.353e-7 1.1602e-8</values></array></gridded2d></shortRangeSelfScalingVariance></mixed></section>'''.split(
+                '\n'))
 
     def test_toXML_strList_36(self):
-        self.maxDiff=None
-        self.assertXMLListsEqual( FeCovariance.covarianceSections[36].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
-        '''<section label="H3 + Mn54 [inclusive]">
+        self.maxDiff = None
+        self.assertXMLListsEqual(
+            FeCovariance.covarianceSections[36].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
+            '''<section label="H3 + Mn54 [inclusive]">
     <rowData ENDF_MFMT="33,105" href="$reactions#/reactionSuite/reactions/reaction[@label='H3 + Mn54 [inclusive]']/crossSection/regions1d[@label='eval']"/>
     <mixed label="eval">
       <covarianceMatrix label="0" type="absolute">
@@ -246,39 +264,43 @@ class Test_mixed( TestCaseBase ):
               <link href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit="b**2"/></axes>
           <array shape="5,5" compression="diagonal">
-            <values>0 7.2e-14 1.5335e-14 2.9892e-12 1.9177e-9</values></array></gridded2d></shortRangeSelfScalingVariance></mixed></section>'''.split('\n') )
+            <values>0 7.2e-14 1.5335e-14 2.9892e-12 1.9177e-9</values></array></gridded2d></shortRangeSelfScalingVariance></mixed></section>'''.split(
+                '\n'))
 
     def test_check(self):
 
-        listAssertEqual = getattr( self, 'assertCountEqual', None )
-        if( listAssertEqual is None ) : listAssertEqual = getattr( self, 'assertItemsEqual' )
+        listAssertEqual = getattr(self, 'assertCountEqual', None)
+        if (listAssertEqual is None): listAssertEqual = getattr(self, 'assertItemsEqual')
 
-        listAssertEqual( FeCovariance.covarianceSections[36].check( { 'checkUncLimits':False, 'negativeEigenTolerance':1e-8, 'eigenvalueRatioTolerance':1e8}), [] )
+        listAssertEqual(FeCovariance.covarianceSections[36].check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 1e-8, 'eigenvalueRatioTolerance': 1e8}), [])
 
     def test_addComponent(self):
-        '''Test adding components the two standard ways'''
+        """Test adding components the two standard ways"""
         ABC = covariances.mixed.MixedForm()
         ABC.addComponent(self.a)
         ABC.addComponent(self.b)
         ABC.addComponent(self.c)
-        self.assertXMLListsEqual(self.abc.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),ABC.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10))
+        self.assertXMLListsEqual(self.abc.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
+                                 ABC.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10))
 
     def test_constructArray(self):
 
-        listAssertEqual = getattr( self, 'assertCountEqual', None )
-        if( listAssertEqual is None ) : listAssertEqual = getattr( self, 'assertItemsEqual' )
+        listAssertEqual = getattr(self, 'assertCountEqual', None)
+        if (listAssertEqual is None): listAssertEqual = getattr(self, 'assertItemsEqual')
 
-        listAssertEqual( self.a.matrix.array.constructArray().ravel(), self.abc.components[0].matrix.array.constructArray().ravel() )
+        listAssertEqual(self.a.matrix.array.constructArray().ravel(),
+                        self.abc.components[0].matrix.array.constructArray().ravel())
 
     @unittest.skip("FIXME")
     def test_group(self):
-        '''test grouping fun on a MixedForm'''
+        """test grouping fun on a MixedForm"""
 
         # build the mixed matrix & make sure is kosher
-        self.assertEqual( list( map( str, self.abc.check(
-            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001} ) ) ), [] )
+        self.assertEqual(list(map(str, self.abc.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001}))), [])
         self.assertXMLListsEqual(self.abc.toXML_strList(),
-                         """<mixed label="None">
+                                 """<mixed label="None">
   <covarianceMatrix label="eval" type="relative">
     <gridded2d>
       <axes>
@@ -311,10 +333,10 @@ class Test_mixed( TestCaseBase ):
         <values>4 1 9 0 0 25</values></array></gridded2d></covarianceMatrix></mixed>""".split('\n'))
 
         abc_c = self.abc.toCovarianceMatrix()
-        self.assertEqual( list( map( str, abc_c.check(
-            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001} ) ) ), [] )
+        self.assertEqual(list(map(str, abc_c.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001}))), [])
         self.assertXMLListsEqual(abc_c.toXML_strList(),
-                         """<covarianceMatrix label="composed" type="relative">
+                                 """<covarianceMatrix label="composed" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
@@ -323,20 +345,21 @@ class Test_mixed( TestCaseBase ):
         <link href="../../grid[@index='2']/values"/></grid>
       <axis index="0" label="matrix_elements" unit="b**2"/></axes>
     <array shape="8,8" symmetry="lower">
-      <values>8 8 12 5 9 17 5 6 14 22 1 2 2 10 43 1 1 1 1 34 59 0 0 0 0 0 25 50 0 0 0 0 0 25 25 25</values></array></gridded2d></covarianceMatrix>""".split('\n'))
+      <values>8 8 12 5 9 17 5 6 14 22 1 2 2 10 43 1 1 1 1 34 59 0 0 0 0 0 25 50 0 0 0 0 0 25 25 25</values></array></gridded2d></covarianceMatrix>""".split(
+                                     '\n'))
 
-        self.maxDiff=None
+        self.maxDiff = None
         g = abc_c.group(groupBoundaries=(self.__groupBoundaries, self.__groupBoundaries),
                         groupUnit=(self.__groupUnit, self.__groupUnit))
         g.convertAxesToUnits(('b**2', 'MeV', 'MeV'))
         self.assertTrue(g.matrix.axes[0].unit, 'MeV')
         self.assertTrue(g.matrix.axes[1].unit, 'MeV')
         self.assertTrue(g.matrix.axes[2].unit, 'b**2')
-        self.assertEqual( list( map( str, g.check(
-            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001} ) ) ), [] )
+        self.assertEqual(list(map(str, g.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001}))), [])
         if True:
             self.assertXMLListsEqual(g.toXML_strList(),
-                         """<covarianceMatrix label="composed" type="relative">
+                                     """<covarianceMatrix label="composed" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
@@ -350,89 +373,90 @@ class Test_mixed( TestCaseBase ):
         10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 3.17404481019479e-16 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 40.6309282309796
         3.17404481019479e-16 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 40.6309282309796 40.6309282309796 3.17404481019479e-16 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 40.6309282309796 40.6309282309796 40.6309282309796 3.17404481019479e-16 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 40.6309282309796 40.6309282309796 40.6309282309796 40.6309282309796 3.17404481019479e-16 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969
         2.28691160987969 40.6309282309796 40.6309282309796 40.6309282309796 40.6309282309796 40.6309282309796 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 50 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 50 50 0 0 0 0
-        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 50 50 50 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 50 50 50 50</values></array></gridded2d></covarianceMatrix>""".split('\n'))
+        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 50 50 50 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 50 50 50 50</values></array></gridded2d></covarianceMatrix>""".split(
+                                         '\n'))
         if False:
-            #self.abc.plot(xlog=True, ylog=True, title='abc')
-            #self.abc.plot(xlog=False, ylog=False, title='abc')
+            # self.abc.plot(xlog=True, ylog=True, title='abc')
+            # self.abc.plot(xlog=False, ylog=False, title='abc')
             self.a.plot(title="a")
             self.b.plot(xlog=True, ylog=True, title='b')
             self.c.plot(title='c')
             g.plot(xlog=True, ylog=True, title='abc grouped')
 
     def test_getMatchingComponent_0(self):
-        self.assertXMLListsEqual( FeCovariance.covarianceSections[33]['eval'].getMatchingComponent(
-                            rowBounds = (1.e-5, 2.e7),
-                            columnBounds = (1.e-5, 2.e7)).toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
-                         [  '<covarianceMatrix label="1" type="relative">',
-                            '<gridded2d>',
-                            '<axes>',
-                            '<grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">',
-                            '<values>1e-5 8.5e5 2e6 3e6 4e6 5e6 6e6 7e6 1e7 2e7</values></grid>',
-                            '<grid index="1" label="column_energy_bounds" unit="eV" style="link">',
-                            '<link href="../../grid[@index=\'2\']/values"/></grid>',
-                            '<axis index="0" label="matrix_elements" unit=""/></axes>',
-                            '<array shape="9,9" compression="diagonal">',
-                            '<values>0 0.0396 0.0891 0.0891 0.0891 0.0891 0.0891 0.0891 0.3782</values></array></gridded2d></covarianceMatrix>'] )
+        self.assertXMLListsEqual(FeCovariance.covarianceSections[33]['eval'].getMatchingComponent(
+            rowBounds=(1.e-5, 2.e7),
+            columnBounds=(1.e-5, 2.e7)).toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
+                                 ['<covarianceMatrix label="1" type="relative">',
+                                  '<gridded2d>',
+                                  '<axes>',
+                                  '<grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">',
+                                  '<values>1e-5 8.5e5 2e6 3e6 4e6 5e6 6e6 7e6 1e7 2e7</values></grid>',
+                                  '<grid index="1" label="column_energy_bounds" unit="eV" style="link">',
+                                  '<link href="../../grid[@index=\'2\']/values"/></grid>',
+                                  '<axis index="0" label="matrix_elements" unit=""/></axes>',
+                                  '<array shape="9,9" compression="diagonal">',
+                                  '<values>0 0.0396 0.0891 0.0891 0.0891 0.0891 0.0891 0.0891 0.3782</values></array></gridded2d></covarianceMatrix>'])
 
     def test_getMatchingComponent_0_stripped(self):
         x = FeCovariance.covarianceSections[33]['eval'].getMatchingComponent(
-                            rowBounds = (1.e-5, 2.e7),
-                            columnBounds = (1.e-5 ,2.e7) )
+            rowBounds=(1.e-5, 2.e7),
+            columnBounds=(1.e-5, 2.e7))
         x.removeExtraZeros()
-        self.assertXMLListsEqual( x.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
-                        [  '<covarianceMatrix label="1" type="relative">',
-                            '<gridded2d>',
-                            '<axes>',
-                            '<grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">',
-                            '<values>8.5e5 2e6 3e6 4e6 5e6 6e6 7e6 1e7 2e7</values></grid>',
-                            '<grid index="1" label="column_energy_bounds" unit="eV" style="boundaries">',
-                            '<link href="../../grid[@index=\'2\']/values"/></grid>',
-                            '<axis index="0" label="matrix_elements" unit=""/></axes>',
-                            '<array shape="8,8" symmetry="lower">',
-                            '<values>0.0396 0 0.0891 0 0 0.0891 0 0 0 0.0891 0 0 0 0 0.0891 0 0 0 0 0 0.0891 0 0 0 0 0 0 0.0891 0 0 0 0 0 0 0 0.3782</values></array></gridded2d></covarianceMatrix>'] )
+        self.assertXMLListsEqual(x.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
+                                 ['<covarianceMatrix label="1" type="relative">',
+                                  '<gridded2d>',
+                                  '<axes>',
+                                  '<grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">',
+                                  '<values>8.5e5 2e6 3e6 4e6 5e6 6e6 7e6 1e7 2e7</values></grid>',
+                                  '<grid index="1" label="column_energy_bounds" unit="eV" style="boundaries">',
+                                  '<link href="../../grid[@index=\'2\']/values"/></grid>',
+                                  '<axis index="0" label="matrix_elements" unit=""/></axes>',
+                                  '<array shape="8,8" symmetry="lower">',
+                                  '<values>0.0396 0 0.0891 0 0 0.0891 0 0 0 0.0891 0 0 0 0 0.0891 0 0 0 0 0 0.0891 0 0 0 0 0 0 0.0891 0 0 0 0 0 0 0 0.3782</values></array></gridded2d></covarianceMatrix>'])
 
     def test_getMatchingComponent_1(self):
-        '''Fails because there is no component of section 1 with such bounds'''
-        self.assertRaises(  ValueError,
-                            FeCovariance.covarianceSections[1]['eval'].getMatchingComponent,
-                            rowBounds = (1.e-5, 2.e7),
-                            columnBounds = (1.e-5, 2.e7) )
+        """Fails because there is no component of section 1 with such bounds"""
+        self.assertRaises(ValueError,
+                          FeCovariance.covarianceSections[1]['eval'].getMatchingComponent,
+                          rowBounds=(1.e-5, 2.e7),
+                          columnBounds=(1.e-5, 2.e7))
 
     def test_getMatchingComponent_2(self):
-        self.maxDiff=None
-        self.assertXMLListsEqual( FeCovariance.covarianceSections[1]['eval'].getMatchingComponent(
-                            rowBounds = (1.e-5, 850636),
-                            columnBounds = (1.e-5, 850636) ).toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
-                         [  '<covarianceMatrix label="1" type="relative">',
-                            '<gridded2d>',
-                            '<axes>',
-                            '<grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">',
-                            '<values>1e-5 20 3e2 33830.5 76772 102950 152676 204928 238299 446595 483428 518904 553281 850636</values></grid>',
-                            '<grid index="1" label="column_energy_bounds" unit="eV" style="link">',
-                            '<link href="../../grid[@index=\'2\']/values"/></grid>',
-                            '<axis index="0" label="matrix_elements" unit=""/></axes>',
-                            '<array shape="13,13" symmetry="lower">',
-                            '<values>1.6e-3 2.4e-3 3.6e-3 0 0 3.176954e-3 0 0 3.468456e-3 0.01514682 0 0 2.606664e-3 5.691679e-3 8.554986e-3 0 0 2.975089e-3 6.496139e-3 4.882072e-3 0.0111442 0 0 2.995769e-3 6.541293e-3 4.916007e-3 5.610834e-3 0.01129967 0 0 3.582893e-3 7.823286e-3 5.879469e-3 6.710471e-3 6.757115e-3 0.01616281 0 0 3.334617e-3 7.281172e-3 5.472051e-3 6.245469e-3 6.288881e-3 7.521405e-3 0.01400042 0 0 3.325916e-3 7.262173e-3 5.457774e-3 6.229173e-3 6.272472e-3 7.50178e-3 6.981945e-3 0.01392745 0 0 3.059465e-3 6.680374e-3 5.020531e-3 5.730131e-3 5.769962e-3 6.900785e-3 6.422595e-3 6.405837e-3 0.01178528 0 0 3.185348e-3 6.955242e-3 5.227104e-3 5.965901e-3 6.00737e-3 7.184721e-3 6.686857e-3 6.669409e-3 6.135098e-3 0.01277506 0 0 2.919549e-3 6.374865e-3 4.790931e-3 5.468079e-3 5.506088e-3 6.585196e-3 6.128875e-3 6.112884e-3 5.623158e-3 5.854526e-3 0.010732</values></array></gridded2d></covarianceMatrix>'] )
+        self.maxDiff = None
+        self.assertXMLListsEqual(FeCovariance.covarianceSections[1]['eval'].getMatchingComponent(
+            rowBounds=(1.e-5, 850636),
+            columnBounds=(1.e-5, 850636)).toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
+                                 ['<covarianceMatrix label="1" type="relative">',
+                                  '<gridded2d>',
+                                  '<axes>',
+                                  '<grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">',
+                                  '<values>1e-5 20 3e2 33830.5 76772 102950 152676 204928 238299 446595 483428 518904 553281 850636</values></grid>',
+                                  '<grid index="1" label="column_energy_bounds" unit="eV" style="link">',
+                                  '<link href="../../grid[@index=\'2\']/values"/></grid>',
+                                  '<axis index="0" label="matrix_elements" unit=""/></axes>',
+                                  '<array shape="13,13" symmetry="lower">',
+                                  '<values>1.6e-3 2.4e-3 3.6e-3 0 0 3.176954e-3 0 0 3.468456e-3 0.01514682 0 0 2.606664e-3 5.691679e-3 8.554986e-3 0 0 2.975089e-3 6.496139e-3 4.882072e-3 0.0111442 0 0 2.995769e-3 6.541293e-3 4.916007e-3 5.610834e-3 0.01129967 0 0 3.582893e-3 7.823286e-3 5.879469e-3 6.710471e-3 6.757115e-3 0.01616281 0 0 3.334617e-3 7.281172e-3 5.472051e-3 6.245469e-3 6.288881e-3 7.521405e-3 0.01400042 0 0 3.325916e-3 7.262173e-3 5.457774e-3 6.229173e-3 6.272472e-3 7.50178e-3 6.981945e-3 0.01392745 0 0 3.059465e-3 6.680374e-3 5.020531e-3 5.730131e-3 5.769962e-3 6.900785e-3 6.422595e-3 6.405837e-3 0.01178528 0 0 3.185348e-3 6.955242e-3 5.227104e-3 5.965901e-3 6.00737e-3 7.184721e-3 6.686857e-3 6.669409e-3 6.135098e-3 0.01277506 0 0 2.919549e-3 6.374865e-3 4.790931e-3 5.468079e-3 5.506088e-3 6.585196e-3 6.128875e-3 6.112884e-3 5.623158e-3 5.854526e-3 0.010732</values></array></gridded2d></covarianceMatrix>'])
 
     def test_makeSafeBounds(self):
         cc = copy.copy(FeCovariance.covarianceSections[0]['eval'])
         self.assertEqual(
             [c.rowBounds() for c in cc.components],
-            [(1.e-5, 862270.), (1e-5, 2.e7)] )
+            [(1.e-5, 862270.), (1e-5, 2.e7)])
         cc.makeSafeBounds()
         self.assertEqual(
             [c.rowBounds() for c in cc.components],
-            [(1.e-5, 862270.), (862270., 2.e7)] )
+            [(1.e-5, 862270.), (862270., 2.e7)])
 
     def test_getRowBounds(self):
-        self.assertEqual( FeCovariance.covarianceSections[0]['eval'].rowBounds('eV'),(1.e-5, 2.e7))
-        self.assertEqual( FeCovariance.covarianceSections[1]['eval'].rowBounds('eV'),(1.e-5, 2.e7))
-        self.assertEqual( FeCovariance.covarianceSections[2]['eval'].rowBounds('eV'),(1.e-5, 2.e7))
+        self.assertEqual(FeCovariance.covarianceSections[0]['eval'].rowBounds('eV'), (1.e-5, 2.e7))
+        self.assertEqual(FeCovariance.covarianceSections[1]['eval'].rowBounds('eV'), (1.e-5, 2.e7))
+        self.assertEqual(FeCovariance.covarianceSections[2]['eval'].rowBounds('eV'), (1.e-5, 2.e7))
 
     def test_getColumnBounds(self):
-        self.assertEqual( FeCovariance.covarianceSections[0]['eval'].columnBounds('eV'),(1.e-5, 2.e7))
-        self.assertEqual( FeCovariance.covarianceSections[1]['eval'].columnBounds('eV'),(1.e-5, 2.e7))
-        self.assertEqual( FeCovariance.covarianceSections[2]['eval'].columnBounds('eV'),(1.e-5, 2.e7))
+        self.assertEqual(FeCovariance.covarianceSections[0]['eval'].columnBounds('eV'), (1.e-5, 2.e7))
+        self.assertEqual(FeCovariance.covarianceSections[1]['eval'].columnBounds('eV'), (1.e-5, 2.e7))
+        self.assertEqual(FeCovariance.covarianceSections[2]['eval'].columnBounds('eV'), (1.e-5, 2.e7))
 
     @unittest.skip("FIXME")
     def test_getUncertaintyVector(self):
@@ -505,9 +529,9 @@ class Test_mixed( TestCaseBase ):
 
     @unittest.skip("FIXME")
     def test_toCovarianceMatrix(self):
-        self.maxDiff=None
+        self.maxDiff = None
         # The values below are correct, I checked them by hand (what a pain) DAB 13 Jun 2016
-        self.assertXMLListsEqual(self.abc.toCovarianceMatrix().toXML_strList(),"""<covarianceMatrix label="composed" type="relative">
+        self.assertXMLListsEqual(self.abc.toCovarianceMatrix().toXML_strList(), """<covarianceMatrix label="composed" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
@@ -516,13 +540,14 @@ class Test_mixed( TestCaseBase ):
         <link href="../../grid[@index='2']/values"/></grid>
       <axis index="0" label="matrix_elements" unit="b**2"/></axes>
     <array shape="8,8" symmetry="lower">
-      <values>8 8 12 5 9 17 5 6 14 22 1 2 2 10 43 1 1 1 1 34 59 0 0 0 0 0 25 50 0 0 0 0 0 25 25 25</values></array></gridded2d></covarianceMatrix>""".split('\n'))
+      <values>8 8 12 5 9 17 5 6 14 22 1 2 2 10 43 1 1 1 1 34 59 0 0 0 0 0 25 50 0 0 0 0 0 25 25 25</values></array></gridded2d></covarianceMatrix>""".split(
+            '\n'))
         self.abc.plot()
 
     @unittest.skip("FIXME")
     def test_toAbsolute(self):
-        l=FeCovariance.covarianceSections[0]['eval'].toAbsolute()
-        self.assertXMLListsEqual(l.toXML_strList(),"""<mixed label="eval">
+        l = FeCovariance.covarianceSections[0]['eval'].toAbsolute()
+        self.assertXMLListsEqual(l.toXML_strList(), """<mixed label="eval">
   <covarianceMatrix label="composed" type="absolute">
     <gridded2d>
       <axes>
@@ -545,12 +570,13 @@ class Test_mixed( TestCaseBase ):
           <link href="../../grid[@index='2']/values"/></grid>
         <axis index="0" label="matrix_elements" unit="b**2"/></axes>
       <array shape="6,6" symmetry="lower">
-        <values>9.9e-5 0 5.564e-3 0 0 1.584e-3 0 0 0 8.91e-4 0 0 0 0 3.96e-4 0 0 0 0 0 3.96e-4</values></array></gridded2d></covarianceMatrix></mixed>""".split('\n'))
+        <values>9.9e-5 0 5.564e-3 0 0 1.584e-3 0 0 0 8.91e-4 0 0 0 0 3.96e-4 0 0 0 0 0 3.96e-4</values></array></gridded2d></covarianceMatrix></mixed>""".split(
+            '\n'))
 
     @unittest.skip("FIXME")
     def test_toRelative(self):
-        l=FeCovariance.covarianceSections[0]['eval'].toRelative()
-        self.assertXMLListsEqual( l.toXML_strList(), """<mixed label="eval">
+        l = FeCovariance.covarianceSections[0]['eval'].toRelative()
+        self.assertXMLListsEqual(l.toXML_strList(), """<mixed label="eval">
   <covarianceMatrix label="composed" type="relative">
     <gridded2d>
       <axes>
@@ -573,8 +599,9 @@ class Test_mixed( TestCaseBase ):
           <link href="../../grid[@index='2']/values"/></grid>
         <axis index="0" label="matrix_elements" unit=""/></axes>
       <array shape="6,6" symmetry="lower">
-        <values>9.9e-5 0 5.564e-3 0 0 1.584e-3 0 0 0 8.91e-4 0 0 0 0 3.96e-4 0 0 0 0 0 3.96e-4</values></array></gridded2d></covarianceMatrix></mixed>""".split('\n') )
+        <values>9.9e-5 0 5.564e-3 0 0 1.584e-3 0 0 0 8.91e-4 0 0 0 0 3.96e-4 0 0 0 0 0 3.96e-4</values></array></gridded2d></covarianceMatrix></mixed>""".split(
+            '\n'))
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     unittest.main()

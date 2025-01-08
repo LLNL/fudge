@@ -15,23 +15,23 @@ import fudge.styles as stylesModule
 
 summaryDocString__FUDGE = """This script removed all processed data (except resonance reconstructed data) for the specified GNDS protare file."""
 
-description = summaryDocString__FUDGE
+description = summaryDocString__FUDGE + """ If option "--outputDir" is present, the directory is striped from the output path and replaced 
+with the specified path."""
 
 parser = argparse.ArgumentParser(description=description, allow_abbrev=False)
 singleProtareArguments = argumentsForScriptsModule.SingleProtareArguments(parser)
-parser.add_argument('output', nargs='?', default=None,                  help='Output file name.')
+parser.add_argument('outputPath', default=None, type=pathlib.Path,             help='Output file name.')
+parser.add_argument('--outputDir', action='store', default=None, type=pathlib.Path,     help='The output directory to write the output file to.')
 
 args = parser.parse_args()
 
 protare = singleProtareArguments.protare(args)
+protare.cullProcessedData()
 
-stylesToRemove = []
-preProcessingStyles = protare.styles.preProcessingStyles()
-for style in protare.styles :
-    if not isinstance(style, preProcessingStyles):
-        stylesToRemove.append(style.label)
-protare.removeStyles(stylesToRemove)
+outputPath = args.outputPath
+if outputPath is None:
+    outputPath = pathlib.Path(protare.sourcePath).with_suffix('.culled.xml')
+if args.outputDir is not None:
+    outputPath = args.outputDir / outputPath.name
 
-output = args.output
-if output is None: output = pathlib.Path(protare.sourcePath).with_suffix('.culled.xml')
-protare.saveToFile(output)
+protare.saveToFile(outputPath)

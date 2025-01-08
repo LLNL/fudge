@@ -36,8 +36,7 @@ This module contains the following functions:
 import pathlib
 
 from pqu import PQU as PQUModule
-
-allowedVersions = ('1.0', )
+from fudge  import protareProductInfo as protareProductInfoModule
 
 class RIS:
     """
@@ -52,20 +51,20 @@ class RIS:
     +---------------+-----------------------------------------------------------------------------------+
     | Member        | Description                                                                       |
     +===============+===================================================================================+
-    | version       | The version of the RIS file.                                                      |
+    | format        | The format of the RIS file.                                                       |
     +---------------+-----------------------------------------------------------------------------------+
     | projectiles   | This is a dictionary of the projectiles.                                          |
     +---------------+-----------------------------------------------------------------------------------+
     """
 
-    def __init__(self, version):
+    def __init__(self, format):
         """
-        :param version:     The version of the RIS file.
+        :param format:     The format of the RIS file.
         """
 
-        if version not in allowedVersions:
-            raise ValueError('Unsupported RIS versions "%s"' % version)
-        self.__version = version
+        if format not in protareProductInfoModule.Formats.allowed:
+            raise ValueError('Unsupported RIS format "%s"' % format)
+        self.__format = format
 
         self.__projectiles = {}
 
@@ -92,12 +91,12 @@ class RIS:
         return self.__projectiles
 
     @property
-    def version(self):
+    def format(self):
         """
-        This method returns a reference to *self*'s version member.
+        This method returns a reference to *self*'s format member.
         """
 
-        return self.__version
+        return self.__format
 
     def addProtare(self, protare):
         """
@@ -167,9 +166,9 @@ class RIS:
         index, command, data = getLine(0, lines, True)
         if command != '#ris':
             raise ValueError('File is not an RIS file.')
-        version = checkDataLength(index, lines, 1, data)
+        format = checkDataLength(index, lines, 1, data)
 
-        ris = RIS(version)
+        ris = RIS(format)
 
         numberOfLines = len(lines)
         while index < numberOfLines:
@@ -318,9 +317,13 @@ class Protare:
                 numberOfReactions = int(checkDataLength(index, lines, 1, data))
                 for index2 in range(numberOfReactions):
                     index, command, data = getLine(index, lines, False)
-                    label, threshold, intermediate, process = checkDataLength(index, lines, 4, data)
+                    if len(data) == 4:
+                        label, threshold, intermediate, process = checkDataLength(index, lines, 4, data)
+                        reactionLabel, covarianceFlag = None, None
+                    else:
+                        label, threshold, intermediate, process, reactionLabel, covarianceFlag = checkDataLength(index, lines, 4, data)
                     threshold = PQUModule.PQU(float(threshold), self.__energyUnit)
-                    reaction = Reaction(label, threshold, intermediate, process)
+                    reaction = Reaction(label, threshold, intermediate, process, reactionLabel, covarianceFlag)
                     self.__reactions.append(reaction)
             else:
                 break
@@ -336,20 +339,24 @@ class Reaction:
 
     The following table list the primary members of this class:
 
-    +---------------+-----------------------------------------------------------------------------------+
-    | Member        | Description                                                                       |
-    +===============+===================================================================================+
-    | label         | This the label for the reaction.                                                  |
-    +---------------+-----------------------------------------------------------------------------------+
-    | threshold     | This is the effective threshold for the reaction.                                 |
-    +---------------+-----------------------------------------------------------------------------------+
-    | intermediate  | This is the intermediate product for the reaction.                                |
-    +---------------+-----------------------------------------------------------------------------------+
-    | process       | This is the process label for the reaction.                                       |
-    +---------------+-----------------------------------------------------------------------------------+
+    +-------------------+-----------------------------------------------------------------------------------+
+    | Member            | Description                                                                       |
+    +===================+===================================================================================+
+    | label             | This the label for the reaction.                                                  |
+    +-------------------+-----------------------------------------------------------------------------------+
+    | threshold         | This is the effective threshold for the reaction.                                 |
+    +-------------------+-----------------------------------------------------------------------------------+
+    | intermediate      | This is the intermediate product for the reaction.                                |
+    +-------------------+-----------------------------------------------------------------------------------+
+    | process           | This is the process label for the reaction.                                       |
+    +-------------------+-----------------------------------------------------------------------------------+
+    | reactionLabel     | This is the GNDS label for the reaction.                                          |
+    +-------------------+-----------------------------------------------------------------------------------+
+    | covarianceFlag    | This is the string 'covariance' if the reaction has covariance and None otherwise.|
+    +-------------------+-----------------------------------------------------------------------------------+
     """
 
-    def __init__(self, label, threshold, intermediate, process):
+    def __init__(self, label, threshold, intermediate, process, reactionLabel=None, covarianceFlag=None):
         """
         :param label:               The label for the reaction.
         :param threshold:           The threshold for the reaction.
@@ -361,6 +368,8 @@ class Reaction:
         self.__threshold = threshold
         self.__intermediate = intermediate
         self.__process = process
+        self.__reactionLabel = reactionLabel
+        self.__covarianceFlag = covarianceFlag
 
     def __str__(self):
         """
@@ -406,6 +415,22 @@ class Reaction:
         """
 
         return self.__process
+
+    @property
+    def reactionLabel(self):
+        """
+        This method returns a reference to *self*'s reactionLabel member.
+        """
+
+        return self.__reactionLabel
+
+    @property
+    def covarianceFlag(self):
+        """
+        This method returns a reference to *self*'s covarianceFlag member.
+        """
+
+        return self.__covarianceFlag
 
 def checkDataLength(index, lines, length, data):
     """

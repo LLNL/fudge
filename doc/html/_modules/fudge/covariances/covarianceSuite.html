@@ -59,31 +59,35 @@
 
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">styles</span> <span class="k">as</span> <span class="n">stylesModule</span><span class="p">,</span> <span class="n">suites</span> <span class="k">as</span> <span class="n">suitesModule</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">covarianceSection</span> <span class="k">as</span> <span class="n">sectionModule</span><span class="p">,</span> <span class="n">summed</span> <span class="k">as</span> <span class="n">summedModule</span><span class="p">,</span> <span class="n">mixed</span> <span class="k">as</span> <span class="n">mixedModule</span><span class="p">,</span> <span class="n">modelParameters</span> <span class="k">as</span> <span class="n">modelParametersModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">covarianceSection</span> <span class="k">as</span> <span class="n">sectionModule</span><span class="p">,</span> <span class="n">summed</span> <span class="k">as</span> <span class="n">summedModule</span><span class="p">,</span> <span class="n">mixed</span> <span class="k">as</span> <span class="n">mixedModule</span><span class="p">,</span> \
+    <span class="n">modelParameters</span> <span class="k">as</span> <span class="n">modelParametersModule</span>
 
-<div class="viewcode-block" id="CovarianceSections"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.CovarianceSections">[docs]</a><span class="k">class</span> <span class="nc">CovarianceSections</span><span class="p">(</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">):</span>
+
+<div class="viewcode-block" id="CovarianceSections"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.CovarianceSections">[docs]</a><span class="k">class</span> <span class="nc">CovarianceSections</span><span class="p">(</span><span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Most covariances are stored in &#39;sections&#39;, each representing either the internal covariance</span>
 <span class="sd">    for a single quantity (i.e. cross section) or the cross-term between two quantities</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;covarianceSections&#39;</span>
-    <span class="n">legacyMemberNameMapping</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;section&#39;</span> <span class="p">:</span> <span class="n">sectionModule</span><span class="o">.</span><span class="n">CovarianceSection</span><span class="o">.</span><span class="n">moniker</span> <span class="p">}</span>
+    <span class="n">legacyMemberNameMapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;section&#39;</span><span class="p">:</span> <span class="n">sectionModule</span><span class="o">.</span><span class="n">CovarianceSection</span><span class="o">.</span><span class="n">moniker</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">sectionModule</span><span class="o">.</span><span class="n">CovarianceSection</span><span class="p">,))</span></div>
 
-<div class="viewcode-block" id="ParameterCovariances"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.ParameterCovariances">[docs]</a><span class="k">class</span> <span class="nc">ParameterCovariances</span><span class="p">(</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">):</span>
+
+<div class="viewcode-block" id="ParameterCovariances"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.ParameterCovariances">[docs]</a><span class="k">class</span> <span class="nc">ParameterCovariances</span><span class="p">(</span><span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Resolved and unresolved resonance parameters are stored inside the parameterCovariances.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;parameterCovariances&#39;</span>
-    <span class="n">legacyMemberNameMapping</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;section&#39;</span> <span class="p">:</span> <span class="n">modelParametersModule</span><span class="o">.</span><span class="n">AverageParameterCovariance</span><span class="o">.</span><span class="n">moniker</span> <span class="p">}</span>
+    <span class="n">legacyMemberNameMapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;section&#39;</span><span class="p">:</span> <span class="n">modelParametersModule</span><span class="o">.</span><span class="n">AverageParameterCovariance</span><span class="o">.</span><span class="n">moniker</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">modelParametersModule</span><span class="o">.</span><span class="n">ParameterCovariance</span><span class="p">,</span>
-                                           <span class="n">modelParametersModule</span><span class="o">.</span><span class="n">AverageParameterCovariance</span><span class="p">)</span> <span class="p">)</span></div>
+                                           <span class="n">modelParametersModule</span><span class="o">.</span><span class="n">AverageParameterCovariance</span><span class="p">))</span></div>
+
 
 <div class="viewcode-block" id="CovarianceSuite"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.CovarianceSuite">[docs]</a><span class="k">class</span> <span class="nc">CovarianceSuite</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -98,15 +102,15 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;covarianceSuite&#39;</span>
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;externalFiles&#39;</span><span class="p">,</span> <span class="s1">&#39;styles&#39;</span><span class="p">,</span> <span class="s1">&#39;covarianceSections&#39;</span><span class="p">,</span> <span class="s1">&#39;parameterCovariances&#39;</span><span class="p">)</span>
     <span class="n">childNodeOrder</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span> <span class="p">:</span>       <span class="p">(</span>  <span class="n">suitesModule</span><span class="o">.</span><span class="n">ExternalFiles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>                 <span class="n">stylesModule</span><span class="o">.</span><span class="n">Styles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>
-                                                             <span class="n">CovarianceSections</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>                         <span class="n">ParameterCovariances</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span>
-            <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_4</span> <span class="p">:</span> <span class="p">(</span>  <span class="n">suitesModule</span><span class="o">.</span><span class="n">ExternalFiles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>                 <span class="n">stylesModule</span><span class="o">.</span><span class="n">Styles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>
-                                                             <span class="n">CovarianceSections</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>                         <span class="n">ParameterCovariances</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span>
-            <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span><span class="p">:</span>         <span class="p">(</span>  <span class="n">suitesModule</span><span class="o">.</span><span class="n">ExternalFiles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>                 <span class="n">stylesModule</span><span class="o">.</span><span class="n">Styles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>
-                                                             <span class="n">CovarianceSections</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>                         <span class="n">ParameterCovariances</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">}</span>
+        <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">:</span> <span class="p">(</span><span class="n">suitesModule</span><span class="o">.</span><span class="n">ExternalFiles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">Styles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>
+                                                <span class="n">CovarianceSections</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">ParameterCovariances</span><span class="o">.</span><span class="n">moniker</span><span class="p">),</span>
+        <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_4</span><span class="p">:</span> <span class="p">(</span><span class="n">suitesModule</span><span class="o">.</span><span class="n">ExternalFiles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">Styles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>
+                                                      <span class="n">CovarianceSections</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">ParameterCovariances</span><span class="o">.</span><span class="n">moniker</span><span class="p">),</span>
+        <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span><span class="p">:</span> <span class="p">(</span><span class="n">suitesModule</span><span class="o">.</span><span class="n">ExternalFiles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">Styles</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span>
+                                               <span class="n">CovarianceSections</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">ParameterCovariances</span><span class="o">.</span><span class="n">moniker</span><span class="p">)}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">interaction</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                  <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">sourcePath</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">interaction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">formatVersion</span><span class="o">=</span><span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">sourcePath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param projectile:  particle id</span>
 <span class="sd">        :param target:      particle id</span>
@@ -116,10 +120,11 @@
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">formatVersion</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">allowedPlus</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unsupported GNDS structure &#39;</span><span class="si">%s</span><span class="s2">&#39;!&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">formatVersion</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">formatVersion</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">allowedPlus</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s2">&quot;Unsupported GNDS structure &#39;</span><span class="si">%s</span><span class="s2">&#39;!&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">formatVersion</span><span class="p">))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span> <span class="o">=</span> <span class="n">projectile</span>            <span class="c1">#: The projectile</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>                    <span class="c1">#: The target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span> <span class="o">=</span> <span class="n">projectile</span>  <span class="c1">#: The projectile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>  <span class="c1">#: The target</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span> <span class="o">=</span> <span class="n">evaluation</span>
 
         <span class="k">if</span> <span class="n">interaction</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interaction</span><span class="o">.</span><span class="n">legacyTNSL</span><span class="p">:</span>
@@ -129,24 +134,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sourcePath</span> <span class="o">=</span> <span class="n">sourcePath</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__externalFiles</span> <span class="o">=</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">ExternalFiles</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__externalFiles</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__externalFiles</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__styles</span> <span class="o">=</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">Styles</span><span class="p">(</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__styles</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__styles</span> <span class="o">=</span> <span class="n">stylesModule</span><span class="o">.</span><span class="n">Styles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__styles</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__covarianceSections</span> <span class="o">=</span> <span class="n">CovarianceSections</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__covarianceSections</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__covarianceSections</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__parameterCovariances</span> <span class="o">=</span> <span class="n">ParameterCovariances</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__parameterCovariances</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parameterCovariances</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">formatVersion</span> <span class="o">=</span> <span class="n">formatVersion</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">formatVersion</span> <span class="o">=</span> <span class="n">formatVersion</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sourcePath</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">sourcePath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the sourcePath member which is the path to the covarianceSuite file for self if self is from a file.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sourcePath</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sourcePath</span><span class="p">)</span>
 
     <span class="nd">@sourcePath</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">sourcePath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
@@ -163,7 +168,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Path must be a str or None, got &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__sourcePath</span> <span class="o">=</span> <span class="n">path</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">styles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__styles</span>
@@ -181,46 +186,47 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parameterCovariances</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the minimum of the projectile energy for the evaluation. This needs to be fixed to handle multiple evaulation styles.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">projectileEnergyDomain</span><span class="o">.</span><span class="n">min</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">projectileEnergyDomain</span><span class="o">.</span><span class="n">min</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the maximum of the projectile energy for the evaluation. This needs to be fixed to handle multiple evaulation styles.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">projectileEnergyDomain</span><span class="o">.</span><span class="n">min</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">projectileEnergyDomain</span><span class="o">.</span><span class="n">min</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the unit of the projectile energy for the evaluation. This needs to be fixed to handle multiple evaulation styles.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">projectileEnergyDomain</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">projectileEnergyDomain</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s interaction.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__interaction</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__interaction</span><span class="p">)</span>
 
     <span class="nd">@interaction</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interaction</span><span class="o">.</span><span class="n">nuclear</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Need to specify interaction when calling CovarianceSuite.__init__. Setting it to &quot;</span><span class="si">%s</span><span class="s1">&quot;. Please update your code as in the future this will execute a raise.&#39;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s1">&#39;Need to specify interaction when calling CovarianceSuite.__init__. Setting it to &quot;</span><span class="si">%s</span><span class="s1">&quot;. Please update your code as in the future this will execute a raise.&#39;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__interaction</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interaction</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CovarianceSuite.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.CovarianceSuite.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="CovarianceSuite.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.CovarianceSuite.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { &#39;eV&#39; : &#39;MeV&#39;, &#39;b&#39; : &#39;mb&#39; }).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">:</span> <span class="n">style</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
-        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span><span class="p">:</span> <span class="n">section</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
-        <span class="k">for</span> <span class="n">mpsection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameterCovariances</span><span class="p">:</span> <span class="n">mpsection</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+        <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">:</span> <span class="n">style</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span><span class="p">:</span> <span class="n">section</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">mpsection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameterCovariances</span><span class="p">:</span> <span class="n">mpsection</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CovarianceSuite.check"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.CovarianceSuite.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -247,7 +253,7 @@
             <span class="s1">&#39;maxRelUnc&#39;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
             <span class="s1">&#39;theData&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s1">&#39;negativeEigenTolerance&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1e-6</span><span class="p">,</span>  <span class="c1"># ignore smaller negative eigenvalues</span>
-            <span class="s1">&#39;eigenvalueRatioTolerance&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="c1"># warn if smallest eival &lt; 1e-8 * biggest</span>
+            <span class="s1">&#39;eigenvalueRatioTolerance&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span>  <span class="c1"># warn if smallest eival &lt; 1e-8 * biggest</span>
             <span class="s1">&#39;eigenvalueAbsoluteTolerance&#39;</span><span class="p">:</span> <span class="mf">1e-14</span><span class="p">,</span>
             <span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="p">}</span>
@@ -284,15 +290,18 @@
                         <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="k">def</span> <span class="nf">get_edges</span><span class="p">(</span><span class="n">section_</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>   <span class="c1">#: return list of all pointers from this section</span>
+        <span class="k">def</span> <span class="nf">get_edges</span><span class="p">(</span><span class="n">section_</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>  <span class="c1">#: return list of all pointers from this section</span>
             <span class="n">form</span> <span class="o">=</span> <span class="n">section_</span><span class="p">[</span><span class="n">style</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">summedModule</span><span class="o">.</span><span class="n">SummedCovariance</span><span class="p">):</span> <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">link</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">form</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">summedModule</span><span class="o">.</span><span class="n">SummedCovariance</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">link</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">form</span><span class="p">]</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">mixedModule</span><span class="o">.</span><span class="n">MixedForm</span><span class="p">):</span>
                 <span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">form</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="n">summedModule</span><span class="o">.</span><span class="n">SummedCovariance</span><span class="p">):</span> <span class="n">edges</span> <span class="o">+=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">link</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">part</span><span class="p">]</span>
                 <span class="k">return</span> <span class="n">edges</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">sec</span> <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span> <span class="k">if</span> <span class="n">get_edges</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">])]</span>  <span class="c1"># sections that contain pointers</span>
+
+        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">sec</span> <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span> <span class="k">if</span>
+                 <span class="n">get_edges</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">])]</span>  <span class="c1"># sections that contain pointers</span>
 
         <span class="k">if</span> <span class="n">nodes</span><span class="p">:</span>
             <span class="n">cycle</span> <span class="o">=</span> <span class="n">find_cycle</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">get_edges</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">])</span>
@@ -312,7 +321,7 @@
 
         <span class="k">return</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s1">&#39;CovarianceSuite: </span><span class="si">%s</span><span class="s1"> + </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">),</span> <span class="n">warnings</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CovarianceSuite.fix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.CovarianceSuite.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+<div class="viewcode-block" id="CovarianceSuite.fix"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.CovarianceSuite.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply basic fixes to a covariance</span>
 
@@ -330,29 +339,29 @@
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
         <span class="c1"># default input options</span>
         <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;removeNegativeEVs&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span> 
-            <span class="s1">&#39;removeSmallEVs&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span> 
-            <span class="s1">&#39;fixUncLimits&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span> 
-            <span class="s1">&#39;minRelUnc&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="s1">&#39;maxRelUnc&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span> 
-            <span class="s1">&#39;theData&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;removeNegativeEVs&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;removeSmallEVs&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;fixUncLimits&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;minRelUnc&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;maxRelUnc&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;theData&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s1">&#39;negativeEigenTolerance&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1e-6</span><span class="p">,</span>  <span class="c1"># ignore smaller negative eigenvalues</span>
-            <span class="s1">&#39;eigenvalueRatioTolerance&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="c1"># warn if smallest eival &lt; 1e-8 * biggest</span>
+            <span class="s1">&#39;eigenvalueRatioTolerance&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span>  <span class="c1"># warn if smallest eival &lt; 1e-8 * biggest</span>
             <span class="s1">&#39;eigenvalueAbsoluteTolerance&#39;</span><span class="p">:</span> <span class="mf">1e-14</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
                 <span class="n">options</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span> <span class="s2">&quot;fix() received unknown keyword argument &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">key</span> <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;fix() received unknown keyword argument &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
         <span class="c1"># assemble some useful info, to be handed down to children&#39;s check() functions:</span>
-        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;covarianceSuite&#39;</span><span class="p">:</span> <span class="bp">self</span> <span class="p">}</span>
-        <span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">options</span> <span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;covarianceSuite&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
         <span class="c1"># do the fixing</span>
         <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">section_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span><span class="p">:</span> <span class="n">warnings</span> <span class="o">+=</span> <span class="n">section_</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span> <span class="o">**</span><span class="n">info</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">section_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span><span class="p">:</span> <span class="n">warnings</span> <span class="o">+=</span> <span class="n">section_</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s1">&#39;CovarianceSuite: </span><span class="si">%s</span><span class="s1"> + </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">),</span> <span class="n">warnings</span><span class="p">)</span></div>
-    
+
 <div class="viewcode-block" id="CovarianceSuite.removeExtraZeros"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.CovarianceSuite.removeExtraZeros">[docs]</a>    <span class="k">def</span> <span class="nf">removeExtraZeros</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks all covariance matrices for rows/columns of all zero, removes them if found.</span>
@@ -374,7 +383,8 @@
 
         <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">formatVersion</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_3</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_4</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INFO: converting GNDS format from &quot;</span><span class="si">%s</span><span class="s1">&quot; to &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">formatVersion</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INFO: converting GNDS format from &quot;</span><span class="si">%s</span><span class="s1">&quot; to &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">formatVersion</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span><span class="p">))</span>
             <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatVersion</span>
         <span class="k">if</span> <span class="n">formatVersion</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">allowed</span><span class="p">:</span>
@@ -384,7 +394,8 @@
         <span class="k">if</span> <span class="n">interaction</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interaction</span><span class="o">.</span><span class="n">TNSL</span><span class="p">:</span>
             <span class="n">interaction</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interaction</span><span class="o">.</span><span class="n">getTNSL_interaction</span><span class="p">(</span><span class="n">formatVersion</span><span class="p">)</span>
         <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> projectile=&quot;</span><span class="si">%s</span><span class="s1">&quot; target=&quot;</span><span class="si">%s</span><span class="s1">&quot; evaluation=&quot;</span><span class="si">%s</span><span class="s1">&quot; interaction=&quot;</span><span class="si">%s</span><span class="s1">&quot; format=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span>
-                <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="n">interaction</span><span class="p">,</span> <span class="n">formatVersion</span><span class="p">)]</span>
+                     <span class="o">%</span> <span class="p">(</span>
+                     <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="n">interaction</span><span class="p">,</span> <span class="n">formatVersion</span><span class="p">)]</span>
         <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covarianceSections</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -396,16 +407,16 @@
 <div class="viewcode-block" id="CovarianceSuite.parseNodeUsingClass"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.CovarianceSuite.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span> <span class="c1"># keep track of location in the tree, in case errors come up</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>  <span class="c1"># keep track of location in the tree, in case errors come up</span>
 
-        <span class="n">linkData</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">),</span> <span class="s1">&#39;unresolvedLinks&#39;</span><span class="p">:[]}</span>
+        <span class="n">linkData</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">),</span> <span class="s1">&#39;unresolvedLinks&#39;</span><span class="p">:</span> <span class="p">[]}</span>
 
         <span class="n">sourcePath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sourcePath&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;format&#39;</span><span class="p">)</span>
             <span class="n">linkData</span><span class="p">[</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatVersion</span>
             <span class="n">CS</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;projectile&#39;</span><span class="p">),</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">),</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;evaluation&#39;</span><span class="p">),</span>
-                    <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;interaction&#39;</span><span class="p">),</span> <span class="n">formatVersion</span><span class="p">,</span> <span class="n">sourcePath</span><span class="o">=</span><span class="n">sourcePath</span><span class="p">)</span>
+                     <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;interaction&#39;</span><span class="p">),</span> <span class="n">formatVersion</span><span class="p">,</span> <span class="n">sourcePath</span><span class="o">=</span><span class="n">sourcePath</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;styles&#39;</span><span class="p">:</span>
                     <span class="n">CS</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -418,7 +429,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: encountered unexpected element &#39;</span><span class="si">%s</span><span class="s2">&#39; in covarianceSuite!&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;Error encountered at xpath &quot;</span><span class="si">%s</span><span class="s1">&quot; while parsing </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xPath</span><span class="p">),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">moniker</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error encountered at xpath &quot;</span><span class="si">%s</span><span class="s1">&quot; while parsing </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xPath</span><span class="p">),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">moniker</span><span class="p">))</span>
             <span class="k">raise</span>
 
         <span class="c1"># fix links:</span>
@@ -429,14 +440,14 @@
                 <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/covarianceSuite&#39;</span><span class="p">):</span>
                     <span class="n">root</span> <span class="o">=</span> <span class="n">CS</span>
                 <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
-                    <span class="n">root</span> <span class="o">=</span> <span class="n">link_</span>    <span class="c1"># relative link</span>
+                    <span class="n">root</span> <span class="o">=</span> <span class="n">link_</span>  <span class="c1"># relative link</span>
             <span class="k">elif</span> <span class="n">link_</span><span class="o">.</span><span class="n">root</span> <span class="o">==</span> <span class="s1">&#39;$reactions&#39;</span><span class="p">:</span>
                 <span class="n">root</span> <span class="o">=</span> <span class="n">linkData</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">root</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="k">if</span> <span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">continue</span>    <span class="c1"># FIXME links to other files (i.e. cross-material covariances) currently broken</span>
+                <span class="k">continue</span>  <span class="c1"># FIXME links to other files (i.e. cross-material covariances) currently broken</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="n">link_</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
                 <span class="n">link_</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">res</span>
@@ -451,8 +462,16 @@
 
         <span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">reactionSuite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">externalLink</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">_externalLinks</span><span class="p">:</span>
-                <span class="n">externalLink</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">externalLink</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">externalLink</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">externalLink</span><span class="o">.</span><span class="n">follow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">XPathNotFound</span><span class="p">:</span>
+                    <span class="n">errors</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: link </span><span class="si">%s</span><span class="s2"> could not be resolved!&quot;</span> <span class="o">%</span> <span class="n">externalLink</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">XPathNotFound</span><span class="p">(</span><span class="s2">&quot;Encountered </span><span class="si">%d</span><span class="s2"> broken xpath links!&quot;</span> <span class="o">%</span> <span class="n">errors</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">CovarianceSuite</span></div>
 
@@ -463,6 +482,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">CovarianceSuite</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
 
 <div class="viewcode-block" id="read"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSuite.read">[docs]</a><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
