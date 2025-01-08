@@ -123,13 +123,17 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         primaryResidualName, decayProducts, decayChannel, = secondProduct.pid.split( '_' )[0], [], secondProduct.outputChannel
         numberOfDistributions = 0
         if decayChannel is not None:
-            for decayProduct in decayChannel :
-                if not isinstance(decayProduct.distribution[0], unspecifiedModule.Form): numberOfDistributions += 1
+            for decayProduct in decayChannel:
+                if not isinstance(decayProduct.distribution[0], unspecifiedModule.Form):
+                    numberOfDistributions += 1
                 decayProductName = decayProduct.pid
                 if decayProductName not in [primaryResidualName, IDsPoPsModule.photon]:
                     decayProducts.append(decayProductName)
-        if len(decayProducts) == 1:   # Kludge for Carbon breakup into 3 alphas.
-            if (primaryResidualName in ('C0', 'C12')) and (decayProducts == ['He4']): LR = 23
+        if len(decayProducts) == 1:   # Kludge for Be8 -> 2 alphas and Carbon -> 3 alphas.
+            if primaryResidualName == 'Be8' and decayProducts == ['He4'] and numberOfDistributions == 0:
+                LR = 29
+            elif primaryResidualName in ('C0', 'C12') and decayProducts == ['He4']:
+                LR = 23
             else: LR = 1   # FIXME may want to use other more specific LR flags
         elif len(decayProducts) > 1:                                        # This must be a breakup reaction.
             if numberOfDistributions > 0:

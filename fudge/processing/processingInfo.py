@@ -5,6 +5,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+Nothing in the module is being used so the module should be deleted.
+"""
+
 conserveParticle = 'conserveParticle'
 conserveEnergy = 'conserveEnergy'
 conserveParticleAndEnergy = 'conserveParticleAndEnergy'
@@ -15,6 +19,9 @@ from fudge import styles as stylesModule
 from fudge import reactionSuite as reactionSuiteModule
 
 class TempInfo :
+    """
+    This class is not used ans should be deleted.
+    """
 
     def __init__( self ) :
 
@@ -45,6 +52,9 @@ class TempInfo :
         return( list( self.dict.keys( ) ) )
 
 class ProcessInfo2 :
+    """
+    This class is not used ans should be deleted.
+    """
 
     def __init__( self, style, reactionSuite, flux = None, logFile = None, verbosity = 0, verbosityIndentStep = '  ',
             energyAccuracy = 1e-6, momentumAccuracy = 1e-3 ) :
@@ -114,6 +124,9 @@ class ProcessInfo2 :
         raise TypeError( 'style %s not of style %s' % ( _class.moniker, self.style.moniker ) )
 
 class ProcessInfo :
+    """
+    This class is not used ans should be deleted.
+    """
 
     def __init__( self, target, particles = None, flux = None, logFile = None, verbosity = 0 ) :
 
@@ -170,6 +183,9 @@ class ProcessInfo :
             self['verbosity'] = verbositySave
 
 class ProcessInfoParticle :
+    """
+    This class is not used ans should be deleted.
+    """
 
     def __init__( self, name, groups, lMax, conservationFlag = conserveParticle ) :
 
@@ -185,6 +201,9 @@ class ProcessInfoParticle :
         return( s )
 
 class ProcessInfoLLNL( ProcessInfo ) :
+    """
+    This class is not used ans should be deleted.
+    """
 
     def __init__( self, target, groups = None, flux = None, LLNL_Pn = True, lMax = 3, logFile = None, verbosity = 0 ) :
 

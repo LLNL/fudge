@@ -52,11 +52,11 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
 
     # resonances may only contain a scattering radius:
     if not (resolvedCount + unresolvedCount) and self.scatteringRadius:
-        scatRadius = self.scatteringRadius.form
+        scatRadius = self.scatteringRadius.evaluated
         lowerBound, upperBound = scatRadius.domainMin, scatRadius.domainMax
         endf.append(endfFormatsModule.endfHeadLine(ZAM, ABN, 0, 0, 1, 0))
         endf.append(endfFormatsModule.endfHeadLine(lowerBound, upperBound, 0, 0, 0, 0))
-        AP = PQUModule.PQU(self.scatteringRadius.form.value, self.scatteringRadius.form.rangeUnit).getValueAs('10*fm')
+        AP = PQUModule.PQU(self.scatteringRadius.evaluated.value, self.scatteringRadius.evaluated.rangeUnit).getValueAs('10*fm')
         endf.append(endfFormatsModule.endfHeadLine(targetInfo['spin'], AP, 0, 0, 0, 0))
         endf.append(endfFormatsModule.endfSENDLineNumber())
         endfMFList[2][151] = endf
@@ -85,8 +85,8 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         LRU = 1  # resolved
         if isinstance(region.evaluated, resolvedModule.BreitWigner):
             LRF = {
-                resolvedModule.BreitWigner.Approximation.singleLevel: 1,
-                resolvedModule.BreitWigner.Approximation.multiLevel: 2
+                resolvedModule.BreitWigner.Approximation.SingleLevel: 1,
+                resolvedModule.BreitWigner.Approximation.MultiLevel: 2
             }[region.evaluated.approximation]
         elif isinstance(region.evaluated, resolvedModule.RMatrix):
             LRF = 7
@@ -100,6 +100,8 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         else:
             NRO = region.evaluated.getScatteringRadius().isEnergyDependent()
         NAPS = not region.evaluated.calculateChannelRadius
+        if LRF == 7:
+            NAPS = 1    # never compute radii for LRF=7
         endf.append(endfFormatsModule.endfHeadLine(EL, EH, LRU, LRF, NRO, NAPS))
         endf += region.evaluated.toENDF6(flags, targetInfo, verbosityIndent)
     if unresolvedCount != 0:

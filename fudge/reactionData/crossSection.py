@@ -1206,7 +1206,7 @@ class Component(abstractClassesModule.Component):
 
     def integrateTwoFunctionsWithUncertainty(self, f2, domainMin=None, domainMax=None, useCovariance=True,
                                              covariance=None, covarianceSuite=None, normalize=False):
-        """
+        r"""
         Computes the spectrum (i.e. weighted) integral of self with the spectrum (i.e. weight)
         specified by ``spectrum``  optionally from Emin to Emax.  If the covariance is
         provided, the uncertainty on the spectrum integral will be computed.

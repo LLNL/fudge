@@ -46,6 +46,8 @@
 
 <span class="kn">import</span> <span class="nn">abc</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 
 <span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
 
@@ -97,7 +99,32 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">griddedCrossSection</span> <span class="o">=</span> <span class="n">griddedCrossSection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">URR_probabilityTables</span> <span class="o">=</span> <span class="n">URR_probabilityTables</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">heatedMultiGroup</span> <span class="o">=</span> <span class="n">heatedMultiGroup</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">SnElasticUpScatter</span> <span class="o">=</span> <span class="n">SnElasticUpScatter</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SnElasticUpScatter</span> <span class="o">=</span> <span class="n">SnElasticUpScatter</span>
+
+<div class="viewcode-block" id="TemperatureInfo.info"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.TemperatureInfo.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method prints each member of *self* and information about its.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">width</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">get_terminal_size</span><span class="p">()</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">subsequent_indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="s1">&#39;    URR_probabilityTables: &#39;</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span>
+
+        <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            For internal use only. This function wraps *message* to fit onto the screen.</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">subsequent_indent</span><span class="o">=</span><span class="n">subsequent_indent</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="n">wrap</span><span class="p">(</span><span class="s1">&#39;The TemperatureInfo class members:&#39;</span><span class="p">)</span>
+        <span class="n">wrap</span><span class="p">(</span><span class="s1">&#39;    temperature:           The temperature associated with the following labels.&#39;</span><span class="p">)</span>
+        <span class="n">wrap</span><span class="p">(</span><span class="s1">&#39;    heated:                The label for the cross sections heated to the specified temperature.&#39;</span><span class="p">)</span>
+        <span class="n">wrap</span><span class="p">(</span><span class="s1">&#39;    griddedCrossSection:   The label for the cross sections mapped onto a unified grid for all reactions. These data are for Monte Carlo transport.&#39;</span><span class="p">)</span>
+        <span class="n">wrap</span><span class="p">(</span><span class="s1">&#39;    URR_probabilityTables: The label for the cross section URR probability tables.&#39;</span><span class="p">)</span>
+        <span class="n">wrap</span><span class="p">(</span><span class="s1">&#39;    heatedMultiGroup:      The label for the multi-group data.&#39;</span><span class="p">)</span>
+        <span class="n">wrap</span><span class="p">(</span><span class="s1">&#39;    SnElasticUpScatter:    The label for the elastic multi-group average-product-energy and transfer-matrices with upscatter data.&#39;</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Styles"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Styles">[docs]</a><span class="k">class</span> <span class="nc">Styles</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO_base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -410,7 +437,7 @@
             <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="n">_style</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xmlStringList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmptySuites&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmpty&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmptySuite&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">xmlStringList</span> <span class="o">=</span> <span class="p">[</span><span class="n">xmlStringList</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/&gt;&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">xmlStringList</span> <span class="o">=</span> <span class="p">[]</span>

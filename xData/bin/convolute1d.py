@@ -13,7 +13,7 @@ import shutil
 
 from xData import XYs1d as XYs1dModule
 
-summaryDocStringxData = '''Reads 1d data from a file and convolutes its data with data from another file or a Gaussian.'''
+summaryDocString__xData = '''Reads 1d data from a file and convolutes its data with data from another file or a Gaussian.'''
 
 description = '''
 Reads 1d data from a file, and convolutes with data from another file if present or a Gaussian function. That is, performs

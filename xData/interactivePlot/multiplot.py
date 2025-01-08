@@ -31,6 +31,7 @@ import re
 import sys
 import numpy
 import warnings
+import math
 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -40,10 +41,39 @@ from matplotlib import pyplot
 from matplotlib.transforms import Bbox
 matplotlib.use('Qt5Agg')
 
+from pqu import PQU as PQUModule
+
 
 # ignore matplotlib warning for loc="best" since it is only used for cases with less than 10 plots
 warnings.filterwarnings("ignore", message=".*Creating legend with loc.*")
 
+def niceInitialLimits(left, right):
+
+    left1, right1 = min(right, left), max(right, left)
+    delta = right1 - left1
+    if delta == 0:
+        if right == 0:
+            return -1, 1
+        right = 1.01 * right
+        left1 = 0.99 * left1
+        left1, right1 = min(right1, left1), max(right, left1)        # Needed for negative value.
+        delta = right1 - left1
+
+    numberOfDigits = 3 + math.floor(math.log10(max(abs(right1), abs(left1)) / delta))
+
+    left2 = float(PQUModule.floatToShortestString(left1, numberOfDigits))
+    if left2 > left1:
+        adjust = '%.0e' % (left2 - left1)
+        left2 = left1 - float('9.999e' + adjust.split('e')[-1])
+        left2 = float(PQUModule.floatToShortestString(left2, numberOfDigits))
+
+    right2 = float(PQUModule.floatToShortestString(right1, numberOfDigits))
+    if right2 < right1:
+        adjust = '%.0e' % (right1 - right2)
+        right2 = right1 + float('5e' + adjust.split('e')[-1])
+        right2 = float(PQUModule.floatToShortestString(right2, numberOfDigits))
+
+    return left2, right2
 
 class MultiPlotWithPyQt5:
     """
@@ -173,6 +203,7 @@ class PlotCanvas(FigureCanvas):
         self.draw()
 
     def plot2d(self, plotData, plotAttributes):
+
         self.plotAxis = self.figure.add_subplot(111)
 
         floatInfo = numpy.finfo(numpy.float64())
@@ -200,11 +231,17 @@ class PlotCanvas(FigureCanvas):
 
         xleft = self.dataLimits['x'][0] if plotAttributes.get('xMin', '') == '' else float(plotAttributes['xMin'])
         xright = self.dataLimits['x'][1] if plotAttributes.get('xMax', '') == '' else float(plotAttributes['xMax'])
+        xleft, xright = niceInitialLimits(xleft, xright)
         self.plotAxis.set_xlim(xleft, xright)
+        plotAttributes['xMin'] = str(xleft)
+        plotAttributes['xMax'] = str(xright)
 
         yleft = self.dataLimits['y'][0] if plotAttributes.get('yMin', '') == '' else float(plotAttributes['yMin'])
         yright = self.dataLimits['y'][1] if plotAttributes.get('yMax', '') == '' else float(plotAttributes['yMax'])
+        yleft, yright = niceInitialLimits(yleft, yright)
         self.plotAxis.set_ylim(yleft, yright)
+        plotAttributes['yMin'] = str(yleft)
+        plotAttributes['yMax'] = str(yright)
 
         if plotAttributes.get('title', '') != '':
             self.plotAxis.set_title(plotAttributes['title'])

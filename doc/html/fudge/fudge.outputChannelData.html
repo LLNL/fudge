@@ -185,6 +185,11 @@
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.outputChannelData.fissionFragmentData.delayedNeutron.</span></span><span class="sig-name descname"><span class="pre">DelayedNeutron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">product</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutron"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../LUPY/index.html#LUPY.ancestry.AncestryIO" title="LUPY.ancestry.AncestryIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.ancestryMembers">
+<span class="sig-name descname"><span class="pre">ancestryMembers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('rate',</span> <span class="pre">'product')</span></em><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.ancestryMembers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.calculateAverageProductData">
 <span class="sig-name descname"><span class="pre">calculateAverageProductData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutron.calculateAverageProductData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.calculateAverageProductData" title="Permalink to this definition">¶</a></dt>
@@ -241,8 +246,16 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.listOfProducts">
-<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutron.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.listOfProducts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns, as a set, the list of PoP’s ids for all products (i.e., outgoing particles) for all reactions of <em>self</em>.</p>
+<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">finalOnly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeQualifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutron.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.listOfProducts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>includeQualifier</strong> – If <cite>True</cite>, particle qualifiers are include in ids, otherwise, they are stripped from ids.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python set instance.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -300,14 +313,14 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductArray">
-<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutron.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutron.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the full multi-group, total product array for the requested label for the requested product id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – MG instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 </ul>
 </dd>
@@ -316,14 +329,14 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductMatrix">
-<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutron.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutron.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 <li><p><strong>legendreOrder</strong> – Requested Legendre order.</p></li>
 </ul>
@@ -334,7 +347,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutron.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -367,6 +391,11 @@
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutron.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutron.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -395,8 +424,19 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutrons.listOfProducts">
-<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutrons.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutrons.listOfProducts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns, as a set, the list of PoP’s ids for all products (i.e., outgoing particles) for all reactions of <em>self</em>.</p>
+<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">finalOnly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeQualifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/delayedNeutron.html#DelayedNeutrons.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutrons.listOfProducts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>finalOnly</strong> – If <cite>True</cite>, only final product ids are returned, otherwise, all are returned..</p></li>
+<li><p><strong>includeQualifier</strong> – If <cite>True</cite>, particle qualifiers are include in ids, otherwise, they are stripped from ids.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python set instance.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -457,7 +497,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.elapsedTime.ElapsedTime.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/elapsedTime.html#ElapsedTime.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.elapsedTime.ElapsedTime.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -469,6 +520,11 @@
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.elapsedTime.ElapsedTime.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/elapsedTime.html#ElapsedTime.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.elapsedTime.ElapsedTime.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -631,6 +687,11 @@ although we expect to also see XYs1d representations in future evaluations</p>
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionEnergyRelease.html#FissionEnergyRelease.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyRelease.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -669,7 +730,18 @@ although we expect to also see XYs1d representations in future evaluations</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionEnergyRelease.html#FissionEnergyReleaseTerm.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -681,6 +753,11 @@ although we expect to also see XYs1d representations in future evaluations</p>
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionEnergyRelease.html#FissionEnergyReleaseTerm.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.FissionEnergyReleaseTerm.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -736,7 +813,9 @@ although we expect to also see XYs1d representations in future evaluations</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.Polynomial1d.toLinearXYsClass">
 <span class="sig-name descname"><span class="pre">toLinearXYsClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionEnergyRelease.html#Polynomial1d.toLinearXYsClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionEnergyRelease.Polynomial1d.toLinearXYsClass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This method returns the class that is used to represent <em>self</em> as a 1d pointwise function, which is always <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code>.</p>
+<p>returns:        The class <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code>.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -812,6 +891,11 @@ although we expect to also see XYs1d representations in future evaluations</p>
 <span class="sig-name descname"><span class="pre">amendForPatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fromLabel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">toLabel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionFragmentData.html#FissionFragmentData.amendForPatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.amendForPatch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.ancestryMembers">
+<span class="sig-name descname"><span class="pre">ancestryMembers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('delayedNeutrons',</span> <span class="pre">'fissionEnergyReleases',</span> <span class="pre">'productYields')</span></em><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.ancestryMembers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.calculateAverageProductData">
 <span class="sig-name descname"><span class="pre">calculateAverageProductData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionFragmentData.html#FissionFragmentData.calculateAverageProductData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.calculateAverageProductData" title="Permalink to this definition">¶</a></dt>
@@ -850,6 +934,12 @@ although we expect to also see XYs1d representations in future evaluations</p>
 <dd><p>See documentation for reactionSuite.convertUnits.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.cullStyles">
+<span class="sig-name descname"><span class="pre">cullStyles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">styleList</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionFragmentData.html#FissionFragmentData.cullStyles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.cullStyles" title="Permalink to this definition">¶</a></dt>
+<dd><p>See documentation for reactionSuite.cullStyles.</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.delayedNeutrons">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delayedNeutrons</span></span><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.delayedNeutrons" title="Permalink to this definition">¶</a></dt>
@@ -868,8 +958,19 @@ although we expect to also see XYs1d representations in future evaluations</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.listOfProducts">
-<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionFragmentData.html#FissionFragmentData.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.listOfProducts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns, as a set, the list of PoP’s ids for all products (i.e., outgoing particles) for all reactions of <em>self</em>.</p>
+<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">finalOnly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeQualifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionFragmentData.html#FissionFragmentData.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.listOfProducts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>finalOnly</strong> – If <cite>True</cite>, only final product ids are returned, otherwise, all are returned..</p></li>
+<li><p><strong>includeQualifier</strong> – If <cite>True</cite>, particle qualifiers are include in ids, otherwise, they are stripped from ids.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python set instance.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -924,14 +1025,14 @@ although we expect to also see XYs1d representations in future evaluations</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupProductArray">
-<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionFragmentData.html#FissionFragmentData.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionFragmentData.html#FissionFragmentData.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the full multi-group, total product array for the requested label for the requested product id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 </ul>
 </dd>
@@ -940,14 +1041,14 @@ although we expect to also see XYs1d representations in future evaluations</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupProductMatrix">
-<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionFragmentData.html#FissionFragmentData.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionFragmentData.html#FissionFragmentData.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 <li><p><strong>legendreOrder</strong> – Requested Legendre order.</p></li>
 </ul>
@@ -1004,6 +1105,11 @@ although we expect to also see XYs1d representations in future evaluations</p>
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/fissionFragmentData.html#FissionFragmentData.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1050,13 +1156,29 @@ although we expect to also see XYs1d representations in future evaluations</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.incidentEnergy.IncidentEnergy.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/incidentEnergy.html#IncidentEnergy.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.incidentEnergy.IncidentEnergy.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.incidentEnergy.IncidentEnergy.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/incidentEnergy.html#IncidentEnergy.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.incidentEnergy.IncidentEnergy.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -1123,13 +1245,29 @@ each elapsedTime / incidentEnergy.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.productYield.ProductYield.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/productYield.html#ProductYield.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.productYield.ProductYield.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannelData.fissionFragmentData.productYield.ProductYield.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannelData/fissionFragmentData/productYield.html#ProductYield.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannelData.fissionFragmentData.productYield.ProductYield.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

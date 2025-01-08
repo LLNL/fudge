@@ -12,18 +12,18 @@ Module to store base enum class used by other class enums in **FUDGE**.
 import enum
 
 def auto():
-    '''
+    """
     Function to wrap the :py:func:`enum.auto` function in the python **enum** module.
 
     :retuns:        The returned value of :py:func:`enum.auto`.
-    '''
+    """
 
     return enum.auto()
 
 class Enum(enum.Enum):
     """
     This is a base enum class used within **FUDGE**. If :py:func:`enums.auto` is called for a enum, 
-    its value is assigned from its name per the :py:method:`_generate_next_value_` method.
+    its value is assigned from its name per the :py:func:`_generate_next_value_` method.
     """
 
     def _generate_next_value_(name, start, count, last_values):
@@ -41,7 +41,7 @@ class Enum(enum.Enum):
 
     @classmethod
     def fromString(cls, string):
-        '''
+        """
         Returns a enum for cls from the specified string representation.
 
         :param cls:             An :py:class:`Enum` derived class.
@@ -51,7 +51,7 @@ class Enum(enum.Enum):
 
         :raises TypeError:      If *string* is not a python str instance.
         :raises ValueError:     If no match is found in *cls*.
-        '''
+        """
     
         if not isinstance(string, str):
             raise TypeError('Argument must be a string not "%s".' % type(string))
@@ -64,7 +64,7 @@ class Enum(enum.Enum):
 
     @classmethod
     def checkEnumOrString(cls, value):
-        '''
+        """
         Checks that *value* is a valid enum representation of *cls*.
 
         :param cls:             An :py:class:`Enum` derived class.
@@ -73,7 +73,7 @@ class Enum(enum.Enum):
         :returns:               The enum of *cls* represented by *value*.
 
         :raises TypeError:      If *string* is not a python str instance.
-        '''
+        """
 
         if isinstance(value, str):
             value = cls.fromString(value)

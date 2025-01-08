@@ -61,10 +61,8 @@
 <span class="s2">Note, in general, most user should get a protare (i.e., **GNDS** **reactionSuite**) this way.</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
-<span class="n">__todo</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">    -) Need to make Base and some other classes a meta class.</span>
-<span class="s2">&quot;&quot;&quot;</span>
-
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">abc</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
 
@@ -75,30 +73,44 @@
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">LUPY_miscModule</span>
 
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">styles</span> <span class="k">as</span> <span class="n">stylesModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">GNDS_file</span> <span class="k">as</span> <span class="n">GNDS_fileModule</span>
 <span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="kn">import</span> <span class="n">guessInteraction</span> <span class="k">as</span> <span class="n">guessInteractionModule</span>
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">reactionSuite</span> <span class="k">as</span> <span class="n">reactionSuiteModule</span>
 
+
+<span class="n">__todo</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    -) Need to make Base and some other classes a meta class.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="FormatVersion"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.FormatVersion">[docs]</a><span class="k">class</span> <span class="nc">FormatVersion</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is only needed because some legacy map files (map files created before the map node was</span>
 <span class="sd">    defined in **GNDS**) are still used at LLNL. When these map files are no longer used, this class</span>
 <span class="sd">    will be removed. New map files should only be created with **GNDS** format &#39;2.0&#39;.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">version_0_1</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
     <span class="n">version_0_2</span> <span class="o">=</span> <span class="s2">&quot;0.2&quot;</span>
-    <span class="n">allowed</span> <span class="o">=</span> <span class="p">(</span><span class="n">version_0_1</span><span class="p">,</span> <span class="n">version_0_2</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_4</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span><span class="p">)</span>
+    <span class="n">allowed</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">version_0_1</span><span class="p">,</span>
+        <span class="n">version_0_2</span><span class="p">,</span>
+        <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">,</span>
+        <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0_LLNL_4</span><span class="p">,</span>
+        <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_2_0</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">default</span> <span class="o">=</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">default</span>
 
-<div class="viewcode-block" id="FormatVersion.check"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.FormatVersion.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="nb">format</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="FormatVersion.check"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.FormatVersion.check">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="nb">format</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This methods should be used to check that the format of a map file is valid. Also, the returned value is the format</span>
 <span class="sd">        that should be used after calling this method.</span>
 
 <span class="sd">        :param format:  The format string to check.</span>
 
 <span class="sd">        :return:        The format that should be used by other logic in this module.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">version_0_1</span> <span class="ow">or</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">version_0_2</span><span class="p">:</span>
             <span class="nb">format</span> <span class="o">=</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span>
@@ -107,8 +119,9 @@
 
         <span class="k">return</span> <span class="nb">format</span></div></div>
 
-<div class="viewcode-block" id="Base"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Base">[docs]</a><span class="k">class</span> <span class="nc">Base</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="Base"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Base">[docs]</a><span class="k">class</span> <span class="nc">Base</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class used by all other map related classes. Mainly inherits class :py:class:`ancestryModule.AncestryIO`</span>
 <span class="sd">    and adds the members **checksum** and **algorithm**.</span>
 
@@ -121,13 +134,13 @@
 <span class="sd">    +-----------+-----------------------------------------------------------+</span>
 <span class="sd">    | algorithm | The algorithm used to calculate *checksum*.               |</span>
 <span class="sd">    +-----------+-----------------------------------------------------------+</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param checksum:        The check sum of the file referrence by the path member.</span>
 <span class="sd">        :param algorithm:       The algorithm used to calculate *checksum*.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -144,7 +157,8 @@
     <span class="k">def</span> <span class="nf">checksum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checksum_</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets *self*&#39;s checksum to checksum_.&quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">checksum_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">checksum_</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Checksum must be a string.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">checksum_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">checksum_</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Checksum must be a string.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__checksum</span> <span class="o">=</span> <span class="n">checksum_</span>
 
     <span class="nd">@property</span>
@@ -153,7 +167,8 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Map</span><span class="p">):</span> <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Map</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">algorithm</span>
 
     <span class="nd">@algorithm</span><span class="o">.</span><span class="n">setter</span>
@@ -164,8 +179,13 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported checksum algorithm &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">algorithm_</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm</span> <span class="o">=</span> <span class="n">algorithm_</span>
 
+    <span class="nd">@property</span>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
 <div class="viewcode-block" id="Base.standardXML_attributes"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Base.standardXML_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">standardXML_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkAncestor</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the XML attribute string for *checksum* and *algorithm*. Mainly for internal use.</span>
 <span class="sd">        If *checkAncestor* is **True** and *self*&#39;s *ancestor* uses the same *algorithm* as *self*, then</span>
 <span class="sd">        the algorithm attribute string is **not** included in the returned string.</span>
@@ -173,7 +193,7 @@
 <span class="sd">        :param checkAncestor:   Used to determine if *algorithm* needed to be added to attribute string.</span>
 
 <span class="sd">        :return:                XML attribute string for *checksum* and *algorithm*.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">attrs</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checksum</span><span class="p">:</span>
@@ -185,12 +205,13 @@
                 <span class="n">algorithm</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">algorithm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">attrs</span> <span class="o">+=</span> <span class="s1">&#39; algorithm=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">algorithm</span>
-            
+
         <span class="k">return</span> <span class="n">attrs</span></div></div>
 
-<div class="viewcode-block" id="Map"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map">[docs]</a><span class="k">class</span> <span class="nc">Map</span><span class="p">(</span> <span class="n">Base</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    This class represents a **GNDS** **map** that is used to create a nuclear data library from a list </span>
+
+<div class="viewcode-block" id="Map"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map">[docs]</a><span class="k">class</span> <span class="nc">Map</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a **GNDS** **map** that is used to create a nuclear data library from a list</span>
 <span class="sd">    of :py:class:`Protare` :py:class:`TNSL` and :py:class:`Import` instances. Each instance in the list</span>
 <span class="sd">    is called an entry.</span>
 
@@ -211,12 +232,12 @@
 <span class="sd">    +---------------+-----------------------------------------------------------+</span>
 <span class="sd">    | algorithm     | The algorithm used to calculate *checksum*.               |</span>
 <span class="sd">    +---------------+-----------------------------------------------------------+</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s2">&quot;map&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">parentsDir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">checksum</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">parentsDir</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">FormatVersion</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor for **Map** class.</span>
 
 <span class="sd">        :param library:         The name of the library.</span>
@@ -225,13 +246,15 @@
 <span class="sd">        :param format:          The format version for the map file read in.</span>
 <span class="sd">        :param checksum:        Hash for the map (computed from the concatenation of all checksums inside the map)</span>
 <span class="sd">        :param algorithm:       Algorithm used to compute checksums.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">Base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__library</span> <span class="o">=</span> <span class="n">LUPY_miscModule</span><span class="o">.</span><span class="n">isString</span><span class="p">(</span><span class="n">library</span><span class="p">,</span> <span class="s1">&#39;Library must be a string.&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__path</span> <span class="o">=</span> <span class="n">LUPY_miscModule</span><span class="o">.</span><span class="n">isString</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;Path must be a string.&#39;</span><span class="p">)</span>
-        <span class="n">parentsDir</span> <span class="o">=</span> <span class="n">LUPY_miscModule</span><span class="o">.</span><span class="n">isString</span><span class="p">(</span><span class="n">parentsDir</span><span class="p">,</span> <span class="s1">&#39;&#39;&#39;Parent&#39;s path must be a string.&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__library</span> <span class="o">=</span> <span class="n">LUPY_miscModule</span><span class="o">.</span><span class="n">isString</span><span class="p">(</span><span class="n">library</span><span class="p">,</span> <span class="s2">&quot;Library must be a string.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__path</span> <span class="o">=</span> <span class="n">LUPY_miscModule</span><span class="o">.</span><span class="n">isString</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Path must be a string.&quot;</span><span class="p">)</span>
+        <span class="n">parentsDir</span> <span class="o">=</span> <span class="n">LUPY_miscModule</span><span class="o">.</span><span class="n">isString</span><span class="p">(</span>
+            <span class="n">parentsDir</span><span class="p">,</span> <span class="s2">&quot;&quot;&quot;Parent&#39;s path must be a string.&quot;&quot;&quot;</span>
+        <span class="p">)</span>
 
         <span class="n">fileName</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fileName</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
@@ -244,63 +267,65 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the (*index*-1)^th item of *self*.</span>
+<span class="sd">        Returns the (index-1)^th item of self.</span>
 
 <span class="sd">        :param index:       The index of the iter to return.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterators over each entry in *self*. Does not dive into import entries.&quot;&quot;&quot;</span>
 
-        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="p">:</span> <span class="k">yield</span> <span class="n">entry</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">entry</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of entries in *self*. Does not dive into import entries.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns the path this map was read from or may be written to. It may be absolote or relative, </span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the path this map was read from or may be written to. It may be absolote or relative,</span>
 <span class="sd">        depending on how it was initialize.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__path</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns to format for *self*.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__format</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">library</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">library</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the library name for *self*.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__library</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__library</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">fileName</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns the file name for the location of *self*. Unlike the method :py:meth:`path`, </span>
+    <span class="k">def</span> <span class="nf">fileName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name for the location of *self*. Unlike the method :py:func:`path`,</span>
 <span class="sd">        this will always be the absolute path.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fileName</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fileName</span>
 
-<div class="viewcode-block" id="Map.updateAllChecksums"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.updateAllChecksums">[docs]</a>    <span class="k">def</span> <span class="nf">updateAllChecksums</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">checksumsModule</span><span class="o">.</span><span class="n">Sha1sum</span><span class="o">.</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">mapDirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Map.updateAllChecksums"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.updateAllChecksums">[docs]</a>    <span class="k">def</span> <span class="nf">updateAllChecksums</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">checksumsModule</span><span class="o">.</span><span class="n">Sha1sum</span><span class="o">.</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">mapDirectory</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls *updateChecksum* on all entries and then updates *self*&#39;s *checksum*.&quot;&quot;&quot;</span>
 
         <span class="kn">import</span> <span class="nn">threading</span>
         <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">parallelprocessing</span>
 
         <span class="k">class</span> <span class="nc">computeSum</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
-
             <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
                 <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span>
@@ -314,29 +339,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">updateChecksum</span><span class="p">(</span><span class="n">algorithm</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Map.updateChecksum"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.updateChecksum">[docs]</a>    <span class="k">def</span> <span class="nf">updateChecksum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">checksumsModule</span><span class="o">.</span><span class="n">Sha1sum</span><span class="o">.</span><span class="n">algorithm</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Computes map file checksum by concatenating checksums for all entries of *self* into a string and compute the </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes map file checksum by concatenating checksums for all entries of *self* into a string and compute the</span>
 <span class="sd">        checksum of that string.</span>
 
 <span class="sd">        :param algorithm:           The algorithm to use to calculate the checksum.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">checker</span> <span class="o">=</span> <span class="n">checksumsModule</span><span class="o">.</span><span class="n">checkers</span><span class="p">[</span><span class="n">algorithm</span><span class="p">]</span>  <span class="c1"># Caleb, I think checker and checkers should be called algorithm and algorithms.</span>
-        <span class="n">s1</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">entry</span><span class="o">.</span><span class="n">checksum</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">checksum</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+        <span class="n">checker</span> <span class="o">=</span> <span class="n">checksumsModule</span><span class="o">.</span><span class="n">checkers</span><span class="p">[</span>
+            <span class="n">algorithm</span>
+        <span class="p">]</span>  <span class="c1"># Caleb, I think checker and checkers should be called algorithm and algorithms.</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">entry</span><span class="o">.</span><span class="n">checksum</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">checksum</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">checksum</span> <span class="o">=</span> <span class="n">checker</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span> <span class="o">=</span> <span class="n">algorithm</span></div>
 
-<div class="viewcode-block" id="Map.append"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entry</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Appends *entry* to *self*.&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Map.append"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Appends *entry* to *self*.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">EntryBase</span><span class="p">):</span>
-            <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid entry.&#39;</span><span class="p">)</span>
+            <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid entry.&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">entry</span> <span class="p">)</span>
-        <span class="n">entry</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Map.insert"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.insert">[docs]</a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inserts the entry into *self* at index.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Inserts the entry into *self* at index.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">EntryBase</span><span class="p">):</span>
             <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid entry of type &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">entry</span><span class="p">))</span>
@@ -344,22 +371,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
         <span class="n">entry</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Map.iterate"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.iterate">[docs]</a>    <span class="k">def</span> <span class="nf">iterate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Iterates over all protares and TNSLs in *self* including those in import entries. </span>
+<div class="viewcode-block" id="Map.iterate"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.iterate">[docs]</a>    <span class="k">def</span> <span class="nf">iterate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterates over all protares and TNSLs in *self* including those in import entries.</span>
 <span class="sd">        Ergo, unlike :py:class:`__getitem__`, this method dives into import entries.</span>
 <span class="sd">        That is, no :py:class:`Import` instances is returned.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">entry</span><span class="p">,</span> <span class="n">Import</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="k">yield from</span> <span class="n">entry</span><span class="o">.</span><span class="n">iterate</span><span class="p">(</span> <span class="p">)</span>
-            <span class="k">else</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">Import</span><span class="p">):</span>
+                <span class="k">yield from</span> <span class="n">entry</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">entry</span></div>
 
-<div class="viewcode-block" id="Map.find"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">evaluation</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns the first entry matching *projectile*, *target*, *library* and *evaluation*. </span>
+<div class="viewcode-block" id="Map.find"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">evaluation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the first entry matching *projectile*, *target*, *library* and *evaluation*.</span>
 <span class="sd">        Searches each entry in the order they were appended and dives into imported maps.</span>
 <span class="sd">        If *library* is **None**, then all libraries are treated as matched.</span>
 <span class="sd">        If *evaluation* is **None**, then all evaluations are treated as matched.</span>
@@ -370,20 +397,22 @@
 <span class="sd">        :param evaluation:      The name of the evaluation to match.</span>
 
 <span class="sd">        :return:            Returns the found entry or **None** is no match was found.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">entry</span><span class="p">,</span> <span class="n">Import</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="n">foundEntry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span> <span class="p">)</span>
-                <span class="k">if</span><span class="p">(</span> <span class="n">foundEntry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">foundEntry</span> <span class="p">)</span>
-            <span class="k">else</span> <span class="p">:</span>
-                <span class="k">if</span><span class="p">(</span> <span class="n">entry</span><span class="o">.</span><span class="n">isMatch</span><span class="p">(</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">entry</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">Import</span><span class="p">):</span>
+                <span class="n">foundEntry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">foundEntry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">foundEntry</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">isMatch</span><span class="p">(</span><span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">entry</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Map.findAllOf"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.findAllOf">[docs]</a>    <span class="k">def</span> <span class="nf">findAllOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">library</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">evaluation</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Map.findAllOf"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.findAllOf">[docs]</a>    <span class="k">def</span> <span class="nf">findAllOf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">library</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">evaluation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a list of all entries matching *projectile*, *target*, *library* and *evaluation*. Searches </span>
+<span class="sd">        Returns a list of all entries matching *projectile*, *target*, *library* and *evaluation*. Searches</span>
 <span class="sd">        all imported maps. If *library* is **None**, the all libraries are treated as matched.</span>
 <span class="sd">        If *evaluation* is **None**, the all evaluations are treated as matched.</span>
 
@@ -397,13 +426,14 @@
 
         <span class="n">allFound</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">entry</span><span class="p">,</span> <span class="n">Import</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="n">allFound</span> <span class="o">+=</span> <span class="n">entry</span><span class="o">.</span><span class="n">findAllOf</span><span class="p">(</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span> <span class="p">)</span>
-            <span class="k">else</span> <span class="p">:</span>
-                <span class="k">if</span><span class="p">(</span> <span class="n">entry</span><span class="o">.</span><span class="n">isMatch</span><span class="p">(</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">allFound</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">entry</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">Import</span><span class="p">):</span>
+                <span class="n">allFound</span> <span class="o">+=</span> <span class="n">entry</span><span class="o">.</span><span class="n">findAllOf</span><span class="p">(</span><span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">isMatch</span><span class="p">(</span><span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">):</span>
+                    <span class="n">allFound</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="n">allFound</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">allFound</span></div>
 
 <div class="viewcode-block" id="Map.unrecurseAndSave"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.unrecurseAndSave">[docs]</a>    <span class="k">def</span> <span class="nf">unrecurseAndSave</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newFileName</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -430,7 +460,7 @@
 
         <span class="k">return</span> <span class="n">newInstance</span></div>
 
-<div class="viewcode-block" id="Map.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Map.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
 
@@ -440,17 +470,21 @@
 <span class="sd">        :return:                List of str instances representing the XML lines of *self*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;incrementalIndent&quot;</span><span class="p">,</span> <span class="s2">&quot;  &quot;</span><span class="p">)</span>
 
         <span class="nb">format</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;format&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">default</span><span class="p">)))</span>
 
-        <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
-        <span class="n">XML_list</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> library=&quot;</span><span class="si">%s</span><span class="s1">&quot; format=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">library</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">attrs</span> <span class="p">)</span> <span class="p">]</span>
-        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="p">:</span> <span class="n">XML_list</span> <span class="o">+=</span> <span class="n">entry</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
-        <span class="n">XML_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span>  <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="n">XML_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> library=&quot;</span><span class="si">%s</span><span class="s1">&quot; format=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">library</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="n">XML_list</span> <span class="o">+=</span> <span class="n">entry</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XML_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/</span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="n">XML_list</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">XML_list</span></div>
 
 <div class="viewcode-block" id="Map.parseNodeUsingClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Map.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -465,28 +499,31 @@
 <span class="sd">        :return:            :py:class:`Map` instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">Map</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid node name &quot;</span><span class="si">%s</span><span class="s1">&quot; for a map file.&#39;</span> <span class="o">%</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">Map</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid node name &quot;</span><span class="si">%s</span><span class="s1">&quot; for a map file.&#39;</span> <span class="o">%</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 
-        <span class="n">sourcePath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;sourcePath&#39;</span><span class="p">]</span>
+        <span class="n">sourcePath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;sourcePath&quot;</span><span class="p">]</span>
 
-        <span class="nb">format</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;format&#39;</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Map node does not have &#39;format&#39; attribute.&quot;</span> <span class="p">)</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Map node does not have &#39;format&#39; attribute.&quot;</span><span class="p">)</span>
 
-        <span class="n">library</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;library&#39;</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">library</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Map node does not have &#39;library&#39; attribute.&quot;</span> <span class="p">)</span>
+        <span class="n">library</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;library&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">library</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Map node does not have &#39;library&#39; attribute.&quot;</span><span class="p">)</span>
 
         <span class="nb">map</span> <span class="o">=</span> <span class="n">Map</span><span class="p">(</span><span class="n">library</span><span class="p">,</span> <span class="n">sourcePath</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;checksum&#39;</span><span class="p">),</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;algorithm&#39;</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
 
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span> <span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">Import</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
                 <span class="nb">map</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Import</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">Protare</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
                 <span class="nb">map</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Protare</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">TNSL</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
                 <span class="nb">map</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TNSL</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-            <span class="k">else</span> <span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Invalid child tag &#39;</span><span class="si">%s</span><span class="s2">&#39; for map file.&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid child tag &#39;</span><span class="si">%s</span><span class="s2">&#39; for map file.&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">map</span></div>
 
@@ -503,8 +540,9 @@
 
         <span class="k">return</span> <span class="n">Map</span><span class="o">.</span><span class="n">readXML_file</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="EntryBase"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.EntryBase">[docs]</a><span class="k">class</span> <span class="nc">EntryBase</span><span class="p">(</span> <span class="n">Base</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="EntryBase"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.EntryBase">[docs]</a><span class="k">class</span> <span class="nc">EntryBase</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for all map entry classes.</span>
 
 <span class="sd">    The following table list the primary members of this class:</span>
@@ -518,9 +556,9 @@
 <span class="sd">    +-----------+-----------------------------------------------------------+</span>
 <span class="sd">    | algorithm | The algorithm used to calculate *checksum*.               |</span>
 <span class="sd">    +-----------+-----------------------------------------------------------+</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base constructor for map entries.</span>
 
@@ -529,15 +567,15 @@
 <span class="sd">        :param algorithm:       Algorithm for computing the checksum. Only required if different from parent &lt;map&gt; file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">Base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
+        <span class="n">Base</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">fileName</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns the file name for the location of *self*. Unlike the method :py:meth:`path`, </span>
+    <span class="k">def</span> <span class="nf">fileName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name for the location of *self*. Unlike the method :py:func:`path`,</span>
 <span class="sd">        this will always be the absolute path.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">fileName</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fileName</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
@@ -547,31 +585,34 @@
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the *__path* member. This may be absolute or relative.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__path</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__path</span>
 
     <span class="nd">@path</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets member *self*.__path to *path*.</span>
 
 <span class="sd">        :param path:    The name of the path for *self*.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Path must be a string.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Path must be a string.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__path</span> <span class="o">=</span> <span class="n">path</span>
 
 <div class="viewcode-block" id="EntryBase.buildFileName"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.EntryBase.buildFileName">[docs]</a>    <span class="k">def</span> <span class="nf">buildFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapDirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method is designed to aid in building a map file when the map file does not reside in its final resting place.</span>
 <span class="sd">        The value of *mapDirectory* should be the final resting place (i.e., directory) of the map file.</span>
 <span class="sd">        Otherwise, this method is the same as the propery methods *fileName*.</span>
 
 <span class="sd">        :param mapDirectory:    The final directory where the map file will reside if it is different than &quot;./&quot;.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">mapDirectory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
@@ -588,8 +629,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span> <span class="o">=</span> <span class="n">algorithm</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">checksum</span> <span class="o">=</span> <span class="n">checksumsModule</span><span class="o">.</span><span class="n">checkers</span><span class="p">[</span><span class="n">algorithm</span><span class="p">]</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buildFileName</span><span class="p">(</span><span class="n">mapDirectory</span><span class="p">))</span></div></div>
 
-<div class="viewcode-block" id="Import"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import">[docs]</a><span class="k">class</span> <span class="nc">Import</span><span class="p">(</span> <span class="n">EntryBase</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Import"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import">[docs]</a><span class="k">class</span> <span class="nc">Import</span><span class="p">(</span><span class="n">EntryBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representing an &#39;import&#39; entry in a map. An import entry specifies the location of another map file to import.</span>
 
 <span class="sd">    The following table list the primary members of this class:</span>
@@ -603,11 +644,11 @@
 <span class="sd">    +-----------+-----------------------------------------------------------+</span>
 <span class="sd">    | algorithm | The algorithm used to calculate *checksum*.               |</span>
 <span class="sd">    +-----------+-----------------------------------------------------------+</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s2">&quot;import&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for the import entry.</span>
 
 <span class="sd">        :param path:            Path to the map file in import.</span>
@@ -615,22 +656,22 @@
 <span class="sd">        :param algorithm:       Algorithm for computing the checksum. Only required if different from parent &lt;map&gt; file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">EntryBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
+        <span class="n">EntryBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__map</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a simple string representation of *self*.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> with path &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> with path &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">derivedPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the parent part of the ancestor&#39;s path. This, together with *self*&#39;s path defines the</span>
 <span class="sd">        location of the map file to read in.</span>
 
 <span class="sd">        :return:        The parent part of the ancestor&#39;s path.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ancestor</span><span class="p">,</span> <span class="n">Map</span><span class="p">):</span>
@@ -639,16 +680,16 @@
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Import not an entry of a Map instance.&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a reference to *self*.__map.&quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">readMap</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readMap</span><span class="p">()</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__map</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__map</span>
 
-<div class="viewcode-block" id="Import.find"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">evaluation</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Import.find"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">evaluation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calls :py:meth:`Map.find` on *self*.__map and returns its results.</span>
+<span class="sd">        Calls :py:func:`Map.find` on *self*.__map and returns its results.</span>
 
 <span class="sd">        :param projectile:      The name of the projectile to match.</span>
 <span class="sd">        :param target:          The name of the projectile to match.</span>
@@ -658,13 +699,13 @@
 <span class="sd">        :return:                Returns the found entry or **None** is no match was found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">readMap</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readMap</span><span class="p">()</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__map</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__map</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Import.findAllOf"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.findAllOf">[docs]</a>    <span class="k">def</span> <span class="nf">findAllOf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">library</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">evaluation</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Import.findAllOf"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.findAllOf">[docs]</a>    <span class="k">def</span> <span class="nf">findAllOf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">library</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">evaluation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calls :py:meth:`Map.findAllOf` on *self*.__map and returns its results.</span>
+<span class="sd">        Calls :py:func:`Map.findAllOf` on *self*.__map and returns its results.</span>
 <span class="sd">        Arguments that are **None** match all values of their type. For example, if *projectile* is **None**,</span>
 <span class="sd">        then all projectiles are a match.</span>
 
@@ -676,19 +717,19 @@
 <span class="sd">        :return:                Returns the list of all matches found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">readMap</span><span class="p">(</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__map</span><span class="o">.</span><span class="n">findAllOf</span><span class="p">(</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readMap</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__map</span><span class="o">.</span><span class="n">findAllOf</span><span class="p">(</span><span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Import.iterate"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.iterate">[docs]</a>    <span class="k">def</span> <span class="nf">iterate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Import.iterate"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.iterate">[docs]</a>    <span class="k">def</span> <span class="nf">iterate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Iterates over all protares and TNSLs in *self*&#39;s map including nested :py:class:`Map` instances.</span>
 <span class="sd">        No :py:class:`Import` instances is returned.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">readMap</span><span class="p">(</span> <span class="p">)</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="o">.</span><span class="n">iterate</span><span class="p">(</span> <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readMap</span><span class="p">()</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Import.readMap"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.readMap">[docs]</a>    <span class="k">def</span> <span class="nf">readMap</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Import.readMap"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.readMap">[docs]</a>    <span class="k">def</span> <span class="nf">readMap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads in the map file pointed to by *self* if not already read in. An import only reads its map file when needed.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__map</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -699,8 +740,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__map</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__map</span></div>
-    
-<div class="viewcode-block" id="Import.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="Import.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
 
@@ -710,8 +751,8 @@
 <span class="sd">        :return:                List of str instances representing the XML lines of *self*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">(</span> <span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> path=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">attrs</span> <span class="p">)</span> <span class="p">]</span></div>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> path=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="Import.parseNodeUsingClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Import.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -726,14 +767,16 @@
 <span class="sd">        :return:                :py:class:`Import` instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">Import</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Invalid node name.&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">Import</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid node name.&quot;</span><span class="p">)</span>
 
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">attr</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;checksum&#39;</span><span class="p">,</span> <span class="s1">&#39;algorithm&#39;</span><span class="p">)}</span>
-        <span class="n">_import</span> <span class="o">=</span> <span class="n">Import</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">attr</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;checksum&quot;</span><span class="p">,</span> <span class="s2">&quot;algorithm&quot;</span><span class="p">)}</span>
+        <span class="n">_import</span> <span class="o">=</span> <span class="n">Import</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_import</span></div></div>
 
-<div class="viewcode-block" id="ProtareBase"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.ProtareBase">[docs]</a><span class="k">class</span> <span class="nc">ProtareBase</span><span class="p">(</span> <span class="n">EntryBase</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="ProtareBase"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.ProtareBase">[docs]</a><span class="k">class</span> <span class="nc">ProtareBase</span><span class="p">(</span><span class="n">EntryBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for all protare-like entry classes (i.e., the :py:class:`Protare` and :py:class:`TNSL` classes).</span>
 
 <span class="sd">    The following table list the primary members of this class:</span>
@@ -755,9 +798,9 @@
 <span class="sd">    +---------------+-----------------------------------------------------------+</span>
 <span class="sd">    | algorithm     | The algorithm used to calculate *checksum*.               |</span>
 <span class="sd">    +---------------+-----------------------------------------------------------+</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">interaction</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">interaction</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construtor for ProtareBase instance.</span>
 
@@ -772,17 +815,20 @@
 
         <span class="n">EntryBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">projectile</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Projectile must be a string.&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">projectile</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Projectile must be a string.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__projectile</span> <span class="o">=</span> <span class="n">projectile</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">target</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Target must be a string.&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Target must be a string.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__target</span> <span class="o">=</span> <span class="n">target</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">evaluation</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Evaluation must be a string.&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">evaluation</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Evaluation must be a string.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__evaluation</span> <span class="o">=</span> <span class="n">evaluation</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">TNSL</span><span class="p">):</span>
-            <span class="n">interaction</span> <span class="o">=</span> <span class="kc">None</span>                      <span class="c1"># In GNDS 2.0, TNSL no longer as interaction attribution as it is not needed.</span>
+            <span class="n">interaction</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># In GNDS 2.0, TNSL no longer as interaction attribution as it is not needed.</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">interaction</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interaction</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">interaction</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__interaction</span> <span class="o">=</span> <span class="n">interaction</span>
@@ -790,68 +836,68 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__guessedInteraction</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">projectile</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">projectile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the projectile&#39;s name.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__projectile</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__projectile</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">target</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">target</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the target&#39;s name.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__target</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__target</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">evaluation</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the evaluation string.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__evaluation</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__evaluation</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">interaction</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the interaction attribute.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__interaction</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__interaction</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">guessedInteraction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">guessedInteraction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the guessedInteraction value. This is for pre GNDS 2.0 use only and should not be used with GNDS 2.0 or higher</span>
 <span class="sd">        (i.e., it should always return **False** for GNDS 2.0 or higher).</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__guessedInteraction</span>
 
     <span class="nd">@guessedInteraction</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">guessedInteraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Set *self*&#39;s guessedInteraction member. This is for pre GNDS 2.0 use only and should not be </span>
+    <span class="k">def</span> <span class="nf">guessedInteraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set *self*&#39;s guessedInteraction member. This is for pre GNDS 2.0 use only and should not be</span>
 <span class="sd">        used with GNDS 2.0 or higher.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__guessedInteraction</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">library</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">library</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name of the library the protare resides in.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">library</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">library</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">derivedPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the location of the file pointed to by the *path* member relative to the ancestor&#39;s locations.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ancestor</span><span class="p">,</span> <span class="n">Base</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">ancestor</span><span class="o">.</span><span class="n">path</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ProtareBase.isMatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.ProtareBase.isMatch">[docs]</a>    <span class="k">def</span> <span class="nf">isMatch</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">evaluation</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="ProtareBase.isMatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.ProtareBase.isMatch">[docs]</a>    <span class="k">def</span> <span class="nf">isMatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">library</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">evaluation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns **True** is *self* matches projectile, target, library and evaluation, and **False** otherwise.</span>
-<span class="sd">        If an argument has a value of **None**, that argument is a match.  </span>
+<span class="sd">        If an argument has a value of **None**, that argument is a match.</span>
 <span class="sd">        For example, isMatch( None, &quot;O16&quot;, None, None ) will match any entry with a target of &quot;O16&quot;.</span>
 
 <span class="sd">        :param projectile:      The requested projectile&#39;s **PoPs** id to check for match.</span>
@@ -862,11 +908,24 @@
 <span class="sd">        :return:                Returns **True** if a match and **False** otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptable</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="n">projectile</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptable</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">target</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptable</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">library</span><span class="p">,</span> <span class="n">library</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptable</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__evaluation</span><span class="p">,</span> <span class="n">evaluation</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="n">projectile</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">library</span><span class="p">,</span> <span class="n">library</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__evaluation</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">)</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ProtareBase.preview"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.ProtareBase.preview">[docs]</a>    <span class="k">def</span> <span class="nf">preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">haltParsingMoniker</span><span class="o">=</span><span class="n">stylesModule</span><span class="o">.</span><span class="n">Styles</span><span class="o">.</span><span class="n">moniker</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method calls :py:func:`GNDS_fileModule.preview with *haltParsingMoniker*` with *self*&#39;s *fileName* and returns</span>
+<span class="sd">        its retults.  See :py:func:`GNDS_fileModule.preview for more details.</span>
+
+<span class="sd">        :param haltParsingMoniker:  The child node of the protare to halt parsing on.</span>
+
+<span class="sd">        :return:                    An instance of :py:class:`reactionSuiteModule.ReactionSuite`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">GNDS_fileModule</span><span class="o">.</span><span class="n">preview</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="n">haltParsingMoniker</span><span class="o">=</span><span class="n">haltParsingMoniker</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ProtareBase.protare"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.ProtareBase.protare">[docs]</a>    <span class="k">def</span> <span class="nf">protare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">lazyParsing</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls *self*.read. This method is deprecated.&quot;&quot;&quot;</span>
@@ -884,14 +943,14 @@
         <span class="k">return</span> <span class="n">reactionSuiteModule</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="n">verbosity</span><span class="p">,</span> <span class="n">lazyParsing</span><span class="o">=</span><span class="n">lazyParsing</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ProtareBase.standardXML_attributes"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.ProtareBase.standardXML_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">standardXML_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkAncestor</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the XML attribute string for protare, target, evalution and interaction as well that those</span>
-<span class="sd">        returned by :py:meth:`Base.standardXML_attributes`.</span>
+<span class="sd">        returned by :py:func:`Base.standardXML_attributes`.</span>
 
-<span class="sd">        :param checkAncestor:   Passed to the method :py:meth:`Base.standardXML_attributes`.</span>
+<span class="sd">        :param checkAncestor:   Passed to the method :py:func:`Base.standardXML_attributes`.</span>
 
 <span class="sd">        :returns:               A XML attribute string.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">attributeString</span> <span class="o">=</span> <span class="s1">&#39; projectile=&quot;</span><span class="si">%s</span><span class="s1">&quot; target=&quot;</span><span class="si">%s</span><span class="s1">&quot; evaluation=&quot;</span><span class="si">%s</span><span class="s1">&quot; path=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">guessedInteraction</span><span class="p">:</span>
@@ -901,7 +960,7 @@
         <span class="k">return</span> <span class="n">attributeString</span> <span class="o">+</span> <span class="n">Base</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkAncestor</span><span class="o">=</span><span class="n">checkAncestor</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ProtareBase.adaptable"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.ProtareBase.adaptable">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">adaptable</span><span class="p">(</span> <span class="n">item1</span><span class="p">,</span> <span class="n">item2</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">adaptable</span><span class="p">(</span><span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns **True** whenever item2 is **None** or *item1* and *item2* are the same. For internal use.</span>
 
@@ -909,11 +968,13 @@
 <span class="sd">        :param item2:       Item to compare to item1.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="n">item2</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">item2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">item2</span><span class="p">,</span> <span class="n">item1</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div></div>
-    
-<div class="viewcode-block" id="Protare"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Protare">[docs]</a><span class="k">class</span> <span class="nc">Protare</span><span class="p">(</span> <span class="n">ProtareBase</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="Protare"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Protare">[docs]</a><span class="k">class</span> <span class="nc">Protare</span><span class="p">(</span><span class="n">ProtareBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The class for a map&#39;s protare child node.</span>
 
 <span class="sd">    The following table list the primary members of this class:</span>
@@ -935,11 +996,11 @@
 <span class="sd">    +---------------+-----------------------------------------------------------+</span>
 <span class="sd">    | algorithm     | The algorithm used to calculate *checksum*.               |</span>
 <span class="sd">    +---------------+-----------------------------------------------------------+</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s2">&quot;protare&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">interaction</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">interaction</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construtor for a Protare instance.</span>
 
@@ -952,15 +1013,16 @@
 <span class="sd">        :param algorithm:           Algorithm for computing the checksum. Only required if different from parent &lt;map&gt; file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">ProtareBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">interaction</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
+        <span class="n">ProtareBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">interaction</span><span class="p">,</span>
+                             <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a simple string representation of *self*.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> with projectile &quot;</span><span class="si">%s</span><span class="s1">&quot;, target &quot;</span><span class="si">%s</span><span class="s1">&quot;, evaluation &quot;</span><span class="si">%s</span><span class="s1">&quot;, path &quot;</span><span class="si">%s</span><span class="s1">&quot; and interaction &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> 
-            <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> with projectile &quot;</span><span class="si">%s</span><span class="s1">&quot;, target &quot;</span><span class="si">%s</span><span class="s1">&quot;, evaluation &quot;</span><span class="si">%s</span><span class="s1">&quot;, path &quot;</span><span class="si">%s</span><span class="s1">&quot; and interaction &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Protare.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Protare.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Protare.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Protare.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
 
@@ -972,7 +1034,7 @@
 
         <span class="nb">format</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;format&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">default</span><span class="p">)))</span>
 
-        <span class="k">return</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&lt;</span><span class="si">%s%s</span><span class="s2">/&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">())]</span></div>
 
 <div class="viewcode-block" id="Protare.parseNodeUsingClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.Protare.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -987,21 +1049,24 @@
 <span class="sd">        :return:            A :py:class:`Protare` instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">Protare</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Invalid node name.&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">Protare</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid node name.&quot;</span><span class="p">)</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">attr</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span>
                   <span class="p">(</span><span class="s1">&#39;projectile&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;evaluation&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;interaction&#39;</span><span class="p">,</span> <span class="s1">&#39;checksum&#39;</span><span class="p">,</span> <span class="s1">&#39;algorithm&#39;</span><span class="p">)}</span>
 
-        <span class="n">guessedInteraction</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;interaction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guessInteractionModule</span><span class="o">.</span><span class="n">guessInteraction</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;interaction&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;projectile&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">])</span>
+        <span class="n">guessedInteraction</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;interaction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">guessInteractionModule</span><span class="o">.</span><span class="n">guessInteraction</span><span class="p">(</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;interaction&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;projectile&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">])</span>
 
-        <span class="n">protare</span> <span class="o">=</span> <span class="n">Protare</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">protare</span> <span class="o">=</span> <span class="n">Protare</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">protare</span><span class="o">.</span><span class="n">guessedInteraction</span> <span class="o">=</span> <span class="n">guessedInteraction</span>
 
         <span class="k">return</span> <span class="n">protare</span></div></div>
 
-<div class="viewcode-block" id="TNSL"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.TNSL">[docs]</a><span class="k">class</span> <span class="nc">TNSL</span><span class="p">(</span> <span class="n">ProtareBase</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="TNSL"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.TNSL">[docs]</a><span class="k">class</span> <span class="nc">TNSL</span><span class="p">(</span><span class="n">ProtareBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The class for a map&#39;s TNSL node.</span>
 
 <span class="sd">    The following table list the primary members of this class:</span>
@@ -1025,7 +1090,7 @@
 <span class="sd">    +-----------------------+-----------------------------------------------------------+</span>
 <span class="sd">    | algorithm             | The algorithm used to calculate *checksum*.               |</span>
 <span class="sd">    +-----------------------+-----------------------------------------------------------+</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s2">&quot;TNSL&quot;</span>
 
@@ -1044,35 +1109,41 @@
 <span class="sd">        :param algorithm:               Algorithm for computing the checksum. Only required if different from parent &lt;map&gt; file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">ProtareBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
+        <span class="n">ProtareBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">standardTarget</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Standard target must be a string.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Standard target must be a string.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__standardTarget</span> <span class="o">=</span> <span class="n">standardTarget</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">standardEvaluation</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Standard evaluation must be a string, is of type &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">standardEvaluation</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s1">&#39;Standard evaluation must be a string, is of type &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span>
+                <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">standardEvaluation</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__standardEvaluation</span> <span class="o">=</span> <span class="n">standardEvaluation</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a simple string representation of *self*.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> with projectile &quot;</span><span class="si">%s</span><span class="s1">&quot;, target &quot;</span><span class="si">%s</span><span class="s1">&quot;, evaluation &quot;</span><span class="si">%s</span><span class="s1">&quot;, path &quot;</span><span class="si">%s</span><span class="s1">&quot;, standardTarget &quot;</span><span class="si">%s</span><span class="s1">&quot; and standardEvaluation &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> 
-            <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardTarget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardEvaluation</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> with projectile &quot;</span><span class="si">%s</span><span class="s1">&quot;, target &quot;</span><span class="si">%s</span><span class="s1">&quot;, evaluation &quot;</span><span class="si">%s</span><span class="s1">&quot;, path &quot;</span><span class="si">%s</span><span class="s1">&quot;, standardTarget &quot;</span><span class="si">%s</span><span class="s1">&quot; and standardEvaluation &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardTarget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardEvaluation</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">standardTarget</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">standardTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the standardTarget.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__standardTarget</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__standardTarget</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">standardEvaluation</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">standardEvaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the standardEvaluation.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__standardEvaluation</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__standardEvaluation</span>
 
-<div class="viewcode-block" id="TNSL.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.TNSL.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="TNSL.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.TNSL.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
 
@@ -1086,19 +1157,21 @@
         <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardXML_attributes</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">version_0_1</span> <span class="ow">or</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">version_1_10</span><span class="p">:</span>
-            <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
-            <span class="n">XML_list</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attrs</span> <span class="p">)</span> <span class="p">]</span>
-            <span class="n">XML_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;protare projectile=&quot;n&quot; target=&quot;</span><span class="si">%s</span><span class="s1">&quot; evaluation=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> 
-                    <span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardTarget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardEvaluation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
+            <span class="n">XML_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)]</span>
+            <span class="n">XML_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;protare projectile=&quot;n&quot; target=&quot;</span><span class="si">%s</span><span class="s1">&quot; evaluation=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardTarget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardEvaluation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">XML_list</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1"> standardTarget=&quot;</span><span class="si">%s</span><span class="s1">&quot; standardEvaluation=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span>
-                    <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardTarget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardEvaluation</span> <span class="p">)</span> <span class="p">]</span>
+            <span class="n">XML_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1"> standardTarget=&quot;</span><span class="si">%s</span><span class="s1">&quot; standardEvaluation=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardTarget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardEvaluation</span><span class="p">)</span>
+            <span class="p">]</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="n">XML_list</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">XML_list</span></div>
 
 <div class="viewcode-block" id="TNSL.parseNodeUsingClass"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.TNSL.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a TNSL instance from a TNSL node.</span>
 
 <span class="sd">        :param node:            Node to parse.</span>
@@ -1107,12 +1180,14 @@
 <span class="sd">        :param kwargs:          A keyword list.</span>
 
 <span class="sd">        :return:                A :py:class:`TNSL` instance.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">TNSL</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid node name.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid node name.&quot;</span><span class="p">)</span>
 
-        <span class="nb">format</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;format&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">default</span><span class="p">)))</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">check</span><span class="p">(</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;formatVersion&quot;</span><span class="p">,</span> <span class="n">FormatVersion</span><span class="o">.</span><span class="n">default</span><span class="p">))</span>
+        <span class="p">)</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">attr</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span>
                   <span class="p">(</span><span class="s1">&#39;projectile&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;evaluation&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;checksum&#39;</span><span class="p">,</span> <span class="s1">&#39;algorithm&#39;</span><span class="p">)}</span>
@@ -1125,6 +1200,7 @@
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;standardEvaluation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;standardEvaluation&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">TNSL</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
 
 <div class="viewcode-block" id="read"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.map.read">[docs]</a><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

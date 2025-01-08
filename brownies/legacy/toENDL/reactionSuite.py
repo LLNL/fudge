@@ -11,6 +11,7 @@ from pqu import PQU as PQUModule
 
 from PoPs import specialNuclearParticleID as specialNuclearParticleIDPoPsModule
 from PoPs import IDs as IDsPoPsModule
+from PoPs import alias as AliasPoPsModule
 from PoPs.chemicalElements import misc as miscGroupsPoPsModule
 from PoPs.chemicalElements import chemicalElement as chemicalElementPoPsModule
 from PoPs.decays import misc as miscDecaysPoPsModule
@@ -59,8 +60,7 @@ def processCoulombElastic(reactionSuite, reaction, endlZA, yi, temperature, muCu
                 recoil.append([energyIn, POfMuRecoil])
             I1File.addData(recoil, Q=0.0, X1=0.0, temperature=temperature, X4=0.0)
 
-    particle = reactionSuite.PoPs[reaction.outputChannel.products[1].pid]
-    if isinstance(particle, nuclideModule.Alias): particle = reactionSuite.PoPs[particle.pid]
+    particle = reactionSuite.PoPs.final(reaction.outputChannel.products[1].pid)
     residualZA = miscGroupsPoPsModule.ZA(particle)
     try:
         yo = endl2Module.ZAToYo(residualZA)
@@ -149,8 +149,7 @@ def processOutputChannel( reactionSuite, outputChannel, yos, endlZA, temperature
                 if( superProduct.moniker == 'delayedNeutron' ) :
                     _S = 7
                     _X1 = PQUModule.PQU( superProduct.rate[0].value, superProduct.rate[0].unit ).getValueAs( '1/s' )
-            particle = reactionSuite.PoPs[product.pid]
-            if( isinstance( particle, nuclideModule.Alias ) ) : particle = reactionSuite.PoPs[particle.pid]
+            particle = reactionSuite.PoPs.final(product.pid)
             if( isinstance( particle, chemicalElementPoPsModule.ChemicalElement ) ) : continue
             nuclearLevelIndex = 0
             if isinstance( particle, nuclideModule.Particle): nuclearLevelIndex = particle.index
@@ -209,7 +208,8 @@ def toENDL( self, directory, verbose = 0 ) :
             ZA = 1000 * target.Z
         else :
             ZA = miscGroupsPoPsModule.ZA( target )
-        if( isinstance( target, nuclideModule.Alias ) ) : suffix = 'm'
+        if isinstance(target, AliasPoPsModule.MetaStable):
+            suffix = 'm'
 
     endlZA = endlZAClass( ZA, yi, workDir = directory, suffix = suffix )
 

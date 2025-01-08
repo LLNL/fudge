@@ -220,7 +220,7 @@ class ProbabilityTableGenerator:
 
         # extrapolate local copies of widths, densities and scattering radius, all as lin-lin functions
         self.scatteringRadius = self.URR.URR.getScatteringRadius().copy()
-        self.scatteringRadius.form = addPoints(self.scatteringRadius.form, newDomainMin, newDomainMax)
+        self.scatteringRadius.evaluated = addPoints(self.scatteringRadius.evaluated, newDomainMin, newDomainMax)
 
         self.levelSpacings = {}
         self.levelDensities = {}
@@ -544,9 +544,10 @@ class ProbabilityTableGenerator:
                 if column.name in renameColumns:
                     column.name = renameColumns[column.name]
 
-            resolvedRealization = resolvedModule.BreitWigner(label="realization",
-                approximation=resolvedModule.BreitWigner.Approximation.singleLevel,
-                resonanceParameters=commonResonancesModule.ResonanceParameters( combinedTable ),
+            resolvedRealization = resolvedModule.BreitWigner(
+                label="realization",
+                approximation=resolvedModule.BreitWigner.Approximation.SingleLevel,
+                resonanceParameters=commonResonancesModule.ResonanceParameters(combinedTable),
                 scatteringRadius=self.scatteringRadius,
                 PoPs=self.URR.URR.getLocalPoPs())
             if verbose:
@@ -745,17 +746,18 @@ class ProbabilityTableGenerator:
 
         def genPTs(egrid, crossSectionSamples, normalize, nbins=50):
             resultPTs = {}
+            for temperature in temperatures:
+                resultPTs[temperature] = []
             probs = [1 / nbins] * nbins
             for eidx, incidentEnergy in enumerate(egrid):
                 for tidx, temperature in enumerate(temperatures):
-                    resultPTs[temperature] = []
                     total = crossSectionSamples['total'][eidx][tidx].flatten()
                     order = numpy.argsort(total)
                     # sort all reactions in ascending order by total cross section:
                     total = total[order]
                     conditionals = {}
                     for key in crossSectionSamples:
-                        if key == 'total': continue
+                        if key in ('total', 'samplePoints'): continue
                         conditionals[key] = crossSectionSamples[key][eidx][tidx].flatten()[order]
 
                     step = len(total) // nbins

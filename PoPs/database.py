@@ -29,7 +29,7 @@ For example, the id for the electron is normally "e-", but could also be aliased
 In the example above, 'Al26_m1' and 'Na24_m1' are aliases pointing to excited nuclides.
 
 >>> type( pops['Na24_m1'] )
-<class 'PoPs.families.nuclide.alias'>
+<class 'PoPs.alias.MetaStable'>
 
 Each alias has a 'pid' field with the id of the actual particle it points to:
 
@@ -138,25 +138,23 @@ class Database(ancestryModule.AncestryIO):
         if( '{' in key ) : key = key.split( '{' )[0]
         return( self.__getitem( key, 0 ) )
 
-    def __getitem( self, key, level ) :
+    def __getitem(self, key, level):
 
-        if( not( isinstance( key, str ) ) ) : raise TypeError( 'key must be a str' )
-        if( key in self.__aliases ) :
-            alias = self.__aliases[key]
-            item = self.__getitem( alias.pid, level + 1 )
-            if( level == 0 ) : item = item.alias(key, item)
-            return( item )
-        for suite in [ self.__gaugeBosons, self.__leptons, self.__baryons, self.__chemicalElements, self.__unorthodoxes ] :
-            try :
-                return( suite[key] )
-            except KeyError :
+        if not isinstance(key, str):
+            raise TypeError('key must be a str')
+        if key in self.__aliases:
+            return self.__aliases[key]
+        for suite in [self.__gaugeBosons, self.__leptons, self.__baryons, self.__chemicalElements, self.__unorthodoxes]:
+            try:
+                return suite[key]
+            except KeyError:
                 continue
-            except :
+            except:
                 raise
         parentDB = self.parentDatabase()
         if parentDB is not None:
             return parentDB[key]
-        raise KeyError( 'id = "%s" not found' % key )
+        raise KeyError('id = "%s" not found' % key)
 
     def __iter__( self ) :
         """
@@ -423,14 +421,17 @@ class Database(ancestryModule.AncestryIO):
 
         return mass
 
-    def final( self, id ) :
+    def final(self, id, returnAtMetaStableAlias=False):
         """
         Returns the particle matching id. If id is an alias, will follow the alias pid until a non-alias particle is found and that particle is returned.
         """
 
         particle = self[id]
-        if( isinstance( particle, particleModule.Alias ) ) : particle = particle.particle
-        return( particle )
+        if isinstance(particle, aliasModule.BaseAlias):
+            if not isinstance(particle, aliasModule.MetaStable) or not returnAtMetaStableAlias:
+                particle = self.final(particle.pid, returnAtMetaStableAlias)
+
+        return particle
 
     def hasAlias( self, id ) :
 

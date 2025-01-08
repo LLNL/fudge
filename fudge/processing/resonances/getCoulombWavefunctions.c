@@ -11,7 +11,7 @@
 
 #include <Python.h>
 #include <math.h>
-#include <arrayobject.h>
+#include <numpy/arrayobject.h>
 
 #include "coulfg2.h"
 

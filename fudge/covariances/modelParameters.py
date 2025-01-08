@@ -213,8 +213,9 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
                 if isinstance(parameterLink.link, tableModule.Table):
                     for row in parameterLink.link.data:
                         params += row
-                elif isinstance(parameterLink.link, scatteringRadiusModule.ScatteringRadius):
-                    params.append(parameterLink.link.form.value)
+                elif isinstance(parameterLink.link,
+                                (scatteringRadiusModule.ScatteringRadius, scatteringRadiusModule.HardSphereRadius)):
+                    params.append(parameterLink.link.evaluated.value)
                 else:
                     raise NotImplementedError("Model parameter covariance linking to %s" % type(parameterLink.link))
             params = numpy.array(params)

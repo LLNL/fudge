@@ -5,6 +5,31 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module is for FUDGE internal use.
+The functions in this module are used to calculate product matrices for neutron elastic scattering including a non-zero
+temperature of the target.
+
+This module contains the following functions:
+            
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Function                              | Description                                                                       |
+    +=======================================+===================================================================================+
+    | SnElasticUpScatter                    |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | executeCommand                        | This function is used internally to call                                          |
+    |                                       | :py:func:`subprocessingModule.executeCommand`                                     |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | checkNegative_l0                      | This function counts the number of negative elements in the l=0 product matrix.   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | parseAveEnergyOutputFile              | This function parses the average product data in the file *fileName*.             |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | rescaleCrossSection                   |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | analyzeMatrix                         | This function is not used.                                                        |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+"""
+
 import os, sys, subprocess
 
 import fudge as fudgeModule
@@ -14,9 +39,12 @@ from fudge.processing.deterministic import transferMatrices as transferMatricesM
 
 def SnElasticUpScatter(style, tempInfo, comment=None):
     """
-    Generate input and call processing code to generate a transfer matrix for two-body angular distribution.
-    If the distribution is actually made up of two different forms in different energy regions, this function
-    calls itself in the two regions and sums the result.
+    This function generates input for and calls the code which includes a target temperature when calculating product matrices for
+    neutron elastic scattering.
+
+    :param style:       This is not used.
+    :param tempInfo:    This is a dictionary with needed data.
+    :param comment:     This is not used.
     """
 
     logFile = tempInfo['logFile']
@@ -51,6 +79,15 @@ def SnElasticUpScatter(style, tempInfo, comment=None):
     return TM1, TME, APE, paras['maxIncidentEnergyGroup']
         
 def executeCommand(cmd, workDir, workFile):
+    """
+    This functions sets up stuff and executes *cmd* using :py:func:`ubprocessingModule.executeCommand`..
+
+    :param cmd:         The system command to execute.
+    :param workDir:     The directory where input and output files are written to.
+    :param workFile:    Path to file where infomation about the calculations is written.
+
+    :returns:           The number of negative l=0 product matrix elements.
+    """
 
     transferMatrixExecute = cmd.split()[0]
     if( os.path.exists( transferMatrixExecute ) ) :
@@ -96,6 +133,15 @@ def executeCommand(cmd, workDir, workFile):
 
 ### checker for resulting legendre matrices
 def checkNegative_l0( TM_EEpL, weight, infoFile ) :
+    """
+    This function counts the number of negative l=0 elements in the product matrix *TM_EEpL*.
+
+    :param TM_EEpL:     The product matrix to check.
+    :param weight:      A string indicating if the weight is '1' or 'E'. Oops, need to fix the calling string of '0' should be '1'.
+    :param infoFile:    Path to log file.
+
+    :returns:           int that is the number of negative l=0 elements found.
+    """
 
     fOut = open( infoFile, 'a' )
     negative_l0Counter, largestNegative = 0, 0.
@@ -112,6 +158,13 @@ def checkNegative_l0( TM_EEpL, weight, infoFile ) :
 
 
 def parseAveEnergyOutputFile(fileName) :
+    """
+    For interal use. This function parses the average product data in the file *fileName* and returns the values as a list of floats.
+
+    :param fileName:        The path of the file to parse.
+
+    :returns:               A python list of floats.
+    """
     try :
         f = open( fileName )
     except :
@@ -128,6 +181,15 @@ def parseAveEnergyOutputFile(fileName) :
 
 
 def rescaleCrossSection( groupedCrossSec, UpScatterMatrix ) :
+    """
+    For each incident group in *UpScatterMatrix*, this function scales each element so that sum of the l=0 component is equal to 
+    the corresponding element in *groupedCrossSec*.
+
+    :param groupedCrossSec:     The multi-group cross sections.
+    :param UpScatterMatrix:     The product matrices to scale to match *groupedCrossSec*.
+
+    :returns:                   The scaled *UpScatterMatrix*.
+    """
 
     for g,sigma in enumerate(groupedCrossSec):
         summedarray = [ UpScatterMatrix[g][h][0] for h in range(len(UpScatterMatrix[g])) ]
@@ -143,6 +205,9 @@ def rescaleCrossSection( groupedCrossSec, UpScatterMatrix ) :
 
     
 def analyzeMatrix(TM, tempInfo):
+    """
+    This function is not used and should be deleted.
+    """
     #import numpy as np
         
     def plotMatrix(TM, tempInfo, lastElement):

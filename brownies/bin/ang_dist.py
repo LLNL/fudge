@@ -4,8 +4,7 @@ import argparse
 from pqu import PQU
 from brownies.legacy.converting import endfFileToGNDS
 from fudge.core.utilities.brb import winged_banner
-from fudge.productData.distributions import XYs2d, Regions2d, Legendre
-from fudge.productData.distributions import XYs1d as angularXYs1d
+from fudge.productData.distributions import angular
 from xData import XYs1d as XYs1dModule
 from xData import axes as axesModule
 import numpy.polynomial.legendre as legendreModule
@@ -83,7 +82,7 @@ def pack_datatable(_sad, Lmax=None, Emax=None):
     data = []
     egrid = []
     Llist = []
-    if isinstance(_sad, Regions2d):
+    if isinstance(_sad, angular.Regions2d):
         for iregion, region in enumerate(_sad):
             _Llist, _egrid, _data = __do_a_region(region)
             egrid += _egrid
@@ -91,7 +90,7 @@ def pack_datatable(_sad, Lmax=None, Emax=None):
             for L in _Llist:
                 if L not in Llist and L <= Lmax:
                     Llist.append(L)
-    elif isinstance(_sad, XYs2d):
+    elif isinstance(_sad, angular.XYs2d):
         Llist, egrid, data = __do_a_region(_sad)
     cols = [tableModule.ColumnHeader(0, "E", 'eV')] + [tableModule.ColumnHeader(L+1, 'L=%i' % L, "") for L in range(0, Lmax+1)]
     return DataTable(data=data, columns=cols)
@@ -106,7 +105,7 @@ def get_LegendreMoments(theAngDist, defaultLmax=30, verbose=False):
     :return:
     """
     # Reorder the distributions so we have a table of energies for each L
-    if isinstance(theAngDist, Legendre):
+    if isinstance(theAngDist, angular.Legendre):
         Lmax = len(theAngDist[-1])
     else:
         Lmax = defaultLmax
@@ -118,12 +117,12 @@ def get_LegendreMoments(theAngDist, defaultLmax=30, verbose=False):
         E = ePair.outerDomainValue
 
         # For Legendre moment data, we just copy it over
-        if isinstance(ePair, Legendre):
+        if isinstance(ePair, angular.Legendre):
             for L, coeff in enumerate(ePair):
                 theLegMoments[L].append((E, coeff))
 
         # For angle tables, do a Legendre fit to get the coefficients
-        elif isinstance(ePair, angularXYs1d):
+        elif isinstance(ePair, angular.XYs1d):
             for L, coeff in enumerate(Legendre_fit_to_xy_data(ePair, Lmax)):
                 theLegMoments[L].append((E, coeff))
 
@@ -199,13 +198,13 @@ def smooth_pointwise(theAngDist, weight_by_xs=None, egrid=None, NE=TOOMANYENERGI
         # Undo xs weighting
         if weight_by_xs is not None:
             newAngDist.append(
-                Legendre(outerDomainValue=E,
-                         coefficients=[theLegMomentsAsXYs[L][iE][1] /
-                                       weight_by_xs.domainSlice(theLegMomentsAsXYs[L].domainMin,
-                                       theLegMomentsAsXYs[L].domainMax).group(
-                                           egrid, norm='dx', asXYs=True).evaluate(E) for L in range(Lmax + 1)]))
+                angular.Legendre(
+                    outerDomainValue=E,
+                    coefficients=[theLegMomentsAsXYs[L][iE][1] / weight_by_xs.domainSlice(theLegMomentsAsXYs[L].domainMin,
+                                                                                          theLegMomentsAsXYs[L].domainMax)
+                    .group(egrid, norm='dx', asXYs=True).evaluate(E) for L in range(Lmax + 1)]))
         else:
-            newAngDist.append(Legendre(outerDomainValue=E,
+            newAngDist.append(angular.Legendre(outerDomainValue=E,
                                        coefficients=[theLegMomentsAsXYs[L][iE][1] for L in range(Lmax + 1)]))
 
     return newAngDist
@@ -244,12 +243,12 @@ def smooth_angular_distribution(theRxnSuite, styleLabel, MT, outgoingParticle='n
         .outputChannel \
         .getProductWithName(outgoingParticle) \
         .distribution[styleLabel].subforms[0]
-    if isinstance(theAngDist, Regions2d):
+    if isinstance(theAngDist, angular.Regions2d):
         for iregion, region in enumerate(theAngDist):
             if len(region) > NE:
                 print('Smooth region', iregion, 'it has', len(region), 'points')
                 theAngDist[iregion] = smooth_pointwise(region, weight_by_xs=weight_by_xs, NE=NE)
-    elif isinstance(theAngDist, XYs2d):
+    elif isinstance(theAngDist, angular.XYs2d):
         if len(theAngDist) > NE:
             print('Smooth angular distribution, it has', len(theAngDist), 'points')
             theAngDist = smooth_pointwise(theAngDist, weight_by_xs=weight_by_xs, NE=NE)

@@ -43,6 +43,19 @@ class BaseAlias(miscModule.ClassWithIDKey, abc.ABC):
 
         return self.__class__(self.id, self.pid)
 
+    def getMass(self, unit):
+        '''
+        Returns the mass of the final particle referenced by pid.
+
+        :param unit:        The unit of the returned mass.
+
+        :return:            Float.
+        '''
+
+        from . import database as databaseModule
+
+        return self.findClassInAncestry(databaseModule.Database).final(self.pid).getMass(unit)
+
     def isAlias(self):
 
         return True
@@ -120,7 +133,12 @@ class MetaStable(BaseAlias):
         intid1 = nuclide.intid()
         sign = -1 if intid1 < 0 else 1
 
-        return sign * (1000000 * (self.metaStableIndex + 480) + abs(intid1) % 1000000)
+        MM = 500
+        III = ( abs(intid1) // 1000000 ) % 1000
+        if III >= 60:
+            MM = 600
+
+        return sign * (1000000 * ( 1000 + MM + self.metaStableIndex ) + abs(intid1) % 1000000)
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):

@@ -44,9 +44,28 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Coherent and incoherent photon scattering forms.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;        </span>
+<span class="sd">This module contains classes and functions supporting coherent and incoherent photon scattering distribution.</span>
+<span class="sd">                </span>
+<span class="sd">    This module contains the following classes:</span>
+
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class                             | Description                                                           |</span>
+<span class="sd">    +===================================+=======================================================================+</span>
+<span class="sd">    | BaseForm                          | Base class for :py:class:`CoherentPhotonScattering.From` and          |</span>
+<span class="sd">    |                                   | :py:class:`IncoherentPhotonScattering.From` classes.                  |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | CoherentPhotonScattering          | Filler class for storing its Form class.                              |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | CoherentPhotonScattering.From     | A distribution form class with a link to an coherent photon           |</span>
+<span class="sd">    |                                   | scattering instance in the double differential cross section node.    |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | IncoherentPhotonScattering        | Filler class for storing its Form class.                              |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | IncoherentPhotonScattering.From   | A distribution form class with a link to an incoherent photon         |</span>
+<span class="sd">    |                                   | scattering instance in the double differential cross section node.    |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>     
 
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">xDataEnumsModule</span>
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">link</span> <span class="k">as</span> <span class="n">linkModule</span>
@@ -54,6 +73,15 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
 
 <div class="viewcode-block" id="BaseForm"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.photonScattering.BaseForm">[docs]</a><span class="k">class</span> <span class="nc">BaseForm</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">Form</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for :py:class:`CoherentPhotonScattering.From` and :py:class:`IncoherentPhotonScattering.From` classes.</span>
+
+<span class="sd">    :param link:        The linked instance.</span>
+<span class="sd">    :param root:        ?.</span>
+<span class="sd">    :param path:        The xLink string to the linked instance.</span>
+<span class="sd">    :param relative:    If True, link is relative; otherwise it is an absolute link.</span>
+<span class="sd">    :param label:    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">link</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">root</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">relative</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -62,14 +90,28 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">productFrame</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the frame the product data are specified in.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">productFrame</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="BaseForm.check"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.photonScattering.BaseForm.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Does a check of *self*&#39;s data.</span>
+
+<span class="sd">        :param info:        A dictionary with parameters used for determining if a difference is relevant.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseForm.calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.photonScattering.BaseForm.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;         </span>
+<span class="sd">        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.</span>
+<span class="sd">        Average means over all outgoing angle and energy.</span>
+<span class="sd">        </span>
+<span class="sd">        :param style:   The style instance which the calculated data will belong to.</span>
+<span class="sd">        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.</span>
+<span class="sd">        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
 
@@ -79,14 +121,41 @@
         <span class="k">return</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="BaseForm.processMC_cdf"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.photonScattering.BaseForm.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This methods returns an :py:class:`energyAngularMCModule.Form` instance representing *self*.</span>
+
+<span class="sd">    </span>
+<span class="sd">        :param style:           The style for the returned data.</span>
+<span class="sd">        :param tempInfo:        Dictionary of data needed to calculate the data.</span>
+<span class="sd">        :param indent:          The indentation for any verbosity.</span>
+<span class="sd">    </span>
+<span class="sd">        :return:                An instance of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>     
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">processMC_cdf</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseForm.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.photonScattering.BaseForm.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a multi-group representation of *self*.</span>
+
+<span class="sd">        :param style:           The style for the returned data.</span>
+<span class="sd">        :param tempInfo:        Dictionary of data needed to calculate the data.</span>
+<span class="sd">        :param indent:          The indentation for any verbosity.</span>
+
+<span class="sd">        :return:                A multi-group representation of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseForm.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.photonScattering.BaseForm.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div></div>
 

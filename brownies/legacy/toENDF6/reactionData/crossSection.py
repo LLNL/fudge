@@ -8,6 +8,7 @@
 import math
 
 from xData import enums as xDataEnumsModule
+from PoPs import IDs as IDsPoPsModule
 from PoPs.families import nuclide as nuclideModule
 
 from fudge import enums as enumsModule
@@ -29,7 +30,10 @@ def toENDF6(self, MT, endfMFList, targetInfo, level, LR):
     :param LR:
     """
 
+    reactionSuite = targetInfo['reactionSuite']
     ZA, mass, QI, QM = targetInfo['ZA'], targetInfo['mass'], targetInfo['Q'], targetInfo['QM']
+    if targetInfo['crossSectionMF'] == 23 and QI != 0:
+        QI = -QI    # MF23 stores binding energy instead of Q-value
     if 'EFL' in targetInfo:
         QM = QI
         QI = targetInfo['EFL']
@@ -38,8 +42,8 @@ def toENDF6(self, MT, endfMFList, targetInfo, level, LR):
             QM = 0
             if MT in (2, 5):
                 QM = QI
-            elif MT == 4:                                       # Q should be 0 except for excited-state targets:
-                reactionSuite = targetInfo['reactionSuite']
+            elif MT == 4 and reactionSuite.projectile == IDsPoPsModule.neutron:
+                # Q should be 0 except for excited-state targets:
                 targetID = reactionSuite.target
                 if targetID in reactionSuite.PoPs.aliases:
                     targetID = reactionSuite.PoPs[targetID].pid

@@ -6,87 +6,46 @@
 # <<END-copyright>>
 
 r"""
-Angular distribution classes with forms :py:class:`form`, :py:class:`TwoBody` and :py:class:`CoulombElasticForm`.
+The module contains the Angular distribution classes for store :math:`P(\mu)` and :math:`P(\mu|E)` distributions
+for two-body and uncorrelated distributions, as well as the :math:`P(\mu|E)` when the
+correlated distribution is represented as :math:`P(\mu|E)` * :math:`P(E'|E,\mu)`.
 
-This details most of the stuff in :py:mod:`angular.py`, and it also applies to :py:mod:`energy.py`,
-:py:mod:`energyAngular.py` and :py:mod:`angularEnergy.py`. Here we only describe some of the old classes.
-Namely,
+This module contains the following classes:
 
-    * ``pdfOfMu.pointwise``
-
-        - Stores a :math:`P(\mu)` as a list of :math:`\mu_i`, :math:`P_i`
-
-    * ``pdfOfMu.Legendre``
-
-        - Stores a :math:`P(\mu)`  as a Legendre series
-
-    * ``pointwise``
-
-        - Stores the :math:`P(\mu|E)` as a list of :math:`P(\mu)` which can be either
-          pdfOfMu.pointwise of pdfOfMu.Legendre
-
-    * ``piecewise``
-
-        - Stores :math:`P(\mu|E)` as a contigous list of ``pointwise`` instances.
-
-and their new equivalent classes
-
-    * :py:class:`XYs1d`
-
-        - Same as ``pdfOfMu.pointwise``
-
-    * :py:class:`Legendre`
-
-        - Same as ``pdfOfMu.Legendre``
-
-    * :py:class:`XYs2d`
-
-        - Same as ``pointwise``
-
-    * :py:class:`Regions2d`
-
-        - Same as ``piecewise``
-
-
-Note, there was no ``pdfOfMu.piecewise`` and its new equivalent :py:class:`Regions1d`, as
-they are not currently needed. There are other classes in :py:mod:`angular.py`
-(e.g., :py:class:`Isotropic2d`, :py:class:`Forward`, :py:class:`Recoil`) but we can ignore them for now.
-
-So what are the classes in :py:mod:`angular.py` for? They are to represent the
-physics function :math:`P(\mu|E)` where :math:`\mu` is the outgoing :math:`\cos( \theta )` and :math:`E` is
-the projectile's energy. Currently, we only store these as list of :math:`P(\mu)`
-or :math:`C_l`'s (or regions of these).
-
-For the simple case with only :math:`P(\mu`'s (no :math:`C_l`'s), and no change of
-interpolation or step in function, a :math:`P(\mu|E)` looks like::
-
-    E_1, P_1(mu)
-    E_2, P_2(mu)
-    ...
-    E_n-1, P_n-1(mu)
-    E_1, P_1(mu)
-
-In the old code each :math:`P_i(\mu)` was stored as an instance of a
-``pdfOfMu.pointwise`` and the P(mu|E) was an instance of ``pointwise``. In the new
-code each :math:'P_i(\mu)` is stored as an instance of :py:class:`XYs1d`, and :math:`P(\mu|E)` is an
-instance of :py:class:`XYs2d`. There are several nice things about the new structure.
-For example, the names here match the names in ``xData``. Also, the internal
-functions do not need to be nested as, for example, ``pdfOfMu.pointwise`` was.
-This latter point is a result of adding the dimension to the name of each
-class (e.g., :py:class:`XYs1d` vs. :py:class:`XYs2d`) so there is no name clashing.
-
-
-As a further note, in MF=4, the LTT = 1, 2 and 3 are stored using
-
-LTT=1
-    XYs1d for :math:`P(\mu)` and :py:class:`XYs2d` for the list of :math:`{E_i,P(\mu)}`.
-
-LTT=2
-    Legendre for :math:`P(\mu)` and :py:class:`XYs2d` for the list of :math:`{E_i,P(\mu)}`.
-
-LTT=3
-    :py:class:`Regions2d` that stores the LTT=1 in the first region and LTT=2 in the second region.
-
+    +---------------+-----------------------------------------------------------------------+
+    | Class         | Description                                                           |
+    +===============+=======================================================================+
+    | XYs1d         | Stores :math:`P(\mu)` as a list of :math:`\mu_i`, :math:`P_i`.        |
+    +---------------+-----------------------------------------------------------------------+
+    | Legendre      | Stores :math:`P(\mu)` as a Legendre series.                           |
+    +---------------+-----------------------------------------------------------------------+
+    | Xs_pdf_cdf1d  | Stores :math:`P(\mu)` (i.e., :math:`pdf(\mu)`) and :math:`cdf(\mu)`   |
+    |               | as a list of :math:`\mu_i`, :math:`pdf_i` and :math:`cdf_i`.          |
+    +---------------+-----------------------------------------------------------------------+
+    | Isotropic1d   | Specifies that the :math:`P(\mu)` is isotopic.                        |
+    +---------------+-----------------------------------------------------------------------+
+    | Subform       | Base class for all 2d angular distributions.                          |
+    |               | and :py:class:`FSubform` classes.                                     |
+    +---------------+-----------------------------------------------------------------------+
+    | Isotropic2d   | Specifies that the angular distribution :math:`P(\mu|E)` is isotopic  |
+    |               | for all E.                                                            |
+    +---------------+-----------------------------------------------------------------------+
+    | Forward       | Specifies that the angular distribution :math:`P(\mu|E)` is           |
+    |               | :math:`\delta( mu - 1 )` for all E.                                   |
+    +---------------+-----------------------------------------------------------------------+
+    | Recoil        | Specifies that the angular distribution :math:`P(\mu|E)` is           |
+    |               | the recoil of the other two-body outgoing particle.                   |
+    +---------------+-----------------------------------------------------------------------+
+    | XYs2d         | Stores :math:`P(\mu|E)` as a list of :math:`E`, :math:`P(\mu)`.       |
+    +---------------+-----------------------------------------------------------------------+
+    | Regions2d     | Stores :math:`P(\mu|E)` as a list of other 2d angular distributions,  |
+    |               | for contiguous regions of E.                                          |
+    +---------------+-----------------------------------------------------------------------+
+    | Form          | This class does not seem to be used anywhere.                         |
+    +---------------+-----------------------------------------------------------------------+
+    | TwoBody       | Specifies that the :math:`P(\mu|E)` is for a two-body reaction and    |
+    | Form          | that the data are in the center-of-mass frame.                        |
+    +---------------+-----------------------------------------------------------------------+
 """
 
 import math
@@ -121,6 +80,13 @@ from . import energy as energyModule
 
 
 def defaultAxes( energyUnit ) :
+    """
+    Returns an :py:class:`Axes` instance for angular data (i.e., P(mu|E).
+
+    :param energyUnit:  Unit for the energy data.
+
+    :return:            An :py:class:`Axes` instance.
+    """
 
     axes = axesModule.Axes(3)
     axes[0] = axesModule.Axis( 'P(mu|energy_in)', 0, '' )
@@ -128,15 +94,25 @@ def defaultAxes( energyUnit ) :
     axes[2] = axesModule.Axis( 'energy_in', 2, energyUnit )
     return( axes )
 
+
 class XYs1d( XYs1dModule.XYs1d ) :
+    r"""
+    Class to store :math:`P(\mu)` as a list of :math:`\mu_i` and :math:`P_i` points.
+    """
 
     def averageMu( self ) :
+        r"""
+        This method returns the average value of :math:`\mu` for *self*.
+        """
 
         allowedInterpolations = [xDataEnumsModule.Interpolation.linlin, xDataEnumsModule.Interpolation.flat]
         xys = self.changeInterpolationIfNeeded( allowedInterpolations, XYs1dModule.defaultAccuracy )
         return( xys.integrateWithWeight_x( ) )
 
     def invert( self ) :
+        r"""
+        This methed returns an :py:class:`XYs1d` instance that is the reflection of *self* (i.e., :math:`P(-\mu)`).
+        """
 
         reflected = self.copy( )
         pdf = [ [ -x, y ] for x, y in self ]
@@ -145,53 +121,109 @@ class XYs1d( XYs1dModule.XYs1d ) :
         return( reflected )
 
     def isIsotropic( self ) :
+        """
+        This method returns True if *self* is isotropic and False otherwise.
+        """
 
         return( self.rangeMin == self.rangeMax )
 
     def LegendreCoefficient( self, LegendreOrder ) :
+        """
+        This method returns the Legenre coefficient representing *self* at Legenre order *LegendreOrder*.
+
+        :param LegendreOrder:   The Legenre order of the desired Legenre coefficient.
+        """
 
         return( LegendreModule.from_pointwiseXY_C( self, LegendreOrder )[LegendreOrder] )
 
     def toLinearXYsClass( self ) :
+        """
+        This method returns the class for representing linear point-wise 1-d data of *self*.
+        """
 
         return( XYs1d )
 
     def to_xs_pdf_cdf1d(self, style, tempInfo, indent):
+        """
+        This method returns a copy of *self* as an :py:class:`Xs_pdf_cdf1d` representation.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                :py:class:`Xs_pdf_cdf1d` instance.
+        """
 
         return Xs_pdf_cdf1d.fromXYs(self, outerDomainValue=self.outerDomainValue, thinEpsilon=1e-14)
 
 class Legendre( series1dModule.LegendreSeries ) :
+    r"""
+    Class to store :math:`P(\mu)` as Legendre series coefficients.
+    """
 
     def averageMu( self ) :
+        """
+        This function returns the average value of mu for *self*.
+        """
 
         return( self.getCoefficientSafely( 1 ) )
 
     def LegendreCoefficient( self, LegendreOrder ) :
+        """
+        This method returns the Legenre coefficient of *self* at Legenre order *LegendreOrder*.
+
+        :param LegendreOrder:   The Legenre order of the desired Legenre coefficient.
+        """
 
         if( LegendreOrder < len( self ) ) : return( self[LegendreOrder] )
         return( 0.0 )
 
     def toLinearXYsClass( self ) :
+        """
+        This method returns the class for representing linear point-wise 1-d data of *self*.
+        """
 
         return( XYs1d )
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+        """
+        This method returns a copy of *self* as an :py:class:`Xs_pdf_cdf1d` representation.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                :py:class:`Xs_pdf_cdf1d` instance.
+        """
 
         linear = self.toPointwise_withLinearXYs( accuracy = XYs1dModule.defaultAccuracy, lowerEps = 0, upperEps = 1e-8 )
         linear.outerDomainValue = self.outerDomainValue
         return( linear.to_xs_pdf_cdf1d( style, tempInfo, indent ) )
 
 class Xs_pdf_cdf1d( xs_pdf_cdfModule.Xs_pdf_cdf1d ) :
+    r"""
+    This class stores both the :math:`P(\mu|E)` (i.e., pdf) and its cumlative distribution function cdf as three lists: one list
+    for the :math:`\mu` values, and one list for the associated pdf value and one list for the associated cdf value for each :math:`\mu` value,
+    """
 
     def isIsotropic( self ) :
+        """
+        This method returns True if *self* is isotropic and False otherwise.
+        """
 
         return( min( self.pdf.values ) == max( self.pdf.values ) )
 
     def toLinearXYsClass( self ) :
+        """
+        This method returns the class for representing linear point-wise 1-d data of *self*.
+        """
 
         return( XYs1d )
 
 class Isotropic1d(ancestryModule.AncestryIO):
+    r"""
+    This class specifies that the angular distribution :math:`P(\mu)` is isotopic. 
+    """
 
     moniker = 'isotropic1d'
 
@@ -201,23 +233,45 @@ class Isotropic1d(ancestryModule.AncestryIO):
 
     @property
     def domainMin( self ) :
+        """
+        Returns the minimum mu for the product.
+        """
 
         return( -1.0 )
 
     @property
     def domainMax( self ) :
+        """
+        Returns the maximum mu for the product.
+        """
 
         return( 1.0 )
 
     def evaluate( self, mu ) :
+        r"""
+        This method returns the value of :math:`P(\mu)` which is always 0.5 for an isotropic distribution.
+
+        :param mu:      Value of :math:`\mu`  to evaluated :math:`P(\mu)` at.
+        """
 
         return( 0.5 )
 
     def isIsotropic( self ) :
+        """
+        This method always returns True since the distribution is isotropic.
+        """
 
         return( True )
 
     def integrate(self, domainMin, domainMax):
+        """
+        This meethod integrates the angular distribution over the specified outgoing mu range.
+        
+        :param domainMin:               The minimum mu for the range.
+        :param domainMax:               The maximum mu for the range.
+
+        :return:                    A float representing the value of the integration.
+        """
 
         return 0.5 * (domainMax - domainMin)
 
@@ -227,18 +281,45 @@ class Isotropic1d(ancestryModule.AncestryIO):
         return( 0.0 )
 
     def toXML_strList(self, **kwargs):
+        """
+        This method currently does a **raise** as is not in the GNDS specifications.
+
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         raise Exception('Not supported')
 
     @classmethod
-    def parseNodeUsingClass(self, **kwargs):
+    def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        This should not be called and it executes a **raise** if called as **GNDS** does not define this class.
+
+        :param cls:         Form class to return. 
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         raise Exception('Not supported')
 
 class Subform( baseModule.Subform ) :
-    """Abstract base class for angular subforms."""
+    """Abstract base class for 2d angular subforms."""
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+        """
+        This method returns None.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                None
+        """
 
         return( None )
 
@@ -250,6 +331,9 @@ class Subform( baseModule.Subform ) :
         return 0
 
 class Isotropic2d( Subform ) :
+    r"""
+    Specifies that the angular distribution :math:`P(\mu|E)` is isotopic for all E. 
+    """
 
     moniker = 'isotropic2d'
 
@@ -258,11 +342,18 @@ class Isotropic2d( Subform ) :
         Subform.__init__( self )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         pass
 
     def copy( self ):
+        """
+        Returns a copy of *self*.
+        """
 
         return( Isotropic2d( ) )
 
@@ -270,54 +361,108 @@ class Isotropic2d( Subform ) :
 
     @property
     def domainGrid( self ) :
+        """
+        This method returns the minimum and maximum energy domain for *self* as a Python list.
+        """
 
         return( [ self.domainMin, self.domainMax ] )
 
     @property
     def domainMin( self ) :
+        """
+        Returns the minimum projectile energy for *self*.
+        """
 
         from fudge import product as productModule
         return( self.findClassInAncestry( productModule.Product ).domainMin )
 
     @property
     def domainMax( self ) :
+        """
+        Returns the maximum projectile energy for *self*.
+        """
 
         from fudge import product as productModule
         return( self.findClassInAncestry( productModule.Product ).domainMax )
 
     @property
     def domainUnit( self ) :
+        """
+        Returns the energy unit of the projectile.
+        """
 
         from fudge import product as productModule
         return( self.findClassInAncestry( productModule.Product ).domainUnit )
 
     def evaluate( self, energy ) :
+        """
+        This method returns an :py:class:`Isotropic1d` since the distribtion is isotropic at all projectile energies.
+
+        :param energy:  This parameter is not used.
+        """
 
         _isotropic1d = Isotropic1d( )
         _isotropic1d.setAncestor( self )
         return( _isotropic1d )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method just returns [EMin, EMax].
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         return( [ EMin, EMax ] )
 
     def invert( self ) :
+        """
+        This methed returns another  :py:class:`Isotropic2d` instance since the reflection of an isotropic angular
+        distribution is the same as itself.
+        """
 
         return( self.copy( ) )
 
     def isIsotropic( self ) :
+        """
+        This method always returns True since the distribution is isotropic.
+        """
 
         return( True )
 
     def averageMu( self, E, accuracy = None ) :
+        """
+        This method returns the average value of mu for *self* evaluated at projectile energy E. This
+        method always returned 0 since the distribution is isotropic.
+
+        :param E:           The energy of the projectile.
+        :param accuracy:    The accurcay to calculate the average mu to.
+        """
+# FIXME. what frame is mu wanted and what frame are the data in.
 
         return( 0. )
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         return []
 
     def integrate( self, energyIn, muOut ) :
+        """
+        This meethod integrates the angular distribution at projectile energy over the specified outgoing mu range.
+        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *muOut* range.
+        
+        :param energyIn:            The energy of the projectile.
+        :param muOut:               The outgoing mu range to integrate over.
+
+        :return:                    A float representing the value of the integration.
+        """
 
         if( self.domainMin <= energyIn <= self.domainMax ) :
             domainMin, domainMax = miscellaneousModule.domainLimits( muOut, -1.0, 1.0 )
@@ -328,6 +473,13 @@ class Isotropic2d( Subform ) :
         return( 0.0 )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         ptw = XYs2d( axes = defaultAxes( self.domainUnit ) )
         ptw.append( XYs1d( [ [ -1, 0.5 ], [ 1, 0.5 ] ], outerDomainValue = self.domainMin ) )
@@ -335,15 +487,37 @@ class Isotropic2d( Subform ) :
         return( ptw )
 
     def toXML_strList( self, indent = "", **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         return( [ self.XMLStartTagString( indent = indent, emptyTag = True ) ] )
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance *cls*.
+
+        :param cls:         Form class to return. 
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *element*.
+        """
 
         return cls()
 
 class Forward( Subform ) :
+    r"""
+    Specifies that the angular distribution :math:`P(\mu|E)` is :math:`\delta( mu - 1 )` for all E. 
+    """
 
     moniker = 'forward'
 
@@ -352,11 +526,18 @@ class Forward( Subform ) :
         Subform.__init__( self )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         pass
 
     def copy( self ):
+        """
+        Returns a copy of *self*.
+        """
 
         return( Forward( ) )
 
@@ -364,43 +545,85 @@ class Forward( Subform ) :
 
     @property
     def domainMin( self ) :
+        """
+        Returns the minimum projectile energy for *self*.
+        """
 
         from fudge import product as productModule
         return( self.findClassInAncestry( productModule.Product ).domainMin )
 
     @property
     def domainMax( self ) :
+        """
+        Returns the maximum projectile energy for *self*.
+        """
 
         from fudge import product as productModule
         return( self.findClassInAncestry( productModule.Product ).domainMax )
 
     @property
     def domainUnit( self ) :
+        """
+        Returns the energy unit of the projectile.
+        """
 
         from fudge import product as productModule
         return( self.findClassInAncestry( productModule.Product ).domainUnit )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method just returns [EMin, EMax].
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         return( [ EMin, EMax ] )
 
     def invert( self ) :
+        r"""
+        This methed returns an :py:class:`XYs1d` instance that is the reflection of *self* (i.e., :math:`P(-\mu)`).
+        """
 
         return( self.toPointwise_withLinearXYs( ).invert( ) )
 
     def isIsotropic( self ) :
+        """
+        This method always returns False since the distribution is not isotropic.
+        """
 
         return( False )
 
     def averageMu( self, E, accuracy = None ) :
+        """
+        This method returns the average value of mu for *self* evaluated at projectile energy E. This
+        method always returned 1.
+
+        :param E:           The energy of the projectile.
+        :param accuracy:    The accurcay to calculate the average mu to.
+        """
 
         return( 1. )
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         return []
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         accuracy = xDataBaseModule.getArguments( kwargs, { 'accuracy' : 1e-6 } )['accuracy']
 
@@ -410,15 +633,37 @@ class Forward( Subform ) :
         return( ptw )
 
     def toXML_strList( self, indent = "", **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         return( [ self.XMLStartTagString( indent = indent, emptyTag = True ) ] )
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance *cls*.
+
+        :param cls:         Form class to return. 
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *element*.
+        """
 
         return cls()
 
 class Recoil( linkModule.Link, Subform ) :
+    r"""
+    Specifies that the angular distribution :math:`P(\mu|E)` is the recoil of the other two-body outgoing particle. 
+    """
 
     moniker = 'recoil'
 
@@ -428,12 +673,12 @@ class Recoil( linkModule.Link, Subform ) :
         Only meant for angular 2-body reactions.
         The 'root' and 'path' usually do not need to be specified: they will be computed from the link.
 
-        :param link: distribution form for recoil partner
-        :type link: distribution.base.Form
-        :param root: filename where recoil partner is defined (usually None)
-        :param path: xpath to recoil partner (usually will be computed from the link)
-        :param label: label for this subform (usually None)
-        :param relative: whether to write xpath as relative or absolute
+        :param link:        distribution form for recoil partner.
+        :type link:         distribution.base.Form.
+        :param root:        File path where recoil partner is defined (usually None).
+        :param path:        xpath to recoil partner (usually will be computed from the link).
+        :param label:       label for this subform (usually None).
+        :param relative:    Whether to write xpath as a relative or absolute path.
         :return:
         """
 
@@ -442,60 +687,107 @@ class Recoil( linkModule.Link, Subform ) :
 
     @property
     def domainUnit( self ) :
+        """
+        Returns the energy unit of the projectile.
+        """
 
         return( self.partner.angularSubform.domainUnit )
 
     @property
     def domainMin(self):
-        """Returns the domainMin."""
+        """
+        Returns the minimum projectile energy for *self*.
+        """
 
         return self.partner.angularSubform.domainMin
 
     @property
     def domainMax(self):
-        """Returns the domainMax."""
+        """
+        Returns the maximum projectile energy for *self*.
+        """
 
         return self.partner.angularSubform.domainMax
 
     @property
     def partner( self ) :
+        """
+        This method returns a reference to the angular form for the other outgoing particle of the two-body channel.
+        """
 
         if( self.link is None ) : raise Exception( "Encountered unresolved link!" )
         return( self.link )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         pass
 
     def copy( self ):
+        """
+        Returns a copy of *self*.
+        """
 
         return( Recoil( self.partner ) )
 
     __copy__ = copy
 
     def evaluate( self, energy ) :
+        r"""
+        This method returns a :math:`P(\mu)` of *self* evaluated at projectile energy *energy*.
+
+        :param energy:      The projectile energy to evaluate *self* at.
+        """
 
         return( self.partner.angularSubform.evaluate( energy ).invert( ) )
 
     def getNumericalDistribution( self ) :
+        """
+        This method returns a pointwise representation of *self*.
+        """
 
         partnerForm = self.partner.toPointwise_withLinearXYs( upperEps = 1e-8 ).invert( )
         return( partnerForm )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method returns the list of projectile energies that *self* (i.e., its partner) is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         return( self.partner.getEnergyArray( EMin = EMin, EMax = EMax ) )
 
     def isIsotropic( self ) :
+        """
+        This method returns True if *self* is isotropic and False otherwise.
+        """
 
         return( self.partner.isIsotropic( ) )
 
     def averageMu( self, E, accuracy = None ) :
+        """
+        This method returns the average value of mu for *self* evaluated at projectile energy E.
+
+        :param E:           The energy of the projectile.
+        :param accuracy:    The accurcay to calculate the average mu to.
+        """
 
         return( -self.partner.averageMu( E, accuracy = accuracy ) )
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
 
@@ -506,10 +798,22 @@ class Recoil( linkModule.Link, Subform ) :
         return warnings
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         return( self.partner.invert( ).toPointwise_withLinearXYs( **kwargs ) )
 
 class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
+    r"""
+    Stores :math:`P(\mu|E)` as a list of :math:`E`, :math:`P(\mu)`. The :math:`P(\mu)` functions can be any value 1d angular function.
+
+    :param kwargs:              A dictionary that contains data to control the way this method acts.
+    """
 
     def __init__( self, **kwargs ) :
 
@@ -517,29 +821,48 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         Subform.__init__( self )
 
     def getAtEnergy( self, energy ) :
+        r"""
+        This method returns :math:`P(\mu)` evaluated at projectile energy *energy*.
+
+        :param energy:      The energy of the projectile.
+
+        :return:            A :math:`P(\mu)`.
+        """
 
         return self.interpolateAtValue(energy, extrapolation=xDataEnumsModule.Extrapolation.flat)
 
     def fixDomains(self, domainMin, domainMax, fixToDomain, tweakLower = True):
         """
-        This method call **fixDomains* on the *self* via the **probabilitiesModule.PofX1GivenX2** class.
+        This method calls *fixDomains* on *self* via the **probabilitiesModule.PofX1GivenX2** class.
         """
 
         return probabilitiesModule.PofX1GivenX2.fixDomains(self, domainMin, domainMax, fixToDomain, tweakLower = tweakLower)
 
     def invert( self ) :
+        r"""
+        This method returns an :py:class:`XYs2d` instance that is the reflection of *self* (i.e., :math:`P(-\mu|E)`).
+        """
 
         ptw = XYs2d( axes = self.axes.copy( ) )
         for POfMu in self : ptw.append( POfMu.invert( ) )
         return( ptw )
 
     def isIsotropic( self ) :
+        """
+        This method returns True if *self* is isotropic for all projectile energies and False otherwise.
+        """
 
         for energy_in in self :
             if( not( energy_in.isIsotropic( ) ) ) : return( False )
         return( True )
 
     def averageMu( self, E, accuracy = None ) :
+        """
+        This method returns the average value of mu for *self* evaluated at projectile energy E.
+
+        :param E:           The energy of the projectile.
+        :param accuracy:    The accurcay to calculate the average mu to.
+        """
 
         mode, function1, function2, frac, interpolation, interpolationQualifier = self.getBoundingSubFunctions( E )
         if( mode is None ) : raise ValueError( 'angular has no data' )
@@ -554,6 +877,14 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         return( mu1 )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method returns the list of projectile energies that *self* is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         Es = [ data.outerDomainValue for data in self ]
         if( EMin is not None ) :
@@ -563,6 +894,11 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         return( Es )
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
 
@@ -586,21 +922,47 @@ class XYs2d( Subform, probabilitiesModule.PofX1GivenX2 ) :
         return warnings
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+        """
+        This method returns a copy of *self* as a :py:class:`XYs2d` instance with the P(mu) data
+        returned as :py:class:`Xs_pdf_cdf1d` instances.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                :py:class:`XYs2d` instance.
+        """
 
         subform = XYs2d( axes = self.axes.copy( ), interpolation = self.interpolation )
         for xys in self : subform.append( xys.to_xs_pdf_cdf1d( style, tempInfo, indent ) )
         return( subform )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         return( multiD_XYsModule.XYs2d.toPointwise_withLinearXYs( self, cls = XYs2d, **kwargs ) )
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns the list of classes that can be sub-nodes (i.e., 1-d function) of an :py:class:`XYs2d` instance.
+        """
 
         return( ( XYs1d, Legendre, Xs_pdf_cdf1d ) )
 
 class Regions2d( Subform, regionsModule.Regions2d ) :
+    r"""
+    Stores :math:`P(\mu|E)` as a list of other 2d angular distributions that abut at specific E values and form
+    a contiguous function of E.
+
+    :param kwargs:              A dictionary that contains data to control the way this method acts.
+    """
 
     def __init__( self, **kwargs ) :
 
@@ -608,6 +970,11 @@ class Regions2d( Subform, regionsModule.Regions2d ) :
         Subform.__init__( self )
 
     def check( self, info ):
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
 
@@ -620,6 +987,14 @@ class Regions2d( Subform, regionsModule.Regions2d ) :
         return warnings
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+        """         
+        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+        Average means over all outgoing angle and energy.
+        
+        :param style:   The style instance which the calculated data will belong to.
+        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.
+        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+        """
 
         EMax = kwargs['EMax']
         aveEnergies = []
@@ -635,18 +1010,29 @@ class Regions2d( Subform, regionsModule.Regions2d ) :
 
     def fixDomains(self, domainMin, domainMax, fixToDomain):
         """
-        This method call **fixDomains* on the *self* via the **regionsModule.Regions2d** class.
+        This method call *fixDomains* on the *self* via the **regionsModule.Regions2d** class.
         """
 
         return regionsModule.Regions2d.fixDomains(self, domainMin, domainMax, fixToDomain)
 
     def isIsotropic( self ) :
+        """
+        This method returns True if *self* is isotropic for all regions and False otherwise.
+        """
 
         for region in self :
             if( not( region.isIsotropic( ) ) ) : return( False )
         return( True )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method returns the list of projectile energies that *self* is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         Es = [ self[0][0].outerDomainValue ]
         for region in self: Es.extend( [ data.outerDomainValue for data in region[1:] ] )
@@ -657,6 +1043,12 @@ class Regions2d( Subform, regionsModule.Regions2d ) :
         return( Es )
 
     def averageMu( self, E, accuracy = None ) :
+        """
+        This method returns the average value of mu for *self* evaluated at projectile energy E.
+
+        :param E:           The energy of the projectile.
+        :param accuracy:    The accurcay to calculate the average mu to.
+        """
 
         # FIXME what if E lies on boundary between regions?
         for region in self:
@@ -665,12 +1057,29 @@ class Regions2d( Subform, regionsModule.Regions2d ) :
         return self[-1].averageMu( E, accuracy )
 
     def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+        """
+        This method returns a copy of *self* as a :py:class:`Regions2d` with the P(mu) data
+        returned as :py:class:`Xs_pdf_cdf1d` instances.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                :py:class:`Regions2d` instance.
+        """
 
         _regions2d = Regions2d( axes = self.axes )
         for region in self : _regions2d.append( region.to_xs_pdf_cdf1d( style, tempInfo, indent ) )
         return( _regions2d )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         arguments = self.getArguments( kwargs, { 'lowerEps' : 0, 'upperEps' : 0 } )
         lowerEps = arguments['lowerEps']
@@ -699,11 +1108,17 @@ class Regions2d( Subform, regionsModule.Regions2d ) :
         return( linear )
 
     def toLinearXYsClass( self ) :
+        """
+        This method returns the class for representing linear point-wise 2-d data of *self*.
+        """
 
         return( XYs2d )
 
     @staticmethod
     def allowedSubElements( ) :
+        """
+        This method returns the list of classes that can be sub-nodes (i.e., 2-d function) of an :py:class:`Regions2d` instance.
+        """
 
         return( ( XYs2d, ) )
 
@@ -714,6 +1129,9 @@ class Regions2d( Subform, regionsModule.Regions2d ) :
 """
 
 class Form( baseModule.Form ) :
+    """
+    This class does not seem to be used.
+    """
 
     moniker = 'angular'
     subformAttributes = ( 'angularSubform', )
@@ -725,11 +1143,23 @@ class Form( baseModule.Form ) :
         baseModule.Form.__init__( self, label, productFrame, ( angularSubform, ) )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.angularSubform.convertUnits( unitMap )
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+        """         
+        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+        Average means over all outgoing angle and energy.
+        
+        :param style:   The style instance which the calculated data will belong to.
+        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.
+        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+        """
 
         raise NotImplementedError('FIXME, when am I called?')
 
@@ -770,12 +1200,31 @@ class Form( baseModule.Form ) :
         return( depData )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
+        """
+        Returns a multi-group representation of *self*.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                A multi-group representation of *self*.
+        """
 
         raise NotImplementedError( 'need to implement' )
 
     @classmethod
     def parseNodeUsingClass(cls, angularElement, xPath, linkData, **kwargs):
-        """Translate <angular> element from xml."""
+        """
+        Parse *angularElement* into an instance *cls*.
+
+        :param cls:             Form class to return. 
+        :param angularElement:  Node to parse.
+        :param xPath:           List containing xPath to current node, useful mostly for debugging.
+        :param linkData:        dict that collects unresolved links.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *angularElement*.
+        """
 
         xPath.append( angularElement.tag )
         subformClass = {
@@ -790,6 +1239,21 @@ class Form( baseModule.Form ) :
         return( angularSubform )
 
 class TwoBody( baseModule.Form ) :
+    r"""
+    This class specifies that the :math:`P(\mu|E)` is for a two-body reaction and that the data are in the center-of-mass frame. 
+
+    The following table list the primary members of this class:
+    
+    +-------------------+-----------------------------------------------------------+           
+    | Member            | Description                                               |
+    +===================+===========================================================+           
+    | angularSubform    | Angular data.                                             |
+    +-------------------+-----------------------------------------------------------+           
+    
+    :param label:               The label for this form.
+    :param productFrame:        The frame the product data are specified in.
+    :param angularSubform:      An :py:class:`Subform` representing the angular data.
+    """
 
     moniker = 'angularTwoBody'
     subformAttributes = ( 'angularSubform', )
@@ -802,37 +1266,70 @@ class TwoBody( baseModule.Form ) :
 
     @property
     def data(self):
-        '''Temporary method until I redo all the classes that have a data-like member.'''
+        """Return the data of *self*. Temporary method until I redo all the classes that have a data-like member."""
 
         return(self.angularSubform)
 
     @data.setter
     def data(self, data):
-        '''Temporary method until I redo all the classes that have a data-like member. Need to check data type.'''
+        r"""
+        Sets the data of *self* to *data*. Temporary method until I redo all the classes that have a data-like member. Need to check data type.
+
+        :param data:    The :math:`P(\mu|E)` data for *self.*
+        """
 
         self.angularSubform = data
 
     @property
     def domainMin(self):
+        """
+        Returns the minimum projectile energy for *self*.
+        """
 
         return self.angularSubform.domainMin
 
     def averageMu( self, E, accuracy = None ) :
+        """
+        This method returns the average value of mu for *self* evaluated at projectile energy E.
+
+        :param E:           The energy of the projectile.
+        :param accuracy:    The accurcay to calculate the average mu to.
+        """
  
         return( self.angularSubform.averageMu( E, accuracy = accuracy ) )
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+        """         
+        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+        Average means over all outgoing angle and energy.
+        
+        :param style:   The style instance which the calculated data will belong to.
+        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.
+        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+        """
 
         kwargs['productFrame'] = self.productFrame
         return( calculateAverageProductData( self.angularSubform, style, indent, **kwargs ) )
 
     def convertUnits( self, unitMap ) :
-        """See documentation for reactionSuite.convertUnits."""
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.angularSubform.convertUnits( unitMap )
 
     def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
-        """Returns the energy spectrum in the lab frame for the specified incident energy."""
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn* for frame *frame*,
+
+        :param energy_in:           Energy of the projectile.
+        :param frame:               The frame to calculate the energy spectrum in.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         from fudge import product as productModule
         from ... import outputChannel as outputChannelModule
@@ -871,23 +1368,22 @@ class TwoBody( baseModule.Form ) :
             productMass, residualMass = residualMass, productMass
 
         comKineticEnergy = energyIn * targetMass / (projectileMass + targetMass) + projectileMass + targetMass - productMass - residualMass
-        comKineticEnergy *= residualMass / (productMass + residualMass)
         if comKineticEnergy < 0.0:
             return energyModule.XYs1d(axes=energyModule.defaultAxes(energyUnit))
+        productComEnergy = comKineticEnergy * residualMass / (productMass + residualMass)
 
         PofMu = self.angularSubform.evaluate(energyIn)
         if frame == xDataEnumsModule.Frame.centerOfMass:
             twoBodyCOMResolution = min(0.1, max(1e-6, kwargs.get('twoBodyCOMResolution', 1e-2)))
-            data = [[comKineticEnergy * (1 - twoBodyCOMResolution), 0.0],
-                    [comKineticEnergy, 1.0], 
-                    [comKineticEnergy * (1 + twoBodyCOMResolution), 0.0]]
+            data = [[productComEnergy* (1 - twoBodyCOMResolution), 0.0],
+                    [productComEnergy, 1.0], 
+                    [productComEnergy* (1 + twoBodyCOMResolution), 0.0]]
             return energyModule.XYs1d(data, axes=energyModule.defaultAxes(energyUnit)).normalize() * PofMu.integrate(domainMin=muMin, domainMax=muMax)
 
         projectileSpeed = math.sqrt(2.0 * energyIn / projectileMass)
         comSpeed = projectileMass / (projectileMass + targetMass) * projectileSpeed
 
         comSpeedProductEnergy = 0.5 * productMass * comSpeed * comSpeed
-        productComEnergy = comKineticEnergy * residualMass / (productMass + residualMass)
         productCOM_speed = math.sqrt(2.0 * productComEnergy / productMass)
         sqrtEnergiesTimes2 = 2.0 * math.sqrt(comSpeedProductEnergy * productComEnergy)
 
@@ -906,6 +1402,8 @@ class TwoBody( baseModule.Form ) :
                 energyPrime = comSpeedProductEnergy + productComEnergy + mu * sqrtEnergiesTimes2
                 PatMu = PofMu.evaluate(mu)
                 PatE = PatMu / sqrtEnergiesTimes2
+                if mu == 1 and abs(energyPrime - energyIn) < 1e-8 * energyIn:   # Attempt to handle forward elastic scattering exactly.
+                    energyPrime = energyIn
                 PofEnergyPrime.append([energyPrime, PatE])
             if partialMuDomain:
                 norm += PofMu.integrate(domainMin=mu1, domainMax=mu2)
@@ -926,6 +1424,14 @@ class TwoBody( baseModule.Form ) :
         return PofEnergyPrime
 
     def evaluate( self, energy, mu, phi = 0, frame = None ) :
+        r"""
+        This method returns the value of *self* at :math:`P(\mu|energy)`.
+
+        :param energy:      This parameter is the projectile energy to evaluate *self* at.
+        :param mu:          This parameter is the :math:`\mu` value to evaluate *self* at.
+        :param phi:         This parameter is not used.
+        :param frame:       The frame to evaluate *self* in.
+        """
 
         if( frame is None ) : frame = self.productFrame
         if( frame == self.productFrame ) :
@@ -941,22 +1447,47 @@ class TwoBody( baseModule.Form ) :
             raise ValueError( 'Only frame of product is currently supported' )
 
     def findLinks( self, links ) :
+        """
+        Need to figure out what this method is doing and document it.
+        """
 
         item = self.angularSubform
         if( isinstance( item, ( linkModule.Link, linkModule.Link2 ) ) ) : links.append( [ item, item.link, item.path ] )
 
     def fixDomains(self, energyMin, energyMax, domainToFix):
         """
-        This method call \*\*fixDomains\* on the \*\*angularSubform\* member.
+        This method call *fixDomains* on the *angularSubform* member.
         """
 
         return self.angularSubform.fixDomains(energyMin, energyMax, domainToFix)
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
+        """
+        This method returns the list of projectile energies that the data of *self* is specific at.
+
+        :parem EMin:        If *self* does not have an projectile energy values, the default minimum energy to return.
+        :parem EMax:        If *self* does not have an projectile energy values, the default maximum energy to return.
+
+        :return:            Python list of float.
+        """
 
         return( self.angularSubform.getEnergyArray( EMin = EMin, EMax = EMax ) )
 
     def integrate( self, reaction_suite, energyIn, energyOut = None, muOut = None, phiOut = None, frame = xDataEnumsModule.Frame.product, LegendreOrder = 0 ) :
+        """
+        This meethod integrates the distribution at projectile energy over the specified outgoing energy, mu and phi ranges.
+        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*, *muOut* and *phiOut*.
+        
+        :param reaction_suite:      The :py:class:`ReactionSuite` instance for this distribution.
+        :param energyIn:            The energy of the projectile.
+        :param energyOut:           The outgoing energy range to integrate over.
+        :param muOut:               The outgoing mu range to integrate over.
+        :param phiOut:              The outgoing phi range to integrate over.
+        :param frame:               The frame the outgoing energy, mu and phi range specify.
+        :param LegendreOrder:       The parameter is not used.
+
+        :return:                    A float representing the value of the integration.
+        """
 
         from fudge import product as productModule
         from ... import outputChannel as outputChannelModule
@@ -1038,18 +1569,38 @@ class TwoBody( baseModule.Form ) :
         return( angular_evaluate * phi_evaluate )
 
     def invert( self ) :
+        r"""
+        This method returns a 2d angular instance that is the reflection of *self* (i.e., :math:`P(-\mu|E)`).
+        """
 
         return( self.angularSubform.invert( ) )
 
     def isIsotropic( self ) :
+        """
+        This method returns True if *self* is isotropic for all projectile energies and False otherwise.
+        """
 
         return( self.angularSubform.isIsotropic( ) )
 
     def isTwoBody( self ) :
+        """
+        This method always returns True since *self* is a two-body distribution.
+        """
 
         return( True )
 
     def processMC_cdf( self, style, tempInfo, indent ) :
+        """
+        This methods returns an :py:class:`TwoBody` instance representing *self* with (xs, pdf, cdf) data for 
+        representing the P(mu) data as needed for Monte Carlo transport.
+
+    
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+    
+        :return:                An instance of self.
+        """     
 
         verbosity = tempInfo['verbosity']
         indent2 = indent + tempInfo['incrementalIndent']
@@ -1062,6 +1613,15 @@ class TwoBody( baseModule.Form ) :
         return( form )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
+        """
+        Returns a multi-group representation of *self*.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                A multi-group representation of *self*.
+        """
 
         from fudge.processing import group as groupModule
         from fudge.processing.deterministic import transferMatrices as transferMatricesModule
@@ -1097,13 +1657,28 @@ class TwoBody( baseModule.Form ) :
         return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a pointwise represent of *self*.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`XYs2d` instance.
+        """
 
         return( self.angularSubform.toPointwise_withLinearXYs( **kwargs ) )
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
-        Translate <angularTwoBody> element from xml. Returns instance of angular.TwoBody.
+        Parse *node* into an instance *cls*.
+
+        :param cls:         Form class to return. 
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
         """
 
         xPath.append(node.tag)
@@ -1124,7 +1699,7 @@ class TwoBody( baseModule.Form ) :
 
     @staticmethod
     def productMuInCOM_fromProductMuInLab(muLab, COM_speed, productCOM_speed):
-        '''
+        r"""
         This function returns the tuple (mu1, mu2, isTangent) where mu1 and mu2 are the center-of-
         mass (COM) frame mus for an outgoing particle (product) that correspond to the lab frame mu *muLab*.
         The interaction is two-body, *COM_speed* is the COM mass speed and *productCOM_speed*
@@ -1135,7 +1710,13 @@ class TwoBody( baseModule.Form ) :
         and the tuple (None, None, False) is returned. If *muLab* is tangent to the circle of the product's
         velolicty in the COM frame then (mu1, None, True) are returned. Otherwise (mu1, mu2, False) is
         returned with mu1 < mu2.
-        '''
+
+        :param muLab:               The desired :math:`\mu` value in the lab frame.
+        :param COM_speed:           The center-of-mass speed of the system (i.e., projectile and target).
+        :param productCOM_speed:    The speed of the outgoing particle in the center-of-mass frame.
+
+        :return:                    (mu1, mu2, isTangent).
+        """
 
         speedRatio = COM_speed / productCOM_speed
         factor = speedRatio * (1.0 - muLab * muLab)
@@ -1161,7 +1742,7 @@ class TwoBody( baseModule.Form ) :
 
     @staticmethod
     def productMuInCOM_fromProductMusInLab(muMinLab, muMaxLab, COM_speed, productCOM_speed):
-        '''
+        """
         This function determines all center-of-mass (COM) frame mu domains (i.e., [mu1, mu2] pairs) that lay 
         between the lab frame mus *muMinLab* and *muMaxLab*. The returned objects is a list that can contain 0, 
         1 or 2 pairs of mu values. Note if *muMinLab* >= *muMaxLab* an empty list is returned. If 
@@ -1169,7 +1750,7 @@ class TwoBody( baseModule.Form ) :
         1) no COM mus corresonding to *muMaxLab* (and hence *muMinLab*) in which case an empty list is also returned, 
         2) only *muMaxLab* has corresonding COM mus and [[mu1, mu2]] is returned where mu1 < mu2 or 3) both *muMinLab*
         and *muMaxLab* have corresonding COM mus and [[mu1, mu2], [mu3, mu4]] where mu1 < mu2 < mu3 < mu4 is returned.
-        '''
+        """
 
         if muMinLab >= muMaxLab:
             return []
@@ -1189,17 +1770,37 @@ class TwoBody( baseModule.Form ) :
         return [[mu3, mu1], [mu2, mu4]]
 
 def calculateAverageProductData( self, style, indent, **kwargs ) :
-    """
-    This function calculates average product data for two-body reactions.
+    """         
+    This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+    Average means over all outgoing angle and energy.
+    
+    :param style:   The style instance which the calculated data will belong to.
+    :param indent:  If this method does any printing, this is the amount of indentation of the printed line.
+    :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
     """
 
     def calculateDepositionEnergyAtE( angularData, E, parameters ) :
+        r"""
+        For internal use. This function calculates the average energy to the outgoing particle in the lab frame.
+
+        :param angularData:     The angular data :math:`P(\mu|E)`.
+        :param E:               The projectile energy the average energy is evaluated at.
+        :param parameters:      Parameters used to calculate the average energy.
+        """
 
         a1x, a2y, Qp = parameters['a1x'], parameters['a2y'], parameters['Qp']
         dE = max( 0., E - Qp )
         return( a1x * E + a2y * dE + 2. * math.sqrt( a1x * a2y * E * dE ) * angularData.averageMu( E, accuracy = energyAccuracy ) )
 
     def calculateDepositionEnergyAtEForPhotoProjectile( angularData, E, parameters ) :
+        r"""
+        For internal use. This function calculates the average energy to the outgoing photon in the lab frame
+        when the projectile is a photon.
+
+        :param angularData:     The angular data :math:`P(\mu|E)`.
+        :param E:               The projectile energy the average energy is evaluated at.
+        :param parameters:      Parameters used to calculate the average energy.
+        """
 
         mass2, massx, massy, Q = parameters['m2'], parameters['mx'], parameters['my'], parameters['Q']
         E__E_m2 = E / ( E + mass2 )
@@ -1207,10 +1808,21 @@ def calculateAverageProductData( self, style, indent, **kwargs ) :
         return( 0.5 * E__E_m2**2 * massx + dE + E__E_m2 * math.sqrt( 2. * dE * massx ) * angularData.averageMu( E, accuracy = energyAccuracy ) )
 
     def calculateDepositionEnergyAtE_forInfiniteTargetMass( angularData, E, parameters ) :
+        r"""
+        For internal use. This function calculates the average energy to the outgoing photon in the lab frame assuming theat the
+        target mass can be assumed to be infinite. The returned value is alwasy *E*.
+
+        :param angularData:     The angular data :math:`P(\mu|E)`.
+        :param E:               The projectile energy the average energy is evaluated at.
+        :param parameters:      Parameters used to calculate the average energy.
+        """
 
         return( E )
 
     class CalculateDepositionEnergyThicken :
+        """
+        For internal use. This class is needed by the :py:func:`fudgemath.thickenXYList` function.
+        """
 
         def __init__( self, data, angular, func, parameters, relativeTolerance, absoluteTolerance ) :
 
@@ -1222,16 +1834,36 @@ def calculateAverageProductData( self, style, indent, **kwargs ) :
             self.absoluteTolerance = absoluteTolerance
 
         def evaluateAtX( self, E ) :
+            """
+            Returns the average energy to the outgoing particle for prjectile energy *E*.
+
+            :param E:       Energy of the prjectile.
+            """
 
             return( self.func( self.angular, E, self.parameters ) )
 
     def calculateDepositionMomentumAtE( angularData, E, parameters ) :
+        r"""
+        For internal use. This function calculates the average momentum to the outgoing particle in the lab frame.
+
+        :param angularData:     The angular data :math:`P(\mu|E)`.
+        :param E:               The projectile energy the average energy is evaluated at.
+        :param parameters:      Parameters used to calculate the average energy.
+        """
 
         mass1, massx, b1x, a2y, Qp = parameters['m1'], parameters['mx'], parameters['b1x'], parameters['a2y'], parameters['Qp']
         dE = max( 0., E - Qp )
         return( b1x * math.sqrt( 2. * E / mass1 ) + math.sqrt( 2. * massx * a2y * dE ) * angularData.averageMu( E, accuracy = momentumAccuracy ) )
 
     def calculateDepositionMomentumAtEForPhotoProjectile( angularData, E, parameters ) :
+        r"""
+        For internal use. This function calculates the average energy to the outgoing particle in the lab frame
+        when the projectile is a photon.
+
+        :param angularData:     The angular data :math:`P(\mu|E)`.
+        :param E:               The projectile energy the average energy is evaluated at.
+        :param parameters:      Parameters used to calculate the average energy.
+        """
 
         mass2, massx, massy, Q = parameters['m2'], parameters['mx'], parameters['my'], parameters['Q']
         E__E_m2 = E / ( E + mass2 )
@@ -1239,10 +1871,21 @@ def calculateAverageProductData( self, style, indent, **kwargs ) :
         return( E__E_m2 * massx + math.sqrt( 2. * dE * massx ) * angularData.averageMu( E, accuracy = momentumAccuracy ) )
 
     def calculateDepositionMomentumAtE_forInfiniteTargetMass( angularData, E, parameters ) :
+        r"""
+        For internal use. This function calculates the average energy to the outgoing photon in the lab frame assuming
+        that the target mass can be assumed to be infinite.
+
+        :param angularData:     The angular data :math:`P(\mu|E)`.
+        :param E:               The projectile energy the average energy is evaluated at.
+        :param parameters:      Parameters used to calculate the average energy.
+        """
 
         return( math.sqrt( 2.0 * mass1 * E ) * angularData.averageMu( E, accuracy = momentumAccuracy ) )
 
     class CalculateDepositionMomentumThicken :
+        """
+        For internal use. This class is needed by the :py:func:`fudgemath.thickenXYList` function.
+        """
 
         def __init__( self, data, angular, func, parameters, relativeTolerance, absoluteTolerance ) :
 
@@ -1254,6 +1897,11 @@ def calculateAverageProductData( self, style, indent, **kwargs ) :
             self.absoluteTolerance = absoluteTolerance
 
         def evaluateAtX( self, E ) :
+            """
+            Returns the average momentum to the outgoing particle for prjectile energy *E*.
+
+            :param E:       Energy of the prjectile.
+            """
 
             return( self.func( self.angular, E, self.parameters ) )
 

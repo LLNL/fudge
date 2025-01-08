@@ -44,7 +44,26 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
-<span class="sd">&quot;&quot;&quot;Uncorrelated double differential distribution classes.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;             </span>
+<span class="sd">This module contains classes and functions supporting uncorrelated double differential distribution.</span>
+<span class="sd">                </span>
+<span class="sd">    This module contains the following classes: </span>
+<span class="sd">            </span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class             | Description                                                           |</span>
+<span class="sd">    +===================+=======================================================================+</span>
+<span class="sd">    | Subform           | Base class for :py:class:`AngularSubform` and                         |</span>
+<span class="sd">    |                   | :py:class:`EnergySubform` classes.                                    |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | AngularSubform    | This class represents the angular part of the distribution.           |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | EnergySubform     | This class represents the energy part of the distribution.            |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Form              | Class representing the **GNDS** uncorrelated distribution. This       |</span>
+<span class="sd">    |                   | distribution has 2 child nodes. One representing the angular part     |</span>
+<span class="sd">    |                   | and one representing the energy part of the distribution.             |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">fudge.core.math</span> <span class="kn">import</span> <span class="n">fudgemath</span>
@@ -66,6 +85,20 @@
 
 
 <div class="viewcode-block" id="Subform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Subform">[docs]</a><span class="k">class</span> <span class="nc">Subform</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for the :py:class:`AngularSubform` and :py:class:`EnergySubform` classes.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    | Member    | Description                                               |</span>
+<span class="sd">    +===========+===========================================================+</span>
+<span class="sd">    | data      | This member stores the actual data as a 2d function.      |</span>
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+
+<span class="sd">    :param data:            2d function representing the angular or energy data.</span>
+<span class="sd">    :param dataSubform:     Allowed class for *data*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="p">)</span>
 
@@ -79,15 +112,25 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">productFrame</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the frame the product data are specified in.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">productFrame</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Subform.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Subform.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Subform.copy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Subform.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a copy of *self*.</span>
+
+<span class="sd">        :return:        An instance that is the same class as *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span></div>
 
@@ -99,6 +142,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fixDomains</span><span class="p">(</span><span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainsToFix</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Subform.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Subform.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
 
@@ -108,6 +159,13 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">xmlStringList</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Subform.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Subform.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self* in a representation suitable for Monte Carlo transport.</span>
+
+<span class="sd">        :param style:           The style for the returned data.</span>
+<span class="sd">        :param tempInfo:        Dictionary of data needed to calculate the data.</span>
+<span class="sd">        :param indent:          The indentation for any verbosity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span>
@@ -115,7 +173,7 @@
 
 <div class="viewcode-block" id="Subform.findEntity"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Subform.findEntity">[docs]</a>    <span class="k">def</span> <span class="nf">findEntity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Override ancestry.findEntity for angularSubform and energySubform</span>
+<span class="sd">        Overrides :py:meth:`ancestryModule.Ancestry.findEntity`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">moniker</span> <span class="o">==</span> <span class="n">entityName</span><span class="p">:</span>
@@ -124,10 +182,34 @@
 
 <div class="viewcode-block" id="Subform.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Subform.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method does nothing.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param element:     Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return: an instance of *cls* representing *element*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">pass</span></div></div>
 
 <div class="viewcode-block" id="AngularSubform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.AngularSubform">[docs]</a><span class="k">class</span> <span class="nc">AngularSubform</span><span class="p">(</span> <span class="n">Subform</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class representing the angular data for an uncorrelated distribution.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    | Member    | Description                                               |</span>
+<span class="sd">    +===========+===========================================================+</span>
+<span class="sd">    | data      | This member stores the actual data as a 2d function.      |</span>
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    </span>
+<span class="sd">    :param data:            2d function representing the angular data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;angular&#39;</span>
 
@@ -136,6 +218,19 @@
         <span class="n">Subform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">Subform</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="EnergySubform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.EnergySubform">[docs]</a><span class="k">class</span> <span class="nc">EnergySubform</span><span class="p">(</span> <span class="n">Subform</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class representing the energy data for an uncorrelated distribution.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    | Member    | Description                                               |</span>
+<span class="sd">    +===========+===========================================================+</span>
+<span class="sd">    | data      | This member stores the actual data as a 2d function.      |</span>
+<span class="sd">    +-----------+-----------------------------------------------------------+</span>
+<span class="sd">    </span>
+<span class="sd">    :param data:            2d function representing the angular data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;energy&#39;</span>
 
@@ -147,6 +242,21 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Contains uncorrelated distributions for outgoing angle and outgoing energy. Use when the correlations</span>
 <span class="sd">    between angle and energy are unknown.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-------------------+-----------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                               |</span>
+<span class="sd">    +===================+===========================================================+</span>
+<span class="sd">    | angularSubform    | Angular data.                                             |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------+</span>
+<span class="sd">    | energySubform     | Energy data.                                              |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------+</span>
+<span class="sd">    </span>
+<span class="sd">    :param label:               The label for this form.</span>
+<span class="sd">    :param productFrame:        The frame the product data are specified in.</span>
+<span class="sd">    :param _angularSubform:     An :py:class:`AngularSubform` representing the energy data.</span>
+<span class="sd">    :param _energySubform:      An :py:class:`EnergySubform` representing the energy data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;uncorrelated&#39;</span>
@@ -162,10 +272,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the energy unit of the projectile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Form.calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;         </span>
+<span class="sd">        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.</span>
+<span class="sd">        Average means over all outgoing angle and energy.</span>
+<span class="sd">        </span>
+<span class="sd">        :param style:   The style instance which the calculated data will belong to.</span>
+<span class="sd">        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.</span>
+<span class="sd">        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">Regions2d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Regions2d angular is currently not supported&#39;</span> <span class="p">)</span>
@@ -188,12 +309,18 @@
         <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">aveEnergy</span> <span class="p">],</span> <span class="p">[</span> <span class="n">aveMomentum</span> <span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns the energy spectrum at projectile energy *energyIn* in frame *frame*. Currently,</span>
-<span class="sd">        if frame=&#39;lab&#39; and the product is a photon then its data are treated as being in the lab frame.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the outgoing particle&#39;s energy spectrum at projectile energy *energyIn* for frame *frame*,</span>
+<span class="sd">        Currently, if frame=&#39;lab&#39; and the product is a photon then its data are treated as being in the lab frame.</span>
 <span class="sd">        The domain of angular integration can be set with the muMin and muMax keys in *kwargs*. Default angular integration</span>
 <span class="sd">        is from -1 to 1.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+
+<span class="sd">        :param energy_in:           Energy of the projectile.</span>
+<span class="sd">        :param frame:               The frame to calculate the energy spectrum in. </span>
+<span class="sd">        :param kwargs:              A dictionary that contains data to control the way this method acts.</span>
+<span class="sd">        </span>
+<span class="sd">        :return:                    XYs1d instance for the energy spectrum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">class</span> <span class="nc">AngualarAtEnergyCOM</span><span class="p">:</span>
 
@@ -231,16 +358,17 @@
             <span class="k">return</span> <span class="n">energySpectrum</span></div>
 
 <div class="viewcode-block" id="Form.getSpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.getSpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">getSpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method is deprecated, please use energySpectrumAtEnergy instead.</span>
 <span class="sd">        Returns the energy spectrum for self at projectile energy in the lab frame.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energySpectrumAtEnergy</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">lab</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.findEntity"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.findEntity">[docs]</a>    <span class="k">def</span> <span class="nf">findEntity</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Overrides ancestry.findEntity. uncorrelated contains both energy and angular form,</span>
+<span class="sd">        Overrides :py:func:`ancestryModule.Ancestry.findEntity`.</span>
+<span class="sd">        Uncorrelated contains both energy and angular form,</span>
 <span class="sd">        need to check both to find desired entity</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -259,6 +387,20 @@
         <span class="k">return</span> <span class="n">numberOfFixes</span></div>
 
 <div class="viewcode-block" id="Form.integrate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reaction_suite</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">muOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phiOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">product</span><span class="p">,</span> <span class="n">LegendreOrder</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This meethod integrates the distribution at projectile energy over the specified outgoing energy, mu and phi ranges.</span>
+<span class="sd">        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*, *muOut* and *phiOut*.</span>
+<span class="sd">        </span>
+<span class="sd">        :param reaction_suite:      The :py:class:`ReactionSuite` instance for this distribution.</span>
+<span class="sd">        :param energyIn:            The energy of the projectile.</span>
+<span class="sd">        :param energyOut:           The outgoing energy range to integrate over.</span>
+<span class="sd">        :param muOut:               The outgoing mu range to integrate over.</span>
+<span class="sd">        :param phiOut:              The outgoing phi range to integrate over.</span>
+<span class="sd">        :param frame:               The frame the outgoing energy, mu and phi range specify.</span>
+<span class="sd">        :param LegendreOrder:       The parameter is not used.</span>
+
+<span class="sd">        :return:                    A float representing the value of the integration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">angularEvaluate</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="n">angularData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">data</span>
@@ -297,6 +439,16 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">phiEvaluate</span> <span class="o">*</span> <span class="n">angularEvaluate</span> <span class="o">*</span> <span class="n">energyPartialIntegral</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.processMC_cdf"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This methods returns an :py:class:`Form` instance representing *self* with (xs, pdf, cdf) data </span>
+<span class="sd">        for P(E&#39;) and P(mu).</span>
+<span class="sd">    </span>
+<span class="sd">        :param style:           The style for the returned data.</span>
+<span class="sd">        :param tempInfo:        Dictionary of data needed to calculate the data.</span>
+<span class="sd">        :param indent:          The indentation for any verbosity.</span>
+<span class="sd">    </span>
+<span class="sd">        :return:                An instance of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>     
 
         <span class="n">_angularSubform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
         <span class="n">_energySubform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energySubform</span><span class="o">.</span><span class="n">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
@@ -309,6 +461,15 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">_form</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a multi-group representation of *self*.</span>
+
+<span class="sd">        :param style:           The style for the returned data.</span>
+<span class="sd">        :param tempInfo:        Dictionary of data needed to calculate the data.</span>
+<span class="sd">        :param indent:          The indentation for any verbosity.</span>
+
+<span class="sd">        :return:                A multi-group representation of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="kn">import</span> <span class="n">group</span> <span class="k">as</span> <span class="n">groupModule</span>
         <span class="kn">from</span> <span class="nn">fudge.processing.deterministic</span> <span class="kn">import</span> <span class="n">transferMatrices</span> <span class="k">as</span> <span class="n">transferMatricesModule</span>
@@ -349,6 +510,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">groupModule</span><span class="o">.</span><span class="n">TMs2Form</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.spectrum"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.spectrum">[docs]</a>    <span class="k">def</span> <span class="nf">spectrum</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an :py:class:`energyAngularModule.XYs3d` instance of *self*.</span>
+
+<span class="sd">        :param frame:       The desired frame the distribution is to represent.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">frame</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span>
 
@@ -363,6 +530,12 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">xys3d</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.spectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.spectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">spectrumAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">frame</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a XYs2d instance of *self* evaluated at *energyIn*.</span>
+
+<span class="sd">        :param energyIn:    The energy of the projectile that the distribution is evaluated at.</span>
+<span class="sd">        :param frame:       The desired frame the distribution is to represent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">class</span> <span class="nc">AngualarAtEnergyCOM</span> <span class="p">:</span>
 
@@ -394,6 +567,13 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">miscellaneousModule</span><span class="o">.</span><span class="n">energyAngularSpectrumFromCOMSpectrumToLabAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyProbability</span><span class="p">,</span> <span class="n">AngualarAtEnergyCOM</span><span class="p">(</span> <span class="n">angularProbability</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a pointwise represent of *self*.</span>
+
+<span class="sd">        :param kwargs:              A dictionary that contains data to control the way this method acts.</span>
+
+<span class="sd">        :return:                    An :py:class:`angularEnergyModule.XYs3d` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">angularSubform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
         <span class="n">energySubform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energySubform</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
@@ -416,6 +596,14 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">f_E_mu_Ep</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
 
@@ -432,8 +620,18 @@
 
 <div class="viewcode-block" id="Form.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.Form.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Translate &lt;uncorrelated&gt; element from xml. Must contain one &lt;angular&gt; and one &lt;energy&gt; component.&quot;&quot;&quot;</span>
-        
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *element* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param element:     Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return: an instance of *cls* representing *element*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">Form</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
@@ -447,6 +645,17 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">uncorrelated</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.uncorrelated.calculateAverageProductData">[docs]</a><span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">angularSubform</span><span class="p">,</span> <span class="n">energySubform</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;         </span>
+<span class="sd">    This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.</span>
+<span class="sd">    Average means over all outgoing angle and energy.</span>
+
+<span class="sd">    :param productFrame:    The frame the product data are specified in.</span>
+<span class="sd">    :param angularSubform:  2d function of the angular data.</span>
+<span class="sd">    :param energySubform:   2d function of the energy data.</span>
+<span class="sd">    :param style:           The style instance which the calculated data will belong to.</span>
+<span class="sd">    :param indent:          If this method does any printing, this is the amount of indentation of the printed line.</span>
+<span class="sd">    :param kwargs:          A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">fixLimits</span><span class="p">(</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span><span class="p">,</span> <span class="n">Es</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -455,7 +664,7 @@
         <span class="n">Es</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">while</span><span class="p">(</span> <span class="n">Es</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">EMin</span> <span class="p">)</span> <span class="p">:</span> <span class="k">del</span> <span class="n">Es</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">while</span><span class="p">(</span> <span class="n">Es</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">:</span> <span class="k">del</span> <span class="n">Es</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="o">.</span><span class="n">sortAndThin</span><span class="p">(</span> <span class="n">Es</span><span class="p">,</span> <span class="mf">1e-6</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="o">.</span><span class="n">sortAndThin</span><span class="p">(</span> <span class="n">Es</span><span class="p">,</span> <span class="mf">1e-12</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">calculateAverageEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Ein</span> <span class="p">)</span> <span class="p">:</span>
 

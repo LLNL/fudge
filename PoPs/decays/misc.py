@@ -47,6 +47,44 @@ def completePhotonBranchingData(initialState, branchingData, probability, comple
         completePhotons[key][1] += branchingRatio * probability * photonEmissionProbability
         completePhotonBranchingData(finalState, branchingData, branchingRatio * probability, completePhotons)
 
+def angleBiasingPhotonBranchingData(initialState, branchingData, probability, angleBiasingData, photonDecayChain):
+    """
+    This function calculations transition probabilities for each decay transition and the data needed to calculate
+    the photon multiplicity for each transition. The results are stored in *angleBiasingData*. For decay transition *trans*
+    the following::
+
+    photonDecayChain[trans][0] is the probabiltity for emitting this photon. The sum of the this for all transistions (i.e., photons) is 1.
+    photonDecayChain[trans][1] is the probability for emitting this photon for one decay path.
+    photonDecayChain[trans][2] is the probability weighted multiplicity for emitting this photon for one decay path.
+
+    :param initialState:            The current state (nuclide) the decaying isotope is in.
+    :param branchingData:           Branching data calculated by the function **photonBranchingData**.
+    :param probability:             The probability of reaching level *initialState*.
+    :param angleBiasingData:        A python dict of all emitted photon data by transition.
+    :param photonDecayChain:        A list of length two. The first item is the photon multiplicity and the second
+                                    is the list of decay transitions.
+    """
+
+    gammas = branchingData[initialState]['photons']
+    if len(gammas) == 0:
+        for transition in photonDecayChain[1]:
+            if transition not in angleBiasingData:
+                angleBiasingData[transition] = [0.0, 0.0, 0.0]
+            if photonDecayChain[0] != 0.0:
+                angleBiasingData[transition][0] += probability / photonDecayChain[0]    # Add probability for emitting this photon (i.e., transition).
+                angleBiasingData[transition][1] += probability
+                angleBiasingData[transition][2] += photonDecayChain[0] * probability    # Multiplicity * probability.
+        return
+
+    for branchingRatio, gammaEnergy, finalState, photonEmissionProbability in gammas:
+        photonDecayChain[0] += photonEmissionProbability    # If all photonEmissionProbability's are 1, this is the number of photons emitted by this decay path.
+
+        key = '%s:%s' % (initialState, finalState)
+        photonDecayChain[1].append(key)
+        angleBiasingPhotonBranchingData(finalState, branchingData, branchingRatio * probability, angleBiasingData, photonDecayChain)
+        photonDecayChain[1].remove(key)
+        photonDecayChain[0] -= photonEmissionProbability
+
 def photonBranchingData(pops, id):
     '''
     This function summarizes all photon branches for the specified nuclide. The returned object is a dictionary with 
@@ -104,5 +142,15 @@ def photonBranchingData(pops, id):
         completePhotons = {}
         completePhotonBranchingData(nuclideId, branchingData, 1.0, completePhotons)
         nuclideData['completePhotons'] = completePhotons
+
+        _angleBiasingData = {}
+        angleBiasingPhotonBranchingData(nuclideId, branchingData, 1.0, _angleBiasingData, [0.0, []])
+        angleBiasingData = {}
+        for transition, data in _angleBiasingData.items():
+            multiplicity = 0.0
+            if data[1] != 0:
+                multiplicity = data[2] / data[1]
+            angleBiasingData[transition] = {'probability': data[0], 'multiplicity': multiplicity}
+        nuclideData['angleBiasingData'] = angleBiasingData
 
     return branchingData

@@ -7,6 +7,8 @@
 
 from pqu import PQU as PQUModule
 
+from PoPs import misc as PoPs_miscModule
+
 from fudge import abstractClasses as abstractClassesModule
 
 from .photonScattering import coherent as coherentModule
@@ -53,11 +55,21 @@ class Component( abstractClassesModule.Component ) :
 
         return 0
 
-    def listOfProducts(self):
-        """Returns, as a set, the list of PoP's ids for all products (i.e., outgoing particles) for *self*."""
+    def listOfProducts(self, finalOnly=False, includeQualifier=True):
+        '''
+        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.
+
+        :param finalOnly:           If `True`, only final product ids are returned, otherwise, all are returned..
+        :param includeQualifier:    If `True`, particle qualifiers are include in ids, otherwise, they are stripped from ids.
+
+        :return:                    A python set instance.
+        '''
 
         products = set()
-        if len(self) > 0: products.add(self[0].pid)
+        if len(self) > 0:
+            pid = self[0].pid
+            if not includeQualifier:
+                pid = PoPs_miscModule.idWithQualifierRemoved(pid)
+            products.add(pid)
 
         return products
-

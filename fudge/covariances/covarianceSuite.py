@@ -11,6 +11,7 @@ Module with containers for covariances in several different forms
 
 import sys
 import os
+import pathlib
 
 from LUPY import ancestry as ancestryModule
 from fudge import GNDS_formatVersion as GNDS_formatVersionModule
@@ -86,7 +87,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
             interaction = enumsModule.Interaction.TNSL
         self.interaction = interaction
 
-        self.__sourcePath = sourcePath
+        self.sourcePath = sourcePath
 
         self.__externalFiles = suitesModule.ExternalFiles()
         self.__externalFiles.setAncestor( self )
@@ -107,6 +108,22 @@ class CovarianceSuite(ancestryModule.AncestryIO):
         """Returns the sourcePath member which is the path to the covarianceSuite file for self if self is from a file."""
 
         return( self.__sourcePath )
+
+    @sourcePath.setter
+    def sourcePath(self, path):
+        """
+        This method sets *self*'s *sourcePath* to *path*.
+
+        :param path:        The new *sourcePath*.
+        """
+
+        if isinstance(path, pathlib.Path):
+            path = str(path)
+        if path is not None:
+            if not isinstance(path, str):
+                raise ValueError('Path must be a str or None, got "%s"' % type(path))
+
+        self.__sourcePath = path
     
     @property
     def styles(self):

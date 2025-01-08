@@ -262,6 +262,18 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
 
         return( [ item.label for item in self.__items ] )
 
+    def printAllowedChildren(self):
+        """
+        This method prints all the allowed classes that can be a added as a child of *self*.
+        """
+
+        for cls in self.allowedClasses:
+            try:
+                location = str(cls).split("'")[1]
+            except:
+                location = str(cls)
+            print('    %s' % location)
+
     def remove( self, label ) :
         """
         Remove item by label. Returns True if label was present, otherwise returns False
@@ -333,8 +345,9 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
 
         moniker = self.monikerByFormat.get(kwargs.get('formatVersion'), self.moniker)
         if len(self) == 0:
-            if kwargs.get('showEmptySuites', False):
-                return ['%s<%s/>' % (indent, moniker)]
+            showEmptySuite = kwargs.get('showEmpty', False) or kwargs.get('showEmptySuite', False)
+            if showEmptySuite:
+                return ['%s%-24s <!-- suite -->' % (indent, ('<%s/>' % moniker))]
             return []
 
         xmlString = ['%s<%s>' % (indent, moniker)]

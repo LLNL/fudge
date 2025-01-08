@@ -22,6 +22,7 @@ from . import productYield as productYieldModule
 class FissionFragmentData(ancestryModule.AncestryIO_base):
 
     moniker = 'fissionFragmentData'
+    ancestryMembers = ('delayedNeutrons', 'fissionEnergyReleases', 'productYields')
 
     def __init__( self ) :
 
@@ -93,6 +94,13 @@ class FissionFragmentData(ancestryModule.AncestryIO_base):
         self.__fissionEnergyReleases.convertUnits( unitMap )
         self.__productYields.convertUnits( unitMap )
 
+    def cullStyles(self, styleList):
+        """ See documentation for reactionSuite.cullStyles. """
+
+        self.__delayedNeutrons.cullStyles(styleList)
+        self.__fissionEnergyReleases.cullStyles(styleList)
+        self.__productYields.cullStyles(styleList)
+
     def fixDomains(self, labels, energyMin, energyMax):
         """
         Calls the **fixDomains** for the **delayedNeutrons** member.
@@ -100,10 +108,17 @@ class FissionFragmentData(ancestryModule.AncestryIO_base):
 
         return self.__delayedNeutrons.fixDomains(labels, energyMin, energyMax)
 
-    def listOfProducts(self):
-        """Returns, as a set, the list of PoP's ids for all products (i.e., outgoing particles) for all reactions of *self*."""
+    def listOfProducts(self, finalOnly=False, includeQualifier=True):
+        '''
+        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.
 
-        return self.__delayedNeutrons.listOfProducts()
+        :param finalOnly:           If `True`, only final product ids are returned, otherwise, all are returned..
+        :param includeQualifier:    If `True`, particle qualifiers are include in ids, otherwise, they are stripped from ids.
+
+        :return:                    A python set instance.
+        '''
+
+        return self.__delayedNeutrons.listOfProducts(finalOnly=finalOnly, includeQualifier=includeQualifier)
 
     def processMC_cdf( self, style, tempInfo, indent = '', incrementalIndent = '  ' ) :
 
@@ -177,13 +192,13 @@ class FissionFragmentData(ancestryModule.AncestryIO_base):
 
         return averageMomentum
 
-    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particles, productID, legendreOrder):
+    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder):
         """
         Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.
 
         :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles: The list of particles to be transported.
+        :param particleIDs: The list of particles to be transported.
         :param productID: Particle id for the requested product.
         :param legendreOrder: Requested Legendre order.
         """
@@ -191,17 +206,17 @@ class FissionFragmentData(ancestryModule.AncestryIO_base):
         productMatrix = matrixModule.Matrix()
         if multiGroupSettings.delayedNeutrons == transportingModule.DelayedNeutrons.on:
             for delayedNeutrons in self.delayedNeutrons:
-                productMatrix += delayedNeutrons.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, productID, legendreOrder)
+                productMatrix += delayedNeutrons.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder)
 
         return productMatrix
 
-    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particles, productID):
+    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particleIDs, productID):
         """
         Returns the full multi-group, total product array for the requested label for the requested product id.
 
         :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles: The list of particles to be transported.
+        :param particleIDs: The list of particles to be transported.
         :param productID: Particle id for the requested product.
         """
 
@@ -209,7 +224,7 @@ class FissionFragmentData(ancestryModule.AncestryIO_base):
 
         if multiGroupSettings.delayedNeutrons == transportingModule.DelayedNeutrons.on:
             for delayedNeutrons in self.delayedNeutrons:
-                productArray += delayedNeutrons.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
+                productArray += delayedNeutrons.multiGroupProductArray(multiGroupSettings, temperatureInfo, particleIDs, productID)
 
         return productArray
 

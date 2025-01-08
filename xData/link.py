@@ -10,10 +10,10 @@ from LUPY import ancestry as ancestryModule
 from . import base as baseModule
 
 class Link(baseModule.XDataCoreMembers):
-    '''
-    This class contains the path to another element, that could be stored in a different file.
-    The **follow** member function is used to get a pointer to the linked-to element,
-    which will then be stored as self.link.
+    """
+    An instance of this class represents a GNDS xPath and a link to to another instance (typically an instance of this class
+    represents a form that links to another form).  The :py:func:`follow` member function is used to get a pointer to the 
+    linked-to instance, which will then be stored as self's link member.
 
     The following table list the primary members of this class:
 
@@ -22,22 +22,24 @@ class Link(baseModule.XDataCoreMembers):
     +===========+===========================================================+
     | label     | XML tag name.                                             |
     +-----------+-----------------------------------------------------------+
-    | link      | Actual pointer to other data.                             |
+    | link      | Actual pointer to other instance (form).                  |
     +-----------+-----------------------------------------------------------+
-    | root      | File name where other data are stored, only needed if     |
-    |           | are not int current file.                                 |
+    | root      | File name where the other instance is stored. Only used   |
+    |           | if the linked-to instance was read / will be stored in a  |
+    |           | different file.                                           |
     +-----------+-----------------------------------------------------------+
     | path      | An xPath expression that identifies the other data.       |
     +-----------+-----------------------------------------------------------+
-    | relative  | FIXME.                                                    |
+    | relative  | If True, the xPath is relative to *self*, otherwise       |
+    |           | it is an absolute xPath.                                  |
     +-----------+-----------------------------------------------------------+
     
     example links::
 
-        <element href='/reactionSuite/reaction[@label="102"]'>
+        <form href='/reactionSuite/reaction[@label="102"]'>
         or
-        <element href='/covariances.xml#covId'>
-    '''
+        <form href='/covariances.xml#covId'>
+    """
 
     moniker = 'link'
 
@@ -45,11 +47,11 @@ class Link(baseModule.XDataCoreMembers):
         """
         Creates a link to another instance.
 
-        :param link: pointer to another instance. That instance should inherit from ancestry
-        :param root: external file identifier, required if the link points outside the current file
-        :param path: xPath expression that uniquely identifies the other instance
-        :param label: unique label, generally associated with a style (e.g. 'eval')
-        :param relative: boolean, whether to use relative link when writing out xPath (default = False)
+        :param link:        This is a reference to the linked-to instance. That instance must inherit from ancestry.
+        :param root:        External file identifier, required if the link points outside the current file.
+        :param path:        This is the xPath expression that uniquely identifies the lined-to instance.
+        :param label:       The label to *self*.
+        :param relative:    If True, use relative xPath when writing to a file (default = False).
         """
 
         baseModule.XDataCoreMembers.__init__(self, index=None, label=label)
@@ -63,10 +65,18 @@ class Link(baseModule.XDataCoreMembers):
         if self.path is not None: self.path = self.path.replace('"',"'")
 
     def __str__( self ) :
+        """
+        This method returns the xPath of the linked-to instance.
+
+        :returns:       A python str.
+        """
 
         return( "%s" % self.path )
 
     def __deepcopy__(self, memo = {}):
+        """
+        This method returns a copy of *self*.
+        """
 
         if self.path is None: self.updateXPath()
         theCopy = self.__class__( link = self.__link, root = self.root, path = self.path, label = self.label, relative = self.__relative )
@@ -76,8 +86,10 @@ class Link(baseModule.XDataCoreMembers):
     @property
     def link(self):
         """
-        Returns *self.__link*. However, if *self.__link* is **None** then **updateLink()** is called before *self.__link* is returned.
-        Also see **linkWithoutUpdating**.
+        This method returns a reference to the lined-to instance. If the reference is None then :py:func:`updateLink` is 
+        called before the reference is returned.  Also see :py:func:`linkWithoutUpdating`.
+
+        :returns:           The linked-to instance.
         """
 
         if self.__link is None:
@@ -87,24 +99,44 @@ class Link(baseModule.XDataCoreMembers):
 
     @link.setter
     def link(self, instance):
+        """
+        Thie method set's the linked-to instance to *instance*.
+
+        :param instance:    The new linked-to instance.
+        """
 
         self.__link = instance
 
     @property
     def linkWithoutUpdating(self):
         """
-        This method returns *self.__link* without calling "self.updateLink()" if *self.__link* is None. Also see method **link**.
+        This method returns a reference to the lined-to instance. If reference is None then None is returned.
+        Also see :py:func:`link`.
+
+        :returns:           The linked-to instance.
         """
 
         return self.__link
 
     @property
     def relative( self ) :
+        """
+        This method returns the value of the relative member.
+
+        :returns:           A boolean.
+        """
 
         return( self.__relative )
 
     def build_href( self, **kwargs ) :
-        """Builds the href (using "formatVersion" if present in **kwargs) and returns the href. The href will include the root if the root is not None."""
+        """
+        This member builds the xPath and returns it (using "formatVersion" if present in *kwargs*). 
+        The xPath will include the root if the root is not None.
+
+        :param kwargs:      A dictionary of extra arguments that controls how *self* creates the href.
+
+        :returns:           A python str.
+        """
 
         if( self.__link is None ) :           # Should only happen when linking is to another protare's data.
             XPath = self.path
@@ -121,7 +153,7 @@ class Link(baseModule.XDataCoreMembers):
 
     def updateLink(self):
         """
-        Uses the xpath to set the link.
+        This method uses the xPath to reset *self*'s link.
         """
 
         if self.path[0] == '.':
@@ -145,7 +177,7 @@ class Link(baseModule.XDataCoreMembers):
             self.link = self.follow(externalFile.instance)
 
     def updateXPath( self ):
-        """Ensure the xPath agrees with the linked-to data."""
+        """This method sets *self*'s path member to the linked-to instance."""
 
         if self.__relative and hasattr(self, 'toRelativeXLink'):
             self.path = self.toRelativeXLink( self.link )
@@ -154,13 +186,24 @@ class Link(baseModule.XDataCoreMembers):
 
     def follow( self, startNode ):
         """
-        :param startNode: instance corresponding to the beginning of self.path (must inherit from ancestry)
-        :return: class instance pointed to by self.path
+        This method returns the instance reference by *self*'s xPath.
+
+        :param startNode: instance corresponding to the beginning of self.href (must inherit from ancestry)
+
+        :return: instance pointed to by self.href
         """
 
         return startNode.followXPath( self.path )
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         attributeStr = self.attributesToXMLAttributeStr()
         return ['%s<%s%s href="%s"/>' % (indent, self.moniker, attributeStr, self.build_href(**kwargs))]
@@ -168,8 +211,17 @@ class Link(baseModule.XDataCoreMembers):
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
-        Parse the link. The resulting link points to None, and must be resolved by the calling function.
-        Link attributes can be converted to desired type by passing a 'typeConversion' dictionary in linkData
+        Parse *node* into an instance of *cls*.
+        The resulting link points to None, and must be resolved by the calling function.
+        Link attributes can be converted to desired type by passing a 'typeConversion' dictionary in linkData.
+
+        :param cls:         Class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
         """
 
         xPath.append( node.tag )
@@ -192,23 +244,7 @@ class Link(baseModule.XDataCoreMembers):
 
 class Link2(ancestryModule.AncestryIO):
     """
-    This class contains an href to another node as a xPath. The href could reference a node in a different file.
-    The 'follow' member function is used to get a pointer to the linked-to node,
-    which will then be stored as self.instance.
-    
-    Member data ::
-    
-        * moniker   : the moniker of the instance pointed to by instance (type: str)
-        * instance  : python reference to the linked instance (type: reference)
-        * root      : file name where other node exists, only needed if it's not the current file (type: str)
-        * href      : an xPath expression that uniquely identifies the other instance (type: str)
-        * relative  : Whether to use relative xlink when writing out xPath (type: bool)
-
-    sample links::
-
-        <element href='/reactionSuite/reaction[@label="102"]'/>
-        or
-        <element href='/covariances.xml#covId'/>
+    This class is like :py:class:`link` but adds members *moniker*, *keyName, and *keyValue*.
     """
 
     moniker = 'link'
@@ -231,10 +267,18 @@ class Link2(ancestryModule.AncestryIO):
         if( self.__href is not None ) : self.__href = self.__href.replace( '"', "'" )        # Careful with nesting single/double quotes.
 
     def __str__( self ) :
+        """
+        This method returns the xPath of the linked-to instance.
+
+        :returns:       A python str.
+        """
 
         return( "%s" % self.__href )
 
     def __deepcopy__(self, memo = {}):
+        """
+        This method returns a copy of *self*.
+        """
 
         if self.path is None:
             self.updateXPath()
@@ -246,14 +290,22 @@ class Link2(ancestryModule.AncestryIO):
 
     @property
     def moniker( self ) :
+        """
+        This method returns *self*'s moniker.
+
+        :returns:       A python str.
+        """
 
         return( self.__moniker )
 
     @property
     def instance(self) :
+        """
+        This method returns a reference to the lined-to instance. If the reference is None then :py:func:`updateLink` is 
+        called before the reference is returned.  Also see :py:func:`linkWithoutUpdating`.
 
-        if self.__instance is None:
-            self.updateLink()
+        :returns:           The linked-to instance.
+        """
 
         if self.__instance is None:
             self.updateLink()
@@ -267,26 +319,52 @@ class Link2(ancestryModule.AncestryIO):
 
     @property
     def link(self):
+        """
+        This method returns a reference to the lined-to instance. If the reference is None then :py:func:`updateLink` is 
+        called before the reference is returned.  Also see :py:func:`linkWithoutUpdating`.
+
+        :returns:           The linked-to instance.
+        """
 
         return self.instance
 
     @link.setter
     def link(self, value):
+        """
+        Thie method set's the linked-to instance to *value*.
+
+        :param value:       The new linked-to instance.
+        """
 
         self.instance = value
 
     @property
     def keyName( self ) :
+        """
+        This method returns *self*'s keyName.
+
+        :returns:           A python str.
+        """
 
         return( self.__keyName )
 
     @property
     def keyValue( self ) :
+        """
+        This method returns *self*'s keyValue.
+
+        :returns:           A python str.
+        """
 
         return( self.__keyValue )
 
     @property
     def index(self):
+        """
+        This method returns *self*'s index.
+
+        :returns:           A python str.
+        """
 
         if self.__keyName == 'index': return int(self.keyValue)
 
@@ -294,6 +372,11 @@ class Link2(ancestryModule.AncestryIO):
 
     @index.setter
     def index(self, value):
+        """
+        Thie method set's *self*'s index to *value*.
+
+        :param value:       The new index for *self*.
+        """
 
         if self.__keyName == 'index':
             self.__keyValue = int(value)
@@ -303,31 +386,63 @@ class Link2(ancestryModule.AncestryIO):
 
     @property
     def label( self ) :
+        """
+        This method returns *self*'s label.
+
+        :returns:           A python str.
+        """
 
         return( self.__label )
 
     @property
     def root( self ) :
+        """
+        This method returns *self*'s root.
+
+        :returns:           A python str.
+        """
 
         return( self.__root )
 
     @property
     def href( self ) :
+        """
+        This method returns *self*'s href.
+
+        :returns:           A python str.
+        """
 
         return( self.__href )
 
     @property
     def path( self ) :
+        """
+        This method returns *self*'s path.
+
+        :returns:           A python str.
+        """
 
         return( self.__href )
 
     @property
     def relative( self ) :
+        """
+        This method returns the value of the relative member.
+
+        :returns:           A boolean.
+        """
 
         return( self.__relative )
 
     def build_href( self, **kwargs ) :
-        """Builds the href (using "formatVersion" if present in **kwargs) and returns the href. The href will include the root if the root is not None."""
+        """
+        This member builds the xPath and returns it (using "formatVersion" if present in *kwargs*). 
+        The xPath will include the root if the root is not None.
+
+        :param kwargs:      A dictionary of extra arguments that controls how *self* creates the href.
+
+        :returns:           A python str.
+        """
 
         if self.__instance is None:                 # Should only happen when linking to another protare's data.
             XPath = self.path
@@ -343,6 +458,12 @@ class Link2(ancestryModule.AncestryIO):
         return( XPath )
 
     def updateKey( self, keyName = None, keyValue = None ) :
+        """
+        Thie method updates *self*'s *keyName* and *keyValue* members. This is mainly for use by the constructor :py:func:`__init__`.
+
+        :param keyName:     The new keyName.
+        :param keyValue:    The new keyValue.
+        """
 
         if( self.__keyName is not None ) :
             if( self.__keyName != keyName ) : raise Exception( '''self's Keyname "%s" != "%s"''' % ( self.__keyName, keyName ) )
@@ -359,7 +480,7 @@ class Link2(ancestryModule.AncestryIO):
 
     def updateLink(self):
         """
-        Uses the xpath to set the link.
+        This method uses the xPath to reset *self*'s link.
         """
 
         if self.path[0] == '.':
@@ -368,9 +489,7 @@ class Link2(ancestryModule.AncestryIO):
             self.link = self.follow(self.rootAncestor)
 
     def updateXPath( self ) :
-        """
-        Ensure the xPath agrees with the linked instance.
-        """
+        """This method sets *self*'s path member to the linked-to instance."""
 
         if( self.__relative ) :
             self.__href = self.toRelativeXLink( self.__instance )
@@ -380,7 +499,10 @@ class Link2(ancestryModule.AncestryIO):
 
     def follow( self, startNode ) :
         """
+        This method returns the instance reference by *self*'s xPath.
+
         :param startNode: instance corresponding to the beginning of self.href (must inherit from ancestry)
+
         :return: instance pointed to by self.href
         """
 
@@ -388,7 +510,12 @@ class Link2(ancestryModule.AncestryIO):
 
     def toXML_strList( self, indent = '', **kwargs ):
         """
-        Pointers show up in the attributes list on an xml element (i.e., <element href="...xpath" anotherAttribute="foo" .../>).
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
         """
 
         attributes = ''
@@ -400,8 +527,17 @@ class Link2(ancestryModule.AncestryIO):
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
-        Parse the xml-represented link back to python. The resulting link points to None, and must be resolved by the calling function.
-        Link attributes can be converted to desired type by passing a 'typeConversion' dictionary in linkData
+        Parse *node* into an instance of *cls*.
+        The resulting link points to None, and must be resolved by the calling function.
+        Link attributes can be converted to desired type by passing a 'typeConversion' dictionary in linkData.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
         """
 
         xPath.append( node.tag )

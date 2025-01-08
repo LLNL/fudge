@@ -46,6 +46,14 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains the GNDS documentation class.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                     | Description                                                                       |</span>
+<span class="sd">    +===========================+===================================================================================+</span>
+<span class="sd">    | Documentation             | This is the class for the GNDS documentation node.                                 |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
@@ -65,14 +73,67 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">texts</span> <span class="k">as</span> <span class="n">textsModule</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">text</span> <span class="k">as</span> <span class="n">textParentModule</span>
 
+
 <div class="viewcode-block" id="Documentation"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation">[docs]</a><span class="k">class</span> <span class="nc">Documentation</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS documentation node.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The class for the GNDS documentation node.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | Member                | Description                                                               |</span>
+<span class="sd">    +=======================+===========================================================================+</span>
+<span class="sd">    | doi                   | This is the doi if the data/publication/code were published.              |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | version               | This is the version of the data/publication/code for this documentation.  |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | publicationDate       | This is the date the data/publication/code was published.                 |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | authors               | This is the list of authors for the data/publication/code.                |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | contributors          | This is the list of contributors for the data/publication/code.           |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | collaborations        | This is the list of collaborations for the data/publication/code.         |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | dates                 | This is the list of dates for the data/publication/code.                  |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | copyright             | This is the copy right for the data/publication/code.                     |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | acknowledgements      | This is the list of acknowledgements for the data/publication/code.       |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | keywords              | This is the list of keywords for the data/publication/code.               |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | relatedItems          | This is the list of relatedItems for the data/publication/code.           |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | title                 | This is the title for the data/publication/code.                          |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | abstract              | This is the abstract for the data/publication/code.                       |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | body                  | This is the body for the data/publication/code.                           |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | computerCodes         | This is the list of computer codes used for the data/publication.         |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | experimentalDataSets  | This is the list of experimental datasets used for the data/publication.  |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | bibliography          | This is the list of bibliographies for the data/publication/code.         |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | endfCompatible        | This is text that is limited to 66 characters per line that can be        |</span>
+<span class="sd">    |                       | written to an ENDF-6 formatted file.                                      |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;documentation&#39;</span>
-    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;authors&#39;</span><span class="p">,</span> <span class="s1">&#39;contributors&#39;</span><span class="p">,</span> <span class="s1">&#39;collaborations&#39;</span><span class="p">,</span> <span class="s1">&#39;dates&#39;</span><span class="p">,</span> <span class="s1">&#39;copyright&#39;</span><span class="p">,</span> <span class="s1">&#39;acknowledgements&#39;</span><span class="p">,</span> <span class="s1">&#39;keywords&#39;</span><span class="p">,</span> 
-            <span class="s1">&#39;relatedItems&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;abstract&#39;</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="s1">&#39;computerCodes&#39;</span><span class="p">,</span> <span class="s1">&#39;experimentalDataSets&#39;</span><span class="p">,</span> <span class="s1">&#39;bibliography&#39;</span><span class="p">,</span> <span class="s1">&#39;endfCompatible&#39;</span> <span class="p">)</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;authors&#39;</span><span class="p">,</span> <span class="s1">&#39;contributors&#39;</span><span class="p">,</span> <span class="s1">&#39;collaborations&#39;</span><span class="p">,</span> <span class="s1">&#39;dates&#39;</span><span class="p">,</span> <span class="s1">&#39;copyright&#39;</span><span class="p">,</span> <span class="s1">&#39;acknowledgements&#39;</span><span class="p">,</span> <span class="s1">&#39;keywords&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;relatedItems&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;abstract&#39;</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="s1">&#39;computerCodes&#39;</span><span class="p">,</span> <span class="s1">&#39;experimentalDataSets&#39;</span><span class="p">,</span> <span class="s1">&#39;bibliography&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;endfCompatible&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doi</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">publicationDate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param doi:</span>
+<span class="sd">        :param version:</span>
+<span class="sd">        :param publicationDate:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -127,37 +188,61 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">doi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s doi.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *doi* member of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`textParentModule.Text`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doi</span>
 
     <span class="nd">@doi</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">doi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doi</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets self&#39;s doi to *doi*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the *doi* member of *self* to *doi*.</span>
+
+<span class="sd">        :param doi:     An instance of :py:class:`textParentModule.Text`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__doi</span> <span class="o">=</span> <span class="n">textParentModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">doi</span><span class="p">,</span> <span class="s1">&#39;doi&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s version.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *version* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`textParentModule.Text`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__version</span>
 
     <span class="nd">@version</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets self&#39;s version to *version*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the *version* member of *self* to *version*.</span>
+
+<span class="sd">        :param version:     An instance of :py:class:`textParentModule.Text`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__version</span> <span class="o">=</span> <span class="n">textParentModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">publicationDate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s publicationDate.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *publicationDate* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`dateModule.Date`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__publicationDate</span>
 
     <span class="nd">@publicationDate</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">publicationDate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets self&#39;s publicationDate to *date*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets the *date* member of *self* to *date*.</span>
+
+<span class="sd">        :param date:        An instance of :py:class:`dateModule.Date`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__publicationDate</span> <span class="o">=</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">Date</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">Resolution</span><span class="o">.</span><span class="n">undefined</span><span class="p">)</span>
@@ -167,76 +252,151 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">authors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *authors* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`authorModule.Authors`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__authors</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">contributors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *contributors* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`contributorModule.Contributor`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__contributors</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">collaborations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *collaborations* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`collaborationsModule.Collaborations`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__collaborations</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *dates* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`datesModule.Dates`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dates</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *copyright* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`copyrightModule.Copyright`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copyright</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">acknowledgements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *acknowledgements* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`acknowledgementModule.Acknowledgements`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__acknowledgements</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *keywords* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`keywordModule.Keywords`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__keywords</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">relatedItems</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *relatedItems* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`relatedItemModule.RelatedItems`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relatedItems</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *title* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`textsModule.Title`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__title</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">abstract</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *abstract* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`textsModule.Abstract`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__abstract</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *body* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`textsModule.Body`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">computerCodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *computerCodes* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`computerCodeModule.ComputerCodes`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__computerCodes</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">experimentalDataSets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *experimentalDataSets* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`exforDataSetModule.ExperimentalDataSets`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__experimentalDataSets</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">bibliography</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *bibliography* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`bibitemModule.Bibliography`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bibliography</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">endfCompatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *endfCompatible* member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`textsModule.EndfCompatible`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__endfCompatible</span>
 
@@ -246,10 +406,12 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Documentation.findEntriesWithKey"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation.findEntriesWithKey">[docs]</a>    <span class="k">def</span> <span class="nf">findEntriesWithKey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyValue</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns the list of each entry in *self*&#39;s authors, contributors, collaborations, acknowledgements, relatedItems and computerCodes</span>
-<span class="sd">        which have the key *keyValue*.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the list of each entry in *self*&#39;s authors, contributors, collaborations, acknowledgements,</span>
+<span class="sd">        relatedItems and computerCodes which have the key *keyValue*.</span>
+
+<span class="sd">        :param keyValue:        The value of the key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">keyValue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__authors</span><span class="p">:</span>
@@ -267,16 +429,23 @@
 
         <span class="k">return</span> <span class="n">entries</span></div>
 
-<div class="viewcode-block" id="Documentation.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Documentation.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:       The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:       dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:             List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;skipDocumentation&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[]</span>
 
-        <span class="n">showEmptySuites</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmptySuites&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">incrementalIndent</span>
 
-        <span class="n">XMLList</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__authors</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__authors</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__contributors</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__collaborations</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dates</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -292,11 +461,12 @@
         <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bibliography</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__endfCompatible</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">attributes</span>  <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">doi</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="s1">&#39; doi=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">doi</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">doi</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="s1">&#39; doi=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">doi</span>
         <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="s1">&#39; version=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span>
-        <span class="n">attributes</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__publicationDate</span><span class="o">.</span><span class="n">asXML_attribute</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;publicationDate&#39;</span><span class="p">)</span>
+        <span class="n">attributes</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__publicationDate</span><span class="o">.</span><span class="n">asXML_attribute</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;publicationDate&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">showEmptySuites</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">XMLList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">XMLList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
 
         <span class="n">XMLList</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributes</span><span class="p">))</span>
         <span class="n">XMLList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
@@ -304,6 +474,14 @@
         <span class="k">return</span> <span class="n">XMLList</span></div>
 
 <div class="viewcode-block" id="Documentation.parseNode"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method fills *self* by parsing the data in *node*.</span>
+
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 
@@ -313,6 +491,17 @@
 
 <div class="viewcode-block" id="Documentation.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.documentation.Documentation.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">doi</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;doi&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>

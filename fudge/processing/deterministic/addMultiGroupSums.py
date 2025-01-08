@@ -5,7 +5,27 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-import sys
+"""
+This module contains functions to calculates total, total for incomplete products and delayedNeutron multi-group sums.
+
+This module contains the following functions:
+            
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Function                              | Description                                                                       |
+    +=======================================+===================================================================================+
+    | findAddProductsWithPid                |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | toGridded1d                           | This function is used internally to call                                          |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | toGridded3d                           | This function counts the number of negative elements in the l=0 product matrix.   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | reactionMultiGrouping                 | This function parses the average product data in the file *fileName*.             |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | addMultiGroupSums                     |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+"""
+
+import pathlib
 import numpy
 
 from xData import enums as xDataEnumsModule
@@ -38,12 +58,15 @@ from . import tokens as tokensModule
 transportableIDs = (IDsModule.neutron, 'H1', 'H2', 'H3', 'He3', 'He4', IDsModule.photon)
 
 def findAddProductsWithPid(pid, outputChannel):
-    '''
-    Returns the list of all products in *outputChannel* with pid *pid*, including products nested in a product's outputChannel.
+    """
+    This function returns the list of all products in *outputChannel* with pid *pid*, including products nested in a product's outputChannel.
+    This function is for internal use.
 
-    :param pid:              The pid of the requrest product.
-    :param outputChannel:    The output channel to search.
-    '''
+    :param pid:             The pid of the requrest product.
+    :param outputChannel:   The output channel to search.
+
+    :returns:               A python list of product instances.
+    """
 
     products = []
 
@@ -56,14 +79,17 @@ def findAddProductsWithPid(pid, outputChannel):
     return products
 
 def toGridded1d(module, axesTemplate1d, data, label):
-    '''
-    Creates a Gridded1d instance from the input arguments.
+    """
+    This function creates a :py:class:module.Gridded1d` instance from the input arguments.
+    This function is for internal use.
 
     :param module:              The FUDGE module containing the Gridded1d instance to create.
     :param axesTemplate1d:      An axes templated used to aid in constructing the axes.
     :param data:                The data.
     :param label:               The style label for the data.
-    '''
+
+    :returns:                   A :py:class:module.Gridded1d` instance.
+    """
 
     for index, value in enumerate(data):
         if value != 0:
@@ -80,13 +106,16 @@ def toGridded1d(module, axesTemplate1d, data, label):
     return module.Gridded1d(axes=axes, array=array, label=label)
 
 def toGridded3d(axesTemplate3d, data, label):
-    '''
-    Creates a Gridded3d instance from the input arguments.
+    """
+    This function creates a Gridded3d instance from the input arguments.
+    This function is for internal use.
 
     :param axesTemplate3d:      An axes templated used to aid in constructing the axes.
     :param data:                The data.
     :param label:               The style label for the data.
-    '''
+
+    :returns:                   A :py:class:`multiGroupModule.Form` instance.
+    """
 
     ndarray = data.array
 
@@ -127,8 +156,9 @@ def toGridded3d(axesTemplate3d, data, label):
     return multiGroupModule.Form(label, xDataEnumsModule.Frame.lab, gridded3d)
 
 def reactionMultiGrouping(protare, totalReaction, productsMissingData, MG, MG_upscatter, temperatureInfo, axesTemplate1d, axesTemplate3dByProduct):
-    '''
-    For the specified temperature, sums the multi-group data.
+    """
+    For the specified temperature, this function sums the multi-group data and add to *totalReaction*.
+    This function is for internal use.
 
     :param protare:                 The protare to process.
     :param totalReaction:           The reaction which the summed, multi-group data will be added to.
@@ -137,7 +167,7 @@ def reactionMultiGrouping(protare, totalReaction, productsMissingData, MG, MG_up
     :param temperatureInfo:         TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
     :param axesTemplate1d:          The axes template for 1d multi-group data.
     :param axesTemplate3dByProduct: The axes template for distribution multi-group data.
-    '''
+    """
 
     label = temperatureInfo.heatedMultiGroup
 
@@ -196,12 +226,15 @@ def reactionMultiGrouping(protare, totalReaction, productsMissingData, MG, MG_up
                 product.distribution.add(toGridded3d(axesTemplate3dByProduct[transportableID], data, upscatterLabel))
 
 def addMultiGroupSums(self, replace=False):
-    '''
-    Calculates total and delayedNeutron multi-group sums for *self* and adds the results to the applicationData node as
-    separate institutions with labels "LLNL::multiGroupReactions" and "LLNL::multiGroupDelayedNeutrons", respectivley.
+    """
+    This function calculates total, total for incomplete products and delayedNeutron multi-group sums for *self*, and 
+    adds the results to the applicationData node as separate institutions with labels "LLNL::multiGroupReactions", 
+    "LLNL::multiGroupIncompleteProducts" and "LLNL::multiGroupDelayedNeutrons", respectivley.
 
-    :param replace:           If summed multi-group data already present, then a raise is executed if *replace* is **False**, otherwise the old data are replaced.
-    '''
+    :param self:            A reactionSuite instance.
+    :param replace:         If summed multi-group data already present, then a raise is executed if *replace* is False, 
+                            otherwise the old data are replaced.
+    """
 
     if tokensModule.multiGroupReactions in self.applicationData:
         if not replace:
@@ -264,7 +297,7 @@ def addMultiGroupSums(self, replace=False):
             try:
                 data = fissionFragmentData.multiGroupMultiplicity(MG_delayedNeutrons, temperatureInfo, IDsModule.neutron)
             except:
-                print('WARNING: Delayed neutron data not complete and will not be included.')
+                print('WARNING: from %s: fission delayed neutron data not complete and will not be included.' % pathlib.Path(__file__).name)
                 fissionFragmentData = None                      # Some delayed neutrons have unspecified multiplicities.
                 data = []
 

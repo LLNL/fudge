@@ -44,6 +44,29 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">This module contains functions used internally by FUDGE to multi-group 1d functions.</span>
+<span class="sd">        </span>
+<span class="sd">This module contains the following functions: </span>
+<span class="sd">        </span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                                 | Description                                                                       |</span>
+<span class="sd">    +=======================================+===================================================================================+</span>
+<span class="sd">    | _toLinear                             | This function returns an XYs1d linear version of its argument.                    |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | _groupFunctionsAndFluxInit            | Takes raw transfer matrices and wraps them in a                                   |</span>
+<span class="sd">    |                                       | :py:class:`multiGroupModule.Form` instance.                                       |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | _mutualifyGrouping3Data               | Reads in a file and returns a :py:class:`Groups` instance.                        |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | groupOneFunctionAndFlux               | Reads in a file and returns a :py:class:`Groups` instance.                        |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | groupTwoFunctionsAndFlux              | Reads in a file and returns a :py:class:`Groups` instance.                        |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | groupFunctionCrossSectionAndFlux      | Reads in a file and returns a :py:class:`Groups` instance.                        |</span>
+<span class="sd">    +---------------------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-6</span>
 
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">xDataEnumsModule</span>
@@ -56,6 +79,14 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">group</span> <span class="k">as</span> <span class="n">groupModule</span>
 
 <span class="k">def</span> <span class="nf">_toLinear</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns an XYs1d linear version of :math:`func`.</span>
+<span class="sd">    This function if for internal use.</span>
+
+<span class="sd">    :param func:    Function to convert to a lin-lin XYs1d instance.</span>
+
+<span class="sd">    :returns:       An XYs1d instace.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">func</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">:</span>
@@ -69,6 +100,16 @@
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;FIX ME&#39;</span> <span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">_groupFunctionsAndFluxInit</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">f1</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns the flux and multi-group boundaries from *style* and *tempInfo*, and domainSlices the</span>
+<span class="sd">    flux to the domain of :math:`f1` if it is not None.  This function if for internal use.</span>
+
+<span class="sd">    :param style:           This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:        This is a dictionary with needed data.</span>
+<span class="sd">    :param f1:              A 1-d function whose domain is used to set the domain limit of the returned flux.</span>
+
+<span class="sd">    :returns:               The multi-group boundaries and flux.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
     <span class="n">groupBoundaries</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">transportables</span><span class="p">[</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span><span class="p">]</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">boundaries</span>
@@ -79,6 +120,17 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">groupBoundaries</span><span class="p">,</span> <span class="n">flux</span> <span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">_mutualifyGrouping3Data</span><span class="p">(</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">printMutualDomainWarning</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns versions of :math:`f1`, :math:`f2` and :math:`f3` whose domains are all mutual.</span>
+<span class="sd">    This function if for internal use.</span>
+
+<span class="sd">    :param f1:                          One of the two functions that represent the product this is multi-grouped.</span>
+<span class="sd">    :param f2:                          One of the two functions that represent the product this is multi-grouped.</span>
+<span class="sd">    :param f3:                          One of the two functions that represent the product this is multi-grouped.</span>
+<span class="sd">    :param printMutualDomainWarning:    If True, a warning is printed if the domain of :math:`f1`, :math:`f2` and :math:`f3` are not mutual.</span>
+
+<span class="sd">    :returns:                           Versions of :math:`f1`, :math:`f2` and :math:`f3` whose domains are all mutual.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">domainMin1</span><span class="p">,</span> <span class="n">domainMax1</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">f1</span><span class="o">.</span><span class="n">domainMax</span>
     <span class="n">domainMin2</span><span class="p">,</span> <span class="n">domainMax2</span> <span class="o">=</span> <span class="n">f2</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">f2</span><span class="o">.</span><span class="n">domainMax</span>
@@ -96,6 +148,16 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="groupOneFunctionAndFlux"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.miscellaneous.groupOneFunctionAndFlux">[docs]</a><span class="k">def</span> <span class="nf">groupOneFunctionAndFlux</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">styleFilter</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function mulit-groups :math:`f1`. This function if for internal use.</span>
+
+<span class="sd">    :param style:           This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:        This is a dictionary with needed data.</span>
+<span class="sd">    :param f1:              The function that to multi-grouped.</span>
+<span class="sd">    :param styleFilter:     See method findFormMatchingDerivedStyle of the class Style.</span>
+
+<span class="sd">    :returns:               A list like object of the multi-group values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">f1</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">f1</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="n">f1</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">styleFilter</span> <span class="o">=</span> <span class="n">styleFilter</span> <span class="p">)</span>
     <span class="n">f1</span> <span class="o">=</span> <span class="n">_toLinear</span><span class="p">(</span> <span class="n">f1</span> <span class="p">)</span>
@@ -103,6 +165,19 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">f1</span><span class="o">.</span><span class="n">groupTwoFunctions</span><span class="p">(</span> <span class="n">groupBoundaries</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;groupedFlux&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="groupTwoFunctionsAndFlux"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.miscellaneous.groupTwoFunctionsAndFlux">[docs]</a><span class="k">def</span> <span class="nf">groupTwoFunctionsAndFlux</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">printMutualDomainWarning</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function mulit-groups the product of two function, :math:`f1 \times f2`. Typically, :math:`f2` is a cross section.</span>
+<span class="sd">    This function if for internal use.</span>
+
+<span class="sd">    :param style:                       This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:                    This is a dictionary with needed data.</span>
+<span class="sd">    :param f1:                          One of the two functions that represent the product this is multi-grouped.</span>
+<span class="sd">    :param f2:                          One of the two functions that represent the product this is multi-grouped.</span>
+<span class="sd">    :param norm:                        A normalization to divided the multi-groups by.</span>
+<span class="sd">    :param printMutualDomainWarning:    If True, a warning is printed if the domain of :math:`f1` and :math:`f2` are not mutual.</span>
+
+<span class="sd">    :returns:                           A list like object of the multi-group values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">f1</span> <span class="o">=</span> <span class="n">_toLinear</span><span class="p">(</span> <span class="n">f1</span> <span class="p">)</span>
     <span class="n">f2</span> <span class="o">=</span> <span class="n">_toLinear</span><span class="p">(</span> <span class="n">f2</span> <span class="p">)</span>
@@ -111,6 +186,18 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">f1</span><span class="o">.</span><span class="n">groupThreeFunctions</span><span class="p">(</span> <span class="n">groupBoundaries</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="groupFunctionCrossSectionAndFlux"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.miscellaneous.groupFunctionCrossSectionAndFlux">[docs]</a><span class="k">def</span> <span class="nf">groupFunctionCrossSectionAndFlux</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">printMutualDomainWarning</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function multi-groups :math:`f1` with the product of the cross section in *tempInfo*.</span>
+<span class="sd">    This function if for internal use.</span>
+
+<span class="sd">    :param cls:                         The Gridded1d class to return that has the multi-group data.</span>
+<span class="sd">    :param style:                       This is the multi-group style for the multi-group data.</span>
+<span class="sd">    :param tempInfo:                    This is a dictionary with needed data.</span>
+<span class="sd">    :param f1:                          One of the two functions that represent the product this is multi-grouped.</span>
+<span class="sd">    :param printMutualDomainWarning:    If True, a warning is printed if the domain of :math:`f1` and :math:`f2` are not mutual.</span>
+
+<span class="sd">    :returns:                           An instance of *cls*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">crossSection</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;crossSection&#39;</span><span class="p">]</span>
     <span class="n">norm</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;groupedFlux&#39;</span><span class="p">]</span>

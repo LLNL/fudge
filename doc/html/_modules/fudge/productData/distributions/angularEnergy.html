@@ -44,7 +44,25 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
-<span class="sd">&quot;&quot;&quot;Angular/energy double differential distribution classes.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Angular/energy double differential distribution classes.</span>
+
+<span class="sd">This module contains the following classes:</span>
+<span class="sd">        </span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class         | Description                                                           |</span>
+<span class="sd">    +===============+=======================================================================+</span>
+<span class="sd">    | Form          | Class representing GNDS eneary/angular data (i.e., P(E&#39;,mu|E)).       |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Subform       | Base class for :py:class:`LLNLPointwise`.                             |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | XYs1d         | Class used to store f(E&#39;) at a specified mu.                          |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | XYs2d         | Class used to store P(E&#39;,mu) at a specified E.                        |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | XYs3d         | Class used to store P(mu,E&#39;|E).                                       |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">math</span>
 
@@ -63,6 +81,14 @@
 
 
 <div class="viewcode-block" id="defaultAxes"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.defaultAxes">[docs]</a><span class="k">def</span> <span class="nf">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span><span class="p">,</span> <span class="n">probabilityLabel</span> <span class="o">=</span> <span class="s1">&#39;P(mu,energy_out|energy_in)&#39;</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns an :py:class:`Axes` instance for GNDS angular/energy data (i.e., P(mu,E&#39;|E)).</span>
+
+<span class="sd">    :param energyUnit:          Unit for the energy data.</span>
+<span class="sd">    :param probabilityLabel:    Label for the probability axis.</span>
+
+<span class="sd">    :return:            An :py:class:`Axes` instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">axes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axes</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
     <span class="n">axes</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span> <span class="s1">&#39;energy_in&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">energyUnit</span> <span class="p">)</span>
@@ -72,22 +98,40 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">axes</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs1d">[docs]</a><span class="k">class</span> <span class="nc">XYs1d</span><span class="p">(</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to store P(E&#39;) at a specified mu. mu is specified via the outerDamainValue attribute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="XYs1d.averageEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs1d.averageEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">averageEnergy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The method calculates the average outgoing energy of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrateWithWeight_x</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
     
 <div class="viewcode-block" id="XYs1d.averageMomentum"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs1d.averageMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">averageMomentum</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The method calculates the average outgoing momentum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrateWithWeight_sqrt_x</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs1d.toLinearXYsClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs1d.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method return the class for representing linear point-wise 1-d data of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span> <span class="p">)</span></div></div>
     
 <div class="viewcode-block" id="XYs2d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs2d">[docs]</a><span class="k">class</span> <span class="nc">XYs2d</span><span class="p">(</span> <span class="n">multiD_XYsModule</span><span class="o">.</span><span class="n">XYs2d</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to store P(mu,E&#39;) at a specified E. E is specified via the outerDamainValue attribute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span>  <span class="fm">__add__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This methods adds *self* to *other*. *Other* can be a float of another :py:class:`XYs2d` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">functionNd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="n">interpolation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">outerDomainValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span>
                 <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">interpolationQualifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolationQualifier</span> <span class="p">)</span>
@@ -111,17 +155,26 @@
     <span class="fm">__radd__</span> <span class="o">=</span> <span class="fm">__add__</span>
 
 <div class="viewcode-block" id="XYs2d.averageEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs2d.averageEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">averageEnergy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The method calculates the average outgoing energy of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">EpOfMu</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">pdfOfEpAtMu</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">pdfOfEpAtMu</span><span class="o">.</span><span class="n">averageEnergy</span><span class="p">(</span> <span class="p">)</span> <span class="p">]</span> <span class="k">for</span> <span class="n">pdfOfEpAtMu</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">]</span>
         <span class="k">return</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">EpOfMu</span><span class="p">)</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="XYs2d.averageMomentum"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs2d.averageMomentum">[docs]</a>    <span class="k">def</span> <span class="nf">averageMomentum</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The method calculates the average outgoing momentum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">MpOfMu</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">pdfOfMpAtMu</span><span class="o">.</span><span class="n">outerDomainValue</span><span class="p">,</span> <span class="n">pdfOfMpAtMu</span><span class="o">.</span><span class="n">averageMomentum</span><span class="p">(</span> <span class="p">)</span> <span class="p">]</span> <span class="k">for</span> <span class="n">pdfOfMpAtMu</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">]</span>
         <span class="k">return</span> <span class="n">XYs1dModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span><span class="n">MpOfMu</span><span class="p">)</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="XYs2d.allowedSubElements"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs2d.allowedSubElements">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">allowedSubElements</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the list of classes that can be sub-nodes (i.e., 1-d function) of an :py:class:`XYs2d` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">XYs1d</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
@@ -131,6 +184,9 @@
     <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="XYs3d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d">[docs]</a><span class="k">class</span> <span class="nc">XYs3d</span><span class="p">(</span> <span class="n">Subform</span><span class="p">,</span> <span class="n">multiD_XYsModule</span><span class="o">.</span><span class="n">XYs3d</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class used to store the probability P(mu,E&#39;|E).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -139,8 +195,10 @@
 
 <div class="viewcode-block" id="XYs3d.check"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check for incomplete angular distributions + any negative probabilities.</span>
+<span class="sd">        Check for incomplete angular/energy distributions and any negative probabilities.</span>
 <span class="sd">        Ignore normalization for this double-differential distribution.</span>
+
+<span class="sd">        :param info:        A dictionary with parameters used for determining if a difference is relevant.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
@@ -163,6 +221,14 @@
         <span class="k">return</span> <span class="n">warnings</span></div>
 
 <div class="viewcode-block" id="XYs3d.calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;         </span>
+<span class="sd">        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.</span>
+<span class="sd">        Average means over all outgoing angle and energy.</span>
+<span class="sd">        </span>
+<span class="sd">        :param style:   The style instance which the calculated data will belong to.</span>
+<span class="sd">        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.</span>
+<span class="sd">        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">multiplicity</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;multiplicity&#39;</span><span class="p">]</span>
         <span class="n">productMass</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;productMass&#39;</span><span class="p">]</span>
@@ -183,8 +249,15 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">aveEnergy</span><span class="p">,</span> <span class="n">aveMomentum</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs3d.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">domainValue</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This methods evaluates P(mu,E&#39;|E) at the requested E = *domainValue*.</span>
 
-        <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;Hi&#39;</span> <span class="p">)</span>
+<span class="sd">        :param domainValue:     The energy of the projectile for which P(mu,E&#39;) is requested.</span>
+<span class="sd">        :epsilon:               If the outerDomainValue of a child 2-d function is, relatively, within this value, return that function.</span>
+
+<span class="sd">        :return:                A 2-d function representing *self* at projectile energy *domainValue*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">position</span><span class="p">,</span> <span class="n">function1</span><span class="p">,</span> <span class="n">function2</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">interpolationQualifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getBoundingSubFunctions</span><span class="p">(</span> <span class="n">domainValue</span> <span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">function1</span> <span class="p">),</span> <span class="nb">type</span><span class="p">(</span> <span class="n">function2</span> <span class="p">),</span> <span class="n">position</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="n">interpolationQualifier</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">position</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;No data to interpolate&quot;</span> <span class="p">)</span>
@@ -229,6 +302,20 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">function</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs3d.integrate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reaction_suite</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">muOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phiOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">product</span><span class="p">,</span> <span class="n">LegendreOrder</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This meethod integrates the distribution at projectile energy over the specified outgoing energy, mu and phi ranges.</span>
+<span class="sd">        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*, *muOut* and *phiOut*.</span>
+<span class="sd">        </span>
+<span class="sd">        :param reaction_suite:      The :py:class:`ReactionSuite` instance for this distribution.</span>
+<span class="sd">        :param energyIn:            The energy of the projectile.</span>
+<span class="sd">        :param energyOut:           The outgoing energy range to integrate over.</span>
+<span class="sd">        :param muOut:               The outgoing mu range to integrate over.</span>
+<span class="sd">        :param phiOut:              The outgoing phi range to integrate over.</span>
+<span class="sd">        :param frame:               The frame the outgoing energy, mu and phi range specify.</span>
+<span class="sd">        :param LegendreOrder:       The parameter is not used.</span>
+
+<span class="sd">        :return:                    A float representing the value of the integration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">energyIn</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">0.0</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">energyIn</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span> <span class="p">:</span> <span class="n">energyIn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span>
@@ -259,6 +346,13 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">phiEvaluate</span> <span class="o">*</span> <span class="n">muEnergyOutEvaluate</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs3d.normalize"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">insitu</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This methods returns a renormalized copy (or *self) of *self*.</span>
+
+<span class="sd">        :param insitu:      If True, normalizes *self*, else copies *self* and return the normalized copy.</span>
+
+<span class="sd">        :return:            Returns the normalzied function which can be *self* if *insitu* is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">insitu</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
@@ -268,6 +362,15 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs3d.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a multi-group representation of *self*.</span>
+
+<span class="sd">        :param style:           The style for the returned data.</span>
+<span class="sd">        :param tempInfo:        Dictionary of data needed to calculate the data.</span>
+<span class="sd">        :param indent:          The indentation for any verbosity.</span>
+
+<span class="sd">        :return:                A multi-group representation of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">fudge.processing.deterministic</span> <span class="kn">import</span> <span class="n">transferMatrices</span> <span class="k">as</span> <span class="n">transferMatricesModule</span>
 
@@ -281,6 +384,18 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">groupModule</span><span class="o">.</span><span class="n">TMs2Form</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="XYs3d.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self* as an :py:class:`angularEnergyMCModule.Angular` representation</span>
+<span class="sd">        and an :py:class:`angularEnergyMCModule.AngularEnergy` representation. This is, P(mu,E&#39;|E) becomes</span>
+<span class="sd">        P(mu|E) * P(E&#39;|E,mu) with the mu data in P(mu|E) and the E&#39; data in P(E&#39;|E,mu) being represented with</span>
+<span class="sd">        :py:class:`angularEnergyMCModule.Angular` and :py:class:`angularEnergyMCModule.AngularEnergy`, respectively.</span>
+
+<span class="sd">        :param style:           The style for the returned data.</span>
+<span class="sd">        :param tempInfo:        Dictionary of data needed to calculate the data.</span>
+<span class="sd">        :param indent:          The indentation for any verbosity.</span>
+
+<span class="sd">        :return:                :py:class:`angularEnergyMCModule.Angular` and :py:class:`angularEnergyMCModule.AngularEnergy` instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">angular</span> <span class="o">=</span> <span class="n">angularModule</span><span class="o">.</span><span class="n">XYs2d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">PofEpGivenMu</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
@@ -299,10 +414,27 @@
 
 <div class="viewcode-block" id="XYs3d.allowedSubElements"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.XYs3d.allowedSubElements">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">allowedSubElements</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the list of classes that can be sub-nodes (i.e., 2-d function) of an :py:class:`XYs2d` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">XYs2d</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Form"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form">[docs]</a><span class="k">class</span> <span class="nc">Form</span><span class="p">(</span>  <span class="n">baseModule</span><span class="o">.</span><span class="n">Form</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class stores a P(mu,E&#39;|E) distribution.</span>
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------------------+-----------------------------------------------------------+</span>
+<span class="sd">    | Member                | Description                                               |</span>
+<span class="sd">    +=======================+===========================================================+</span>
+<span class="sd">    | angularEnergySubform  | This member stores the actual data as a 3d function.      |</span>
+<span class="sd">    +-----------------------+-----------------------------------------------------------+</span>
+<span class="sd">        </span>
+<span class="sd">    :param label:                   The label for this form.</span>
+<span class="sd">    :param productFrame:            The frame the product data are specified in.</span>
+<span class="sd">    :param angularEnergySubform:    A :py:class:`Subform` instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;angularEnergy&#39;</span>
     <span class="n">subformAttributes</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;angularEnergySubform&#39;</span><span class="p">,</span> <span class="p">)</span>
@@ -315,10 +447,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the energy unit of the projectile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Form.calculateAverageProductData"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;         </span>
+<span class="sd">        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.</span>
+<span class="sd">        Average means over all outgoing angle and energy.</span>
+<span class="sd">        </span>
+<span class="sd">        :param style:   The style instance which the calculated data will belong to.</span>
+<span class="sd">        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.</span>
+<span class="sd">        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="o">==</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">centerOfMass</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;center of mass calculation not supported for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span>
@@ -328,11 +471,24 @@
         <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">aveEnergy</span> <span class="p">],</span> <span class="p">[</span> <span class="n">aveMomentum</span> <span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the outgoing particle&#39;s energy spectrum at projectile energy *energyIn* for frame *frame*,</span>
+
+<span class="sd">        :param energy_in:           Energy of the projectile.</span>
+<span class="sd">        :param frame:               The frame to calculate the energy spectrum in.</span>
+<span class="sd">        :param kwargs:              A dictionary that contains data to control the way this method acts.</span>
+
+<span class="sd">        :return:                    XYs1d instance for the energy spectrum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">muMin</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;muMin&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
         <span class="n">muMax</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;muMax&#39;</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">)</span>
@@ -346,27 +502,71 @@
 
 <div class="viewcode-block" id="Form.fixDomains"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.fixDomains">[docs]</a>    <span class="k">def</span> <span class="nf">fixDomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainToFix</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method call \*\*fixDomains\* on the *angularEnergySubform* member.</span>
+<span class="sd">        This method call *fixDomains* on the *angularEnergySubform* member.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">fixDomains</span><span class="p">(</span><span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">,</span> <span class="n">domainToFix</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="Form.integrate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reaction_suite</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">muOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phiOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">product</span><span class="p">,</span> <span class="n">LegendreOrder</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This meethod integrates the distribution at projectile energy over the specified outgoing energy, mu and phi ranges.</span>
+<span class="sd">        See function :py:func:`miscellaneousModule.domainLimits` for how to specify *energyOut*, *muOut* and *phiOut*.</span>
+<span class="sd">        </span>
+<span class="sd">        :param reaction_suite:      The :py:class:`ReactionSuite` instance for this distribution.</span>
+<span class="sd">        :param energyIn:            The energy of the projectile.</span>
+<span class="sd">        :param energyOut:           The outgoing energy range to integrate over.</span>
+<span class="sd">        :param muOut:               The outgoing mu range to integrate over.</span>
+<span class="sd">        :param phiOut:              The outgoing phi range to integrate over.</span>
+<span class="sd">        :param frame:               The frame the outgoing energy, mu and phi range specify.</span>
+<span class="sd">        :param LegendreOrder:       The parameter is not used.</span>
+
+<span class="sd">        :return:                    A float representing the value of the integration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span> <span class="n">reaction_suite</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energyOut</span> <span class="o">=</span> <span class="n">energyOut</span><span class="p">,</span> <span class="n">muOut</span> <span class="o">=</span> <span class="n">muOut</span><span class="p">,</span> <span class="n">phiOut</span> <span class="o">=</span> <span class="n">phiOut</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="p">,</span> <span class="n">LegendreOrder</span> <span class="o">=</span> <span class="n">LegendreOrder</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.processMC_cdf"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This methods returns an :py:class:`angularEnergyMCModule.Form` instance representing *self*.</span>
+
+<span class="sd">    </span>
+<span class="sd">        :param style:           The style for the returned data.</span>
+<span class="sd">        :param tempInfo:        Dictionary of data needed to calculate the data.</span>
+<span class="sd">        :param indent:          The indentation for any verbosity.</span>
+<span class="sd">    </span>
+<span class="sd">        :return:                An instance of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>     
 
         <span class="n">angular</span><span class="p">,</span> <span class="n">angularEnergy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">angularEnergyMCModule</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">angularEnergy</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a multi-group representation of *self*.</span>
+
+<span class="sd">        :param style:           The style for the returned data.</span>
+<span class="sd">        :param tempInfo:        Dictionary of data needed to calculate the data.</span>
+<span class="sd">        :param indent:          The indentation for any verbosity.</span>
+
+<span class="sd">        :return:                A multi-group representation of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productFrame&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span>
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularEnergySubform</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.parseNodeUsingClass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.angularEnergy.Form.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *element* into an instance *cls*.</span>
+
+<span class="sd">        :param cls:                 Form class to return.</span>
+<span class="sd">        :param LegendreElement:     Node to parse.</span>
+<span class="sd">        :param xPath:               List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:            dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:              A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+<span class="sd">                     </span>
+<span class="sd">        :return: an instance of *cls* representing *element*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="n">formElement</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

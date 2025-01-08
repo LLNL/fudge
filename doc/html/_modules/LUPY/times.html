@@ -44,16 +44,16 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
-<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains the :py:class:`Times` class that is useful for timing sections of a python code.</span>
-<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">time</span>
 
 <span class="n">timeIndicesNames</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="s1">&#39;sys&#39;</span><span class="p">,</span> <span class="mi">2</span> <span class="p">:</span> <span class="s1">&#39;children&#39;</span><span class="p">,</span> <span class="mi">3</span> <span class="p">:</span> <span class="s1">&#39;childrenSys&#39;</span><span class="p">,</span> <span class="mi">4</span> <span class="p">:</span> <span class="s1">&#39;wall&#39;</span> <span class="p">}</span>
 
 <div class="viewcode-block" id="Times"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times">[docs]</a><span class="k">class</span> <span class="nc">Times</span> <span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class is useful for timing sections of a python code. This class uses the python class :py:func:`os.times` </span>
 <span class="sd">    to measure time information. Five components of time are measured. They are:</span>
 
@@ -63,7 +63,7 @@
 <span class="sd">        * children sys: total children system time.</span>
 <span class="sd">        * wall:         wall time.</span>
 
-<span class="sd">    All times are since :py:meth:`Times.reset` was called with the :py:method:`Times.reset` method calls.</span>
+<span class="sd">    All times are since :py:func:`Times.reset` was called with the :py:func:`Times.reset` method calls.</span>
 
 <span class="sd">    Example usage is::</span>
 
@@ -80,26 +80,26 @@
 <span class="sd">    +===========+===========================================================+</span>
 <span class="sd">    | times     | The instance return by :py:func:`os.times`.               |</span>
 <span class="sd">    +-----------+-----------------------------------------------------------+</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Calls :py:meth:`self.toString` with no arguments.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls :py:func:`self.toString` with no arguments.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Times.delta"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times.delta">[docs]</a>    <span class="k">def</span> <span class="nf">delta</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reset</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns time information since the last time :py:method:`Times.reset` was called as a dictionary.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns time information since the last time :py:func:`Times.reset` was called as a dictionary.</span>
 <span class="sd">        The dictionary as the keys &#39;user&#39;, &#39;sys&#39;, &#39;children&#39;, &#39;childrenSys&#39; and &#39;wall&#39;.</span>
 
-<span class="sd">        :param reset:       If **True**, :py:method:`Times.reset` is called after the delta time is determined.</span>
+<span class="sd">        :param reset:       If **True**, :py:func:`Times.reset` is called after the delta time is determined.</span>
 
 <span class="sd">        :returns:           A directory containing time components and their times.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">current</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">times</span><span class="p">(</span> <span class="p">),</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">timeIndicesNames</span> <span class="p">:</span> <span class="n">ts</span><span class="p">[</span><span class="n">timeIndicesNames</span><span class="p">[</span><span class="n">index</span><span class="p">]]</span> <span class="o">=</span> <span class="n">current</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -107,19 +107,19 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">ts</span> <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_delta_cpu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">includeChildren</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">includeSystem</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the cpu component of the time form *times*. If *includeChildren* is **True** the cpu </span>
 <span class="sd">        time of the child processes are include in the cpu time. If *includeSystem* is **True** the </span>
 <span class="sd">        system time is include in the cpu time.</span>
 
 <span class="sd">        This should probably be a static method since it does not use *self*.</span>
 
-<span class="sd">        :param times:               The return instance from :py:method:`Times.delta`.</span>
+<span class="sd">        :param times:               The return instance from :py:func:`Times.delta`.</span>
 <span class="sd">        :param includeChildren:     If **True** the cpu time of the child processes are include.</span>
 <span class="sd">        :param includeSystem:       If **True** the system time is include.</span>
 
 <span class="sd">        :returns:                   The requested time as a float.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">0</span> <span class="p">]</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">includeChildren</span> <span class="p">)</span> <span class="p">:</span> <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="mi">2</span> <span class="p">)</span>
@@ -129,49 +129,49 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">t</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Times.delta_cpu"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times.delta_cpu">[docs]</a>    <span class="k">def</span> <span class="nf">delta_cpu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reset</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">includeChildren</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">includeSystem</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the cpu component of the time for *self*. If *includeChildren* is **True** the cpu time of the child processes</span>
 <span class="sd">        are include in the cpu time. If *includeSystem* is **True** the system time is include in the cpu time.</span>
 
-<span class="sd">        :param reset:               If **True**, :py:method:`Times.reset` is called after the delta time is determined.</span>
+<span class="sd">        :param reset:               If **True**, :py:func:`Times.reset` is called after the delta time is determined.</span>
 <span class="sd">        :param includeChildren:     If **True** the cpu time of the child processes are include.</span>
 <span class="sd">        :param includeSystem:       If **True** the system time is include.</span>
 
 <span class="sd">        :returns:           The requested time as a float.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span> <span class="n">reset</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_cpu</span><span class="p">(</span> <span class="n">times</span><span class="p">,</span> <span class="n">includeChildren</span> <span class="o">=</span> <span class="n">includeChildren</span><span class="p">,</span> <span class="n">includeSystem</span> <span class="o">=</span> <span class="n">includeSystem</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Times.delta_wall"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times.delta_wall">[docs]</a>    <span class="k">def</span> <span class="nf">delta_wall</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reset</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the wall component of the time for *self*.</span>
 
-<span class="sd">        :param reset:       If **True**, :py:method:`Times.reset` is called after the delta time is determined.</span>
+<span class="sd">        :param reset:       If **True**, :py:func:`Times.reset` is called after the delta time is determined.</span>
 
 <span class="sd">        :returns:           The wall time as a float.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span> <span class="n">reset</span> <span class="p">)[</span><span class="s1">&#39;wall&#39;</span><span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Times.reset"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reset time to the current time.&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset time to the current time.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">times</span><span class="p">(</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Times.toString"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.Times.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">reset</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">includeChildren</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">includeSystem</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">current</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a string representation of *self*.</span>
 
 <span class="sd">        :param prefix:              A prefix string to add to the returned string.</span>
-<span class="sd">        :param reset:               If **True**, :py:method:`Times.reset` is called after the delta time is determined.</span>
+<span class="sd">        :param reset:               If **True**, :py:func:`Times.reset` is called after the delta time is determined.</span>
 <span class="sd">        :param includeChildren:     If **True** the cpu time of the child processes are include.</span>
 <span class="sd">        :param includeSystem:       If **True** the system time is include.</span>
 <span class="sd">        :param current:             If **True**, the current date/time information is added to the returned string.</span>
 <span class="sd">        :param names:               If **True**, the names of each component is added to the returned string.</span>
 
 <span class="sd">        :returns:                   A string representing the time information.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">deltas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span> <span class="n">reset</span> <span class="o">=</span> <span class="n">reset</span> <span class="p">)</span>
         <span class="n">cpu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_cpu</span><span class="p">(</span> <span class="n">deltas</span><span class="p">,</span> <span class="n">includeChildren</span> <span class="o">=</span> <span class="n">includeChildren</span><span class="p">,</span> <span class="n">includeSystem</span> <span class="o">=</span> <span class="n">includeSystem</span> <span class="p">)</span>
@@ -179,6 +179,24 @@
         <span class="k">if</span><span class="p">(</span> <span class="n">current</span> <span class="p">)</span> <span class="p">:</span> <span class="n">currentTime</span> <span class="o">=</span> <span class="s1">&#39; on </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">names</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">delta times: cpu = </span><span class="si">%.3f</span><span class="s1"> s, wall = </span><span class="si">%.5g</span><span class="s1"> s</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">cpu</span><span class="p">,</span> <span class="n">deltas</span><span class="p">[</span><span class="s1">&#39;wall&#39;</span><span class="p">],</span> <span class="n">currentTime</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s%.3f</span><span class="s1"> s, </span><span class="si">%.5g</span><span class="s1"> s</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">cpu</span><span class="p">,</span> <span class="n">deltas</span><span class="p">[</span><span class="s1">&#39;wall&#39;</span><span class="p">],</span> <span class="n">currentTime</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="timeCode"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.times.timeCode">[docs]</a><span class="k">def</span> <span class="nf">timeCode</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">globals</span><span class="p">,</span> <span class="nb">locals</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function uses a :py:class:`Times` instance to time how long *command* takes to execute.</span>
+
+<span class="sd">    Example usage::</span>
+
+<span class="sd">        import math</span>
+<span class="sd">        timesModule.timeCode(&quot;z = math.sqrt( 3**2 + 4**2 ); print(z)&quot;, globals(), locals())</span>
+
+<span class="sd">    :param command:         A string of the python code to execute.</span>
+<span class="sd">    :param globals:         A global disctionary to pass to the exec function, normally should be globals().</span>
+<span class="sd">    :param locals:          A local disctionary to pass to the exec function, normally should be locals().</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">times</span> <span class="o">=</span> <span class="n">Times</span><span class="p">()</span>
+    <span class="n">exec</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">globals</span><span class="p">,</span> <span class="nb">locals</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">times</span><span class="p">)</span></div>
 
 <span class="k">if</span><span class="p">(</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span> <span class="p">)</span> <span class="p">:</span>
 

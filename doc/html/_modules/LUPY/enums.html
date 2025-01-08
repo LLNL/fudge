@@ -51,18 +51,18 @@
 <span class="kn">import</span> <span class="nn">enum</span>
 
 <div class="viewcode-block" id="auto"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.enums.auto">[docs]</a><span class="k">def</span> <span class="nf">auto</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to wrap the :py:func:`enum.auto` function in the python **enum** module.</span>
 
 <span class="sd">    :retuns:        The returned value of :py:func:`enum.auto`.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Enum"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.enums.Enum">[docs]</a><span class="k">class</span> <span class="nc">Enum</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a base enum class used within **FUDGE**. If :py:func:`enums.auto` is called for a enum, </span>
-<span class="sd">    its value is assigned from its name per the :py:method:`_generate_next_value_` method.</span>
+<span class="sd">    its value is assigned from its name per the :py:func:`_generate_next_value_` method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_generate_next_value_</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">last_values</span><span class="p">):</span>
@@ -80,7 +80,7 @@
 
 <div class="viewcode-block" id="Enum.fromString"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.enums.Enum.fromString">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromString</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a enum for cls from the specified string representation.</span>
 
 <span class="sd">        :param cls:             An :py:class:`Enum` derived class.</span>
@@ -90,7 +90,7 @@
 
 <span class="sd">        :raises TypeError:      If *string* is not a python str instance.</span>
 <span class="sd">        :raises ValueError:     If no match is found in *cls*.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
     
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Argument must be a string not &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
@@ -103,7 +103,7 @@
 
 <div class="viewcode-block" id="Enum.checkEnumOrString"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.enums.Enum.checkEnumOrString">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">checkEnumOrString</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks that *value* is a valid enum representation of *cls*.</span>
 
 <span class="sd">        :param cls:             An :py:class:`Enum` derived class.</span>
@@ -112,7 +112,7 @@
 <span class="sd">        :returns:               The enum of *cls* represented by *value*.</span>
 
 <span class="sd">        :raises TypeError:      If *string* is not a python str instance.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">value</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fromString</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>

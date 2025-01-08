@@ -4,14 +4,22 @@
 # 
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
-"""
-This module contains a form for storing the differential cross section for charged-particle elastic scattering.
-Internally, data can be represented three ways:
- - pure Rutherford scattering
- - Rutherford scattering along with Legendre expansions for nuclear scattering
-        and for real and imaginary nuclear/Coulomb interference
- - Rutherford scattering along with effective cross sections and distributions,
-        obtained by summing the nuclear and interference terms
+
+"""     
+This module contains a class storing the double differential cross section for charged-particle elastic scattering.
+The double differential cross section contain a Rutherford scattering term and maybe nuclear plus interference terms.
+
+This module contains the following classes:
+        
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | Form                              | This class represents the double differential cross section for       |
+    |                                   | charged-particle elastic scattering.                                  |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | CoulombDepositionNotSupported     | This is an exception class that is raised when a method of the        |
+    |                                   | :py:class:`Form` cannot perform its calculation.                      |
+    +-----------------------------------+-----------------------------------------------------------------------+
 """
 
 import math
@@ -35,6 +43,35 @@ from . import nuclearPlusInterference as nuclearPlusInterferenceModule
 
 
 class Form( baseModule.Form ):
+    """
+    This class represents the double differential cross section for charged-particle elastic scattering in one of the following
+    three cases:
+
+        -) Only Rutherford (i.e., Coulomb) scattering is represented.
+        -) Rutherford and nuclear plus interference are represented.
+        -) Rutherford and nuclear amplitude expansion are represented.
+
+    The following table list the primary members of this class:
+
+    +-------------------------------+-------------------------------------------------------------------+
+    | Member                        | Description                                                       |
+    +===============================+===================================================================+
+    | pid                           | The GNDS PoPs id of the product.                                  |
+    +-------------------------------+-------------------------------------------------------------------+
+    | label                         | The label for this form.                                          |
+    +-------------------------------+-------------------------------------------------------------------+
+    | productFrame                  | The frame the product data are specified in.                      |
+    +-------------------------------+-------------------------------------------------------------------+
+    | identicalParticles            | If True, both products in a two-body reaction are identical,      |
+    |                               | otherwise they are not.                                           |
+    +-------------------------------+-------------------------------------------------------------------+
+    | RutherfordScattering          | The Rutherford scattering instance.                               |
+    +-------------------------------+-------------------------------------------------------------------+
+    | nuclearPlusInterference       | The nuclear + interference instance.                              |
+    +-------------------------------+-------------------------------------------------------------------+
+    | nuclearAmplitudeExpansion     | The nuclear amplitude expansion instance.                         |
+    +-------------------------------+-------------------------------------------------------------------+
+    """
 
     moniker = "CoulombPlusNuclearElastic"
     keyName = 'label'
@@ -43,6 +80,15 @@ class Form( baseModule.Form ):
 
     def __init__(self, pid, label, productFrame=xDataEnumsModule.Frame.centerOfMass, RutherfordScattering=None,
                 nuclearPlusInterference=None, nuclearAmplitudeExpansion=None, identicalParticles=False ):
+        """
+        :param pid:                         The PoPs id of the product.
+        :param label:                       The label for the form.
+        :param productFrame:                The frame the product data are specified in.
+        :param RutherfordScattering:        The Rutherford scattering instance.
+        :param nuclearPlusInterference:     The nuclear + interference instance.
+        :param nuclearAmplitudeExpansion:   The nuclear amplitude expansion instance.
+        :param identicalParticles:          If True, the projectile and target are the same type of particle, otherwise they are not.
+        """
 
         if( RutherfordScattering is None) : RutherfordScattering = RutherfordScatteringModule.RutherfordScattering( )
         if( not isinstance( RutherfordScattering, ( RutherfordScatteringModule.RutherfordScattering, type( None ) ) ) ) :
@@ -65,46 +111,54 @@ class Form( baseModule.Form ):
 
     @property
     def spin( self ) :
+        """This function returns the spin of the product for identical particles."""
 
         self.initialize( )
         return( self.__spin )
 
     @property
     def etaCoefficient( self ) :
+        """This function returns the parameter :math:`\eta \, \sqrt{E} = Z_1 \, Z_2 \, sqrt{\alpha^2 \mu m_1 / 2}`."""
 
         self.initialize( )
         return( self.__etaCoefficient  )
 
     @property
     def kCoefficient( self ) :
+        """This function returns the coefficient for the particle wave number (i.e., :math:`k(E) / \sqrt{E}`)."""
 
         self.initialize( )
         return( self.__kCoefficient )
 
     @property
     def data( self ) :
+        """This function returns the non-Rutherform term."""
 
         return self.__data
 
     @property
     def domainMin( self) :
+        """Returns the minimum projectile energy for *self*."""
 
         if self.data is not None: return self.data.domainMin
         return self.RutherfordScattering.domainMin
 
     @property
     def domainMax( self ) :
+        """Returns the maximum projectile energy for *self*."""
 
         if self.data is not None: return self.data.domainMax
         return self.RutherfordScattering.domainMax
 
     @property
     def domainUnit( self ) :
+        """Returns the energy unit of the projectile."""
 
         if self.data is not None: return self.data.domainUnit
         return self.RutherfordScattering.domainUnit
 
     def check( self, info ):
+        """This function does a check of *self*."""
 
         from fudge import warning
         warnings = []
@@ -127,13 +181,13 @@ class Form( baseModule.Form ):
         return warnings
 
     def fixDomains(self, domainMin, domainMax, fixToDomain):
-        """This method does nothing."""
+        """This function does nothing."""
 
         return 0
 
     def initialize( self ):
         """
-        Pre-compute some factors used to calculate the Rutherford cross section.
+        This function pre-computes some factors used to calculate the Rutherford cross section.
         """
 
         if( self.__etaCoefficient is not None ) : return        # Already initialized.
@@ -166,17 +220,21 @@ class Form( baseModule.Form ):
 
     def dSigma_dMu(self, energy, muCutoff, accuracy=1e-3, epsilon=1e-6, excludeRutherfordScattering=False, probability=False):
         """
-        Returns d(Sigma)/d(mu) at the specified incident energy if probability is **False** and P(mu) otherwise.
+        This function returns :math:`d\sigma / d\mu` at the specified incident energy if *probability* is False and :math:`P(\mu)` otherwise
+        if True..  The :math:`\mu` domain goes from muMin to *muCutoff*. For identical particles, muMin is set to -*muCutoff* otherwise it is -1.
 
-        :param energy:      Energy of the projectile.
-        :param accuracy:    The accuracy of the returned *dSigma_dMu*.
-        :param muMax:       Slices the upper domain mu to this value.
-        :param probability: If **True** P(mu) is returned instead of d(Sigma)/d(mu).
+        :param energy:                          Energy of the projectile.
+        :param muCutoff:                        The maximum (and maybe minimum) value of :math:`\mu` for the returned function.
+        :param accuracy:                        The accuracy of the returned function.
+        :param epsilon:                         This variable is not used.
+        :param excludeRutherfordScattering:     If True, Rutherford scattering is not added to the returned function, otherwise it is.
+        :param probability:                     If True :math:`P(\mu)` is returned otherwise :math:`d\sigma / d\mu` is returned.
 
-        :return:            d(Sigma)/d(mu) at *energy*.
+        :return:                                An instance of :py:class:`angularModule.XYs1d`.
         """
 
         def dullPoint( mu, epsilon ) :
+            """This function is not used and should be deleted."""
 
             if( mu < 0.0 ) : epsilon *= -1
             return( mu * ( 1 + epsilon ) )
@@ -201,13 +259,14 @@ class Form( baseModule.Form ):
 
     def evaluate( self, E, mu, phi = 0.0, excludeRutherfordScattering = False ) :
         """
-        Compute the cross section at (E, mu), including Coulomb, nuclear and interference terms.
+        This method returns the cross section at (E, mu).
 
-        :param E: incident energy in the lab frame.
-        :param mu: scattering angle cosine in the center-of-mass.
-        :param phi: scattering azimuthal angle in the center-of-mass.
-        :param excludeRutherfordScattering: If True, only the nuclear and interference terms are included in the returned value.
-        :return:
+        :param E:                               Incident energy in the lab frame.
+        :param mu:                              Scattering angle cosine in the center-of-mass.
+        :param phi:                             Scattering azimuthal angle in the center-of-mass.
+        :param excludeRutherfordScattering:     If True, only the nuclear and interference terms are included in the returned value.
+
+        :return:                                A python float.
         """
 
         if( excludeRutherfordScattering ) :
@@ -219,23 +278,44 @@ class Form( baseModule.Form ):
         return RS + NS
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+        """
+        Ths function is not implemented and executes a raise.
+
+        :param style:   The style instance which the calculated data will belong to.
+        :param indent:  If this function does any printing, this is the amount of indentation of the printed line.
+        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+        """
 
         raise CoulombDepositionNotSupported( "Cannot compute average product data for %s distribution" % self.moniker )
 
     def processCoulombPlusNuclearMuCutoff( self, style, energyMin = None, accuracy = 1e-3, epsilon = 1e-6, excludeRutherfordScattering = False ) :
+        """
+        This function returns the cross section and angular distribution for :math:`\mu` from muMin to muMax.
+        For identical particles, muMin is set to -muMax otherwise it is -1. The value of muMax is the *muCufoff* 
+        member of *style*.
+
+        :param style:                           The style for the returned data.
+        :param energyMin:                       The minimum projectile energy for calculating the data.
+        :param accuracy:                        The accuracy of the returned function.
+        :param epsilon:                         This variable is not used.
+        :param excludeRutherfordScattering:     If True, only the nuclear and interference terms are included in the returned value.
+
+        :returns:                               An instances :py:class:`angularModule.XYs1d`.
+        """
 
         class Tester :
 
-            def __init__( self, dSigma_dMu, muCutoff, relativeTolerance, absoluteTolerance ) :
+            def __init__( self, dSigma_dMu, muCutoff, mu_accuracy, relativeTolerance, absoluteTolerance ) :
 
                 self.dSigma_dMu = dSigma_dMu
                 self.muCutoff = muCutoff
+                self.mu_accuracy = mu_accuracy
                 self.relativeTolerance = relativeTolerance
                 self.absoluteTolerance = absoluteTolerance
 
             def evaluateAtX( self, energy ) :
 
-                dSigma_dMu = self.dSigma_dMu( energy, muCutoff, accuracy = self.relativeTolerance, excludeRutherfordScattering = excludeRutherfordScattering )
+                dSigma_dMu = self.dSigma_dMu( energy, muCutoff, accuracy = self.mu_accuracy, excludeRutherfordScattering = excludeRutherfordScattering )
                 return dSigma_dMu.integrate()
 
         nuclearPlusInterferenceCrossSection = None
@@ -275,11 +355,12 @@ class Form( baseModule.Form ):
             energies = RutherfordEnergies
 
         muCutoff = style.muCutoff
+        mu_accuracy = 1e-5
         crossSection = []
         for energy in energies :
-            dSigma_dMu = self.dSigma_dMu( energy, muCutoff, accuracy = accuracy, excludeRutherfordScattering = excludeRutherfordScattering )
+            dSigma_dMu = self.dSigma_dMu( energy, muCutoff, accuracy = mu_accuracy, excludeRutherfordScattering = excludeRutherfordScattering )
             crossSection.append([ energy, dSigma_dMu.integrate() ])
-        _tester = Tester( self.dSigma_dMu, muCutoff, accuracy, accuracy * crossSection[-1][1] )
+        _tester = Tester( self.dSigma_dMu, muCutoff, mu_accuracy, accuracy, accuracy * crossSection[-1][1] )
         crossSection = fudgemathModule.thickenXYList( crossSection, _tester, biSectionMax = 16 )
 
         crossSectionAxes = crossSectionModule.defaultAxes( self.domainUnit )
@@ -290,7 +371,7 @@ class Form( baseModule.Form ):
         crossSectionData = []
         probability = nuclearPlusInterferenceCrossSection is not None
         for energy in energies :
-            data = self.dSigma_dMu(energy, muCutoff, accuracy=accuracy, excludeRutherfordScattering=excludeRutherfordScattering, probability=probability)
+            data = self.dSigma_dMu(energy, muCutoff, accuracy=mu_accuracy, excludeRutherfordScattering=excludeRutherfordScattering, probability=probability)
             if( excludeRutherfordScattering ) : data = data.clip( rangeMin = 0.0 )
 
             xSec = data.integrate()
@@ -313,12 +394,32 @@ class Form( baseModule.Form ):
         return( crossSection, xys2d )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
+        """
+        This functin does nothing.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data. 
+        :param indent:          The indentation for any verbosity.
+            
+        :return:                None.
+        """
 
         print('    processMultiGroup not implemented for distribution form %s.' % self.moniker)
         return( None )
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
 
@@ -346,7 +447,7 @@ class Form( baseModule.Form ):
 
 class CoulombDepositionNotSupported( Exception ):
     """
-    Custom Exception, returned when calculateAverageProductData() is called for
-    nuclearAmplitudeExpansion or nuclearPlusInterference
+    Custom Exception, returned when calculateAverageProductData().
     """
+
     pass

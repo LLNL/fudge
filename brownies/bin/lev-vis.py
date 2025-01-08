@@ -104,8 +104,8 @@ for NAME in ["Angie", 'Nathaniel', "Mami"]:
 
 # Set up axes and title
 plt.title(levs.name)
-plt.xlabel("$\Pi*J$")
-plt.ylabel("$E^*$ (MeV)")
+plt.xlabel(r"$\Pi*J$")
+plt.ylabel(r"$E^*$ (MeV)")
 
 # Widget to get J & Pi, a common theme
 def get_J_and_Pi(__lev, useNone=True):

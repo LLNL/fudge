@@ -13,9 +13,17 @@ An intid of -1 implies an unknown particle. For example, currently, all TNSL ids
 The sign of the intid indicates whether the particle is a particle or anti-particle.
 The particle intid is then defined by its base-10 digits for a signed 32-bit integer (s32).
 The following tables definite the meaning of an intid base-10 digits. For a s32 the 9th base-10 digit can
-only be 0, 1, 2. If the value is 0, then the particle is a nuclear type particle (i.e., a nuclide or nucleus),
-If the value is 1, the particle is not a nuclear type particle; ergo, anything else. For a nuclear type particle,
-the base-10 digits are defined as::
+only be 0, 1, 2. Firstly, the digits of the intid can be written as::
+
+         base-10 digit     9876543210
+         definition       PN?????????
+
+where the P is ' ' or '+' for a particle and '-' for an anti-particle, and N indicates if the particle is 
+a nuclear type particle or not.
+If the value is 0, then the particle is a nuclear type particle (i.e., a nuclide or nucleus), and
+if the value is 1, the particle is not a nuclear type particle; ergo, anything else. Currently N = 2 is not defined.
+
+For a nuclear type particle, the base-10 digits are defined as::
 
          base-10 digit     9876543210
          definition       P0IIIZZZAAA
@@ -24,23 +32,16 @@ That is, the intid can be written as::
 
      intid = P ( 1000000 * III + 1000 * ZZZ + AAA )
 
-where P is ' ' or '+' for a particle and '-' for an anti-particle, ZZZ is the number of protons of the particle
-(also called an atomic number), AAA is the number of protons plus neutrons (also called the atomic mass number)
-and III is the level index with the following meaning:
+where ZZZ is the number of protons of the particle (also called an atomic number), AAA is the number of protons 
+plus neutrons (also called the atomic mass number) and III is the level index with the following meaning:
 
-    *) For 0 <= III < 481 the particle is a nuclide and III is the nuclear level of its nucleus.
+    *) For 0 <= III < 500 the particle is a nuclide and III is the nuclear level of its nucleus.
         For example, III = 0 is a nuclide with its nucleus in its nuclear ground state (e.g., "O16")
         and III = 1 is a nuclide with its nucleus in its first nuclear excited state (e.g., "O16_e1").
 
-    *) For 481 <= III < 500 the particle is a meta-stable for a nuclide with meta-stable index
-        (III - 480). For example, the intid for "Am242_m1" is 481095242.
-
-    *) For 500 <= III < 980 the particle is a nucleus in nuclear excited state (III - 500).
+    *) For 500 <= III < 1000 the particle is a nucleus in nuclear excited state (III - 500).
         For example, III = 500 is a nucleus in its ground state (e.g., "o16") and
         III = 501 is a nucleus in its first excited nuclear state (e.g., "o16_e1").
-
-    *) For 981 <= III < 1000 the particle is a meta-stable for a nucleus with meta-stable index
-        (III - 980). For example, the intid for "am242_m1" is 981095242.
 
 For non-nuclear paricles, the base-10 digits are defined as::
 
@@ -60,11 +61,15 @@ its family. The following families are currently defined (note a space is equiva
     |-------------------+-----------------------|
     |  2                | Baryon with 3 quarks  |
     |-------------------+-----------------------|
-    | 98                | ENDL fission product  |
+    | 50 - 59           | Nuclide meta-stables. |
     |-------------------+-----------------------|
-    | 99                | TNSL: this is         |
+    | 60 - 69           | Nuclear meta-stables. |
+    |-------------------+-----------------------|
+    | 98                | TNSL: this is         |
     |                   | currently not neeeded |
     |                   | hence not used.       |
+    |-------------------+-----------------------|
+    | 99                | ENDL fission product  |
     |-------------------+-----------------------|
 
 For gauge bosons the SSSSSSS values are defined as:
@@ -136,18 +141,26 @@ Note, in addition to a neutron (i.e., id = 'n') having the intid of 1020000000 (
 parseIntid and idFromIntid functions also returns 'n' ('n_anti') when an intid of 1 (-1) is entered due to the way 
 PoPs in FUDGE is implemented. However, this should not be considered as an alias intid but an idiosyncrasy of FUDGE.
 
-Bit SSSSSSS values for ENDL fission products 99120 and 99125 are designated as:
+For nuclide meta-stables the coding is::
 
-    |-------------------+---------------------------|
-    | SSSSSSS           | Fission product           |
-    |-------------------+---------------------------|
-    |   99120           | FissionProductENDL99120   |
-    |-------------------+---------------------------|
-    |   99125           | FissionProductENDL99125   |
-    |-------------------+---------------------------|
+         base-10 digit     9876543210
+         definition       P15MMZZZAAA
+
+where ZZZ and AAA are as for nuclear type particles, and MM is the meta-stable index. For example, the first and second
+meta-stables for Zn61 are::
+
+    |----------+----------------|
+    | GNDS id  |  intid         |
+    |==========+================|
+    | Zn61_m1  |  1501030061    |
+    | Zn61_m2  |  1502030061    |
+    |----------+----------------|
+
+Note, MM = 00 is not a valid meta-stable index.
+
+For nucleus meta-stables the coding is the same as for nuclide meta-stables except the "5" in "P15" is replaced with a "6" as "P16".
 
 The SSSSSSS value for TNSL are currently not needed or used, and are thus not defined.
-
 The following aliases are mapped to other ids:
 
     |-------------------+-----------------------|
@@ -161,6 +174,16 @@ The following aliases are mapped to other ids:
     |-------------------+-----------------------|
     | a                 | he4                   |
     |-------------------+-----------------------|
+
+Bit SSSSSSS values for ENDL fission products 99120 and 99125 are designated as:
+
+    |-------------------+---------------------------|
+    | SSSSSSS           | Fission product           |
+    |-------------------+---------------------------|
+    |   99120           | FissionProductENDL99120   |
+    |-------------------+---------------------------|
+    |   99125           | FissionProductENDL99125   |
+    |-------------------+---------------------------|
 
 Questions/comments:
 
@@ -181,13 +204,15 @@ class Family(enumsModule.Enum):
     Enum for the allowed intid families.
     '''
 
-    nucleus = enumsModule.auto() 
     nuclide = enumsModule.auto()
+    nucleus = enumsModule.auto() 
     gaugeBoson = enumsModule.auto()
     lepton = enumsModule.auto()
     baryon = enumsModule.auto()
-    ENDL_fissionProduct = enumsModule.auto()
+    nuclideMetaStable = enumsModule.auto()
+    nucleusMetaStable = enumsModule.auto()
     TNSL = enumsModule.auto()
+    ENDL_fissionProduct = enumsModule.auto()
 
 def family2Integer(family):
     '''
@@ -200,7 +225,7 @@ def family2Integer(family):
     '''
 
     return {Family.nucleus: -1, Family.nuclide: -2, Family.gaugeBoson: 0, Family.lepton: 1, Family.baryon: 2, 
-            Family.ENDL_fissionProduct: 98, Family.TNSL: 99}[family]
+            Family.nuclideMetaStable: 50, Family.nucleusMetaStable: 60, Family.TNSL: 98, Family.ENDL_fissionProduct: 99}[family]
 
 def parseIntid(intid):
     '''
@@ -226,23 +251,25 @@ def parseIntid(intid):
     | TNSL                  | family enum, isAnti, particle id              |
     |-----------------------+-----------------------------------------------|
 
+    If intid is not a valid particle, then **None** is returned.
+
     :param intid:   Particle's intid.
 
-    :return:        Python tuple whose length depends on the family..
+    :return:        Python tuple whose length depends on the family.
     '''
 
     isAnti = intid < 0
 
     abs_intid = abs(intid)
 
-    nuclearLike = abs_intid // 10**9
-    family = (abs_intid // 10**7) % 100
-    SSSSSSS = abs_intid % 10**7
+    nuclearLike = abs_intid // 10**9                    # Digit can to 0 (nuclear type) or 1 (other).
+    family = (abs_intid // 10**7) % 100                 # Only used for non-nuclear type.
+    SSSSSSS = abs_intid % 10**7                         # Only used for non-nuclear type.
 
     if nuclearLike == 0:
         AAA = abs_intid % 1000
         ZZZ = abs_intid % 1000000 // 1000
-        III = abs_intid % 1000000000 // 1000000
+        III = ( abs_intid % 1000000000 // 1000000 )
         family = Family.nuclide
         if III >= 500:
             family = Family.nucleus
@@ -251,20 +278,32 @@ def parseIntid(intid):
     if nuclearLike != 1:
         raise ValueError('Invalid intid = "%s".' % intid)
 
-    if family == 0:                                 # Gauge boson.
-        return Family.gaugeBoson, isAnti, SSSSSSS
-    elif family == 1:                               # Lepton.
-        generation = SSSSSSS % 10
-        isNeutrino = (SSSSSSS % 100) // 10 != 0
-        return Family.lepton, isAnti, generation, isNeutrino
-    elif family == 2:                               # Baryon with 3 quarks
-        group = SSSSSSS // 10**6
-        baryon = SSSSSSS % 10**6
-        return Family.baryon, isAnti, group, baryon
-    elif family == 8:                               # ENDL fission product.
-        return Family.ENDL_fissionProduct, isAnti, SSSSSSS
-    elif family == 9:                               # TNSL target.
-        return Family.TNSL, isAnti, SSSSSSS
+    if nuclearLike == 1:
+        if family == 0:                                 # Gauge boson.
+            return Family.gaugeBoson, isAnti, SSSSSSS
+        elif family == 1:                               # Lepton.
+            generation = SSSSSSS % 10
+            isNeutrino = (SSSSSSS % 100) // 10 != 0
+            return Family.lepton, isAnti, generation, isNeutrino
+        elif family == 2:                               # Baryon with 3 quarks.
+            group = SSSSSSS // 10**6
+            baryon = SSSSSSS % 10**6
+            return Family.baryon, isAnti, group, baryon
+        elif 50 <= family < 70:                         # Nuclide or nucleus meta-stable.
+            AAA = abs_intid % 1000
+            ZZZ = abs_intid % 1000000 // 1000
+            III = abs_intid % 1000000000 // 1000000
+            MM = III % 100
+            family = Family.nuclideMetaStable
+            if III // 100 == 6:
+                family = Family.nucleusMetaStable
+            return family, isAnti, MM, ZZZ, AAA
+        elif family == 98:                               # TNSL target.
+            return Family.TNSL, isAnti, SSSSSSS
+        elif family == 99:                               # ENDL fission product.
+            return Family.ENDL_fissionProduct, isAnti, SSSSSSS
+
+    return None
 
 def idFromIntid(intid, intidDB=None, mode=specialNuclearParticleIDModule.Mode.familiar):
     '''
@@ -277,6 +316,9 @@ def idFromIntid(intid, intidDB=None, mode=specialNuclearParticleIDModule.Mode.fa
     :return:            The particle's id.
     '''
 
+    if intid == -1:
+        return ''
+
     if intidDB is not None:
         if intid in intidDB.intids:
             return intidDB.intids[intid]
@@ -284,21 +326,17 @@ def idFromIntid(intid, intidDB=None, mode=specialNuclearParticleIDModule.Mode.fa
     family, isAnti, *others = parseIntid(intid)
     anti = miscModule.antiSuffix if isAnti else ''
 
-    if family in (Family.nuclide, Family.nucleus):                      # Nuclide/nuclear-like particle.
+    if family in (Family.nuclide, Family.nucleus, Family.nuclideMetaStable, Family.nucleusMetaStable):   # Nuclide/nuclear-like particle or thier meta-stable alias.
         III, ZZZ, AAA = others
-        try:
-            pid = chemicalElementsMiscModule.idFromZAndA(ZZZ, AAA)
-        except:
-            print('intid, III, ZZZ, AAA =', intid, III, ZZZ, AAA)
-            raise
-        if III >= 500:
-            pid = pid.lower()
+        pid = chemicalElementsMiscModule.idFromZAndA(ZZZ, AAA, False)
+        if family == Family.nucleus:
             III -= 500
+        if family in (Family.nucleus, Family.nucleusMetaStable):
+            pid = pid.lower()
         if III > 0:
-            if III <= 480:
+            if family in (Family.nuclide, Family.nucleus):
                 pid = '%s_e%d' % (pid, III)
             else:
-                III -= 480
                 pid = '%s_m%d' % (pid, III)
     elif family == Family.gaugeBoson:                                   # Gauge boson.
         particleID = others[0]

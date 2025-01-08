@@ -27,7 +27,8 @@ For translating ENDF ITYPE=3 data (photo-atomic and electro-atomic interactions)
 # 2-body 
 #   T(g,g)T    502, 505, 506 and 504
 #   T(g,e-)T{}        522           For gamma, sum of 534 to 572
-#   T(e-,e-)T{?}      526           called 'electro-atomic elastic scattering' on page 198 and 'electro-atomic scattering' on page 315
+#   T(e-,e-)T{?}      526           called 'electro-atomic elastic scattering' on page 198
+#                                   and 'electro-atomic scattering' on page 315
 #
 # Uncorrelated bodies
 #   T(g,e- e+)T       515, 516, 517
@@ -61,76 +62,78 @@ from .ENDF_ITYPE_0_Misc import readMF3, readMF6
 from .ENDF_ITYPE_3_6_Misc import MT_AtomicConfigurations
 from .. import endf_endl as endf_endlModule
 
-photonSumLabels = { 501 : 'total', 516 : 'pair product', 522 : 'photoelectric absorption' }
+photonSumLabels = {501: 'total', 516: 'pair product', 522: 'photoelectric absorption'}
 
-def readMF27( info, MT, MF27Datas, label, warningList ) :
 
-    _class = { 502 : coherentModule.FormFactor, 
-               504 : None,
-               505 : coherentModule.ImaginaryAnomalousFactor,
-               506 : coherentModule.RealAnomalousFactor }[MT]
+def readMF27(info, MT, MF27Datas, label, warningList):
+    _class = {502: coherentModule.FormFactor,
+              504: None,
+              505: coherentModule.ImaginaryAnomalousFactor,
+              506: coherentModule.RealAnomalousFactor}[MT]
 
     XYs1d = coherentModule.XYs1d
-    if( MT == 504 ) : XYs1d = incoherentModule.XYs1d
+    if MT == 504: XYs1d = incoherentModule.XYs1d
 
     MF27Data = MF27Datas[27]
     del MF27Datas[27]
     energyUnit = 'eV'
-    if( MT in [ 502, 504 ] ) : energyUnit = '1/Ang'
-    axes = baseModule.defaultAxes( label, energyUnit = energyUnit )
-    ZA, AWR = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(MF27Data[0], intIndices=[0], logFile=info.logs )[0:2]
+    if MT in [502, 504]: energyUnit = '1/Ang'
+    axes = baseModule.defaultAxes(label, energyUnit=energyUnit)
+    ZA, AWR = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
+        MF27Data[0], intIndices=[0], logFile=info.logs)[0:2]
     info.ZA_massLineInfo.add(ZA, AWR, MT, 8, 0)
-    dataLine, TAB1, MF27s = endfFileToGNDSMisc.getTAB1Regions(1, MF27Data, axes = axes, allowInterpolation6 = True, logFile = info.logs, cls = XYs1d)
-    if( len( MF27s ) == 1 ) :
-        if( MT == 504 ) : return( MF27s[0] )
-        data = coherentModule.XYs1d( data = MF27s[0], axes = axes )
-    else :
-        if( MT == 504 ) :
-            data = incoherentModule.Regions1d( axes = axes )
-        else :
-            data = coherentModule.Regions1d( axes = axes )
-        for region in MF27s :
-            if( len( region ) > 1 ) : data.append( region )
-        if( MT == 504 ) : return( data )
-    return( _class( data ) )
+    dataLine, TAB1, MF27s = endfFileToGNDSMisc.getTAB1Regions(
+        1, MF27Data, axes=axes, allowInterpolation6=True, logFile=info.logs, cls=XYs1d)
+    if len(MF27s) == 1:
+        if MT == 504: return MF27s[0]
+        data = coherentModule.XYs1d(data=MF27s[0], axes=axes)
+    else:
+        if MT == 504:
+            data = incoherentModule.Regions1d(axes=axes)
+        else:
+            data = coherentModule.Regions1d(axes=axes)
+        for region in MF27s:
+            if len(region) > 1: data.append(region)
+        if MT == 504: return data
+    return _class(data)
 
-def extractMT505or506( info, MT, MTList, MTDatas, label ) :
 
-    if( MT in MTDatas ) :
+def extractMT505or506(info, MT, MTList, MTDatas, label):
+    if MT in MTDatas:
         warningList = []
         MFDatas = MTDatas[MT]
-        factor = readMF27( info, MT, MFDatas, label, warningList )
-        if( len( MFDatas ) != 0 ) : raise Exception( 'Unsupported MF values = %s' % MFDatas.keys( ) )
-        MTList.remove( MT )
-        for warning in warningList : info.logs.write( "       WARNING: %s\n" % warning, stderrWriting = True )
-        return( factor )
+        factor = readMF27(info, MT, MFDatas, label, warningList)
+        if len(MFDatas) != 0: raise Exception('Unsupported MF values = %s' % MFDatas.keys())
+        MTList.remove(MT)
+        for warning in warningList: info.logs.write("       WARNING: %s\n" % warning, stderrWriting=True)
+        return factor
 
-    return( None )
+    return None
 
-def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, verbose = 0 ) :
 
-    MTs = sorted( MTDatas.keys( ) )
-    if( 451 in MTs ) : MTs.remove( 451 )
-    MTList = endfFileToGNDSMisc.niceSortOfMTs(MTs, verbose = verbose, logFile = info.logs)
+def ITYPE_3(MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, verbose=0):
+    MTs = sorted(MTDatas.keys())
+    if 451 in MTs: MTs.remove(451)
+    MTList = endfFileToGNDSMisc.niceSortOfMTs(MTs, verbose=verbose, logFile=info.logs)
 
-    MT505 = extractMT505or506( info, 505, MTList, MTDatas, 'imaginary part of anomalous scattering factor' )
-    MT506 = extractMT505or506( info, 506, MTList, MTDatas, 'real part of anomalous scattering factor' )
+    MT505 = extractMT505or506(info, 505, MTList, MTDatas, 'imaginary part of anomalous scattering factor')
+    MT506 = extractMT505or506(info, 506, MTList, MTDatas, 'real part of anomalous scattering factor')
 
     iChannel = 0
-    summedReactions = { 501 : None, 516 : None, 522 : None }
-    for MT in MTList :
-        if( MT == 500 ) : raise Exception( "MT %d not supported" % MT )
-        if( ( singleMTOnly is not None ) and ( MT != singleMTOnly ) ) : continue
+    summedReactions = {501: None, 516: None, 522: None}
+    for MT in MTList:
+        if MT == 500: raise Exception("MT %d not supported" % MT)
+        if (singleMTOnly is not None) and (MT != singleMTOnly): continue
 
-        if( MT in [ 523 ] ) :
+        if MT in [523]:
             print('    Skipping MT %d as I do not know what it really is' % MT)
             continue
 
         warningList = []
         MTData = MTDatas[MT]
 
-        info.logs.write( '    %3d %s' % ( MT, sorted( MTData.keys( ) ) ) )
-        EPE, EFL, crossSection, LR, breakupProducts = readMF3( info, MT, MTData[23], warningList )
+        info.logs.write('    %3d %s' % (MT, sorted(MTData.keys())))
+        EPE, EFL, crossSection, LR, breakupProducts = readMF3(info, MT, MTData[23], warningList)
         if EFL != 0:
             raise NotImplementedError("Non-zero EFL flag in incident electron evaluation")
         del MTData[23]
@@ -138,127 +141,138 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
         isTwoBody = MT in (525, 526)
         productList = []
         doubleDifferentialCrossSectionForm = None
-        undefinedLevelInfo = { 'ZA' : None, 'level' : 0, 'levelIndex' : None, 'count' : 0 }
+        undefinedLevelInfo = {'ZA': None, 'level': 0, 'levelIndex': None, 'count': 0}
 
-        if( 26 in MTData ) :
-            isTwoBody = readMF6( MT, info, MTData[26], productList, warningList, undefinedLevelInfo, isTwoBody, crossSection, 0 )
+        if 26 in MTData:
+            isTwoBody = readMF6(MT, info, MTData[26], productList, warningList, undefinedLevelInfo, isTwoBody,
+                                crossSection, 0)
             del MTData[26]
-            if( MT == 527 ) :
-                for product in productList :
-                    if( isinstance( product.multiplicity[0], multiplicityModule.XYs1d ) ) :
-                        multiplicity = product.multiplicity.pop( product.multiplicity[0].label )
-                        multiplicity = multiplicityModule.Constant1d( 1, multiplicity.domainMin, multiplicity.domainMax, 
-                                axes = multiplicity.axes, label = multiplicity.label )
-                        product.multiplicity.add( multiplicity )
+            if MT == 527:
+                for product in productList:
+                    if isinstance(product.multiplicity[0], multiplicityModule.XYs1d):
+                        multiplicity = product.multiplicity.pop(product.multiplicity[0].label)
+                        multiplicity = multiplicityModule.Constant1d(
+                            1, multiplicity.domainMin, multiplicity.domainMax, axes=multiplicity.axes,
+                            label=multiplicity.label)
+                        product.multiplicity.add(multiplicity)
 
         addTargetAsResidual = True
         productsNeeded = []
-        try : 
-            process = { 502 : 'coherent',                           504 : 'incoherent',                     522 : None,
-                        515 : 'pair production: electron field',    517 : 'pair production: nuclear field', 525 : 'large angle electro-atomic scattering',
-                        526 : 'large angle Coulomb scattering',     527 : 'bremsstrahlung',                 528 : 'excitation' }[MT]
+        try:
+            process = {502: 'coherent', 504: 'incoherent', 522: None,
+                       515: 'pair production: electron field', 517: 'pair production: nuclear field',
+                       525: 'large angle electro-atomic scattering',
+                       526: 'large angle Coulomb scattering', 527: 'bremsstrahlung', 528: 'excitation'}[MT]
         except KeyError:
             process = None
-        if( MT in [ 502, 504, 522 ] ) :
+        if MT in [502, 504, 522]:
             outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.twoBody, process=process)
-            outputChannel.Q.add( toGNDSMiscModule.returnConstantQ( info.style, 0, crossSection ) )
-            if( MT in [ 502 , 504 ] ) :
-                product = toGNDSMiscModule.getTypeNameGamma( info, 0 )
-                product = toGNDSMiscModule.newGNDSParticle( info, product, crossSection )
-                outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
-                if( MT == 502 ) :
-                    formFactor = readMF27( info, MT, MTData, 'coherent form factor', warningList )
-                    doubleDifferentialCrossSectionForm = coherentModule.Form( product.pid, info.style, xDataEnumsModule.Frame.lab, 
-                            formFactor, MT506, MT505 )
-                    form = photonScatteringModule.CoherentPhotonScattering.Form( label = info.style, link = doubleDifferentialCrossSectionForm )
-                else :
-                    subform = readMF27( info, MT, MTData, 'incoherent scattering function', warningList )
+            outputChannel.Q.add(toGNDSMiscModule.returnConstantQ(info.style, 0, crossSection))
+            if MT in [502, 504]:
+                product = toGNDSMiscModule.getTypeNameGamma(info, 0)
+                product = toGNDSMiscModule.newGNDSParticle(info, product, crossSection)
+                outputChannel.products.add(outputChannel.products.uniqueLabel(product))
+                if MT == 502:
+                    formFactor = readMF27(info, MT, MTData, 'coherent form factor', warningList)
+                    doubleDifferentialCrossSectionForm = coherentModule.Form(
+                        product.pid, info.style, xDataEnumsModule.Frame.lab, formFactor, MT506, MT505)
+                    form = photonScatteringModule.CoherentPhotonScattering.Form(
+                        label=info.style, link=doubleDifferentialCrossSectionForm)
+                else:
+                    subform = readMF27(info, MT, MTData, 'incoherent scattering function', warningList)
                     scatteringFactor = incoherentModule.ScatteringFactor(subform)
-                    doubleDifferentialCrossSectionForm = incoherentModule.Form(product.pid, info.style, xDataEnumsModule.Frame.lab, scatteringFactor)
-                    form = photonScatteringModule.IncoherentPhotonScattering.Form( label = info.style, link = doubleDifferentialCrossSectionForm )
-                product.distribution.add( form )
-        elif( MT in [ 525, 526, 527, 528 ] ) :
-            if( isTwoBody ) :
+                    doubleDifferentialCrossSectionForm = incoherentModule.Form(
+                        product.pid, info.style, xDataEnumsModule.Frame.lab, scatteringFactor)
+                    form = photonScatteringModule.IncoherentPhotonScattering.Form(
+                        label=info.style, link=doubleDifferentialCrossSectionForm)
+                product.distribution.add(form)
+        elif MT in [525, 526, 527, 528]:
+            if isTwoBody:
                 outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.twoBody, process=process)
-            else :
+            else:
                 outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process=process)
-            outputChannel.Q.add( toGNDSMiscModule.returnConstantQ( info.style, 0, crossSection ) )
-            productsNeeded = [ IDsPoPsModule.electron ]
-            if( MT == 527 ) : productsNeeded.insert( 0, IDsPoPsModule.photon )
-        else :
-            if( MT in [ 515, 517 ] ) : EPE = -crossSection.domainMin
-            if MT == 515:               # Threshold is -2 * Q for pair production off an electron.
+            outputChannel.Q.add(toGNDSMiscModule.returnConstantQ(info.style, 0, crossSection))
+            productsNeeded = [IDsPoPsModule.electron]
+            if MT == 527: productsNeeded.insert(0, IDsPoPsModule.photon)
+        else:
+            if MT in [515, 517]: EPE = -crossSection.domainMin
+            if MT == 515:  # Threshold is -2 * Q for pair production off an electron.
                 EPE /= 2
+            if MT in range(534, 573):
+                EPE = -EPE  # ENDF stores binding energy instead of Q-value for ionization cross sections
             outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody, process=process)
-            outputChannel.Q.add( toGNDSMiscModule.returnConstantQ( info.style, EPE, crossSection ) )
-            if( MT in MT_AtomicConfigurations ) :
-                productsNeeded = [ IDsPoPsModule.electron ]
-            elif( MT == 515 ) :
-                productsNeeded = [ IDsPoPsModule.electron, IDsPoPsModule.electron, IDsPoPsModule.electronAnti ]
-            elif( MT == 517 ) :
-                productsNeeded = [ IDsPoPsModule.electron, IDsPoPsModule.electronAnti ]
-            else :
+            outputChannel.Q.add(toGNDSMiscModule.returnConstantQ(info.style, EPE, crossSection))
+            if MT in MT_AtomicConfigurations:
+                productsNeeded = [IDsPoPsModule.electron]
+            elif MT == 515:
+                productsNeeded = [IDsPoPsModule.electron, IDsPoPsModule.electron, IDsPoPsModule.electronAnti]
+            elif MT == 517:
+                productsNeeded = [IDsPoPsModule.electron, IDsPoPsModule.electronAnti]
+            else:
                 addTargetAsResidual = False
 
-        for pid in productsNeeded :
+        for pid in productsNeeded:
             product = None
-            for i1, product in enumerate( productList ) :
-                if( pid == product.pid ) : break
+            for i1, product in enumerate(productList):
+                if pid == product.pid: break
                 product = None
-            if( product is None ) :
-                product = toGNDSMiscModule.getTypeNameGamma( info, { IDsPoPsModule.photon : 0, IDsPoPsModule.electronAnti : 8, IDsPoPsModule.electron : 9 }[pid] )
-                product = toGNDSMiscModule.newGNDSParticle( info, product, crossSection )
-            outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
-        if( ( MT >= 534 ) and ( reactionSuite.projectile == IDsPoPsModule.electron ) ) :
-            product = toGNDSMiscModule.getTypeNameGamma( info, 9 )
-            product = toGNDSMiscModule.newGNDSParticle( info, product, crossSection )
-            outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
+            if product is None:
+                product = toGNDSMiscModule.getTypeNameGamma(
+                    info, {IDsPoPsModule.photon: 0, IDsPoPsModule.electronAnti: 8, IDsPoPsModule.electron: 9}[pid])
+                product = toGNDSMiscModule.newGNDSParticle(info, product, crossSection)
+            outputChannel.products.add(outputChannel.products.uniqueLabel(product))
+        if (MT >= 534) and (reactionSuite.projectile == IDsPoPsModule.electron):
+            product = toGNDSMiscModule.getTypeNameGamma(info, 9)
+            product = toGNDSMiscModule.newGNDSParticle(info, product, crossSection)
+            outputChannel.products.add(outputChannel.products.uniqueLabel(product))
 
-        if( addTargetAsResidual ) :
-            elementSymbol = chemicalElementMiscPoPsModule.symbolFromZ[info.targetZA//1000]
-            if( MT >= 534 ) : elementSymbol += '{%s}' % MT_AtomicConfigurations[MT]
-            residual = toGNDSMiscModule.newGNDSParticle( info, elementSymbol, crossSection )
+        if addTargetAsResidual:
+            elementSymbol = chemicalElementMiscPoPsModule.symbolFromZ[info.targetZA // 1000]
+            if MT >= 534: elementSymbol += '{%s}' % MT_AtomicConfigurations[MT]
+            residual = toGNDSMiscModule.newGNDSParticle(info, elementSymbol, crossSection)
             residual.distribution.add(
-                unspecifiedModule.Form(info.style, productFrame = xDataEnumsModule.Frame.lab)
+                unspecifiedModule.Form(info.style, productFrame=xDataEnumsModule.Frame.lab)
             )
-            outputChannel.products.add( outputChannel.products.uniqueLabel( residual ) )
-            info.ENDFconversionFlags.add( residual, 'implicitProduct' )
+            outputChannel.products.add(outputChannel.products.uniqueLabel(residual))
+            info.ENDFconversionFlags.add(residual, 'implicitProduct')
 
-        if( len( MTData ) > 0 ) : raise Exception( 'Untranslated MF data: MFs = %s' % MTData.keys( ) )
+        if len(MTData) > 0: raise Exception('Untranslated MF data: MFs = %s' % MTData.keys())
 
-        if( MT in summedReactions ) :
-            summedReactions[MT] = [ crossSection, outputChannel ]
-            info.logs.write( '\n' )
+        if MT in summedReactions:
+            summedReactions[MT] = [crossSection, outputChannel]
+            info.logs.write('\n')
             continue
 
-        if( MT == 525 ) :
-            reaction = incompleteReactionModule.IncompleteReaction( None, outputChannel.genre, ENDF_MT = MT )
-        else :
-            reaction = reactionModule.Reaction( None, outputChannel.genre, ENDF_MT = MT )
-        endf_endlModule.setReactionsOutputChannelFromOutputChannel( info, reaction, outputChannel )
-        reaction.crossSection.add( crossSection )
-        if( doubleDifferentialCrossSectionForm is not None ) : reaction.doubleDifferentialCrossSection.add( doubleDifferentialCrossSectionForm )
+        if MT == 525:
+            reaction = incompleteReactionModule.IncompleteReaction(None, outputChannel.genre, ENDF_MT=MT)
+        else:
+            reaction = reactionModule.Reaction(None, outputChannel.genre, ENDF_MT=MT)
+        endf_endlModule.setReactionsOutputChannelFromOutputChannel(info, reaction, outputChannel)
+        reaction.crossSection.add(crossSection)
+        if doubleDifferentialCrossSectionForm is not None:
+            reaction.doubleDifferentialCrossSection.add(doubleDifferentialCrossSectionForm)
 
-        if( MT == 525 ) :
-            reactionSuite.incompleteReactions.add( reaction )
-        else :
-            reactionSuite.reactions.add( reaction )
+        if MT == 525:
+            reactionSuite.incompleteReactions.add(reaction)
+        else:
+            reactionSuite.reactions.add(reaction)
 
-        info.logs.write( '\n' )
-        for warning in warningList : info.logs.write( "       WARNING: %s\n" % warning, stderrWriting = True )
+        info.logs.write('\n')
+        for warning in warningList: info.logs.write("       WARNING: %s\n" % warning, stderrWriting=True)
 
-    if( True ) :            # Need to test for gamma as projectile.
-        for MT in sorted( summedReactions.keys( ) ) :
-            if( summedReactions[MT] is None ) : continue
+    if True:  # Need to test for gamma as projectile.
+        for MT in sorted(summedReactions.keys()):
+            if summedReactions[MT] is None: continue
             crossSection, outputChannel = summedReactions[MT]
-            summandMTs = list( { 501 : range( 502, 573 ), 516 : ( 515, 517 ), 522 : range( 534, 573 ) }[MT] )
-            if( 525 in summandMTs ) : summandMTs.remove( 525 )
+            summandMTs = list({501: range(502, 573), 516: (515, 517), 522: range(534, 573)}[MT])
+            if 525 in summandMTs: summandMTs.remove(525)
 
-            summedCrossSection = sumsModule.CrossSectionSum( label=photonSumLabels[MT], ENDF_MT=MT )
-            summedCrossSection.crossSection.add( crossSection )
-            for reaction in reactionSuite :
-                if( reaction.ENDF_MT in summandMTs ) : summedCrossSection.summands.append( sumsModule.Add( link = reaction.crossSection ) )
+            summedCrossSection = sumsModule.CrossSectionSum(label=photonSumLabels[MT], ENDF_MT=MT)
+            summedCrossSection.crossSection.add(crossSection)
+            for reaction in reactionSuite:
+                if reaction.ENDF_MT in summandMTs:
+                    summedCrossSection.summands.append(sumsModule.Add(link=reaction.crossSection))
             Q = outputChannel.Q[info.style]
-            if( Q is not None ) : summedCrossSection.Q.add( Q )
-            reactionSuite.sums.crossSectionSums.add( summedCrossSection )
+            if Q is not None: summedCrossSection.Q.add(Q)
+            reactionSuite.sums.crossSectionSums.add(summedCrossSection)
             iChannel += 1

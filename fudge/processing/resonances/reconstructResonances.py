@@ -84,9 +84,9 @@ VERBOSE = False
 FISSIONCHANNEL, NEUTRONCHANNEL, CPCHANNEL, GAMMACHANNEL, COMPETITIVECHANNEL = range(5)
 
 class ChannelDesignator:
-    __slots__=[ 'l', 'J', 'reaction', 'index', 's', 'gfact', 'particleA', 'particleB', 'Xi', 'isElastic', 'channelClass', 'useRelativistic', 'eliminated' ]
+    __slots__=[ 'l', 'J', 'reaction', 'index', 's', 'gfact', 'particleA', 'particleB', 'Xi', 'isElastic', 'channelClass', 'useRelativistic', 'eliminated', 'externalRMatrix' ]
 
-    def __init__(self, l, J, reaction, index, s, gfact=None, particleA=None, particleB=None, Xi=0.0, isElastic=None, channelClass=None, useRelativistic=False, eliminated=False ):
+    def __init__(self, l, J, reaction, index, s, gfact=None, particleA=None, particleB=None, Xi=0.0, isElastic=None, channelClass=None, useRelativistic=False, eliminated=False, externalRMatrix=None ):
         """
         Simple widget to specify a channel
 
@@ -106,6 +106,7 @@ class ChannelDesignator:
         :param channelClass: nature of channel: gamma, fission, neutron or charged particle
         :param useRelativistic: flag for using relativistic kinematics
         :param eliminated: flag for whether to eliminate this channel using Reich-Moore approximation (useful for gamma channels)
+        :param externalRMatrix: optional external function (SAMMY or Froehner parameterization)
         :return:
         """
         self.l=l
@@ -121,6 +122,7 @@ class ChannelDesignator:
         self.channelClass=channelClass
         self.useRelativistic=useRelativistic
         self.eliminated=eliminated
+        self.externalRMatrix=externalRMatrix
 
     def __eq__(self, other):
         if self.gfact is None or other.gfact is None:
@@ -136,7 +138,8 @@ class ChannelDesignator:
                self.isElastic==other.isElastic and \
                self.channelClass==other.channelClass and \
                self.useRelativistic==other.useRelativistic and \
-               self.eliminated==other.eliminated
+               self.eliminated==other.eliminated and \
+               self.externalRMatrix==other.externalRMatrix
 
     def __hash__(self):
         theHash=0
@@ -166,8 +169,8 @@ def getResonanceReconstructionClass( formalism ):
     if formalism.moniker == resolvedModule.BreitWigner.moniker:
         gndsClass = resolvedModule.BreitWigner
         proc = {
-            gndsClass.Approximation.singleLevel: SLBWcrossSection,
-            gndsClass.Approximation.multiLevel: MLBWcrossSection
+            gndsClass.Approximation.SingleLevel: SLBWcrossSection,
+            gndsClass.Approximation.MultiLevel: MLBWcrossSection
         }[ formalism.approximation ]
         return proc
     elif formalism.moniker == resolvedModule.RMatrix.moniker:
@@ -386,7 +389,7 @@ If we have lots of incident energies, this splits up a calculation using the mul
 May need to tweak the 'NEmax' and 'numTasks' variables for best performance.
 """
 def blockwise(function):
-    NEmax = 1000
+    NEmax = 50000
     def wrapped(self,E,**kwargs):
         if numpy.isscalar(E):
             NE = 1
@@ -1177,7 +1180,7 @@ class RRBaseClass(ResonanceReconstructionBaseClass, abc.ABC):
                 try:
                     s = _p.nucleus.spin.float('hbar')
                 except KeyError as err:
-                    raise KeyError(err.message + ' for particle ' + _p.id)
+                    raise KeyError(str(err) + ' for particle ' + _p.id)
                 except IndexError as err:
                     # Sometimes (mainly with MLBW and SLBW), there's no spin given for a nucleus.
                     # In that case, an IndexError gets raised.  We have to punt.
@@ -1201,9 +1204,7 @@ class RRBaseClass(ResonanceReconstructionBaseClass, abc.ABC):
         # for elastic is appropriate, for others it doesn't matter
         if rxn=='elastic' or 'fission' in rxn or "competitive" in rxn:
             spinA, parityA = get_spin_parity(self.RR.PoPs[self.reactionSuite.projectile])
-            target = self.RR.PoPs[self.target]
-            if (target.id in self.RR.PoPs.aliases):
-                target = self.RR.PoPs[target.pid]
+            target = self.RR.PoPs.final(self.target)
             spinB, parityB = get_spin_parity(target)
             return (spinA, parityA), (spinB, parityB)
 
@@ -1211,9 +1212,7 @@ class RRBaseClass(ResonanceReconstructionBaseClass, abc.ABC):
         if rxn=='capture' or 'photon' in rxn:
             spinA = min(self.projectileSpin+0.5, abs(self.projectileSpin-0.5))
             parityA = 1
-            compound = self.RR.PoPs[self.reactionSuite.compound_nucleus]
-            if (compound.id in self.RR.PoPs.aliases):
-                compound = self.RR.PoPs[compound.pid]
+            compound = self.RR.PoPs.final(self.reactionSuite.compound_nucleus)
             spinB, parityB = get_spin_parity(compound)
             return (spinA, parityA), (spinB, parityB)
 
@@ -2050,7 +2049,7 @@ class MLBWcrossSection(RRBaseClass):
 
 # some helper functions:
 
-def getR_S(E, Eres, captureWidth, widths, penetrabilities):
+def getR_S(E, Eres, captureWidth, widths, penetrabilities, externals):
     """
     Both versions of Reich_Moore formalisms (LRF=3 and 7) rely on building the complex matrix 'R'.
     Here we break it up into the real component R and the imaginary component S,
@@ -2108,7 +2107,12 @@ def getR_S(E, Eres, captureWidth, widths, penetrabilities):
                 S[:,j,i] = S[:,i,j]
         del captOverDEN, dEoverDEN
 
-    return R,S
+    for idx in range(len(externals)):
+        p_ii = penetrabilities[idx]**2
+        S[:, idx, idx] += (p_ii * externals[idx][0]).flatten()
+        R[:, idx, idx] += (p_ii * externals[idx][1]).flatten()
+
+    return R, S
 
 
 def invertMatrices( R, S ):
@@ -2145,6 +2149,7 @@ def invertMatrices( R, S ):
 
         def vectorInv(arr):
             # invert all MxM matrices in Nx(MxM) array
+            # FIXME are special cases for 2x2 and 3x3 matrices still useful? numpy.linalg.inv may end up faster
             dim = arr.shape[1]
             if dim==2:
                 arrinv = numpy.zeros(arr.shape)
@@ -2170,11 +2175,7 @@ def invertMatrices( R, S ):
                 arrinv[:,2,2] = (arr[:,0,0]*arr[:,1,1]-arr[:,0,1]*arr[:,1,0])/det
                 return arrinv
             else:
-                result = numpy.zeros( arr.shape )
-                NE = arr.shape[0]
-                for i in range(NE):
-                    result[i] = numpy.linalg.inv(arr[i])
-                return result
+                return numpy.linalg.inv(arr)
 
         identity = numpy.zeros( (NE, dim, dim) )
         for i in range(dim):
@@ -2240,6 +2241,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
             if rreac.boundaryConditionValue is not None:
                 raise NotImplementedError("Reconstruction with numeric boundary condition")
 
+        self.haveExternalRMatrix = False
         for sg in self.RR.spinGroups:
             sg.energy = numpy.array( sg.resonanceParameters.table.getColumn('energy',self.energyUnit) )
 
@@ -2248,7 +2250,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                 column = sg.resonanceParameters.table.columns[ channel.columnIndex ]
                 column.tag = resonanceReaction.tag
                 if channel.externalRMatrix is not None:
-                    raise NotImplementedError("Reconstruction with external R-Matrix still TBD")
+                    self.haveExternalRMatrix = True
 
         # for energy grid generation:
         energies, totalWidths = [],[]
@@ -2406,6 +2408,9 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                     channelClass=channelClass,
                     useRelativistic=self.RR.relativisticKinematics,
                     eliminated=pp.eliminated )
+
+                if channel.externalRMatrix:
+                    c.externalRMatrix = channel.externalRMatrix
                 channelIndex+=1
 
                 # Don't put closed channels onto lists
@@ -2610,6 +2615,12 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                     R[:, ic1, ic2] += dR[:,0]
                     if ic1 != ic2:
                         R[:, ic2, ic1] += dR[:,0]
+
+        for ic1, c1 in enumerate(self.channels):
+            if c1.externalRMatrix:
+                external_real, external_imag = c1.externalRMatrix.evaluate(Ein.flatten())
+                R[:, ic1, ic1] += external_real + 1j * external_imag
+
         return R
 
     def getScatteringMatrixT(self, Ein, useTabulatedScatteringRadius=True, enableExtraCoulombPhase=False):
@@ -2763,10 +2774,11 @@ class RMatrixLimitedcrossSection(RRBaseClass):
             thresholdIndices = []
             chanIds = []
             eliminatedWidth = numpy.zeros( sg.resonanceParameters.table.nRows )
+            externals = []
 
             for chan in sg.channels:
-                resonanceReaction = self.RR.resonanceReactions[ chan.resonanceReaction ]
-                chanWidths = numpy.array( sg.resonanceParameters.table.getColumn(chan.columnIndex, self.energyUnit) )
+                resonanceReaction = self.RR.resonanceReactions[chan.resonanceReaction]
+                chanWidths = numpy.array(sg.resonanceParameters.table.getColumn(chan.columnIndex, self.energyUnit))
 
                 if resonanceReaction.eliminated:
                     eliminatedWidth += chanWidths / 2
@@ -2841,29 +2853,35 @@ class RMatrixLimitedcrossSection(RRBaseClass):
                     widths.append( reducedWidths )
                     penetrabilities.append( penetrabilityAtEin )
 
+                if chan.externalRMatrix:
+                    externals.append(chan.externalRMatrix.evaluate(E))
+                else:
+                    externals.append((E*0, E*0))
+
             # are there any threshold reactions (negative Q-values)?
             # If so, we must break up the calculation above/below each threshold
-            if any( thresholdIndices ):
+            if any(thresholdIndices):
                 if thresholdIndices != sorted(thresholdIndices):
                     # sort by increasing threshold
-                    (thresholdIndices, chanIds, widths, penetrabilities) = list( zip( *sorted(
-                        zip(thresholdIndices,chanIds,widths,penetrabilities),
+                    (thresholdIndices, chanIds, widths, penetrabilities, externals) = list(zip(*sorted(
+                        zip(thresholdIndices,chanIds,widths,penetrabilities,externals),
                         key=lambda tmp: tmp[0]  # sort only by threshold index (not by id or width)
-                    ) ) )
+                    )))
                 assert thresholdIndices[-1] <= len(E)
                 thresholdIndices = list(thresholdIndices) + [len(E)]
 
                 RI = numpy.zeros((len(E), len(widths), len(widths)))
-                SI = numpy.zeros( RI.shape )
+                SI = numpy.zeros(RI.shape)
 
                 threshSet = sorted(set(thresholdIndices))
                 for i1 in range(len(threshSet)-1):
                     low = threshSet[i1]
                     high = threshSet[i1+1]
-                    nOpen = len( [th for th in thresholdIndices if th-low <= 0] )
+                    nOpen = len([th for th in thresholdIndices if th-low <= 0])
                     RI_now, SI_now = invertMatrices(
-                            *getR_S( E[low:high], sg.energy, eliminatedWidth,
-                            widths[:nOpen], [p[low:high] for p in penetrabilities[:nOpen]] )
+                            *getR_S(E[low:high], sg.energy, eliminatedWidth, widths[:nOpen],
+                                    [p[low:high] for p in penetrabilities[:nOpen]],
+                                    [(extR[low:high], extI[low:high]) for (extR, extI) in externals[:nOpen]])
                             )
                     if nOpen==1:  # numpy insists on same number of dimensions for copy:
                         RI_now.shape = SI_now.shape = (len(RI_now),1,1)
@@ -2873,7 +2891,7 @@ class RMatrixLimitedcrossSection(RRBaseClass):
 
             else:   # no threshold reactions
                 RI,SI = invertMatrices(
-                        *getR_S(E, sg.energy, eliminatedWidth, widths, penetrabilities)
+                        *getR_S(E, sg.energy, eliminatedWidth, widths, penetrabilities, externals)
                         )
 
             # reconstruct:
@@ -3240,39 +3258,38 @@ class URRcrossSection(ResonanceReconstructionBaseClass):
                 VL = self.DOFs[(l,j)]['elastic'] * self.penetrationFactor(l,rho) / rho
                 # Save all the widths in a new widths container to simplify coding in the fluctuating integral widget
                 widths = {}
-                for label in self.averageWidths[(l,j)]:
-                    function = self.averageWidths[(l,j)][label]
-                    widths[label] = numpy.array( [function.evaluate(energy) for energy in E]
-                                                 ).reshape(-1,1) # convert to column vector
+                for label in self.averageWidths[(l, j)]:
+                    function = self.averageWidths[(l, j)][label]
+                    widths[label] = numpy.array([function.evaluate(energy) for energy in E.flatten()]
+                                                ).reshape(-1, 1)    # convert to column vector
 
                 widths['elastic'] *= self.energyFactor * VL*numpy.sqrt(E)   # convert reduced width to 'regular' width
 
-                RE,RC,RF = self.getFluctuationIntegrals(E, widths, self.DOFs[(l,j)])
+                RE, RC, RF = self.getFluctuationIntegrals(E, widths, self.DOFs[(l, j)])
 
                 # common factor for all reactions:
-                levelSpacing = numpy.array( [self.levelSpacings[(l,j)].evaluate(energy) for energy in E]
-                                             ).reshape(-1,1)
+                levelSpacing = numpy.array(
+                    [self.levelSpacings[(l, j)].evaluate(energy) for energy in E.flatten()]).reshape(-1, 1)
                 comfac = 2 * numpy.pi * gfactor * widths['elastic'] / levelSpacing
 
-                elasticSum += ( (RE * widths['elastic'] - 2 * numpy.sin(phi)**2) * comfac )[:,0]
-                captureSum += ( RC * widths['capture'] * comfac )[:,0]
+                elasticSum += ((RE * widths['elastic'] - 2 * numpy.sin(phi)**2) * comfac)[:, 0]
+                captureSum += (RC * widths['capture'] * comfac)[:, 0]
                 if 'fission' in widths:
-                    fissionSum += ( RF * widths['fission'] * comfac )[:,0]
+                    fissionSum += (RF * widths['fission'] * comfac)[:, 0]
 
-
-            elasticSum += 4*(2*l+1)*numpy.sin(phi[:,0])**2
+            elasticSum += 4*(2*l+1)*numpy.sin(phi[:, 0])**2
 
         # common factor 'beta' as row vector:
-        beta = numpy.pi / self.k(E)[:,0]**2
+        beta = numpy.pi / self.k(E)[:, 0]**2
         capture = beta * captureSum
         elastic = beta * elasticSum
         fission = beta * fissionSum
-        for reaction in (capture,elastic,fission):
-            reaction[ reaction<=0 ] = 0
+        for reaction in (capture, elastic, fission):
+            reaction[reaction <= 0] = 0
         total = elastic + capture + fission
         nonelastic = capture + fission
 
-        xscs = {'total':total, 'elastic':elastic, 'capture':capture, 'fission':fission, 'nonelastic':nonelastic}
+        xscs = {'total': total, 'elastic': elastic, 'capture': capture, 'fission': fission, 'nonelastic': nonelastic}
         return xscs
 
     def getTransmissionCoefficients(self, skipFission=True, method='weakCoupling'):

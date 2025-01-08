@@ -62,8 +62,64 @@
 <dt class="sig sig-object py" id="fudge.processing.resonances.getCoulombWavefunctions.coulombNormalizationFactor">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.resonances.getCoulombWavefunctions.</span></span><span class="sig-name descname"><span class="pre">coulombNormalizationFactor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/getCoulombWavefunctions.html#coulombNormalizationFactor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.getCoulombWavefunctions.coulombNormalizationFactor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coulomb wavefunction normalization factor (see DLMF Eq. 33.2.5 or Abramowitz &amp; Stegun Eq. 14.1.7),
-<img class="math" src="../_images/math/743ad5a319c2854fba1bc3fdeffe35764b0e47b1.png" alt="C_\ell(\eta)={2^\ell e^{2\pi\eta}|\Gamma(\ell+1+i\eta)|}/{(2\ell+1)!}"/></p>
-<p>Because we’re working with numpy arrays of <img class="math" src="../_images/math/97db043c7cba573ac389b71add78b048077e8a13.png" alt="\eta"/> (for parallelization ala’ Caleb’s tricks), the logic
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">C_\\ell(\\eta)={2^\\ell e^{2\pi\\eta}|\Gamma(\\ell+1+i\\eta)|}/{(2\\ell+1)!}</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2020-10-01&gt; patch level 4
+L3 programming layer &lt;2021-02-18&gt;
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/anyfontsize/anyfontsize.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-dvips.def)
+(./math.aux) (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 \fontsize{12}{14}\selectfont $C_\\
+                                       ell(\\eta)={2^\\ell e^{2\pi\\eta}|\Ga...
+
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 ...e{12}{14}\selectfont $C_\\ell(\\eta)={2^\\
+                                                  ell e^{2\pi\\eta}|\Gamma(\...
+
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...a}|\Gamma(\\ell+1+i\\eta)|}/{(2\\ell+1)!}$
+                                                  
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...a}|\Gamma(\\ell+1+i\\eta)|}/{(2\\ell+1)!}$
+                                                  
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 540 bytes).
+Transcript written on math.log.
+</p>
+</aside>
+</p>
+<p>Because we’re working with numpy arrays of <img class="math" src="../_images/math/d30032e9306a9ad987535cb0f640b025fa6e2889.png" alt="\\eta"/> (for parallelization ala’ Caleb’s tricks), the logic
 of numpy masked arrays is at work here to handle different regimes of eta.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -84,9 +140,174 @@ of numpy masked arrays is at work here to handle different regimes of eta.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.resonances.getCoulombWavefunctions.coulombPenetrationFactor">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.resonances.getCoulombWavefunctions.</span></span><span class="sig-name descname"><span class="pre">coulombPenetrationFactor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/getCoulombWavefunctions.html#coulombPenetrationFactor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.getCoulombWavefunctions.coulombPenetrationFactor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the Coulomb penetrability, <img class="math" src="../_images/math/c6d98173d18bccf2ace8c54bc8d4ef97f6960982.png" alt="P_\ell"/>,
-<img class="math" src="../_images/math/bffa7485c3fc9852210cab33c54e77c2e4b36fd0.png" alt="P_\ell(\rho,\eta)={\rho}/{(A_\ell(\rho,\eta))^2}"/>
-where <img class="math" src="../_images/math/09ec5801382e36be46f814faa59515d441aa5e6f.png" alt="(A_\ell(\rho,\eta))^2=(G_\ell(\rho,\eta))^2+(F_\ell(\rho,\eta))^2"/></p>
+<dd><p>Compute the Coulomb penetrability, <aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">P_\\ell</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2020-10-01&gt; patch level 4
+L3 programming layer &lt;2021-02-18&gt;
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/anyfontsize/anyfontsize.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-dvips.def)
+(./math.aux) (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 \fontsize{12}{14}\selectfont $P_\\
+                                       ell$
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 \fontsize{12}{14}\selectfont $P_\\ell$
+                                           
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 288 bytes).
+Transcript written on math.log.
+</p>
+</aside>
+,
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">P_\\ell(\\rho,\\eta)={\\rho}/{(A_\\ell(\\rho,\\eta))^2}</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2020-10-01&gt; patch level 4
+L3 programming layer &lt;2021-02-18&gt;
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/anyfontsize/anyfontsize.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-dvips.def)
+(./math.aux) (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 \fontsize{12}{14}\selectfont $P_\\
+                                       ell(\\rho,\\eta)={\\rho}/{(A_\\ell(\\...
+
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 ...tfont $P_\\ell(\\rho,\\eta)={\\rho}/{(A_\\
+                                                  ell(\\rho,\\eta))^2}$
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...\\eta)={\\rho}/{(A_\\ell(\\rho,\\eta))^2}$
+                                                  
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...\\eta)={\\rho}/{(A_\\ell(\\rho,\\eta))^2}$
+                                                  
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 480 bytes).
+Transcript written on math.log.
+</p>
+</aside>
+
+where <aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">(A_\\ell(\\rho,\\eta))^2=(G_\\ell(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2020-10-01&gt; patch level 4
+L3 programming layer &lt;2021-02-18&gt;
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/anyfontsize/anyfontsize.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-dvips.def)
+(./math.aux) (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 \fontsize{12}{14}\selectfont $(A_\\
+                                        ell(\\rho,\\eta))^2=(G_\\ell(\\rho,\...
+
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 ...selectfont $(A_\\ell(\\rho,\\eta))^2=(G_\\
+                                                  ell(\\rho,\\eta))^2+(F_\\e...
+
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 ...o,\\eta))^2=(G_\\ell(\\rho,\\eta))^2+(F_\\
+                                                  ell(\\rho,\\eta))^2$
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2$
+                                                  
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2$
+                                                  
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2$
+                                                  
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 556 bytes).
+Transcript written on math.log.
+</p>
+</aside>
+</p>
 <p>Because we’re working with numpy arrays of <img class="math" src="../_images/math/97db043c7cba573ac389b71add78b048077e8a13.png" alt="\eta"/> (for parallelization ala’ Caleb’s tricks), the logic
 of numpy masked arrays is at work here to handle different regimes of eta.</p>
 <p>Here we use an external subroutine <cite>coulfg2</cite> from Thompson et al, converted to c and wrapped</p>
@@ -94,7 +315,7 @@ of numpy masked arrays is at work here to handle different regimes of eta.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>L</strong> (<em>int</em>) – the L to evaluate at</p></li>
-<li><p><strong>rho</strong> (<em>numpy.array</em><em>(</em><em>type=float</em><em>)</em>) – array of <img class="math" src="../_images/math/27dc86f9f1b1c3435b2403a869b5870c582facea.png" alt="\rho"/> values</p></li>
+<li><p><strong>rho</strong> (<em>numpy.array</em><em>(</em><em>type=float</em><em>)</em>) – array of <img class="math" src="../_images/math/392a2e0fe684aaaaca1e130c1bf840693a2ec54e.png" alt="\\rho"/> values</p></li>
 <li><p><strong>eta</strong> (<em>numpy.array</em><em>(</em><em>type=float</em><em>)</em>) – array of <img class="math" src="../_images/math/97db043c7cba573ac389b71add78b048077e8a13.png" alt="\eta"/> values</p></li>
 </ul>
 </dd>
@@ -110,16 +331,126 @@ of numpy masked arrays is at work here to handle different regimes of eta.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.resonances.getCoulombWavefunctions.coulombPhi">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.resonances.getCoulombWavefunctions.</span></span><span class="sig-name descname"><span class="pre">coulombPhi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/getCoulombWavefunctions.html#coulombPhi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.getCoulombWavefunctions.coulombPhi" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the Coulomb phase, <img class="math" src="../_images/math/933b17ff11b94d47973fd60547c9cea115e8bad5.png" alt="\varphi_\ell"/>, <img class="math" src="../_images/math/e48449349fee9b3dce636f781dcc9c382380b4ce.png" alt="\varphi_\ell(\rho,\eta)=\arg(G_\ell(\rho,\eta)+iF_\ell(\rho,\eta))"/></p>
-<p>Because we’re working with numpy arrays of <img class="math" src="../_images/math/97db043c7cba573ac389b71add78b048077e8a13.png" alt="\eta"/> (for parallelization ala’ Caleb’s tricks), the logic
+<dd><p>Compute the Coulomb phase, <aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">\\varphi_\\ell</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2020-10-01&gt; patch level 4
+L3 programming layer &lt;2021-02-18&gt;
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/anyfontsize/anyfontsize.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-dvips.def)
+(./math.aux) (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 \fontsize{12}{14}\selectfont $\\varphi_\\
+                                              ell$
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 \fontsize{12}{14}\selectfont $\\varphi_\\ell$
+                                                  
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 304 bytes).
+Transcript written on math.log.
+</p>
+</aside>
+, <aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">\\varphi_\\ell(\\rho,\\eta)=\\arg(G_\\ell(\\rho,\\eta)+iF_\\ell(\\rho,\\eta))</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2020-10-01&gt; patch level 4
+L3 programming layer &lt;2021-02-18&gt;
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/anyfontsize/anyfontsize.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-dvips.def)
+(./math.aux) (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 \fontsize{12}{14}\selectfont $\\varphi_\\
+                                              ell(\\rho,\\eta)=\\arg(G_\\ell...
+
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 ...nt $\\varphi_\\ell(\\rho,\\eta)=\\arg(G_\\
+                                                  ell(\\rho,\\eta)+iF_\\ell(...
+
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 ...ho,\\eta)=\\arg(G_\\ell(\\rho,\\eta)+iF_\\
+                                                  ell(\\rho,\\eta))$
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...\\ell(\\rho,\\eta)+iF_\\ell(\\rho,\\eta))$
+                                                  
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...\\ell(\\rho,\\eta)+iF_\\ell(\\rho,\\eta))$
+                                                  
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...\\ell(\\rho,\\eta)+iF_\\ell(\\rho,\\eta))$
+                                                  
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 508 bytes).
+Transcript written on math.log.
+</p>
+</aside>
+</p>
+<p>Because we’re working with numpy arrays of <img class="math" src="../_images/math/d30032e9306a9ad987535cb0f640b025fa6e2889.png" alt="\\eta"/> (for parallelization ala’ Caleb’s tricks), the logic
 of numpy masked arrays is at work here to handle different regimes of eta.</p>
 <p>Here we use an external subroutine ‘coulfg2’ from Thompson et al, converted to c and wrapped</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>L</strong> (<em>int</em>) – the L to evaluate at</p></li>
-<li><p><strong>rho</strong> (<em>numpy.array</em><em>(</em><em>type=float</em><em>)</em>) – array of <img class="math" src="../_images/math/27dc86f9f1b1c3435b2403a869b5870c582facea.png" alt="\rho"/> values</p></li>
-<li><p><strong>eta</strong> (<em>numpy.array</em><em>(</em><em>type=float</em><em>)</em>) – array of <img class="math" src="../_images/math/97db043c7cba573ac389b71add78b048077e8a13.png" alt="\eta"/> values</p></li>
+<li><p><strong>rho</strong> (<em>numpy.array</em><em>(</em><em>type=float</em><em>)</em>) – array of <img class="math" src="../_images/math/392a2e0fe684aaaaca1e130c1bf840693a2ec54e.png" alt="\\rho"/> values</p></li>
+<li><p><strong>eta</strong> (<em>numpy.array</em><em>(</em><em>type=float</em><em>)</em>) – array of <img class="math" src="../_images/math/d30032e9306a9ad987535cb0f640b025fa6e2889.png" alt="\\eta"/> values</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -131,8 +462,141 @@ of numpy masked arrays is at work here to handle different regimes of eta.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.resonances.getCoulombWavefunctions.coulombShiftFactor">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.resonances.getCoulombWavefunctions.</span></span><span class="sig-name descname"><span class="pre">coulombShiftFactor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/getCoulombWavefunctions.html#coulombShiftFactor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.getCoulombWavefunctions.coulombShiftFactor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the Coulomb shift, <img class="math" src="../_images/math/360db66461cfb28f3d7a13bcfdba13d2b121336b.png" alt="S_\ell"/>, <img class="math" src="../_images/math/1ca348da0855c3b9fc4adb533666a83a24a167af.png" alt="S_\ell(\rho,\eta)=({\rho}/{A_\ell(\rho,\eta)})({\partial A_\ell(\rho,\eta)}/{\partial\rho})"/>
-where <img class="math" src="../_images/math/09ec5801382e36be46f814faa59515d441aa5e6f.png" alt="(A_\ell(\rho,\eta))^2=(G_\ell(\rho,\eta))^2+(F_\ell(\rho,\eta))^2"/></p>
+<dd><p>Compute the Coulomb shift, <img class="math" src="../_images/math/360db66461cfb28f3d7a13bcfdba13d2b121336b.png" alt="S_\ell"/>, <aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">S_\\ell(\\rho,\\eta)=({\\rho}/{A_\\ell(\\rho,\\eta)})({\partial A_\\ell(\\rho,\\eta)}/{\partial\\rho})</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2020-10-01&gt; patch level 4
+L3 programming layer &lt;2021-02-18&gt;
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/anyfontsize/anyfontsize.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-dvips.def)
+(./math.aux) (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 \fontsize{12}{14}\selectfont $S_\\
+                                       ell(\\rho,\\eta)=({\\rho}/{A_\\ell(\\...
+
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 ...tfont $S_\\ell(\\rho,\\eta)=({\\rho}/{A_\\
+                                                  ell(\\rho,\\eta)})({\parti...
+
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 ...ho}/{A_\\ell(\\rho,\\eta)})({\partial A_\\
+                                                  ell(\\rho,\\eta)}/{\partia...
+
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...al A_\\ell(\\rho,\\eta)}/{\partial\\rho})$
+                                                  
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...al A_\\ell(\\rho,\\eta)}/{\partial\\rho})$
+                                                  
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...al A_\\ell(\\rho,\\eta)}/{\partial\\rho})$
+                                                  
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 528 bytes).
+Transcript written on math.log.
+</p>
+</aside>
+
+where <aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">(A_\\ell(\\rho,\\eta))^2=(G_\\ell(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2020-10-01&gt; patch level 4
+L3 programming layer &lt;2021-02-18&gt;
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/anyfontsize/anyfontsize.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-dvips.def)
+(./math.aux) (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 \fontsize{12}{14}\selectfont $(A_\\
+                                        ell(\\rho,\\eta))^2=(G_\\ell(\\rho,\...
+
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 ...selectfont $(A_\\ell(\\rho,\\eta))^2=(G_\\
+                                                  ell(\\rho,\\eta))^2+(F_\\e...
+
+! Missing { inserted.
+&lt;to be read again&gt; 
+                   \let 
+l.13 ...o,\\eta))^2=(G_\\ell(\\rho,\\eta))^2+(F_\\
+                                                  ell(\\rho,\\eta))^2$
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2$
+                                                  
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2$
+                                                  
+! Missing } inserted.
+&lt;inserted text&gt; 
+                }
+l.13 ...(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2$
+                                                  
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 556 bytes).
+Transcript written on math.log.
+</p>
+</aside>
+</p>
 <p>Because we’re working with numpy arrays of <img class="math" src="../_images/math/97db043c7cba573ac389b71add78b048077e8a13.png" alt="\eta"/> (for parallelization ala’ Caleb’s tricks), the logic
 of numpy masked arrays is at work here to handle different regimes of eta.</p>
 <p>Here we use an external subroutine ‘coulfg2’ from Thompson et al, converted to c and wrapped</p>
@@ -140,7 +604,7 @@ of numpy masked arrays is at work here to handle different regimes of eta.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>L</strong> (<em>int</em>) – the L to evaluate at</p></li>
-<li><p><strong>rho</strong> (<em>numpy.array</em><em>(</em><em>type=float</em><em>)</em>) – array of <img class="math" src="../_images/math/27dc86f9f1b1c3435b2403a869b5870c582facea.png" alt="\rho"/> values</p></li>
+<li><p><strong>rho</strong> (<em>numpy.array</em><em>(</em><em>type=float</em><em>)</em>) – array of <img class="math" src="../_images/math/392a2e0fe684aaaaca1e130c1bf840693a2ec54e.png" alt="\\rho"/> values</p></li>
 <li><p><strong>eta</strong> (<em>numpy.array</em><em>(</em><em>type=float</em><em>)</em>) – array of <img class="math" src="../_images/math/97db043c7cba573ac389b71add78b048077e8a13.png" alt="\eta"/> values</p></li>
 </ul>
 </dd>
@@ -224,7 +688,7 @@ resonance parameter contribution to the cross section by doing:</p>
 </div></blockquote>
 <dl class="py class">
 <dt class="sig sig-object py" id="fudge.processing.resonances.reconstructResonances.ChannelDesignator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.processing.resonances.reconstructResonances.</span></span><span class="sig-name descname"><span class="pre">ChannelDesignator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gfact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleA</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleB</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Xi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isElastic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channelClass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useRelativistic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eliminated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#ChannelDesignator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ChannelDesignator" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.processing.resonances.reconstructResonances.</span></span><span class="sig-name descname"><span class="pre">ChannelDesignator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gfact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleA</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleB</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Xi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isElastic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channelClass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useRelativistic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eliminated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">externalRMatrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#ChannelDesignator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ChannelDesignator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fudge.processing.resonances.reconstructResonances.ChannelDesignator.J">
@@ -244,6 +708,11 @@ resonance parameter contribution to the cross section by doing:</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fudge.processing.resonances.reconstructResonances.ChannelDesignator.eliminated">
 <span class="sig-name descname"><span class="pre">eliminated</span></span><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ChannelDesignator.eliminated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fudge.processing.resonances.reconstructResonances.ChannelDesignator.externalRMatrix">
+<span class="sig-name descname"><span class="pre">externalRMatrix</span></span><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.ChannelDesignator.externalRMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1308,7 +1777,7 @@ Also, it makes the use of the Python range() function possible.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.resonances.reconstructResonances.getR_S">
-<span class="sig-prename descclassname"><span class="pre">fudge.processing.resonances.reconstructResonances.</span></span><span class="sig-name descname"><span class="pre">getR_S</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Eres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">captureWidth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penetrabilities</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#getR_S"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.getR_S" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fudge.processing.resonances.reconstructResonances.</span></span><span class="sig-name descname"><span class="pre">getR_S</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Eres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">captureWidth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penetrabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">externals</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/resonances/reconstructResonances.html#getR_S"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.resonances.reconstructResonances.getR_S" title="Permalink to this definition">¶</a></dt>
 <dd><p>Both versions of Reich_Moore formalisms (LRF=3 and 7) rely on building the complex matrix ‘R’.
 Here we break it up into the real component R and the imaginary component S,
 which represent symmetric and anti-symmetric scattering respectively</p>

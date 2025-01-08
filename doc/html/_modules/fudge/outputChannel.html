@@ -86,11 +86,12 @@
     <span class="n">continuum</span> <span class="o">=</span> <span class="s1">&#39;continuum&#39;</span>
     <span class="n">inclusive</span> <span class="o">=</span> <span class="s1">&#39;inclusive&#39;</span></div>
 
+
 <div class="viewcode-block" id="OutputChannel"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel">[docs]</a><span class="k">class</span> <span class="nc">OutputChannel</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the GNDS outputChannel which is a Q value and a list of products (i.e., product objects).&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;outputChannel&#39;</span>
-    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span> <span class="s1">&#39;fissionFragmentData&#39;</span> <span class="p">)</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span> <span class="s1">&#39;fissionFragmentData&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">process</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for outputChannel.&quot;&quot;&quot;</span>
@@ -118,67 +119,53 @@
             <span class="k">if</span><span class="p">(</span> <span class="n">ancestryMember</span> <span class="ow">in</span> <span class="p">(</span> <span class="s1">&#39;fissionFragmentData&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
             <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ancestryMember</span> <span class="p">)</span><span class="o">.</span><span class="n">findLinks</span><span class="p">(</span> <span class="n">links</span> <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the i^th product in the channel.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of products for this channel.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__products</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts channel object to a string representation.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compares self to other.&quot;&quot;&quot;</span>
-
-        <span class="k">if</span><span class="p">(</span> <span class="n">other</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
-        <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
-        <span class="n">n2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span> <span class="p">)</span>
-        <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">other</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
-            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">other</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span>  <span class="mi">1</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">n1</span> <span class="o">&lt;</span> <span class="n">n2</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">n1</span> <span class="o">&gt;</span> <span class="n">n2</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span>  <span class="mi">1</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span><span class="n">simpleString</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">Q</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">Q</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span> <span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">products</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__Q</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">fissionFragmentData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">genre</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">fissionFragmentData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__genre</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">genre</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__genre</span>
 
     <span class="nd">@genre</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">genre</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">genre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__genre</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Genre</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__process</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__process</span>
 
     <span class="nd">@process</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__process</span> <span class="o">=</span> <span class="n">value</span>
 
@@ -304,12 +291,20 @@
 
         <span class="k">return</span> <span class="n">numberOfFixes</span></div>
 
-<div class="viewcode-block" id="OutputChannel.listOfProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns, as a set, the list of PoP&#39;s ids for all products (i.e., outgoing particles) for *self*.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OutputChannel.listOfProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">finalOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.</span>
+
+<span class="sd">        :param finalOnly:           If `True`, only final product ids are returned, otherwise, all are returned..</span>
+<span class="sd">        :param includeQualifier:    If `True`, particle qualifiers are include in ids, otherwise, they are stripped from ids.</span>
+
+<span class="sd">        :return:                    A python set instance.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">products</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span><span class="p">:</span> <span class="n">products</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">())</span>
-        <span class="n">products</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__products</span><span class="p">:</span>
+            <span class="n">products</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">(</span><span class="n">finalOnly</span><span class="o">=</span><span class="n">finalOnly</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="n">includeQualifier</span><span class="p">))</span>
+        <span class="n">products</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">listOfProducts</span><span class="p">(</span><span class="n">finalOnly</span><span class="o">=</span><span class="n">finalOnly</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="n">includeQualifier</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">products</span></div>
 
@@ -472,41 +467,41 @@
 
         <span class="k">return</span> <span class="n">averageMomentum</span></div>
 
-<div class="viewcode-block" id="OutputChannel.multiGroupProductMatrix"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.multiGroupProductMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">):</span>
+<div class="viewcode-block" id="OutputChannel.multiGroupProductMatrix"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.multiGroupProductMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.</span>
 
 <span class="sd">        :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.</span>
 <span class="sd">        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</span>
-<span class="sd">        :param particles: The list of particles to be transported.</span>
+<span class="sd">        :param particleIDs: The list of particles to be transported.</span>
 <span class="sd">        :param productID: Particle id for the requested product.</span>
 <span class="sd">        :param legendreOrder: Requested Legendre order.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">productMatrix</span> <span class="o">=</span> <span class="n">matrixModule</span><span class="o">.</span><span class="n">Matrix</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">:</span>
-            <span class="n">productMatrix</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">multiGroupProductMatrix</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">)</span>
+            <span class="n">productMatrix</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">multiGroupProductMatrix</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">)</span>
 
-        <span class="n">productMatrix</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionFragmentData</span><span class="o">.</span><span class="n">multiGroupProductMatrix</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">)</span>
+        <span class="n">productMatrix</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionFragmentData</span><span class="o">.</span><span class="n">multiGroupProductMatrix</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">,</span> <span class="n">productID</span><span class="p">,</span> <span class="n">legendreOrder</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">productMatrix</span></div>
 
-<div class="viewcode-block" id="OutputChannel.multiGroupProductArray"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.multiGroupProductArray">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
+<div class="viewcode-block" id="OutputChannel.multiGroupProductArray"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.multiGroupProductArray">[docs]</a>    <span class="k">def</span> <span class="nf">multiGroupProductArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">,</span> <span class="n">productID</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the full multi-group, total product array for the requested label for the requested product id.</span>
 
 <span class="sd">        :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.</span>
 <span class="sd">        :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</span>
-<span class="sd">        :param particles: The list of particles to be transported.</span>
+<span class="sd">        :param particleIDs: The list of particles to be transported.</span>
 <span class="sd">        :param productID: Particle id for the requested product.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">productArray</span> <span class="o">=</span> <span class="n">productArrayModule</span><span class="o">.</span><span class="n">ProductArray</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">:</span>
-            <span class="n">productArray</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">multiGroupProductArray</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span>
+            <span class="n">productArray</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">multiGroupProductArray</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span>
 
-        <span class="n">productArray</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionFragmentData</span><span class="o">.</span><span class="n">multiGroupProductArray</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particles</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span>
+        <span class="n">productArray</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionFragmentData</span><span class="o">.</span><span class="n">multiGroupProductArray</span><span class="p">(</span><span class="n">multiGroupSettings</span><span class="p">,</span> <span class="n">temperatureInfo</span><span class="p">,</span> <span class="n">particleIDs</span><span class="p">,</span> <span class="n">productID</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">productArray</span></div>
 

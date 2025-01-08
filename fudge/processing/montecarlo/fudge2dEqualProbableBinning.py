@@ -5,14 +5,41 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module contains a class and a function for handling equal probable bins.
+
+This module contains the following classes:
+
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Class                                 | Description                                                                       |
+    +=======================================+===================================================================================+
+    | EqualProbableBinnedData               | This class stores data for an instance of equal probable bins                     |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+
+This module contains the following functions:
+
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Class                                 | Description                                                                       |
+    +=======================================+===================================================================================+
+    | equalProbableBins                     |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+"""
+
 import math 
 from fudge.core.math import fudgemath
 
 
 class EqualProbableBinnedData :
+    """
+    This class is for storing and modifing equal probable bins.
+    """
 
     def __init__( self, data ) :
-        """Constructor for the EqualProbableBinnedData class."""
+        """
+        Constructor for the EqualProbableBinnedData class.
+
+        :param data:        The qual probable bins to store.
+        """
 
         self.data = data
 
@@ -32,7 +59,7 @@ class EqualProbableBinnedData :
         return( len( self.data ) )
 
     def getData( self ) :
-        """Returns the data of self."""
+        """Returns the data member of self."""
 
         return( self.data )
 
@@ -47,6 +74,14 @@ class EqualProbableBinnedData :
         return( 0 )
 
 def equalProbableBins( nBins, xy ) :
+    """
+    This function calculates *nBins* equal probable bins for the pdf given by *xy*.
+
+    :param nBins:       The number of desired equal probable bins.
+    :param xy:          The pdf whose equal probable bins are returned.
+
+    :returns:           An instance of :py:class:`EqualProbableBinnedData`.
+    """
 
     S = fudgemath.runningYSum( xy )
     SMax = S.data[-1][1]

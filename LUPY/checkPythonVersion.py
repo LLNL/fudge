@@ -10,3 +10,8 @@ if sys.version_info.major != 3:
     raise ValueError('FUDGE only tested with Python 3.')
 elif sys.version_info.minor < 7:
     raise ValueError('FUDGE only tested with Python 3 with minor version 7 or higher.')
+
+try:
+    import numericalFunctions
+except ImportError:
+    raise ImportError("Cannot import required modules! Have extensions been compiled? You are using python %s" % sys.version)

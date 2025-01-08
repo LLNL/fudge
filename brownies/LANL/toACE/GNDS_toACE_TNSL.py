@@ -28,49 +28,63 @@ floatFormatOthers = '%20.12E'
 floatFormatEnergyGrid = '%21.13E'
 floatFormatEnergyGrid = floatFormatOthers
 
-standardsData = {   'H1'    : [  125, 0.999167,     [  1001 ] ], 
-                    'HC'    : [  125, 0.999167,     [  1001, 6012 ] ],
-                    'H2'    : [  128, 1.996800,     [  1002 ] ],
-                    'Be'    : [  425, 8.934780,     [  4009 ] ], 
-                    'C'     : [  625, 11.893650,    [  6012, 6000 ] ], 
-                    'N'     : [  725, 13.882780,    [  7014 ] ], 
-                    'O'     : [  825, 15.857510,    [  8016 ] ], 
-                    'SiO2'  : [ 825,  15.857510,    [  8016, 8017, 14028 ] ], 
-                    'Al'    : [ 1325, 26.749750,    [ 13027 ] ], 
-                    'Si'    : [ 1425, 27.737000,    [ 14028, 14029, 14030 ] ], 
-                    'Fe'    : [ 2631, 55.454430,    [ 26056, 26054, 26057 ] ], 
-                    'Y'     : [ 3925, 88.142100,    [ 39089 ] ], 
-                    'Zr'    : [ 4025, 89.132400,    [ 40090, 40091, 40092 ] ],
-                    'U'     : [ 9237, 236.005800,   [ 92238 ] ] }
+# Special lookup for complex target names, especially ones that don't follow "Sym in molecule" pattern:
+targetMapping = {
+    'HinParaffinicOil'      : ['h-parf',   'H'],
+    '7Liin7LiD-mixed'       : ['li-lid',   'Li'],
+    '7Liin7LiH-mixed'       : ['li-lih',   'Li'],
+    'Be-metal'              : ['be-met',   'Be'],
+    'benzene'               : ['benz',     'HC'],
+    'tnsl-Al27'             : ['al-27',    'Al'],
+    'tnsl-Fe56'             : ['fe-56',    'Fe'],
+    'crystalline-graphite'  : ['grph',     'C'],
+    'reactor-graphite-10P'  : ['grph10',   'C'],
+    'reactor-graphite-20P'  : ['grph20',   'C'],
+    'reactor-graphite-30P'  : ['grph30',   'C'],
+    'SiO2-alpha'            : ['sio2',     'SiO2'],
+    'U-metal'               : ['umet',     'U'],
+    'U-metal-5P'            : ['umet05',   'U'],
+    'U-metal-10P'           : ['umet10',   'U'],
+    'U-metal-100P'          : ['umet99',   'U'],
+    'U-metal-HALEU'         : ['uleu',     'U'],
+    'U-metal-HEU'           : ['uheu',     'U235'],
+    }
 
-targetMapping = {   'Be-metal'              : [ 'be-met',   'Be' ],
-                    'BeinBeO'               : [ 'be-beo',   'Be' ],
-                    'tnsl-Al27'             : [ 'al-27',    'Al' ],
-                    'benzene'               : [ 'benz',     'HC' ],
-                    'CinSiC'                : [ 'c-sic',    'C' ],
-                     'DinD2O'               : [ 'd-d2o',    'H2' ],
-                    'tnsl-Fe56'             : [ 'fe-56',    'Fe' ],
-                    'crystalline-graphite'  : [ 'grph',     'C' ],
-                    'reactor-graphite-10P'  : [ 'grph10',   'C' ],
-                    'reactor-graphite-30P'  : [ 'grph30',   'C' ],
-                    'HinH2O'                : [ 'h-h2o',    'H1' ],
-                    'HinYH2'                : [ 'h-yh2',    'H1' ],
-                    'HinZrH'                : [ 'h-zrh',    'H1' ],
-                    'NinUN'                 : [ 'n-un',     'N' ],
-                    'OinBeO'                : [ 'o-beo',    'O' ],
-                    'OinD2O'                : [ 'o-d2o',    'O' ],
-                    'OinUO2'                : [ 'o-uo2',    'O' ],
-                    'SiinSiC'               : [ 'si-sic',   'Si' ],
-                    'UinUN'                 : [ 'u-un',     'U' ],
-                    'UinUO2'                : [ 'u-uo2',    'U' ],
-                    'YinYH2'                : [ 'y-yh2',    'Y' ],
-                    'ZrinZrH'               : [ 'zr-zrh',   'Zr' ],
-                    'HinC5O2H8'             : [ 'h-luci',   'H1' ],
-                    'CinC5O2H8'             : [ 'c-luci',   'C' ],
-                    'OinC5O2H8'             : [ 'o-luci',   'O' ],
-                    'HinCH2'                : [ 'h-poly',   'H1' ],
-                    'CinCH2'                : [ 'c-poly',   'C' ],
-                    'SiO2-alpha'            : [ 'sio2',     'SiO2' ] }
+# ACE header only provides 6 characters to describe target!
+shortNames = {
+    'C5O2H8':    'luci',
+    'CH2':       'poly',
+    '-HALEU':    'leu',
+    '-HEU':      'heu',
+    '-100P':     'p',
+    '-10P':      'p',
+    '-5P':       'p',
+}
+
+# Find MAT, AWR and list of isotopes for 'standard' nuclear target
+standardsData = {
+    'H'     : [  125, 0.999167,     [  1001 ] ],
+    'H1'    : [  125, 0.999167,     [  1001 ] ],
+    'HC'    : [  125, 0.999167,     [  1001, 6012 ] ],
+    'H2'    : [  128, 1.996800,     [  1002 ] ],
+    'D'     : [  128, 1.996800,     [  1002 ] ],
+    'Li'    : [  328, 6.955733,     [  3007 ] ],
+    'Be'    : [  425, 8.934780,     [  4009 ] ],
+    'C'     : [  625, 11.893650,    [  6012, 6000 ] ],
+    'N'     : [  725, 13.882780,    [  7014 ] ],
+    'O'     : [  825, 15.857510,    [  8016 ] ],
+    'F'     : [  925, 18.835200,    [  9019 ] ],
+    'SiO2'  : [  825, 15.857510,    [  8016, 8017, 14028 ] ],
+    'Al'    : [ 1325, 26.749750,    [ 13027 ] ],
+    'Si'    : [ 1425, 27.737000,    [ 14028, 14029, 14030 ] ],
+    'Ca'    : [ 2025, 39.619293,    [ 20040 ] ],
+    'Fe'    : [ 2631, 55.454430,    [ 26056, 26054, 26057 ] ],
+    'Y'     : [ 3925, 88.142100,    [ 39089 ] ],
+    'Zr'    : [ 4025, 89.132400,    [ 40090, 40091, 40092 ] ],
+    'U'     : [ 9237, 236.005800,   [ 92238 ] ],
+    'U235'  : [ 9228, 233.024787,   [ 92235 ] ],
+    'Pu'    : [ 9437, 236.998589,   [ 94239 ] ],
+    }
 
 def getEqualProbableBins(xs_pdf_cdf, numberOfBins, check=False):
     """Returns the equal probable bins of xs_pdf_cdf as a list."""
@@ -92,18 +106,32 @@ def toACE(self, args, styleLabel, cdf_style, fileName, evaluationId, addAnnotati
     checkEqualProbableBinning = False
 
     target = self.target
-    if target in ['HinZrH2', 'HinZrHx']:               # Special targets in ENDF/B-VIII.1 beta release.
-        target = 'HinZrH'
-    if target in ['ZrinZrH2', 'ZrinZrHx']:
-        target = 'ZrinZrH'
-    targetMap = targetMapping[target]
-    standardData = standardsData[targetMap[1]]
+
+    if target in targetMapping:
+        identifier, targ = targetMapping[target]
+    elif 'in' in target:
+        targ, standardName = target.split('in')
+        for shortName in shortNames:
+            if shortName in standardName:
+                standardName = standardName.replace(shortName, shortNames[shortName])
+                break
+        identifier = targ.lower() + '-' + standardName.lower()
+    else:
+        raise Exception("Could not determine target info for TNSL material '%s'" % target)
+
+    if targ not in standardsData:
+        raise Exception("Missing MAT and AWR for standard target '%s'" % targ)
+    standardData = standardsData[targ]
+
+    if len(identifier) > 6:
+        print("WARNING: truncating %s to %s" % (identifier, identifier[:6]))
+        identifier = identifier[:6]
 
     strRecords = []
     date = dateModule.Date.parse(cdf_style.date).date
     date = '%s/%s/%s' % (date.month, date.day, date.year % 100)
     
-    line = '%6s.%2.2dt%12.6f%12.5e %10s' % ( targetMap[0], evaluationId, standardData[1], cdf_style.temperature.getValueAs('MeV/k'), date)
+    line = '%6s.%2.2dt%12.6f%12.5e %10s' % ( identifier, evaluationId, standardData[1], cdf_style.temperature.getValueAs('MeV/k'), date)
     strRecords.append(line)
 
     line = '%-70s' % ('%s at %12.2fK' % (target, cdf_style.temperature.getValueAs('K'))) + '%10s' % ('mat%4d' % standardData[0])

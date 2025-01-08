@@ -7,6 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+import sys
 import numpy
 import argparse
 
@@ -24,6 +25,7 @@ from xData import table as tableModule
 
 from LUPY import times as timesModule
 
+summaryDocString__FUDGE = """This script process unresolved resonances to create probability tables."""
 
 parser = argparse.ArgumentParser(
     "Process unresolved resonances to create probability tables and optional cross section PDFs")
@@ -35,6 +37,7 @@ parser.add_argument("-f", "--formatVersion", default=GNDS_formatVersionModule.de
                     help="GNDS format version to write out")
 parser.add_argument("--skipPDFs", action="store_true", help="Generate probability tables but not PDFs. A bit faster.")
 parser.add_argument("--hybrid", action="store_true", help="Write hybrid XML/HDF5 files.")
+parser.add_argument("--debug", help="Save realization details to specified file (pickle format).")
 parser.add_argument("-v", "--verbose", action="store_true", help="enable verbose output")
 args = parser.parse_args()
 
@@ -43,11 +46,20 @@ if args.output is None:
 
 RS = reactionSuiteModule.read(args.gnds)
 
+if not RS.resonances or not RS.resonances.unresolved:
+    if args.verbose:
+        print(f"Skipping URR processing since {args.gnds} contains no URR data")
+    RS.saveAllToFile(args.output, xs_pdf_cdf1d_singleLine=True, formatVersion=args.formatVersion, hybrid=args.hybrid)
+    sys.exit()
+
 energyUnit = RS.styles.getEvaluatedStyle().projectileEnergyDomain.unit
 urrStyles = RS.styles.getStylesOfClass(stylesModule.URR_probabilityTables)
 assert len(urrStyles) == 0, "Error: file already contains processed URR data"
 
 griddedStyles = RS.styles.getStylesOfClass(stylesModule.GriddedCrossSection)
+assert len(griddedStyles) > 0, ("No processed Monte Carlo data found! "
+                                "Make sure to include the '-mc' option when running processProtare.py")
+
 temperatures = [style.temperature.value for style in griddedStyles]
 temperatureUnits = [style.temperature.unit for style in griddedStyles]
 assert len(set(temperatureUnits)) == 1, "Inconsistent temperature units"
@@ -57,7 +69,8 @@ tableGenerator = makeUnresolvedProbabilityTables.ProbabilityTableGenerator(RS)
 
 timer = timesModule.Times()
 results = tableGenerator.generatePDFs(args.nSamples, temperatures, temperatureUnit=str(temperatureUnits[0]),
-                                      verbose=args.verbose, style=args.generator, makePDFs=(not args.skipPDFs))
+                                      verbose=args.verbose, style=args.generator, makePDFs=(not args.skipPDFs),
+                                      debugFile=args.debug)
 print(timer.toString())
 
 # package results into GNDS:
@@ -111,7 +124,4 @@ institution = institutionModule.Institution(probabilityTablesModule.LLNLProbabil
 institution.append(probabilityTables)
 RS.applicationData.add(institution)
 
-if args.hybrid:
-    RS.saveAllToFile(args.output, hybrid=True, formatVersion=args.formatVersion)
-else:
-    RS.saveToFile(args.output, formatVersion=args.formatVersion)
+RS.saveAllToFile(args.output, xs_pdf_cdf1d_singleLine=True, formatVersion=args.formatVersion, hybrid=args.hybrid)

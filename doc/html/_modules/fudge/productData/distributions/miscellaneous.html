@@ -44,6 +44,33 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains various functions that do common calculations.</span>
+
+<span class="sd">This module contains the following functions:</span>
+<span class="sd">        </span>
+<span class="sd">    +-------------------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Function                                              | Description                                                           | </span>
+<span class="sd">    +=======================================================+=======================================================================+</span>
+<span class="sd">    | energyAngularSpectrumFromCOMSpectrumToLabAtEnergy     | This function converts a center-of-mass (COM) P(E&#39;) and P(E&#39;,mu) into |</span>
+<span class="sd">    |                                                       | a lab frame.                                                          |</span>
+<span class="sd">    +-------------------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | calculateDepositionEnergyFromEpP                      |                                                                       |</span>
+<span class="sd">    +-------------------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | calculateDepositionEnergyFromAngular_angularEnergy    |                                                                       |</span>
+<span class="sd">    +-------------------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | GaussQuadrature2                                      |                                                                       |</span>
+<span class="sd">    +-------------------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | GnG_adaptiveQuadrature                                |                                                                       |</span>
+<span class="sd">    +-------------------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | domainLimits                                          |                                                                       |</span>
+<span class="sd">    +-------------------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | integratePhi                                          |                                                                       |</span>
+<span class="sd">    +-------------------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | muPhiEvaluate                                         |                                                                       |</span>
+<span class="sd">    +-------------------------------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
@@ -54,7 +81,6 @@
 
 <span class="kn">from</span> <span class="nn">fudge.productData</span> <span class="kn">import</span> <span class="n">averageProductEnergy</span> <span class="k">as</span> <span class="n">averageProductEnergyModule</span>
 
-
 <div class="viewcode-block" id="energyAngularSpectrumFromCOMSpectrumToLabAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.miscellaneous.energyAngularSpectrumFromCOMSpectrumToLabAtEnergy">[docs]</a><span class="k">def</span> <span class="nf">energyAngularSpectrumFromCOMSpectrumToLabAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">,</span> <span class="n">energySpectrumAtEnergyCOM</span><span class="p">,</span> <span class="n">energyAngualarAtEnergyCOM</span><span class="p">,</span> <span class="n">angularIsNormalized</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function converts a center-of-mass (COM) P(E&#39;) and P(E&#39;,mu) into a lab frame. </span>
@@ -64,7 +90,7 @@
 <span class="sd">    :param energyAngualarAtEnergyCOM:       P(E&#39;,mu) or P(mu|E&#39;) in the center-of-mass frame.</span>
 <span class="sd">    :param angularIsNormalized:             If True, energyAngualarAtEnergyCOM is P(E&#39;,mu) otherwise it is P(mu|E&#39;).</span>
 
-<span class="sd">    :return:                                An XYs2d representing P(E,mu) in the lab frame.</span>
+<span class="sd">    :return:                                An XYs2d instance representing P(E&#39;,mu) in the lab frame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">energyAngular</span> <span class="k">as</span> <span class="n">energyAngularModule</span>
@@ -72,6 +98,16 @@
     <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="n">energySpectrumAtEnergyCOM</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">energySpectrumAtEnergyCOM</span><span class="o">.</span><span class="n">domainMax</span>
 
     <span class="k">def</span> <span class="nf">probabilityLab</span><span class="p">(</span> <span class="n">energyPrimeLab</span><span class="p">,</span> <span class="n">muLab</span><span class="p">,</span> <span class="n">energyPrimeCOM</span><span class="p">,</span> <span class="n">muCOM</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the probability in the lab frame for the specified inputs. For internal use only.</span>
+
+<span class="sd">        :param energyPrimeLab:  The energy of the product in the lab frame.</span>
+<span class="sd">        :param muLab:           The mu of the product in the lab frame.</span>
+<span class="sd">        :energyPrimeCOM:        The energy of the product in the center-of-mass frame.</span>
+<span class="sd">        :param muCOM:           The mu of the product in the center-of-mass frame.</span>
+
+<span class="sd">        :return:                The list [muLab, P(muLab)].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">energyPrimeCOM</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">energyPrimeCOM</span> <span class="o">=</span> <span class="n">domainMin</span> <span class="o">+</span> <span class="mf">1e-6</span> <span class="o">*</span> <span class="p">(</span> <span class="n">domainMax</span> <span class="o">-</span> <span class="n">domainMin</span> <span class="p">)</span>
         <span class="n">PAtEnergyPrime</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -169,7 +205,12 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">spectrum</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="calculateDepositionEnergyFromEpP"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.miscellaneous.calculateDepositionEnergyFromEpP">[docs]</a><span class="k">def</span> <span class="nf">calculateDepositionEnergyFromEpP</span><span class="p">(</span> <span class="n">E</span><span class="p">,</span> <span class="n">EpP</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="s2">&quot;EpP is a list of [ E&#39;, P(E&#39;) ]&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">`    Calculates the average product energy given P(E&#39;) in the lab frame.</span>
+
+<span class="sd">    :param E:       Energy of the projectile.</span>
+<span class="sd">    :param EpP:     List of [ E&#39;, P(E&#39;) ]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">axes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axes</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">EpP</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span>
@@ -178,6 +219,18 @@
     <span class="k">return</span> <span class="n">EpP</span><span class="o">.</span><span class="n">integrateTwoFunctions</span><span class="p">(</span><span class="n">Ep</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="calculateDepositionEnergyFromAngular_angularEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.miscellaneous.calculateDepositionEnergyFromAngular_angularEnergy">[docs]</a><span class="k">def</span> <span class="nf">calculateDepositionEnergyFromAngular_angularEnergy</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">doingGammaMomentum</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-6</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates the average product energy (or average phton as product momentum if *doingGammaMomentum*</span>
+<span class="sd">    is True) for angular distribution P(mu|E) and energy distribution P(E&#39;|E,mu) in the lab frame. The distribution</span>
+<span class="sd">    P(muy,E&#39;|E) is the product P(mu|E) * P(E&#39;|E,mu).</span>
+
+<span class="sd">    :param label:               The label for the returned average product energy (momentum) form.</span>
+<span class="sd">    :param angular:             The angular distribution P(mu|E).</span>
+<span class="sd">    :param energy:              The energy distribution P(E&#39;|E,mu).</span>
+<span class="sd">    :param multiplicity:        The multiplicity of the product as a function of projectile energy.</span>
+<span class="sd">    :param doingGammaMomentum:  If True, the product is a photon and its average momentum is to be calculated.</span>
+<span class="sd">    :param accuracy:            The accuracy of the returned average energy (momentum) as a function of projectile energy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">energyUnit</span> <span class="o">=</span> <span class="n">energy</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span>
     <span class="n">energyPrimeUnit</span> <span class="o">=</span> <span class="n">energy</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span>
@@ -216,6 +269,14 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">averageProductEnergyModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">depEnergy</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GaussQuadrature2"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.miscellaneous.GaussQuadrature2">[docs]</a><span class="k">def</span> <span class="nf">GaussQuadrature2</span><span class="p">(</span> <span class="n">function</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the integral of *function* from *a* to *b*.</span>
+
+<span class="sd">    :param function:    The function to integrate.</span>
+<span class="sd">    :param parameters:  Paramters to pass to *function*.</span>
+<span class="sd">    :param a:           Lower limit of the integral.</span>
+<span class="sd">    :param b:           Upper limit of the integral.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">0.</span> <span class="p">)</span>
     <span class="n">xp</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="mf">0.57735026918962576451</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="p">),</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span>                 <span class="c1"># sqrt( 1. / 3. ), mid-point, width</span>
@@ -223,6 +284,17 @@
     <span class="k">return</span><span class="p">(</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">width</span> <span class="o">*</span> <span class="p">(</span> <span class="n">function</span><span class="p">(</span> <span class="n">x1</span><span class="p">,</span> <span class="n">parameters</span> <span class="p">)</span> <span class="o">+</span> <span class="n">function</span><span class="p">(</span> <span class="n">x2</span><span class="p">,</span> <span class="n">parameters</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GnG_adaptiveQuadrature"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.miscellaneous.GnG_adaptiveQuadrature">[docs]</a><span class="k">def</span> <span class="nf">GnG_adaptiveQuadrature</span><span class="p">(</span> <span class="n">function</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">quadrature</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">,</span> <span class="n">maxEvaluations</span> <span class="o">=</span> <span class="mi">1000</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function uses adaptive quadrature to integrate *function* form *a* to *b*.</span>
+
+<span class="sd">    :param function:            The function to integrate.</span>
+<span class="sd">    :param a:                   The lower limit of the intrgral.</span>
+<span class="sd">    :param b:                   The upper limit of the intrgral.</span>
+<span class="sd">    :param parameters:          Parameters to pass to *function*.</span>
+<span class="sd">    :param quadrature:          The integration quadrature to use.</span>
+<span class="sd">    :param tolerance:           The requested accuracy of the integral.</span>
+<span class="sd">    :param maxEvaluations:      The maximum number of evaluations to perform.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">class</span> <span class="nc">QuadratureInfo</span> <span class="p">:</span>
 
@@ -277,13 +349,17 @@
 
 <div class="viewcode-block" id="domainLimits"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.miscellaneous.domainLimits">[docs]</a><span class="k">def</span> <span class="nf">domainLimits</span><span class="p">(</span> <span class="n">domain</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Provides the domain minimum and maximum given a domain.</span>
+<span class="sd">    Returns the domain minimum and maximum given a domain.</span>
 <span class="sd">    This is used to determine the limits of integration or, if the returned maximum is None, then the returned</span>
 <span class="sd">    minimum is the point to evaluate a function at.</span>
 <span class="sd">    Domain can be None, a number (int or float) or a list (or tuple) of length 1 or 2. All values of the </span>
 <span class="sd">    list must be a number.  If domain is None, domainMin and domainMax are returned. </span>
 <span class="sd">    If domain is a number or a list of length 1, the number and None are returned.</span>
 <span class="sd">    Otherwise, domain is a list of length 2 with the first being the domain minimum and maximum.</span>
+
+<span class="sd">    :param domain:      User specified domain limits.</span>
+<span class="sd">    :param domainMin:   Minimum domain limit.</span>
+<span class="sd">    :param domainMax:   Maximum domain limit.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="n">domain</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span> <span class="p">)</span>
@@ -294,6 +370,12 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">domain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="integratePhi"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.miscellaneous.integratePhi">[docs]</a><span class="k">def</span> <span class="nf">integratePhi</span><span class="p">(</span> <span class="n">phiDomain</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the integral of phi over the domain specified by *phiDomain*. The funtion :py:func:`domainLimits` is used to</span>
+<span class="sd">    determine the phi domain from *phiDomain*. The full phi varies from 0 to 2 pi.</span>
+
+<span class="sd">    :param phiDomain:   The phi domain.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">twoPi</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
     <span class="n">phiMin</span><span class="p">,</span> <span class="n">phiMax</span> <span class="o">=</span> <span class="n">domainLimits</span><span class="p">(</span> <span class="n">phiDomain</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">twoPi</span> <span class="p">)</span>
@@ -301,6 +383,12 @@
     <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">phiMax</span> <span class="o">-</span> <span class="n">phiMin</span> <span class="p">)</span> <span class="o">/</span> <span class="n">twoPi</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="muPhiEvaluate"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.miscellaneous.muPhiEvaluate">[docs]</a><span class="k">def</span> <span class="nf">muPhiEvaluate</span><span class="p">(</span> <span class="n">muOut</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phiOut</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the integral over mu and phi over the limits specified by *muOut* and *phiOut*.</span>
+
+<span class="sd">    :param muOut:   The mu domain.</span>
+<span class="sd">    :param phiOut:  The phi domain.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">muOutFactor</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="k">if</span><span class="p">(</span> <span class="n">muOut</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">muOutFactor</span> <span class="o">=</span> <span class="mf">0.5</span>

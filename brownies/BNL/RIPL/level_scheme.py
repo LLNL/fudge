@@ -498,7 +498,7 @@ class nucleus:
                                pageSizeY=None):
             if pageSizeX is None: pageSizeX = xmax - xmin
             if pageSizeY is None: pageSizeY = 3 * (ymax - ymin)
-            return '''Get["LevelScheme`"]
+            return r'''Get["LevelScheme`"]
 Figure[
     {
         ManualLabel[{7, -0.1}, "\!\(\*SuperscriptBox[\(\[InvisiblePrefixScriptBase]\), \(%A\)]\)%SYM", FontSize -> 35],

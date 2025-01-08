@@ -14,7 +14,7 @@ merced:
 	mv ../Merced/bin/merced .
 
 upscatter: 
-	cd ../fudge/processing/deterministic/upscatter; $(MAKE)
+	cd ../fudge/processing/deterministic/upscatter; $(MAKE) CC=gcc
 	mv ../fudge/processing/deterministic/upscatter/bin/calcUpscatterKernel .
 
 check:

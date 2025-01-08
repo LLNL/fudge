@@ -7,46 +7,92 @@
 
 """
 This module contains the GNDS documentation child node endfCompatible class.
+
+This module contains the following classes:
+
+    +---------------------------+-----------------------------------------------------------------------------------+
+    | Class                     | Description                                                                       |
+    +===========================+===================================================================================+
+    | Acknowledgement           | This class represents a GNDS documentation/acknowledgements/acknowledgement node. |
+    +---------------------------+-----------------------------------------------------------------------------------+
+    | Acknowledgements          | This is the suite class for the GNDS documentation/acknowledgements node.         |
+    +---------------------------+-----------------------------------------------------------------------------------+
 """
 
 from .. import suite as suiteModule
 from .. import text as textModule
 
-class Acknowledgement( textModule.Text ) :
-    """A class representing a GNDS authors/acknowledgement node."""
+
+class Acknowledgement(textModule.Text):
+    """
+    This class represents a GNDS documentation/acknowledgements/acknowledgement node.
+
+    The following table list the primary members of this class:
+
+    +---------------+---------------------------------------------------------------+
+    | Member        | Description                                                   |
+    +===============+===============================================================+
+    | label         | The unique label for the acknowledgement.                     |
+    +---------------+---------------------------------------------------------------+
+    """
 
     moniker = 'acknowledgement'
     keyName = 'label'
 
-    def __init__( self, _label ) :
+    def __init__(self, _label):
+        textModule.Text.__init__(self)
 
-        textModule.Text.__init__( self )
-
-        self.__label = textModule.raiseIfNotString( _label, 'label' )
+        self.__label = textModule.raiseIfNotString(_label, 'label')
 
     @property
-    def label( self ) :
+    def label(self):
+        """
+        This method returns the label.
 
-        return( self.__label )
+        :returns:   A python str.
+        """
 
-    def XML_extraAttributes( self, **kwargs ) :
+        return self.__label
 
-        if( self.__label == '' ) : return ''
+    def XML_extraAttributes(self, **kwargs):
+        """
+        This method returns the XML attributes for *self* as a single python str.
+
+        :kwargs:        This argument is not used.
+
+        :returns:       A python str.
+        """
+
+        if self.__label == '': return ''
 
         return ' label="%s"' % self.__label
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
 
-        label = node.get( 'label', '' )
+        :param cls:        Form class to return.
+        :param node:       Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
+
+        :returns:          An instance of *cls* representing *node*.
+        """
+
+        label = node.get('label', '')
 
         return cls(label)
 
-class Acknowledgements( suiteModule.Suite ) :
+
+class Acknowledgements(suiteModule.Suite):
+    """
+    This is the suite class for the GNDS documentation/acknowledgements node.
+    """
 
     moniker = 'acknowledgements'
     suiteName = 'label'
 
-    def __init__( self ) :
-
-        suiteModule.Suite.__init__( self, [ Acknowledgement ] )
+    def __init__(self):
+        suiteModule.Suite.__init__(self, [Acknowledgement])

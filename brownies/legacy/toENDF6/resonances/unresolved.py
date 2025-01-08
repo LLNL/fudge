@@ -28,7 +28,7 @@ def toENDF6(self, flags, targetInfo, verbosityIndent=''):
     endf = []
     AP = self.getScatteringRadius()
     if AP.isEnergyDependent():
-        scatRadius = AP.form
+        scatRadius = AP.evaluated
         NR, NP = 1, len(scatRadius)
         endf.append(endfFormatsModule.endfHeadLine(0, 0, 0, 0, NR, NP))
         endf += endfFormatsModule.endfInterpolationList(

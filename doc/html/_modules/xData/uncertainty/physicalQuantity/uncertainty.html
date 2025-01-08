@@ -46,6 +46,23 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains the base uncertainty class.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                     | Description                                                                       |</span>
+<span class="sd">    +===========================+===================================================================================+</span>
+<span class="sd">    | Base                      | This is the base class for all instances that can be a the for of uncertainty for |</span>
+<span class="sd">    |                           | an instance of :py:class:`Uncertainty`.                                           |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Uncertainty               | This class presents an uncertain for a physical quantity.                         |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Quantity                  | This is the class for the GNDS computerCode version attribute.                    |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Number                    | This is the class for the GNDS computerCode version attribute.                    |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Double                    | This is the class for the GNDS computerCode version attribute.                    |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -56,16 +73,33 @@
 <span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
 
 <div class="viewcode-block" id="Base"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Base">[docs]</a><span class="k">class</span> <span class="nc">Base</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the base class for all instances that can be a the for of uncertainty for an instance of :py:class:`Uncertainty`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Uncertainty"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Uncertainty">[docs]</a><span class="k">class</span> <span class="nc">Uncertainty</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class presents an uncertainty for a physical quantity.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | Member                | Description                                                               |</span>
+<span class="sd">    +=======================+===========================================================================+</span>
+<span class="sd">    | form                  | This is the uncertainly function.                                         |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s2">&quot;uncertainty&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">form</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param form:        This is the uncertainly function for *this* uncertainty instance..</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
@@ -75,18 +109,41 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">form</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the form member of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`Base`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__form</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Uncertainty.copy"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Uncertainty.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self*.</span>
+
+<span class="sd">        :returns:           An instance of :py:class:`Uncertainty`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__form</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Uncertainty.parentConvertingUnits"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Uncertainty.parentConvertingUnits">[docs]</a>    <span class="k">def</span> <span class="nf">parentConvertingUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">factors</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is call by the parent with the conversion factors used to change units.</span>
+
+<span class="sd">        :param factors:     A list of python floats.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__form</span><span class="o">.</span><span class="n">parentConvertingUnits</span><span class="p">(</span> <span class="n">factors</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Uncertainty.toXML_strList"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Uncertainty.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
 
@@ -98,6 +155,17 @@
 
 <div class="viewcode-block" id="Uncertainty.parseNodeUsingClass"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Uncertainty.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">standard</span> <span class="k">as</span> <span class="n">standardModule</span>
 
@@ -115,6 +183,20 @@
         <span class="k">return</span> <span class="n">uncertainty1</span></div></div>
 
 <div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is the base class for all values (currently only floats) that an uncdertainty may have.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | Member                | Description                                                               |</span>
+<span class="sd">    +=======================+===========================================================================+</span>
+<span class="sd">    | value                 | This is the value of the uncertainty.                                     |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | relative              | This member indicates whether *value* is **absolute**, **relative** or    |</span>
+<span class="sd">    |                       | percent.                                                                  |</span>
+<span class="sd">    +-----------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">absolute</span> <span class="o">=</span> <span class="s1">&#39;absolute&#39;</span>
     <span class="n">relative</span> <span class="o">=</span> <span class="s1">&#39;relative&#39;</span>
@@ -122,6 +204,10 @@
     <span class="n">relations</span> <span class="o">=</span> <span class="p">(</span> <span class="n">absolute</span><span class="p">,</span> <span class="n">relative</span><span class="p">,</span> <span class="n">percent</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">relation</span> <span class="o">=</span> <span class="n">absolute</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param value:           This is the value of the uncertainty.</span>
+<span class="sd">        :param relation:        This member indicates whether *value* is **absolute**, **relative** or percent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
@@ -132,30 +218,61 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">relation</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Thie method returns the *relation* member of *self*.</span>
+
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relation</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Thie method returns the *value* member of *self*.</span>
+
+<span class="sd">        :returns:       A type of self.valueType.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="p">)</span>
 
     <span class="nd">@value</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This member sets the *value* member of *self* to *value.</span>
+
+<span class="sd">        :param value:       Must of type self.valueType.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">valueType</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid value type must be a &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">valueType</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">valueType</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *valueType* member of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__valueType</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Quantity.copy"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Quantity.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self*.</span>
+
+<span class="sd">        :returns:           An instance of the class of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">relation</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Quantity.toXML_strList"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Quantity.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">relation</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relation</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">absolute</span><span class="p">:</span>
@@ -165,6 +282,17 @@
 
 <div class="viewcode-block" id="Quantity.parseNodeUsingClass"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Quantity.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 
@@ -180,6 +308,13 @@
         <span class="k">return</span> <span class="n">instance</span></div>
 
 <div class="viewcode-block" id="Quantity.toValueType"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Quantity.toValueType">[docs]</a>    <span class="k">def</span> <span class="nf">toValueType</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *value* as a type of the valueType of *self*.</span>
+
+<span class="sd">        :param value:   Instance to convert.</span>
+
+<span class="sd">        :returns:       An instance of the type of the valueType of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__valueType</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div></div>
 
@@ -190,7 +325,11 @@
 
 <div class="viewcode-block" id="Number.pqu"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Number.pqu">[docs]</a>    <span class="k">def</span> <span class="nf">pqu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a PQU instance of self&#39;s value in units of unit. If unit is None, self&#39;s unit is used.</span>
+<span class="sd">        This method returns a :py:class:`PQUModule.PQU` instance of *self*&#39;s value in units of *unit*. If *unit* is None, self&#39;s unit is used.</span>
+
+<span class="sd">        :param unit:    The unit for the returned :py:class:`PQUModule.PQU` instance.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`PQUModule.PQU`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">ancestor</span>
@@ -204,7 +343,11 @@
 
 <div class="viewcode-block" id="Number.float"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Number.float">[docs]</a>    <span class="k">def</span> <span class="nf">float</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a float instance of self&#39;s value in units of unit.</span>
+<span class="sd">        This method returns a float instance of self&#39;s value in units of unit.</span>
+
+<span class="sd">        :param unit:    The unit of the returned value.</span>
+
+<span class="sd">        :returns:       A python float.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="p">(</span> <span class="nb">str</span><span class="p">,</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PhysicalUnit</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;unit argument must be a str or a PQU.PhysicalUnit.&#39;</span> <span class="p">)</span>
@@ -225,19 +368,39 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">valueType</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This seems redundant as it is defined in the base class Quantity.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__valueType</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Double.parentConvertingUnits"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Double.parentConvertingUnits">[docs]</a>    <span class="k">def</span> <span class="nf">parentConvertingUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">factors</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is call by the parent with the conversion factors used to change units.</span>
+
+<span class="sd">        :param factors:     A list of python floats.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">relation</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">absolute</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Double.toValueType"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Double.toValueType">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">toValueType</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *value* as a type of the valueType of this class.</span>
+
+<span class="sd">        :param value:   Instance to convert.</span>
+
+<span class="sd">        :returns:       An instance of the type of the valueType of this class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__valueType</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Double.valueToString"><a class="viewcode-back" href="../../../../xData/index.html#xData.uncertainty.physicalQuantity.uncertainty.Double.valueToString">[docs]</a>    <span class="k">def</span> <span class="nf">valueToString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a string version of the value of  *self*. See the function :py:func:`PQUModule.floatToShortestString`.</span>
+
+<span class="sd">        :param precision:       The precision of the returned string.</span>
+
+<span class="sd">        :returns:               A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">floatToShortestString</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">precision</span><span class="p">),</span> <span class="mi">17</span><span class="p">),</span> <span class="n">keepPeriod</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
 </pre></div>

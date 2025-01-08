@@ -21,6 +21,7 @@ class DelayedNeutron( ancestryModule.AncestryIO ) :
 
     moniker = 'delayedNeutron'
     keyName = 'label'
+    ancestryMembers = ('rate', 'product')
 
     def __init__(self, label, product):
 
@@ -91,10 +92,16 @@ class DelayedNeutron( ancestryModule.AncestryIO ) :
 
         return self.__product.fixDomains(labels, energyMin, energyMax)
 
-    def listOfProducts(self):
-        """Returns, as a set, the list of PoP's ids for all products (i.e., outgoing particles) for all reactions of *self*."""
+    def listOfProducts(self, finalOnly=False, includeQualifier=True):
+        '''
+        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.
 
-        return self.__product.listOfProducts()
+        :param includeQualifier:    If `True`, particle qualifiers are include in ids, otherwise, they are stripped from ids.
+
+        :return:                    A python set instance.
+        '''
+
+        return self.__product.listOfProducts(finalOnly=finalOnly, includeQualifier=includeQualifier)
 
     def processMC_cdf( self, style, tempInfo, indent = '', incrementalIndent = '  ' ) :
 
@@ -145,30 +152,30 @@ class DelayedNeutron( ancestryModule.AncestryIO ) :
 
         return self.product.multiGroupAverageMomentum(multiGroupSettings, temperatureInfo, productID)
 
-    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particles, productID, legendreOrder):
+    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder):
         """
         Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.
 
         :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles: The list of particles to be transported.
+        :param particleIDs: The list of particles to be transported.
         :param productID: Particle id for the requested product.
         :param legendreOrder: Requested Legendre order.
         """
         
-        return self.product.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, productID, legendreOrder)
+        return self.product.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder)
 
-    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particles, productID):
+    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particleIDs, productID):
         """
         Returns the full multi-group, total product array for the requested label for the requested product id.
 
         :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles: The list of particles to be transported.
+        :param particleIDs: The list of particles to be transported.
         :param productID: Particle id for the requested product.
         """
 
-        return self.product.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
+        return self.product.multiGroupProductArray(multiGroupSettings, temperatureInfo, particleIDs, productID)
 
     def removeStyles( self, styleLabels ) :
         """
@@ -235,11 +242,19 @@ class DelayedNeutrons(suitesModule.ExclusiveSuite):
 
         for delayedNeutron1 in self : delayedNeutron1.calculateAverageProductData( style, indent = indent, **kwargs )
 
-    def listOfProducts(self):
-        """Returns, as a set, the list of PoP's ids for all products (i.e., outgoing particles) for all reactions of *self*."""
+    def listOfProducts(self, finalOnly=False, includeQualifier=True):
+        '''
+        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.
+
+        :param finalOnly:           If `True`, only final product ids are returned, otherwise, all are returned..
+        :param includeQualifier:    If `True`, particle qualifiers are include in ids, otherwise, they are stripped from ids.
+
+        :return:                    A python set instance.
+        '''
 
         products = set()
-        for delayedNeutron1 in self : products.update(delayedNeutron1.listOfProducts())
+        for delayedNeutron1 in self:
+            products.update(delayedNeutron1.listOfProducts(finalOnly=finalOnly, includeQualifier=includeQualifier))
 
         return products
 

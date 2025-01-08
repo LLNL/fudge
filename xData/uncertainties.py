@@ -6,15 +6,20 @@
 # <<END-copyright>>
 
 """
-    This module contains the class ``uncertainties``, which can appear inside other xData classes.
+This module contains the classes for representing an uncertainty instance that is a child node inside a GNDS function.
 
-    Multiple types of uncertainty are supported:
-        pointwise (stored in the XYs1d class),
-        links,
-        Covariances,
-        ...
+This module contains the following classes:
 
-    May contain more than one uncertainty, e.g. to support asymmetric uncertainties
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | Uncertainty                       | This class represents the uncertainty instance that is a child node   |
+    |                                   | inside an xData function.                                             |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Covariance                        |                                                                       |
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | ListOfCovariances                 |                                                                       |
+    +-----------------------------------+-----------------------------------------------------------------------+
 """
 
 from LUPY import ancestry as ancestryModule
@@ -24,6 +29,17 @@ from . import link as linkModule
 
 
 class Uncertainty(ancestryModule.AncestryIO_bare):
+    """
+    This class represents the uncertainty instance that is a child node inside an xData function.
+
+    The following table list the primary members of this class:
+
+    +---------------+---------------------------------------------------------------+
+    | Member        | Description                                                   |
+    +===============+===============================================================+
+    | functional    | This is an xData function defining the uncertainty.           |
+    +---------------+---------------------------------------------------------------+
+    """
 
     moniker = 'uncertainty'
     keyName = None
@@ -33,6 +49,9 @@ class Uncertainty(ancestryModule.AncestryIO_bare):
     defaultRelation='offset'
 
     def __init__(self, functional=None):
+        """
+        :param functional:  The xData function defining the uncertainty.
+        """
 
         baseModule.XDataCoreMembers.__init__(self)
 
@@ -40,18 +59,37 @@ class Uncertainty(ancestryModule.AncestryIO_bare):
 
     @property
     def data(self):
+        """
+        This method returns a reference to *self*'s functional.
+        """
 
         return self.__functional
 
     def convertUnits(self, unitMap):
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         if self.__functional is not None: self.__functional.convertUnits(unitMap)
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        if self.data is None: return []
+        if self.data is None:
+            if kwargs.get('showEmpty', False):
+                return ['%s<%s/>' % ( indent, self.moniker )]
+            return []
 
         XML_strList = ['%s<%s>' % ( indent, self.moniker )]
         XML_strList += self.__functional.toXML_strList(indent=indent2, **kwargs)
@@ -61,7 +99,12 @@ class Uncertainty(ancestryModule.AncestryIO_bare):
 
     def parseNode(self, node, xPath, linkData, **kwargs):
         """
-        Translate <uncertainty> node into uncertainty instance.
+        This method sets data in *self* using the contents of *node*.
+
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
         """
 
         from . import XYs1d as XYs1dModule
@@ -87,6 +130,9 @@ class Uncertainty(ancestryModule.AncestryIO_bare):
         xPath.pop()
 
 class Covariance(linkModule.Link):
+    """
+    This class represents a link to a covariance instance.
+    """
 
     moniker = 'covariance'
 
@@ -109,6 +155,14 @@ class ListOfCovariances(ancestryModule.AncestryIO):
         self.__items.append(obj)
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent','  ')
         XML_strList = ['%s<%s>' % (indent, self.moniker)]
@@ -119,6 +173,17 @@ class ListOfCovariances(ancestryModule.AncestryIO):
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
+        """
 
         xPath.append(node.tag)
 

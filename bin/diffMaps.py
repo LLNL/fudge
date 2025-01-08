@@ -11,7 +11,7 @@ import argparse
 
 from fudge import map as mapModule
 
-summaryDocStringFUDGE = '''Prints the protare differences between two map files.'''
+summaryDocString__FUDGE = '''Prints the protare differences between two map files.'''
 
 description = '''For each projectile in the two map files, prints targets that are in one map file and not in the other.'''
 

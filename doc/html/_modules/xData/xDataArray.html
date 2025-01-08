@@ -44,6 +44,32 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module containes all the classes for handling GNDS array containers.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class                             | Description                                                           |</span>
+<span class="sd">    +===================================+=======================================================================+</span>
+<span class="sd">    | Symmetry                          | This class is an enum of the supported symmetries for an array.       |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Permutation                       | This class is an enum of the supported premutations for an array.     |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | ArrayBase                         | This class is the base class for the array classes.                   |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Full                              | This class represents an array with all cells containing data.        |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Diagonal                          | This class represents an array where the data are stored in the       |</span>
+<span class="sd">    |                                   | compact GNDS diagaonal array format.                                  |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Flattened                         | This class represents an array where the data are stored in the       |</span>
+<span class="sd">    |                                   | compact GNDS flattened array format.                                  |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Embedded                          | This class represents an array that contains other arrays.            |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">LUPY_enumsModule</span>
@@ -55,23 +81,61 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">matrix</span> <span class="k">as</span> <span class="n">matrixModule</span>
 
 <div class="viewcode-block" id="Symmetry"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Symmetry">[docs]</a><span class="k">class</span> <span class="nc">Symmetry</span><span class="p">(</span><span class="n">LUPY_enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is an enum of the supported symmetries for an array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">none</span> <span class="o">=</span> <span class="n">LUPY_enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">lower</span> <span class="o">=</span> <span class="n">LUPY_enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">upper</span> <span class="o">=</span> <span class="n">LUPY_enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Permutation"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Permutation">[docs]</a><span class="k">class</span> <span class="nc">Permutation</span><span class="p">(</span><span class="n">LUPY_enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is an enum of the supported premutations for an array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">plus</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span>
     <span class="n">minus</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span></div>
 
 <div class="viewcode-block" id="ArrayBase"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase">[docs]</a><span class="k">class</span> <span class="nc">ArrayBase</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is the base class for the array classes.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                                                   |</span>
+<span class="sd">    +===================+===============================================================================================+</span>
+<span class="sd">    | shape             | This is the shape of the array.                                                               |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | symmetry          | This is the symmtry (none, lower or upper) for the data in the array.                         |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | storageOrder      | This is the storage order (row or column) for the data in the arrary.                         |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | offset            | This is the offset index where the first data value in the array starts.                      |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | permutation       | This is the permutation for the data in the array.                                            |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | index             | This is index of the array inside of other xData function.                                    |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | label             | This is the label for the array.                                                              |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;array&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">symmetry</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">storageOrder</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span> 
                 <span class="n">offset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span>
                 <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param shape:               This is the shape of the array.</span>
+<span class="sd">        :param symmetry:            This is the symmtry (none, lower or upper) for the data in the array.</span>
+<span class="sd">        :param storageOrder:        This is the storage order (row or column) for the data in the arrary.</span>
+<span class="sd">        :param offset:              This is the offset index where the first data value in the array starts.</span>
+<span class="sd">        :param permutation:         This is the permutation for the data in the array.</span>
+<span class="sd">        :param index:               This is index of the array inside of other xData function.</span>
+<span class="sd">        :param label:               This is the label for the array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;compression must be a string&#39;</span> <span class="p">)</span>
         <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
@@ -99,21 +163,41 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__offset</span> <span class="o">=</span> <span class="n">offset</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the dimension of the array.</span>
+
+<span class="sd">        :returns:           A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dimension</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the dimension of the array.</span>
+
+<span class="sd">        :returns:           A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shape</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a reference to the shape member.</span>
+
+<span class="sd">        :returns:            A python tuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shape</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the number of cells in a full representation of *self*.</span>
+
+<span class="sd">        :returns:            A python int.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shape</span> <span class="p">:</span> <span class="n">size</span> <span class="o">*=</span> <span class="n">length</span>
@@ -121,44 +205,76 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">symmetry</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the symmetry of *self*.</span>
+
+<span class="sd">        :returns:            An instance of :py:class:`Symmetry`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__symmetry</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">permutation</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the permutation of *self*.</span>
+
+<span class="sd">        :returns:            An instance of :py:class:`Permutation`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__permutation</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">compression</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the compression of *self*.</span>
+
+<span class="sd">        :returns:            A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">storageOrder</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the storageOrder of *self*.</span>
+
+<span class="sd">        :returns:            An instance of :py:class:`enumsModule.StorageOrder`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__storageOrder</span> <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">offset</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the offset of *self*.</span>
+
+<span class="sd">        :returns:            A python tuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__offset</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="ArrayBase.offsetScaleValues"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.offsetScaleValues">[docs]</a>    <span class="k">def</span> <span class="nf">offsetScaleValues</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Modify every element in the array: multiply by scale and add offset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method modifies every cell in the array by multiply it by *scale* and adding *offset*.</span>
+
+<span class="sd">        :param offset:      The offset to apply to each cell.</span>
+<span class="sd">        :param scale:       The multiplicative scale factor to apply to each cell.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">offsetScaleValues</span><span class="p">(</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ArrayBase.constructVector"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.constructVector">[docs]</a>    <span class="k">def</span> <span class="nf">constructVector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secondIndex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert the output of the xData.xDataArray.arrayBase.constructArray() to an instancce of xData.vector.Vector.</span>
+<span class="sd">        This method only works for 1d and 2d arrays. For a 1d array, its returns the data as an instancce of :py:class:`vectorModule.Vector`.</span>
+<span class="sd">        For a 2d array, it returns the data for row *secondIndex* as an instancce of :py:class:`vectorModule.Vector`.</span>
 
-<span class="sd">        :param secondIndex: Index along the third dimension from which to extract 1d-array.</span>
-<span class="sd">        :returns: instance of xData.vector.Vector.</span>
+<span class="sd">        :param secondIndex:     Index along the second dimension from which to extract 1d-array.</span>
+
+<span class="sd">        :returns:               An instance of :py:class:`vectorModule.Vector`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">secondIndex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">secondIndex</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">),</span> <span class="s1">&#39;The method constructVector requires the first argument to be an integer.&#39;</span>
+            <span class="k">assert</span> <span class="n">secondIndex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">secondIndex</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;The method constructVector requires the first argument to be an integer.&#39;</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">secondIndex</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">vectorModule</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
@@ -174,16 +290,18 @@
 
 <div class="viewcode-block" id="ArrayBase.constructMatrix"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.constructMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">constructMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thirdIndex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate an xData.matrix.Matrix object from an xData.xDataArray.arrayBase instance.</span>
+<span class="sd">        This method only works for 3d array.</span>
+<span class="sd">        This method returns the data at dimension *thirdIndex* as a :py:class:`matrixModule.Matrix` instance.</span>
 
-<span class="sd">        :param thirdIndex: Index along the third dimension from which to extract 2d-array.</span>
-<span class="sd">        :returns: instance of xData.matrix.Matrix.</span>
+<span class="sd">        :param thirdIndex:      Index along the third dimension from which to extract 2d-array.</span>
+
+<span class="sd">        :returns:               An instance of :py:class:`matrixModule.Matrix`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The method constructMatrix is only defined for 3D arrays&#39;</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">thirdIndex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thirdIndex</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">),</span> <span class="s1">&#39;The method constructMatrix requires the first argument to be an integer.&#39;</span>
+        <span class="k">assert</span> <span class="n">thirdIndex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thirdIndex</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;The method constructMatrix requires the first argument to be an integer.&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thirdIndex</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">matrixModule</span><span class="o">.</span><span class="n">Matrix</span><span class="p">()</span>
 
@@ -191,6 +309,11 @@
             <span class="k">return</span> <span class="n">matrixModule</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()[:,</span> <span class="p">:,</span> <span class="n">thirdIndex</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="ArrayBase.attributesToXMLAttributeStr"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.attributesToXMLAttributeStr">[docs]</a>    <span class="k">def</span> <span class="nf">attributesToXMLAttributeStr</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method converts all the attributes of *self* into an XML attribute string.</span>
+
+<span class="sd">        :returns:       A python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">attributeStr</span> <span class="o">=</span> <span class="s1">&#39; shape=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">length</span> <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="p">]</span> <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">!=</span> <span class="n">Full</span><span class="o">.</span><span class="n">compression</span><span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; compression=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span>
@@ -203,6 +326,17 @@
 
 <div class="viewcode-block" id="ArrayBase.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 
@@ -243,6 +377,14 @@
 
 <div class="viewcode-block" id="ArrayBase.parseNodeAttributes"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.parseNodeAttributes">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeAttributes</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This static method parses the attributes for an array.</span>
+
+<span class="sd">        :param node:        Node whose attributes are parsed.</span>
+<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           A python dict.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span>  <span class="s1">&#39;shape&#39;</span>         <span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
                         <span class="s1">&#39;symmetry&#39;</span>      <span class="p">:</span> <span class="p">(</span><span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
@@ -267,6 +409,14 @@
 
 <div class="viewcode-block" id="ArrayBase.indicesToFlatIndices"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.indicesToFlatIndices">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">indicesToFlatIndices</span><span class="p">(</span> <span class="n">shape</span><span class="p">,</span> <span class="n">indices</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This static method converts each index in *indices* into a flat index.</span>
+
+<span class="sd">        :param shape:       The shape of the array.</span>
+<span class="sd">        :param indices:     The list of indices within *shape*.</span>
+
+<span class="sd">        :returns:           A python list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">flatIndices</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span> <span class="p">:</span>
@@ -282,6 +432,14 @@
 
 <div class="viewcode-block" id="ArrayBase.flatIndicesToIndices"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.ArrayBase.flatIndicesToIndices">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">flatIndicesToIndices</span><span class="p">(</span> <span class="n">shape</span><span class="p">,</span> <span class="n">flatIndices</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This static method converts each flat index in *flatIndices* into an index in an array with shape *shape*.</span>
+
+<span class="sd">        :param shape:       The shape of the array.</span>
+<span class="sd">        :param indices:     The list of flat indices.</span>
+
+<span class="sd">        :returns:           A python list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">products</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">1</span> <span class="p">]</span>
@@ -297,12 +455,34 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">indices</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Full"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Full">[docs]</a><span class="k">class</span> <span class="nc">Full</span><span class="p">(</span> <span class="n">ArrayBase</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class store the array without any compression.</span>
+
+<span class="sd">    The following table list the primary members of this class that are not specified in the primary members</span>
+<span class="sd">    table in :py:class:`ArrayBase`:</span>
+
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                                                   |</span>
+<span class="sd">    +===================+===============================================================================================+</span>
+<span class="sd">    | data              | This is a :py:class:`valuesModule.Values` instance that has the data of the array.            |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">compression</span> <span class="o">=</span> <span class="s1">&#39;full&#39;</span>
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="o">+</span> <span class="p">(</span> <span class="s1">&#39;values&#39;</span><span class="p">,</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symmetry</span><span class="o">=</span><span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">storageOrder</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span> 
                 <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permutation</span><span class="o">=</span><span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param shape:               This is the shape of the array.</span>
+<span class="sd">        :param data:                This is a :py:class:`valuesModule.Values` instance that has the data of the array.</span>
+<span class="sd">        :param symmetry:            This is the symmtry (none, lower or upper) for the data in the array.</span>
+<span class="sd">        :param storageOrder:        This is the storage order (row or column) for the data in the arrary.</span>
+<span class="sd">        :param offset:              This is the offset index where the first data value in the array starts.</span>
+<span class="sd">        :param permutation:         This is the permutation for the data in the array.</span>
+<span class="sd">        :param index:               This is index of the array inside of other xData function.</span>
+<span class="sd">        :param label:               This is the label for the array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ArrayBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">symmetry</span> <span class="o">=</span> <span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">storageOrder</span><span class="p">,</span> 
                 <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">,</span>
@@ -321,6 +501,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Full.constructArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Full.constructArray">[docs]</a>    <span class="k">def</span> <span class="nf">constructArray</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a numpy array that represents the data in *self* with all cells fulled.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`numpy.array`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">import</span> <span class="nn">numpy</span>
 
@@ -380,6 +565,11 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">array1</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">order</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Full.copy"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Full.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`Full`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">Full</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> 
                 <span class="n">symmetry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">,</span> 
@@ -387,6 +577,14 @@
                 <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Full.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Full.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
 
@@ -398,6 +596,22 @@
         <span class="k">return</span> <span class="n">XML_strList</span></div></div>
 
 <div class="viewcode-block" id="Diagonal"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Diagonal">[docs]</a><span class="k">class</span> <span class="nc">Diagonal</span><span class="p">(</span> <span class="n">ArrayBase</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class store the array with GNDS diagonal compression where ohly some of the diagonals have non-zero data. </span>
+<span class="sd">    Multiple diagonals can be stored. If more than the main diagonal is represented, the starting point of each </span>
+<span class="sd">    diagaonal by me specified by the *startingIndices* member as per the GNDS specifications.</span>
+
+<span class="sd">    The following table list the primary members of this class that are not specified in the primary members</span>
+<span class="sd">    table in :py:class:`ArrayBase`:</span>
+
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                                                   |</span>
+<span class="sd">    +===================+===============================================================================================+</span>
+<span class="sd">    | data              | This is a :py:class:`valuesModule.Values` instance that has the data of the array.            |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | startingIndices   | This is a :py:class:`valuesModule.Values` instance specifies where each diagonal starts.      |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">compression</span> <span class="o">=</span> <span class="s1">&#39;diagonal&#39;</span>
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="o">+</span> <span class="p">(</span> <span class="s1">&#39;values&#39;</span><span class="p">,</span> <span class="p">)</span>
@@ -405,6 +619,17 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">startingIndices</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">symmetry</span> <span class="o">=</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span> 
                 <span class="n">offset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span>
                 <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param shape:               This is the shape of the array.</span>
+<span class="sd">        :param data:                This is a :py:class:`valuesModule.Values` instance that has the data of the array.</span>
+<span class="sd">        :param startingIndices:     This is a :py:class:`valuesModule.Values`</span>
+<span class="sd">        :param symmetry:            This is the symmtry (none, lower or upper) for the data in the array.</span>
+<span class="sd">        :param storageOrder:        This is the storage order (row or column) for the data in the arrary.</span>
+<span class="sd">        :param offset:              This is the offset index where the first data value in the array starts.</span>
+<span class="sd">        :param permutation:         This is the permutation for the data in the array.</span>
+<span class="sd">        :param index:               This is index of the array inside of other xData function.</span>
+<span class="sd">        :param label:               This is the label for the array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ArrayBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">storageOrder</span><span class="p">,</span>
                 <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">,</span>
@@ -445,6 +670,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Diagonal.constructArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Diagonal.constructArray">[docs]</a>    <span class="k">def</span> <span class="nf">constructArray</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a numpy array that represents the data in *self* with all cells fulled.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`numpy.array`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">import</span> <span class="nn">numpy</span>
         <span class="kn">import</span> <span class="nn">itertools</span>
@@ -477,6 +707,11 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">array1</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">order</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Diagonal.copy"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Diagonal.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`Diagonal`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">startingIndicesOriginal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startingIndicesOriginal</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">startingIndicesOriginal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">startingIndicesOriginal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startingIndicesOriginal</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
@@ -486,6 +721,14 @@
                 <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Diagonal.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Diagonal.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
 
@@ -499,6 +742,25 @@
         <span class="k">return</span> <span class="n">XML_strList</span></div></div>
 
 <div class="viewcode-block" id="Flattened"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened">[docs]</a><span class="k">class</span> <span class="nc">Flattened</span><span class="p">(</span> <span class="n">ArrayBase</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class store the array with GNDS flattened compression. This array is good for storing an array where the</span>
+<span class="sd">    non-zero parts of the array (called chunk herein) are sparse with many zero cells between each chunk.</span>
+<span class="sd">    In addition to each chunk, the starting position and length of each chunk is needed. A starting position is</span>
+<span class="sd">    is the flat index of the start of the chunk.</span>
+
+<span class="sd">    The following table list the primary members of this class that are not specified in the primary members</span>
+<span class="sd">    table in :py:class:`ArrayBase`:</span>
+
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | Member            | Description                                                                                   |</span>
+<span class="sd">    +===================+===============================================================================================+</span>
+<span class="sd">    | data              | This is a :py:class:`valuesModule.Values` instance that has the data of the array.            |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | starts            | This is a :py:class:`valuesModule.Values` instance that specifies where each chuck starts.    |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    | lengths           | This is a :py:class:`valuesModule.Values` instance that specifies the length of each chunk.   |</span>
+<span class="sd">    +-------------------+-----------------------------------------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">compression</span> <span class="o">=</span> <span class="s1">&#39;flattened&#39;</span>
     <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataCoreMembers</span><span class="o">.</span><span class="n">ancestryMembers</span> <span class="o">+</span> <span class="p">(</span> <span class="s1">&#39;values&#39;</span><span class="p">,</span> <span class="s1">&#39;lengths&#39;</span><span class="p">,</span> <span class="s1">&#39;starts&#39;</span> <span class="p">)</span>
@@ -508,6 +770,18 @@
                 <span class="n">offset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span>
                 <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
                 <span class="n">dataToString</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param shape:               This is the shape of the array.</span>
+<span class="sd">        :param data:                This is a :py:class:`valuesModule.Values` instance that has the data of the array.</span>
+<span class="sd">        :param starts:              This is a :py:class:`valuesModule.Values` instance that contains the start flat index of each data chunk.</span>
+<span class="sd">        :param lengths:             This is a :py:class:`valuesModule.Values` instance that contains the length of each data chunk.</span>
+<span class="sd">        :param symmetry:            This is the symmtry (none, lower or upper) for the data in the array.</span>
+<span class="sd">        :param storageOrder:        This is the storage order (row or column) for the data in the arrary.</span>
+<span class="sd">        :param offset:              This is the offset index where the first data value in the array starts.</span>
+<span class="sd">        :param permutation:         This is the permutation for the data in the array.</span>
+<span class="sd">        :param index:               This is index of the array inside of other xData function.</span>
+<span class="sd">        :param label:               This is the label for the array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ArrayBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">storageOrder</span><span class="p">,</span>
                 <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">,</span>
@@ -551,6 +825,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Flattened.constructArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened.constructArray">[docs]</a>    <span class="k">def</span> <span class="nf">constructArray</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a numpy array that represents the data in *self* with all cells fulled.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`numpy.array`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">import</span> <span class="nn">numpy</span>
 
@@ -571,6 +850,11 @@
         <span class="k">return</span> <span class="n">array1</span></div>
 
 <div class="viewcode-block" id="Flattened.copy"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`Flattened`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">Flattened</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">starts</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> 
                 <span class="n">symmetry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">,</span>
@@ -580,12 +864,14 @@
 <div class="viewcode-block" id="Flattened.fromNumpyArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened.fromNumpyArray">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">fromNumpyArray</span><span class="p">(</span> <span class="n">array</span><span class="p">,</span> <span class="n">symmetry</span> <span class="o">=</span> <span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">nzeroes</span> <span class="o">=</span> <span class="mi">4</span> <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a sparse flattened array that represents an arbitrary numpy array.</span>
-<span class="sd">        Only supports &#39;full&#39; or &#39;lower-symmetric&#39; matrices, with row-major data storage.</span>
-<span class="sd">        :param array: input numpy array</span>
-<span class="sd">        :param symmetry: allowed values are &#39;none&#39; or &#39;lower&#39;</span>
-<span class="sd">        :param nzeroes: how many zeroes to allow before adding a new &#39;start&#39; and &#39;length&#39; </span>
-<span class="sd">        :return: </span>
+<span class="sd">        This static method generates a sparse flattened array that represents an arbitrary numpy array.</span>
+<span class="sd">        Tjios method currently only supports &#39;full&#39; or &#39;lower-symmetric&#39; matrices, with row-major data storage.</span>
+
+<span class="sd">        :param array:           Input numpy array to flatten.</span>
+<span class="sd">        :param symmetry:        Allowed values are &#39;none&#39; or &#39;lower&#39;</span>
+<span class="sd">        :param nzeroes:         How many zeroes to allow before adding a new &#39;start&#39; and &#39;length&#39; </span>
+
+<span class="sd">        :return:                An instance of :py:class:`Flattened`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">starts</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">sparseData</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
@@ -624,6 +910,14 @@
 
 
 <div class="viewcode-block" id="Flattened.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Flattened.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
 
@@ -636,11 +930,25 @@
         <span class="k">return</span> <span class="n">XML_strList</span></div></div>
 
 <div class="viewcode-block" id="Embedded"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded">[docs]</a><span class="k">class</span> <span class="nc">Embedded</span><span class="p">(</span> <span class="n">ArrayBase</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class store the array with GNDS embeeded compression where the array is stores as a list of sub-arrays.</span>
+
+<span class="sd">    The primary members of this class are list in the primary members table in :py:class:`ArrayBase`:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">compression</span> <span class="o">=</span> <span class="s1">&#39;embedded&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symmetry</span><span class="o">=</span><span class="n">Symmetry</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">storageOrder</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">StorageOrder</span><span class="o">.</span><span class="n">rowMajor</span><span class="p">,</span>
                 <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permutation</span><span class="o">=</span><span class="n">Permutation</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param shape:               This is the shape of the array.</span>
+<span class="sd">        :param storageOrder:        This is the storage order (row or column) for the data in the arrary.</span>
+<span class="sd">        :param symmetry:            This is the symmtry (none, lower or upper) for the data in the array.</span>
+<span class="sd">        :param offset:              This is the offset index where the first data value in the array starts.</span>
+<span class="sd">        :param permutation:         This is the permutation for the data in the array.</span>
+<span class="sd">        :param index:               This is index of the array inside of other xData function.</span>
+<span class="sd">        :param label:               This is the label for the array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ArrayBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="n">storageOrder</span><span class="p">,</span> 
                 <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="p">,</span> <span class="n">permutation</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">,</span>
@@ -649,6 +957,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">arrays</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="Embedded.addArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.addArray">[docs]</a>    <span class="k">def</span> <span class="nf">addArray</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">array</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Thie method adds an :py:class:`ArrayBase` instance to *self*.</span>
+
+<span class="sd">        :param array:       An :py:class:`ArrayBase` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">array</span><span class="p">,</span> <span class="n">ArrayBase</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;variable not an array instance&#39;</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">&lt;</span> <span class="n">array</span><span class="o">.</span><span class="n">dimension</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;cannot embedded array into a smaller dimensional array: </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
@@ -665,6 +978,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">arrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">array</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Embedded.constructArray"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.constructArray">[docs]</a>    <span class="k">def</span> <span class="nf">constructArray</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a numpy array that represents the data in *self* with all cells fulled.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`numpy.array`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">import</span> <span class="nn">numpy</span>
 
@@ -679,6 +997,11 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">array1</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Embedded.copy"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self*.</span>
+
+<span class="sd">        :returns:       An instance of :py:class:`Embedded`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">array1</span> <span class="o">=</span> <span class="n">Embedded</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> 
                 <span class="n">symmetry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span><span class="p">,</span> <span class="n">storageOrder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storageOrder</span><span class="p">,</span>
@@ -688,11 +1011,24 @@
         <span class="k">return</span> <span class="n">array1</span></div>
 
 <div class="viewcode-block" id="Embedded.offsetScaleValues"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.offsetScaleValues">[docs]</a>    <span class="k">def</span> <span class="nf">offsetScaleValues</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Modify every sub-array: multiply by scale and add offset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method class *offsetScaleValues* for each sub-array of *self*.</span>
+
+<span class="sd">        :param offset:      The offset to apply to each cell of each sub-array.</span>
+<span class="sd">        :param scale:       The multiplicative scale factor to apply to each cell of each sub-array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">subarray</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrays</span><span class="p">:</span> <span class="n">subarray</span><span class="o">.</span><span class="n">offsetScaleValues</span><span class="p">(</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Embedded.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.xDataArray.Embedded.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
 

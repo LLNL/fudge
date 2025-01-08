@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument('-c', dest='color', default='blue', help='Color of the cross sections, etc., when plotted')
     parser.add_argument('-s', dest='sublibrary', default=None, choices=SUBLIBS, help='ENDF sublibrary prefix/projectile')
     parser.add_argument('-p', dest='path', default=None, help='Path to ENDF files for look for isotopic ENDF files')
-    parser.add_argument('-h', dest='include_hash', default=False, action='store_true', help='Include the git hash in the generated JSON file')
+    parser.add_argument('-H', dest='include_hash', default=False, action='store_true', help='Include the git hash in the generated JSON file')
     parser.add_argument('Z', type=int, help="Z of target to work with")
     return parser.parse_args()
 

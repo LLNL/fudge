@@ -44,94 +44,201 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
-<span class="kn">import</span> <span class="nn">sys</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains all the classes for handling GNDS text container.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class                             | Description                                                           |</span>
+<span class="sd">    +===================================+=======================================================================+</span>
+<span class="sd">    | Encoding                          | This class is an enum of the supported text encodings.                |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Markup                            | This class is an enum of the supported text markups.                  |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Text                              | This class represents a GNDS text node.                               |</span>
+<span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
+
+<span class="sd">This module contains the following functions:</span>
+
+<span class="sd">    +-----------------------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                             | Description                                                               |</span>
+<span class="sd">    +===================================+===========================================================================+</span>
+<span class="sd">    | isString                          | This function test if an object is a valid python string.                 |</span>
+<span class="sd">    +-----------------------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">    | raiseIfNotString                  | This function does a raise if its argument is not a valid python string.  |</span>
+<span class="sd">    +-----------------------------------+---------------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
 
-<div class="viewcode-block" id="isString"><a class="viewcode-back" href="../../xData/index.html#xData.text.isString">[docs]</a><span class="k">def</span> <span class="nf">isString</span><span class="p">(</span> <span class="n">string</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="isString"><a class="viewcode-back" href="../../xData/index.html#xData.text.isString">[docs]</a><span class="k">def</span> <span class="nf">isString</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Executes a TypeError raise if string is not a valid python2 str or unicode instance, or if is not a valid python3 str instance.</span>
-<span class="sd">    Returns the string argument unchanged.&quot;&quot;&quot;</span>
+<span class="sd">    This function executes a TypeError raise if *string* is not a valid python2 str or unicode instance,</span>
+<span class="sd">    or if is not a valid python3 str instance.</span>
+<span class="sd">    This function returns the *string* argument unchanged.</span>
 
-    <span class="k">if</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span> <span class="o">==</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">string</span><span class="p">,</span> <span class="p">(</span> <span class="nb">str</span><span class="p">,</span> <span class="n">unicode</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Text must be a str or unicode.&#39;</span> <span class="p">)</span>
-    <span class="k">else</span> <span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">string</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Text must be a str&#39;</span> <span class="p">)</span>
+<span class="sd">    :param string:  The python instance to check.</span>
 
-    <span class="k">return</span><span class="p">(</span> <span class="n">string</span> <span class="p">)</span></div>
+<span class="sd">    :returns:       The argument *string*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Text must be a str&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">string</span></div>
+
 
 <div class="viewcode-block" id="Encoding"><a class="viewcode-back" href="../../xData/index.html#xData.text.Encoding">[docs]</a><span class="k">class</span> <span class="nc">Encoding</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is an enum of the supported text encodings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">ascii</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">utf8</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
 
+
 <div class="viewcode-block" id="Markup"><a class="viewcode-back" href="../../xData/index.html#xData.text.Markup">[docs]</a><span class="k">class</span> <span class="nc">Markup</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is an enum of the supported text markups.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">none</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">xml</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">html</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">latex</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
 
+
 <div class="viewcode-block" id="Text"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text">[docs]</a><span class="k">class</span> <span class="nc">Text</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a GNDS text container. GNDS text is a string of characters with an encoding and markup.</span>
+<span class="sd">    Encoding describes how bits of the text are to be interpreted (e.g., ascii, utf8). Markup describes</span>
+<span class="sd">    what character sequences have special meaning (e.g., xml, latex).</span>
+
+<span class="sd">    If the body is set to None, the Text instance is considered to be empty and its toXML_strList returns an empty list.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +-----------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member    | Description                                                   |</span>
+<span class="sd">    +===========+===============================================================+</span>
+<span class="sd">    | label     | The label for the text.                                       |</span>
+<span class="sd">    +-----------+---------------------------------------------------------------+</span>
+<span class="sd">    | encoding  | The type of encoding for the text.                            |</span>
+<span class="sd">    +-----------+---------------------------------------------------------------+</span>
+<span class="sd">    | markup    | The markup for the text.                                      |</span>
+<span class="sd">    +-----------+---------------------------------------------------------------+</span>
+<span class="sd">    | body      | The characters representing the text.                         |</span>
+<span class="sd">    +-----------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span>
-    <span class="c1"># FIX-ME Should add allowed encodings as an argument with default of all. Like encodings = Encoding.allowed. Also should check in body setter.</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="n">Encoding</span><span class="o">.</span><span class="n">ascii</span><span class="p">,</span> <span class="n">markup</span> <span class="o">=</span> <span class="n">Markup</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="c1"># FIXME Should add allowed encodings as an argument with default of all. Like encodings = Encoding.allowed.</span>
+    <span class="c1">#  Also should check in body setter.</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">Encoding</span><span class="o">.</span><span class="n">ascii</span><span class="p">,</span> <span class="n">markup</span><span class="o">=</span><span class="n">Markup</span><span class="o">.</span><span class="n">none</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param text:        The characters representing the text.</span>
+<span class="sd">        :param encoding:    The type of encoding for the text.</span>
+<span class="sd">        :param markup:      The markup for the text.</span>
+<span class="sd">        :param label:       The label for the text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">Encoding</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">markup</span> <span class="o">=</span> <span class="n">Markup</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">markup</span><span class="p">)</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid label instance.&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid label instance.&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">text</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the number of characters in the body of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__body</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the character at index in the body of *self*.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">)</span>
+<span class="sd">        :param index:   This index of the character to return with the body of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *self*&#39;s label.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">encoding</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *self*&#39;s encoding.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__encoding</span> <span class="p">)</span>
+<span class="sd">        :returns:       An instance of :py:class:`Encoding`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__encoding</span>
 
     <span class="nd">@encoding</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">encoding</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method set the encoding of *self* to *value*.</span>
+
+<span class="sd">        :param value:       The new encoding value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__encoding</span> <span class="o">=</span> <span class="n">Encoding</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">markup</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">markup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *self*&#39;s markup.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__markup</span> <span class="p">)</span>
+<span class="sd">        :returns:       An instance of :py:class:`Markup`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__markup</span>
 
     <span class="nd">@markup</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">markup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">markup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method set the markup of *self* to *value*.</span>
+
+<span class="sd">        :param value:       The new markup value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__markup</span> <span class="o">=</span> <span class="n">Markup</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">body</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *self*&#39;s body.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span> <span class="p">)</span>
+<span class="sd">        :returns:       A python str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span>
 
     <span class="nd">@body</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the text to *text*, over riding the current text.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method set the body of *self* to *text*, overriding the current text.</span>
+<span class="sd">        If *text* is None, *self* is considered to be empty.</span>
+
+<span class="sd">        :param text:    A python str instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__filled</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__body</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
@@ -141,55 +248,88 @@
 
         <span class="n">isString</span><span class="p">(</span><span class="n">text2</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">==</span> <span class="n">Encoding</span><span class="o">.</span><span class="n">ascii</span><span class="p">:</span>                                 <span class="c1"># If encoding is ascii verify text is.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">==</span> <span class="n">Encoding</span><span class="o">.</span><span class="n">ascii</span><span class="p">:</span>  <span class="c1"># If encoding is ascii verify text is.</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">text2</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">UnicodeEncodeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    ERROR: encountered non-ascii character &#39;</span><span class="si">%s</span><span class="s2">&#39; at index </span><span class="si">%d</span><span class="s2"> of text&quot;</span> <span class="o">%</span>
                       <span class="p">(</span><span class="n">ex</span><span class="o">.</span><span class="n">object</span><span class="p">[</span><span class="n">ex</span><span class="o">.</span><span class="n">start</span><span class="p">],</span> <span class="n">ex</span><span class="o">.</span><span class="n">start</span><span class="p">))</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    Bad character in context:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ex</span><span class="o">.</span><span class="n">object</span><span class="p">[</span><span class="n">ex</span><span class="o">.</span><span class="n">start</span><span class="o">-</span><span class="mi">20</span><span class="p">:</span><span class="n">ex</span><span class="o">.</span><span class="n">end</span><span class="o">+</span><span class="mi">20</span><span class="p">],</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    Bad character in context:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ex</span><span class="o">.</span><span class="n">object</span><span class="p">[</span><span class="n">ex</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="mi">20</span><span class="p">:</span><span class="n">ex</span><span class="o">.</span><span class="n">end</span> <span class="o">+</span> <span class="mi">20</span><span class="p">],</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="n">ex</span>
 
         <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filled</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__body</span> <span class="o">=</span> <span class="n">text2</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">filled</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">filled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns False if *self* is empty and True otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filled</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filled</span>
 
-<div class="viewcode-block" id="Text.copy"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Text.copy"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a copy of *self*.</span>
 
-            <span class="c1"># No need to copy text has it is immutable.</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">Text</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">markup</span> <span class="p">)</span> <span class="p">)</span></div>
+<span class="sd">        :returns:           An instance of :py:class:`Text`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># No need to copy text has it is immutable.</span>
+        <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">markup</span><span class="p">)</span></div>
 
     <span class="n">__copy__</span> <span class="o">=</span> <span class="n">copy</span>
 
-<div class="viewcode-block" id="Text.numberOfLines"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.numberOfLines">[docs]</a>    <span class="k">def</span> <span class="nf">numberOfLines</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Text.numberOfLines"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.numberOfLines">[docs]</a>    <span class="k">def</span> <span class="nf">numberOfLines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the number of line-feeds in the body of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">_numberOfLines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span><span class="o">.</span><span class="n">count</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">_numberOfLines</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">_numberOfLines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__body</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">_numberOfLines</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="n">_numberOfLines</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_numberOfLines</span></div>
 
-<div class="viewcode-block" id="Text.XML_extraAttributes"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Text.XML_extraAttributes"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns an empty python str.</span>
+<span class="sd">        Method is designed to be over-ridden by derived classes which add attributes not in the :py:class:`Text` class.</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span></div>
+<span class="sd">        :returns:       An empty python str instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Text.bodyToXML_CDATA"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.bodyToXML_CDATA">[docs]</a>    <span class="k">def</span> <span class="nf">bodyToXML_CDATA</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
 
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;&lt;![CDATA[</span><span class="si">%s</span><span class="s1">]]&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span> <span class="p">)</span></div>
+<div class="viewcode-block" id="Text.bodyToXML_CDATA"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.bodyToXML_CDATA">[docs]</a>    <span class="k">def</span> <span class="nf">bodyToXML_CDATA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method wraps the body of self into an XML &quot;&lt;![CDATA[&quot; and &quot;]]&gt;&quot; tag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Text.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;![CDATA[</span><span class="si">%s</span><span class="s1">]]&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__body</span></div>
+
+<div class="viewcode-block" id="Text.toXML_strList"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+<span class="sd">        If *self* is empty and kwargs.get(&#39;showEmptyText&#39;) is False, this method returns an empty list.</span>
+
+<span class="sd">        :param indent:     The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:           List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;addExtraAttributes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filled</span>
         <span class="n">extraAttributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">XML_extraAttributes</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filled</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">extraAttributes</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmptyText&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">showEmptyText</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmpty&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;showEmptyText&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">extraAttributes</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">showEmptyText</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">[]</span>
-            <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">extraAttributes</span><span class="p">)]</span>
+            <span class="n">XML_string</span> <span class="o">=</span> <span class="s1">&#39;&lt;</span><span class="si">%s%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">extraAttributes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">extraAttributes</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">XML_string</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%-24s</span><span class="s1"> &lt;!-- text --&gt;&#39;</span> <span class="o">%</span> <span class="n">XML_string</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">indent</span> <span class="o">+</span> <span class="n">XML_string</span><span class="p">]</span>
 
         <span class="n">attributeStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span>
@@ -197,9 +337,17 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__markup</span> <span class="o">!=</span> <span class="n">Markup</span><span class="o">.</span><span class="n">none</span><span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; markup=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__markup</span>
         <span class="n">attributeStr</span> <span class="o">+=</span> <span class="n">extraAttributes</span>
 
-        <span class="k">return</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;</span><span class="si">%s</span><span class="s1">&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributeStr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bodyToXML_CDATA</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;</span><span class="si">%s</span><span class="s1">&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributeStr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bodyToXML_CDATA</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="Text.parseNode"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.parseNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets data in *self* using the contents of *node*.</span>
+
+<span class="sd">        :param node:       Node to parse.</span>
+<span class="sd">        :param xPath:      List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:   dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
 
@@ -207,30 +355,48 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">markup</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;markup&#39;</span><span class="p">,</span> <span class="n">Markup</span><span class="o">.</span><span class="n">none</span><span class="p">)</span>
 
         <span class="n">text</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>                                <span class="c1"># Format &gt;= &#39;2.0.LLNL_4&#39; parsing.</span>
+        <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Format &gt;= &#39;2.0.LLNL_4&#39; parsing.</span>
             <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">text</span>
-        <span class="k">else</span><span class="p">:</span>                                           <span class="c1"># Pre format &#39;2.0.LLNL_4&#39; parsing where the actual text node is a child node named &#39;text&#39;.</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># Pre format &#39;2.0.LLNL_4&#39; parsing where the actual text node is a child node named &#39;text&#39;.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Text.parseNodeUsingClass"><a class="viewcode-back" href="../../xData/index.html#xData.text.Text.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:        Form class to return.</span>
+<span class="sd">        :param node :      Node to parse.</span>
+<span class="sd">        :param xPath:      List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:   dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:          An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="n">instance</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">instance</span></div></div>
 
-<div class="viewcode-block" id="raiseIfNotString"><a class="viewcode-back" href="../../xData/index.html#xData.text.raiseIfNotString">[docs]</a><span class="k">def</span> <span class="nf">raiseIfNotString</span><span class="p">(</span> <span class="n">string</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
 
-    <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">string</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid </span><span class="si">%s</span><span class="s1"> instance.&#39;</span> <span class="o">%</span> <span class="n">name</span> <span class="p">)</span>
-    <span class="k">return</span><span class="p">(</span> <span class="n">string</span> <span class="p">)</span></div>
+<div class="viewcode-block" id="raiseIfNotString"><a class="viewcode-back" href="../../xData/index.html#xData.text.raiseIfNotString">[docs]</a><span class="k">def</span> <span class="nf">raiseIfNotString</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function does a raise if *string* is not a valid python string.</span>
+
+<span class="sd">    :param string:  The python instance to check.</span>
+<span class="sd">    :param name:    The name of the variable representing *string*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid </span><span class="si">%s</span><span class="s1"> instance.&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">string</span></div>
 </pre></div>
 
             <div class="clearer"></div>

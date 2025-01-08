@@ -47,7 +47,7 @@ for chemicalElement in pops.chemicalElements:
     chemicalElement2 = isotopicAbundancesModule.ChemicalElement(chemicalElement.symbol)
     for isotope in isotopes:
         atomFraction, uncertainty = isotopes[isotope]
-        id = miscModule.idFromZAndA(chemicalElement.Z, isotope)
+        id = miscModule.idFromZAndA(chemicalElement.Z, isotope, True)
         chemicalElement2.isotopes.add(isotopicAbundancesModule.Isotope(id, atomFraction / 100., uncertainty / 100.))
     if len(chemicalElement2.isotopes) > 0:
         isotopicAbundancesByChemicalElement.chemicalElements.add(chemicalElement2)

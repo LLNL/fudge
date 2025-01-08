@@ -12,6 +12,7 @@ of a **GNDS/XML** file and the function **read** for reading into **FUDGE** a *G
 If the file is not a *GNDS/XML* file, a raise is executed.
 """
 
+import pathlib
 import xml.sax
 from xml.etree import cElementTree
 
@@ -89,6 +90,13 @@ def type(fileName, show=False, checkForHDF5=True):
     If the file is not a *GNDS/XML* file, a raise is executed.
     """
 
+    if pathlib.Path(fileName).is_dir():
+        if show:
+            print('%-20s ERROR: %s' % ("DIRECTORY", fileName))
+            return
+        else:
+            raise
+
     if HDF5_present and checkForHDF5:
         try:
             with h5py.File(fileName, 'r') as hdf5:
@@ -117,7 +125,6 @@ def type(fileName, show=False, checkForHDF5=True):
             print('%-20s ERROR: %s' % ("Oops", fileName))
         else:
             raise
-
 
 def read(fileName, reactionSuite=None, warningNoReactionSuite=True, verbosity=1, lazyParsing=True):
     """

@@ -82,6 +82,19 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="BaseAlias.getMass"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.alias.BaseAlias.getMass">[docs]</a>    <span class="k">def</span> <span class="nf">getMass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the mass of the final particle referenced by pid.</span>
+
+<span class="sd">        :param unit:        The unit of the returned mass.</span>
+
+<span class="sd">        :return:            Float.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">database</span> <span class="k">as</span> <span class="n">databaseModule</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span><span class="n">databaseModule</span><span class="o">.</span><span class="n">Database</span><span class="p">)</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span></div>
+
     <span class="k">def</span> <span class="nf">isAlias</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="k">return</span> <span class="kc">True</span>
@@ -159,7 +172,12 @@
         <span class="n">intid1</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">intid</span><span class="p">()</span>
         <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">intid1</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
 
-        <span class="k">return</span> <span class="n">sign</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000000</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metaStableIndex</span> <span class="o">+</span> <span class="mi">480</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">intid1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1000000</span><span class="p">)</span></div>
+        <span class="n">MM</span> <span class="o">=</span> <span class="mi">500</span>
+        <span class="n">III</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">abs</span><span class="p">(</span><span class="n">intid1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">1000000</span> <span class="p">)</span> <span class="o">%</span> <span class="mi">1000</span>
+        <span class="k">if</span> <span class="n">III</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">:</span>
+            <span class="n">MM</span> <span class="o">=</span> <span class="mi">600</span>
+
+        <span class="k">return</span> <span class="n">sign</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000000</span> <span class="o">*</span> <span class="p">(</span> <span class="mi">1000</span> <span class="o">+</span> <span class="n">MM</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">metaStableIndex</span> <span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">intid1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1000000</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MetaStable.parseNodeUsingClass"><a class="viewcode-back" href="../../PoPs/misc.html#PoPs.alias.MetaStable.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

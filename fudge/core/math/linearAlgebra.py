@@ -304,7 +304,7 @@ def correlation_to_relative(correlationMatrix, data):
 
 
 def affine_transform_covariance(covarianceMatrix, transformMatrix):
-    """
+    r"""
     Perform an affine transformation to a covariance matrix, namely
     :math:`new = A^T \cdot old \cdot A`, where :math:`A` is a orthogonal matrix.
     """

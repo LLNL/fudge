@@ -45,8 +45,13 @@ def toACE(self, styleLabel, cdf_style, fileName, evaluationId, productData, dela
     massUnit = 'eV/c**2'
     neutron = self.PoPs[IDsPoPsModule.neutron]
     target = self.PoPs[self.target]
+    metastable = 0
+    if hasattr(target, 'metaStableIndex'):
+        metastable = target.metaStableIndex
     if target.id in self.PoPs.aliases: target = self.PoPs[target.pid]
     targetZ, targetA, targetZA, level = miscPoPsModule.ZAInfo( target )
+    if metastable:
+        targetZA += 100 * (3 + metastable)
 
     neutronMass = neutron.getMass( massUnit )
     targetMass = target.getMass( massUnit )
@@ -57,8 +62,7 @@ def toACE(self, styleLabel, cdf_style, fileName, evaluationId, productData, dela
     temperature_MeV = temperature.getValueAs( 'MeV/k' )
 
     processingTime = time.localtime( )
-    processingTime = [ 2014, 5, 10 ]
-    strRecords = [ "%6d.%.2dc%12.7f %11.5E %.2d/%.2d/%.2d" % ( targetZA, evaluationId, target2NeutronMass, 
+    strRecords = [ "%6d.%.2dc%12.7f %11.5E %.2d/%.2d/%.2d" % ( targetZA, evaluationId, target2NeutronMass,
             temperature_MeV, processingTime[1], processingTime[2], processingTime[0] ) ]
 
     nonFissionEnergyDependentNeutronMultiplicities = {}

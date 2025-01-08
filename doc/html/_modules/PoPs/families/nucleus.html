@@ -58,40 +58,10 @@
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">particle</span> <span class="k">as</span> <span class="n">particleModule</span>
 
-<div class="viewcode-block" id="Alias"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nucleus.Alias">[docs]</a><span class="k">class</span> <span class="nc">Alias</span><span class="p">(</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">Alias</span> <span class="p">)</span> <span class="p">:</span>
-
-    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;nucleusAlias&#39;</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">chemicalElementSymbol</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">chemicalElementSymbol</span> <span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">Z</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">Z</span> <span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">A</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">A</span> <span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">index</span> <span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span><span class="o">.</span><span class="n">energy</span> <span class="p">)</span></div>
-
 <div class="viewcode-block" id="Particle"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nucleus.Particle">[docs]</a><span class="k">class</span> <span class="nc">Particle</span><span class="p">(</span> <span class="n">particleModule</span><span class="o">.</span><span class="n">Particle</span> <span class="p">)</span> <span class="p">:</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;nucleus&#39;</span>
     <span class="n">familyOrder</span> <span class="o">=</span> <span class="mi">3</span>
-    <span class="n">alias</span> <span class="o">=</span> <span class="n">Alias</span>
 
 <div class="viewcode-block" id="Particle.__init__"><a class="viewcode-back" href="../../../PoPs/families.html#PoPs.families.nucleus.Particle.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">index</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

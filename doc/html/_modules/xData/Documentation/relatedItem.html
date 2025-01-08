@@ -45,7 +45,19 @@
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module contains the classes representing the GNDS documentation nodes author and authors.</span>
+<span class="sd">This module contains the classes representing the GNDS documentation TBD.</span>
+
+<span class="sd">This module contains the following classes:</span>
+
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | Class                     | Description                                                                       |</span>
+<span class="sd">    +===========================+===================================================================================+</span>
+<span class="sd">    | RelationType              | This enum class represents the allowed relation types.                            |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | RelatedItem               | This is the suite class for the GNDS TBD.                                         |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
+<span class="sd">    | RelatedItems              | This is the suite class for the GNDS TBD.                                         |</span>
+<span class="sd">    +---------------------------+-----------------------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
@@ -53,9 +65,12 @@
 
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">text</span> <span class="k">as</span> <span class="n">textModule</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">abstractClasses</span> <span class="k">as</span> <span class="n">abstractClassesModule</span>
+
 
 <div class="viewcode-block" id="RelationType"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelationType">[docs]</a><span class="k">class</span> <span class="nc">RelationType</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This enum class represents the allowed relation types. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">none</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">isCitedBy</span> <span class="o">=</span> <span class="s1">&#39;IsCitedBy&#39;</span>
@@ -93,12 +108,33 @@
     <span class="n">obsoletes</span> <span class="o">=</span> <span class="s1">&#39;Obsoletes&#39;</span>
     <span class="n">isObsoletedBy</span> <span class="o">=</span> <span class="s1">&#39;IsObsoletedBy&#39;</span></div>
 
+
 <div class="viewcode-block" id="RelatedItem"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItem">[docs]</a><span class="k">class</span> <span class="nc">RelatedItem</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TBD.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member        | Description                                                   |</span>
+<span class="sd">    +===============+===============================================================+</span>
+<span class="sd">    | name          | TBD.                                                          |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | href          | TBD.                                                          |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | relationType  | TBD.                                                          |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;relatedItem&#39;</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;name&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">href</span><span class="p">,</span> <span class="n">relationType</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param name:            TBD.</span>
+<span class="sd">        :param href:            TBD.</span>
+<span class="sd">        :param relationType:    TBD.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -108,23 +144,42 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *name* member.</span>
+
+<span class="sd">        :returns:       instance of :py:class:`textModule.Text`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">href</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *href* member.</span>
+
+<span class="sd">        :returns:       instance of :py:class:`textModule.Text`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">relationType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns the *relationType* member.</span>
+
+<span class="sd">        :returns:       instance of :py:class:`RelationType`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relationType</span>
 
 <div class="viewcode-block" id="RelatedItem.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItem.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param kwargs:       dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:             List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;indent&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
@@ -132,10 +187,21 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__href</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; href=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__relationType</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; relationType=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__relationType</span>
 
-        <span class="k">return</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributes</span> <span class="p">)</span> <span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="RelatedItem.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItem.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse *node* into an instance of *cls*.</span>
+
+<span class="sd">        :param cls:         Form class to return.</span>
+<span class="sd">        :param node:        Node to parse.</span>
+<span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
+<span class="sd">        :param linkData:    dict that collects unresolved links.</span>
+<span class="sd">        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
         <span class="n">href</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -143,17 +209,19 @@
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">href</span><span class="p">,</span> <span class="n">relationType</span><span class="p">)</span></div></div>
 
+
 <div class="viewcode-block" id="RelatedItems"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItems">[docs]</a><span class="k">class</span> <span class="nc">RelatedItems</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the suite class for the GNDS TBD.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;relatedItems&#39;</span>
     <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;name&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">RelatedItem</span><span class="p">])</span>
 
-        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">RelatedItem</span> <span class="p">])</span>
-
-<div class="viewcode-block" id="RelatedItems.toXML"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItems.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
+<div class="viewcode-block" id="RelatedItems.toXML"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.relatedItem.RelatedItems.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div></div>
 </pre></div>
 

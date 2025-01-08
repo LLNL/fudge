@@ -10,18 +10,19 @@ import sys
 
 import fudge as fudgeModule
 
-'''
-    Methods to find scripts or executables in the FUDGE bin folder since the location is dependent on teh way FUDGE is installed.
-'''
+"""
+    This module contains methods to find scripts or executables in the FUDGE bin folder since the location 
+    is dependent on teh way FUDGE is installed.
+"""
 
 def locateFileInBin( fileInBin, exceptionIfNotFound=False ):
-    '''
+    """
        Find the full path to a file located in the FUDGE bin folder
 
        :param fileInBin:           The file for which the path is seeked.
        :param exceptionIfNotFound: Option to raise a FileNotFoundError exception if the requested path is not found. 
        :return:                    Full path to the requested file path. 
-    '''
+    """
 
     filePath = os.path.join(os.path.abspath('./'), fileInBin)
     if not os.path.exists( filePath ):
@@ -37,12 +38,12 @@ def locateFileInBin( fileInBin, exceptionIfNotFound=False ):
     return filePath
 
 def locateMerced( exceptionIfNotFound=False ):
-    '''
+    """
         Find the full path to the mercury executable.
 
        :param exceptionIfNotFound: Option to raise a FileNotFoundError exception if no "mercury" executable is found.
        :return:                    Full path of the "merced" executable. 
-    '''
+    """
 
     return locateFileInBin( 'merced', exceptionIfNotFound )
 

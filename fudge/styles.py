@@ -7,6 +7,8 @@
 
 import abc
 import datetime
+import textwrap
+import shutil
 
 from pqu import PQU as PQUModule
 
@@ -59,6 +61,31 @@ class TemperatureInfo:
         self.URR_probabilityTables = URR_probabilityTables
         self.heatedMultiGroup = heatedMultiGroup
         self.SnElasticUpScatter = SnElasticUpScatter
+
+    def info(self):
+        '''
+        This method prints each member of *self* and information about its.
+        '''
+
+        width = shutil.get_terminal_size().columns
+        subsequent_indent = len('    URR_probabilityTables: ') * ' '
+
+        def wrap(message):
+            '''
+            For internal use only. This function wraps *message* to fit onto the screen.
+            '''
+
+            for line in textwrap.wrap(message, width=width, subsequent_indent=subsequent_indent):
+                print(line)
+
+        print()
+        wrap('The TemperatureInfo class members:')
+        wrap('    temperature:           The temperature associated with the following labels.')
+        wrap('    heated:                The label for the cross sections heated to the specified temperature.')
+        wrap('    griddedCrossSection:   The label for the cross sections mapped onto a unified grid for all reactions. These data are for Monte Carlo transport.')
+        wrap('    URR_probabilityTables: The label for the cross section URR probability tables.')
+        wrap('    heatedMultiGroup:      The label for the multi-group data.')
+        wrap('    SnElasticUpScatter:    The label for the elastic multi-group average-product-energy and transfer-matrices with upscatter data.')
 
 class Styles(ancestryModule.AncestryIO_base):
     """
@@ -371,7 +398,7 @@ class Styles(ancestryModule.AncestryIO_base):
             xmlStringList += _style.toXML_strList(indent2, **kwargs, parameters = parameters)
 
         if len(xmlStringList) == 1:
-            if kwargs.get('showEmptySuites', False):
+            if kwargs.get('showEmpty', False) or kwargs.get('showEmptySuite', False):
                 xmlStringList = [xmlStringList[0][:-1] + '/>']
             else:
                 xmlStringList = []

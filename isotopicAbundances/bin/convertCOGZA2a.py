@@ -47,7 +47,7 @@ with args.COG_file.open() as fIn:
         for index in range(2, 2 * (count + 1),2):
             ZA = int(values[index])
             atomFraction = float(values[index+1])
-            id = miscModule.idFromZA(ZA)
+            id = miscModule.idFromZA(ZA, True)
             chemicalElement.isotopes.add(isotopicAbundancesModule.Isotope(id, atomFraction, -1.0))
         isotopicAbundancesByChemicalElement.chemicalElements.add(chemicalElement)
         atomFractionSums.append((symbol, Z, chemicalElement.atomFractionSum()))

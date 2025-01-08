@@ -19,40 +19,10 @@ from ..quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
 
 from . import particle as particleModule
 
-class Alias( particleModule.Alias ) :
-
-    moniker = 'nucleusAlias'
-
-    @property
-    def chemicalElementSymbol( self ) :
-
-        return( self.__particle.chemicalElementSymbol )
-
-    @property
-    def Z( self ) :
-
-        return( self.__particle.Z )
-
-    @property
-    def A( self ) :
-
-        return( self.__particle.A )
-
-    @property
-    def index( self ) :
-
-        return( self.__particle.index )
-
-    @property
-    def energy( self ) :
-
-        return( self.__particle.energy )
-
 class Particle( particleModule.Particle ) :
 
     moniker = 'nucleus'
     familyOrder = 3
-    alias = Alias
 
     def __init__( self, id, index ) :
         """

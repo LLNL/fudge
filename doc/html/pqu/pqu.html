@@ -217,7 +217,7 @@ base unit. Hence, ‘ft’ is compatible with ‘m’ but not ‘kg’ or ‘s�
 with Joule (‘J’) and Watt-second (‘W * s’) but not Watt (‘W’).</p>
 <p>The <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a> package has many defined units with prefixes (see <a class="reference internal" href="#defined-prefixes-and-units">Defined prefixes and units</a>). In general, the
 PQU methods that operate on <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a> objects do not attempt to simplify the units, even if the result is dimensionless.
-Note, to get rid of dimensionless units use the method <a class="reference internal" href="#pqu.PQU.PQU.simplify" title="pqu.PQU.PQU.simplify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.simplify()</span></code></a>
+Note, to get rid of dimensionless units use the method <a class="reference internal" href="#pqu.PQU.PQU.simplify" title="pqu.PQU.PQU.simplify"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU.simplify()</span></code></a>
 For example, consider the division of ‘3.2 m’ by 11.2 km:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;3.2 m&#39;</span> <span class="p">)</span>
@@ -232,8 +232,8 @@ For example, consider the division of ‘3.2 m’ by 11.2 km:</p>
 <span class="go">PQU( &quot;2.9e-4&quot; )</span>
 </pre></div>
 </div>
-<p>Here the method <a class="reference internal" href="#pqu.PQU.PQU.copyToUnit" title="pqu.PQU.PQU.copyToUnit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.copyToUnit()</span></code></a> is used to convert the units into a dimensionless form. Here is another
-example showing the use of the <a class="reference internal" href="#pqu.PQU.PQU.copyToUnit" title="pqu.PQU.PQU.copyToUnit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.copyToUnit()</span></code></a> method:</p>
+<p>Here the method <a class="reference internal" href="#pqu.PQU.PQU.copyToUnit" title="pqu.PQU.PQU.copyToUnit"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU.copyToUnit()</span></code></a> is used to convert the units into a dimensionless form. Here is another
+example showing the use of the <a class="reference internal" href="#pqu.PQU.PQU.copyToUnit" title="pqu.PQU.PQU.copyToUnit"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU.copyToUnit()</span></code></a> method:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mass</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s2">&quot;4.321 g&quot;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">speed</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s2">&quot;1.234 inch / mus&quot;</span>  <span class="p">)</span>  
 <span class="gp">&gt;&gt;&gt; </span><span class="n">energy</span> <span class="o">=</span> <span class="n">mass</span> <span class="o">*</span> <span class="n">speed</span><span class="o">**</span><span class="mi">2</span>
@@ -244,8 +244,8 @@ example showing the use of the <a class="reference internal" href="#pqu.PQU.PQU.
 <span class="go">4.245e6 J</span>
 </pre></div>
 </div>
-<p>The method <a class="reference internal" href="#pqu.PQU.PQU.inUnitsOf" title="pqu.PQU.PQU.inUnitsOf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.inUnitsOf()</span></code></a> is useful for returning a physical quantity in units of descending compatible units. 
-For example, <a class="reference internal" href="#pqu.PQU.PQU.inUnitsOf" title="pqu.PQU.PQU.inUnitsOf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.inUnitsOf()</span></code></a> will convert ‘3123452.12 s’ into days, hours, minutes and seconds, or just hours and seconds as:</p>
+<p>The method <a class="reference internal" href="#pqu.PQU.PQU.inUnitsOf" title="pqu.PQU.PQU.inUnitsOf"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU.inUnitsOf()</span></code></a> is useful for returning a physical quantity in units of descending compatible units. 
+For example, <a class="reference internal" href="#pqu.PQU.PQU.inUnitsOf" title="pqu.PQU.PQU.inUnitsOf"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU.inUnitsOf()</span></code></a> will convert ‘3123452.12 s’ into days, hours, minutes and seconds, or just hours and seconds as:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;3123452.12 s&#39;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">inUnitsOf</span><span class="p">(</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span> <span class="p">)</span>
 <span class="go">(PQU( &quot;36.0000000 d&quot; ), PQU( &quot;3.000000 h&quot; ), PQU( &quot;37.0000 min&quot; ), PQU( &quot;32.12 s&quot; ))</span>
@@ -253,7 +253,7 @@ For example, <a class="reference internal" href="#pqu.PQU.PQU.inUnitsOf" title="
 <span class="go">(PQU( &quot;867.000000 h&quot; ), PQU( &quot;2252.12 s&quot; ))</span>
 </pre></div>
 </div>
-<p>Also see the methods <a class="reference internal" href="#pqu.PQU.PQU.convertToUnit" title="pqu.PQU.PQU.convertToUnit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.convertToUnit()</span></code></a> and <a class="reference internal" href="#pqu.PQU.PQU.getValueAs" title="pqu.PQU.PQU.getValueAs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.getValueAs()</span></code></a>.</p>
+<p>Also see the methods <a class="reference internal" href="#pqu.PQU.PQU.convertToUnit" title="pqu.PQU.PQU.convertToUnit"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU.convertToUnit()</span></code></a> and <a class="reference internal" href="#pqu.PQU.PQU.getValueAs" title="pqu.PQU.PQU.getValueAs"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU.getValueAs()</span></code></a>.</p>
 </section>
 <section id="changing-non-hardwired-constants">
 <h3>Changing non-hardwired constants<a class="headerlink" href="#changing-non-hardwired-constants" title="Permalink to this heading">¶</a></h3>
@@ -369,8 +369,8 @@ Note, the ‘sqrt’ method is equivalent to the ‘pow’ method with power of 
 <h3>PQU methods by functionality<a class="headerlink" href="#pqu-methods-by-functionality" title="Permalink to this heading">¶</a></h3>
 <p>This section classifies some of the methods in the <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a> class by their function.</p>
 <p>For <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a> methods that require a second operand (e.g., ‘+’, ‘/’), the second operand will be passed to the
-staticmethod <code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU._getOtherAsPQU()</span></code> to determine if it is a suitable object. A suitable object includes any string that
-is a valid <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a>. For example: <a class="reference internal" href="#pqu.PQU.PQU.toString" title="pqu.PQU.PQU.toString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.toString()</span></code></a></p>
+staticmethod <code class="xref py py-func docutils literal notranslate"><span class="pre">PQU._getOtherAsPQU()</span></code> to determine if it is a suitable object. A suitable object includes any string that
+is a valid <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a>. For example: <a class="reference internal" href="#pqu.PQU.PQU.toString" title="pqu.PQU.PQU.toString"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU.toString()</span></code></a></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;12.345&#39;</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;3.23&quot;</span><span class="p">)</span>
 <span class="go">15.58</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;12.345 mm&#39;</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;3.23m&quot;</span><span class="p">)</span>
@@ -405,13 +405,13 @@ This method returns a python float for the value of the <a class="reference inte
 <p><strong>__add__, __radd__, __iadd__, __sub__, __rsub__, __isub__</strong></p>
 <blockquote>
 <div><p>These are the standard binary operators for addition and subtraction. For these operators, the other
-operand is passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU._getOtherAsPQU()</span></code>. The other operand must have units compatible with <em>self</em>.
+operand is passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">PQU._getOtherAsPQU()</span></code>. The other operand must have units compatible with <em>self</em>.
 As expected, the __iadd__ and __isub__ methods modify <em>self</em> and return it.</p>
 </div></blockquote>
 <p><strong>__mul__, __rmul__, __imul__, __div__, __rdiv__, __idiv__</strong></p>
 <blockquote>
 <div><p>These are the standard binary operators for multiplication and division. For these operators, the other
-operand is passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU._getOtherAsPQU()</span></code>. Any unit for other is allowed.
+operand is passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">PQU._getOtherAsPQU()</span></code>. Any unit for other is allowed.
 As expected, the __imul__ and __idiv__ methods modify <em>self</em> and
 return it. All these methods call the __mul__ method; except, when a division happens, and ‘<em>self</em> is other’
 and the denominator is not 0.
@@ -430,7 +430,7 @@ only if the result can be represented by integer powers of the base units.</p>
 <p><strong>__eq__, __ne__, __lt__, __le__, __gt__, __ge__, compare, equivalent</strong></p>
 <blockquote>
 <div><p>These methods compare <em>self</em> to another object. For these operators, the other
-object is passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU._getOtherAsPQU()</span></code> and must have the same unit
+object is passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">PQU._getOtherAsPQU()</span></code> and must have the same unit
 as <em>self</em>. The first 6 methods all call the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> method
 with epsilonFactor = 5. All methods except ‘equivalent’ compare 
 <em>self</em>’s and other’s values and units only. 
@@ -796,7 +796,7 @@ The following illustrates the issue:</p></li>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pqu.PQU.</span></span><span class="sig-name descname"><span class="pre">PQU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uncertainty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkOrder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pqu.PQU.PQU" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class supports a float value with an optional uncertainty and unit. Many basic math operations are supported 
-(e.g., +, -, <a href="#id3"><span class="problematic" id="id4">*</span></a>, /).  A <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a> is anything that the staticmethod <a class="reference internal" href="#pqu.PQU.Parsers.parsePQUString" title="pqu.PQU.Parsers.parsePQUString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Parsers.parsePQUString()</span></code></a> can parse.</p>
+(e.g., +, -, <a href="#id3"><span class="problematic" id="id4">*</span></a>, /).  A <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a> is anything that the staticmethod <a class="reference internal" href="#pqu.PQU.Parsers.parsePQUString" title="pqu.PQU.Parsers.parsePQUString"><code class="xref py py-func docutils literal notranslate"><span class="pre">Parsers.parsePQUString()</span></code></a> can parse.</p>
 <p>In this section the following notations are used:</p>
 <blockquote>
 <div><table class="docutils align-default">
@@ -834,7 +834,7 @@ object. If number, uncertainty is of style ‘+/-‘.</p></td>
 “1 MeV”) or a <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhysicalUnit</span></code></a> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p>string</p></td>
-<td><p>String can be anything that the method <a class="reference internal" href="#pqu.PQU.Parsers.parsePQUString" title="pqu.PQU.Parsers.parsePQUString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Parsers.parsePQUString()</span></code></a> is
+<td><p>String can be anything that the method <a class="reference internal" href="#pqu.PQU.Parsers.parsePQUString" title="pqu.PQU.Parsers.parsePQUString"><code class="xref py py-func docutils literal notranslate"><span class="pre">Parsers.parsePQUString()</span></code></a> is
 capable of parsing (e.g., ‘1.23’, ‘1.23 m’, ‘1.23%’, ‘1.23(12) m’,
 ‘1.23 +/- 0.12m’). If it contains a unit (uncertainty) then the unit
 (uncertainty) argument must be None.</p></td>
@@ -899,7 +899,7 @@ or <em>self</em>.uncertainty’s style is PQU_uncertainty.pqu_uncertaintyStyleNo
 <span class="sig-name descname"><span class="pre">compare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilonFactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.compare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pqu.PQU.PQU.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compares <em>self</em>’s value and unit to other’s value and unit (other’s value is first converted to unit of <em>self</em>) 
 using the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> function.</p>
-<p>Also see method <a class="reference internal" href="#pqu.PQU.PQU.equivalent" title="pqu.PQU.PQU.equivalent"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU.equivalent()</span></code></a>.</p>
+<p>Also see method <a class="reference internal" href="#pqu.PQU.PQU.equivalent" title="pqu.PQU.PQU.equivalent"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU.equivalent()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -955,7 +955,7 @@ the original value/unit. The new unit must be compatible with the original unit 
 two are considered equivalent if their bands overlap. The band for <em>self</em> (or other) is all
 values within ‘factor times uncertainty’ of its value. That is, the band for <em>self</em> is the ranges from
 ‘value - factor * uncertainty’ to ‘value + factor * uncertainty’.</p>
-<p>Note, this is different than the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compare()</span></code></a> method which compares the values using sys.float_info.epsilon
+<p>Note, this is different than the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> method which compares the values using sys.float_info.epsilon
 to calculate a ‘band’ and not their uncertainties.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1275,12 +1275,12 @@ systems like hour/minute/second.</p>
 <dt class="sig sig-object py" id="pqu.PQU.PQU.setPercentFlag">
 <span class="sig-name descname"><span class="pre">setPercentFlag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isPercent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaleValue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.setPercentFlag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pqu.PQU.PQU.setPercentFlag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Changes the percent flag only when <em>self</em> is dimensionless and isPercent != <em>self</em>.isPercent( ).
-Otherwise, a raise is executed.  For scaleValue argument see <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a>.</p>
+Otherwise, a raise is executed.  For scaleValue argument see <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>isPercent</strong> – See <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a></p></li>
-<li><p><strong>scaleValue</strong> – See <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a></p></li>
+<li><p><strong>isPercent</strong> – See <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a></p></li>
+<li><p><strong>scaleValue</strong> – See <a class="reference internal" href="#pqu.PQU.PQU_float.setPercentFlag" title="pqu.PQU.PQU_float.setPercentFlag"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU_float.setPercentFlag()</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -1322,10 +1322,10 @@ this case) and the ‘lb’ and ‘kg’ are all converted to ‘lb’ (or ‘kg
 <dd><p>Returns a string representation of <em>self</em> (e.g., ‘35 +/- 1.2% J’).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>significantDigits</strong> – Passed onto the methods <a class="reference internal" href="#pqu.PQU.PQU_float.toString" title="pqu.PQU.PQU_float.toString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.toString()</span></code></a> and <a class="reference internal" href="#pqu.PQU.PQU_uncertainty.toString" title="pqu.PQU.PQU_uncertainty.toString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_uncertainty.toString()</span></code></a></p>
+<dd class="field-odd"><p><strong>significantDigits</strong> – Passed onto the methods <a class="reference internal" href="#pqu.PQU.PQU_float.toString" title="pqu.PQU.PQU_float.toString"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU_float.toString()</span></code></a> and <a class="reference internal" href="#pqu.PQU.PQU_uncertainty.toString" title="pqu.PQU.PQU_uncertainty.toString"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU_uncertainty.toString()</span></code></a></p>
 </dd>
 </dl>
-<p>:param :param : Passed onto the method <a class="reference internal" href="#pqu.PQU.PQU_float.toString" title="pqu.PQU.PQU_float.toString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.toString()</span></code></a>.</p>
+<p>:param :param : Passed onto the method <a class="reference internal" href="#pqu.PQU.PQU_float.toString" title="pqu.PQU.PQU_float.toString"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU_float.toString()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>str</cite></p>
@@ -1337,8 +1337,8 @@ this case) and the ‘lb’ and ‘kg’ are all converted to ‘lb’ (or ‘kg
 <dt class="sig sig-object py" id="pqu.PQU.PQU.truncate">
 <span class="sig-name descname"><span class="pre">truncate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uncertainty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.truncate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pqu.PQU.PQU.truncate" title="Permalink to this definition">¶</a></dt>
 <dd><p>If value is <strong>True</strong>, calls <em>self</em>.value’s truncate method. If uncertainty is <strong>True</strong>, 
-calls <em>self</em>.uncertainty’s truncate method.  See <a class="reference internal" href="#pqu.PQU.PQU_float.truncate" title="pqu.PQU.PQU_float.truncate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.truncate()</span></code></a>
-and <a class="reference internal" href="#pqu.PQU.PQU_uncertainty.truncate" title="pqu.PQU.PQU_uncertainty.truncate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_uncertainty.truncate()</span></code></a></p>
+calls <em>self</em>.uncertainty’s truncate method.  See <a class="reference internal" href="#pqu.PQU.PQU_float.truncate" title="pqu.PQU.PQU_float.truncate"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU_float.truncate()</span></code></a>
+and <a class="reference internal" href="#pqu.PQU.PQU_uncertainty.truncate" title="pqu.PQU.PQU_uncertainty.truncate"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU_uncertainty.truncate()</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1631,7 +1631,7 @@ is expected to be the number associated the the percent value.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prefix</strong> (<em>str</em>) – A prefix for the ‘+/-’ style</p></li>
-<li><p><strong>significantDigits</strong> – Passed onto method <a class="reference internal" href="#pqu.PQU.PQU_float.toString" title="pqu.PQU.PQU_float.toString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PQU_float.toString()</span></code></a></p></li>
+<li><p><strong>significantDigits</strong> – Passed onto method <a class="reference internal" href="#pqu.PQU.PQU_float.toString" title="pqu.PQU.PQU_float.toString"><code class="xref py py-func docutils literal notranslate"><span class="pre">PQU_float.toString()</span></code></a></p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1657,7 +1657,7 @@ become 3.5 which is the value that the method toString would return.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pqu.PQU.</span></span><span class="sig-name descname"><span class="pre">Parsers</span></span><a class="reference internal" href="../_modules/pqu/PQU.html#Parsers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pqu.PQU.Parsers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This is use to parse the allowed <strong>PQU</strong> strings (e.g., ‘1 m’, ‘1.32(3) kg).
-See the table in the <code class="xref py py-meth docutils literal notranslate"><span class="pre">parsePQUString.parsePQUString()</span></code> doc string for allowed <strong>PQU</strong> strings.
+See the table in the <code class="xref py py-func docutils literal notranslate"><span class="pre">parsePQUString.parsePQUString()</span></code> doc string for allowed <strong>PQU</strong> strings.
 This class is mainly for internal use.</p>
 <p class="rubric">Regular Expression Matching</p>
 <dl class="py method">
@@ -2030,6 +2030,13 @@ Offset is 0.0 except with convert some temperature units.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pqu.PQU.PhysicalUnit.simplifyFractions">
+<span class="sig-name descname"><span class="pre">simplifyFractions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.simplifyFractions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.simplifyFractions" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method converts any part of self’s symbols and powers that are a <code class="xref py py-class docutils literal notranslate"><span class="pre">fractions.Fraction</span></code> instance with 
+denominator of 1 into an integer of the numerator.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pqu.PQU.PhysicalUnit.simplifyUnitsFactor">
 <span class="sig-name descname"><span class="pre">simplifyUnitsFactor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.simplifyUnitsFactor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.simplifyUnitsFactor" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method returns a <a class="reference internal" href="#pqu.PQU.PQU" title="pqu.PQU.PQU"><code class="xref py py-class docutils literal notranslate"><span class="pre">PQU</span></code></a> instance that can be used to simplify <em>self</em>’s units.
@@ -2241,11 +2248,7 @@ or PU</p></td>
 <td><p>PU</p></td>
 <td><p>float in
 unitTo</p></td>
-<td><dl class="simple">
-<dt>PQ in unitTo</dt><dd><p><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
-</dd>
-</dl>
-</td>
+<td><p>PQ in unitTo</p></td>
 </tr>
 <tr class="row-odd"><td><p>float</p></td>
 <td><p>string

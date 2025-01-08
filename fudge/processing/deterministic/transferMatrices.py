@@ -5,6 +5,88 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module is for FUDGE internal use.
+This module calculates the multi-group products matrices for various types of districtions. Many of the functions in this
+module interface between various distribution classes and Merced.
+
+This module contains the following functions:
+            
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Function                              | Description                                                                       |
+    +=======================================+===================================================================================+
+    | twoBodyTransferMatrix                 |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | twoBodyTransferMatrix2                |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | wholeAtomScattering                   |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | comptonScattering                     |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | ENDFEMuEpP_TransferMatrix             |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | ENDLEMuEpP_TransferMatrix             |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | ELEpP_TransferMatrix                  |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | EEpMuP_TransferMatrix                 |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Legendre_TransferMatrix               |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | doubleDifferential_EEpMuP             |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | uncorrelated_EMuP_EEpP_TransferMatrix |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | discreteGammaAngularData              |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | primaryGammaAngularData               |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | NBodyPhaseSpace                       |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | KalbachMann_TransferMatrix            |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | executeCommand                        |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | parseOutputFile                       |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | commonDataToString                    |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | GBToString                            |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | fluxToString                          |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | crossSectionToString                  |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | multiplicityToString                  |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | angularToString                       |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | energyFunctionToString                |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | EEpPDataToString                      |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | LEEpPDataToString                     |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | LegendreDataToString                  |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | EMuEpPDataToString                    |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | EEpMuPDataToString                    |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | KalbachMannDataToString               |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | oneDToString                          |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | twoDToString                          |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | threeDToString                        |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | threeDListToString                    |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | addTMs                                |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+"""
+
 import os
 import sys
 import subprocess
@@ -56,9 +138,20 @@ transferMatrixExecute = locateBinFolderModule.locateMerced()
 
 def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularData, Q, weight = None, comment = None ) :
     """
-    Generate input and call processing code to generate a transfer matrix for two-body angular distribution.
-    If the distribution is actually made up of two different forms in different energy regions, this function
-    calls itself in the two regions and sums the result.
+    This function calculates multi-group product matices from a two-body distribution which must be in the center-of-mass frame. 
+    This function allows for the distribution to have different incident energy regions. It calls :py:func:`twoBodyTransferMatrix2` 
+    for each region and sums the resuts.
+
+    :param style:           This is the multi-group style for the multi-group data.
+    :param tempInfo:        This is a dictionary with needed data.
+    :param productFrame:    This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param crossSection:    This is the pointwise linear cross section for the reaction.
+    :param angularData:     This is the angular distribution data for the product.
+    :param Q:               This is the Q-value for the two-body reaction.
+    :param weight:          This is the pointwise linear weight to multiply the kernal of the integral by.
+    :param comment:         This is a comment that is written to the Merced input file.
+
+    :returns:               The number and energy conserving product matices.
     """
 
     if( isinstance( angularData, angularModule.Isotropic2d ) ) : angularData = angularData.toPointwise_withLinearXYs( )
@@ -104,8 +197,19 @@ def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularD
         
 def twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, productFrame, weight = None, comment = None ) :
     """
-    Helper function for twoBodyTransferMatrix. This should be called separately for every interpolation 
-    region within a Regions2d form.
+    This function calculates multi-group product matices from a two-body distribution which must be in the center-of-mass frame. 
+    This function is called by :py:func:`twoBodyTransferMatrix` to handle one region of the distrition. This function is for internal use.
+
+    :param style:           This is the multi-group style for the multi-group data.
+    :param tempInfo:        This is a dictionary with needed data.
+    :param crossSection:    This is the pointwise linear cross section for the reaction.
+    :param angularData:     This is the angular distribution data for the product.
+    :param Q:               This is the Q-value for the two-body reaction.
+    :param productFrame:    This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param weight:          This is the pointwise linear weight to multiply the kernal of the integral by.
+    :param comment:         This is a comment that is written to the Merced input file.
+
+    :returns:               The number and energy conserving product matices.
     """
 
     reactionSuite = tempInfo['reactionSuite']
@@ -174,6 +278,19 @@ def twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, produ
     return TM1, TME
 
 def wholeAtomScattering( style, tempInfo, productFrame, formFactor, realAnomalousFactor = None, imaginaryAnomalousFactor = None, comment = None ) :
+    """
+    This function calculates multi-group product matices for photo-atomic coherent scattering.
+
+    :param style:                       This is the multi-group style for the multi-group data.
+    :param tempInfo:                    This is a dictionary with needed data.
+    :param productFrame:                This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param formFactor:                  This is the coherent scattering form factor.
+    :param realAnomalousFactor:         This is the real part of the anomalous factor.
+    :param imaginaryAnomalousFactor:    This is the imaginary part of the anomalous factor.
+    :param comment:                     This is a comment that is written to the Merced input file.
+
+    :returns:                           The number and energy conserving product matices.
+    """
 
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
@@ -201,6 +318,17 @@ def wholeAtomScattering( style, tempInfo, productFrame, formFactor, realAnomalou
     return( executeCommand( logFile, transferMatrixExecute, s1, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
 def comptonScattering( style, tempInfo, productFrame, scatteringFactor, comment = None ) :
+    """
+    This function calculates multi-group product matices for photo-atomic incoherent scattering.
+
+    :param style:               This is the multi-group style for the multi-group data.
+    :param tempInfo:            This is a dictionary with needed data.
+    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param scatteringFactor:    This is the incoherent scattering function.
+    :param comment:             This is a comment that is written to the Merced input file.
+
+    :returns:                   The number and energy conserving product matices.
+    """
 
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
@@ -221,7 +349,17 @@ def comptonScattering( style, tempInfo, productFrame, scatteringFactor, comment 
     return( executeCommand( logFile, transferMatrixExecute, s1, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
 def ENDFEMuEpP_TransferMatrix( style, tempInfo, productFrame, crossSection, angularEnergyData, multiplicity, comment = None ) :
-    """This is ENDF MF = 6, LAW = 7 type data."""
+    """
+    This function calculates multi-group product matices for ENDF MF = 6, LAW = 7 type data.
+
+    :param style:               This is the multi-group style for the multi-group data.
+    :param tempInfo:            This is a dictionary with needed data.
+    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param scatteringFactor:    This is the incoherent scattering function.
+    :param comment:             This is a comment that is written to the Merced input file.
+
+    :returns:                   The number and energy conserving product matices.
+    """
 
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
@@ -234,7 +372,20 @@ def ENDFEMuEpP_TransferMatrix( style, tempInfo, productFrame, crossSection, angu
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
 def ENDLEMuEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, angularData, EMuEpPData, multiplicity, comment = None ) :
-    """This is LLNL I = 1, 3 type data."""
+    """
+    This function calculates multi-group product matices for ENDL I = 1, 3 type data.
+
+    :param style:               This is the multi-group style for the multi-group data.
+    :param tempInfo:            This is a dictionary with needed data.
+    :param crossSection:        This is the pointwise linear cross section for the reaction.
+    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param angularData:         This is the angular distribution data for the product (i.e., ENDL I = 1 data).
+    :param EMuEpPData:          This is the energy distribution data for the product (i.e., ENDL I = 3 data).
+    :param multiplicity:        This is the product's multiplicity.
+    :param comment:             This is a comment that is written to the Merced input file.
+
+    :returns:                   The number and energy conserving product matices.
+    """
 
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
@@ -249,7 +400,17 @@ def ENDLEMuEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, angu
 
 def ELEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, LEEpPData, multiplicity, comment = None ) :
     """
-    This is for ENDL I = 4 data with l > 0. This form is deprecated.
+    This function calculates multi-group product matices for ENDL I = 4 data with l > 0.
+
+    :param style:               This is the multi-group style for the multi-group data.
+    :param tempInfo:            This is a dictionary with needed data.
+    :param crossSection:        This is the pointwise linear cross section for the reaction.
+    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param LEEpPData:           This is the distribution data for the product (i.e., ENDL I = 4 data).
+    :param multiplicity:        This is the product's multiplicity.
+    :param comment:             This is a comment that is written to the Merced input file.
+
+    :returns:                   The number and energy conserving product matices.
     """
 
     logFile = tempInfo['logFile']
@@ -263,7 +424,20 @@ def ELEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, LEEpPData
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
 def EEpMuP_TransferMatrix( style, tempInfo, productFrame, crossSection, energyAngularData, multiplicity, comment = None ) :
-    """This is ENDF MT=6 LAW=1, LANG=1,11-15 type data."""
+    """
+    This function calculates multi-group product matices for MT = 6 LAW = 1, LANG = 1, 11-15 data.
+
+    :param style:               This is the multi-group style for the multi-group data.
+    :param tempInfo:            This is a dictionary with needed data.
+    :param crossSection:        This is the pointwise linear cross section for the reaction.
+    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param energyAngularData:   This is the distribution data for the product.
+    :param multiplicity:        This is the product's multiplicity.
+    :param comment:             This is a comment that is written to the Merced input file.
+    
+    :returns:                   The number and energy conserving product matices.
+    """
+
 
     if( isinstance( energyAngularData[0][0], energyAngularModule.Legendre ) ) :
         return( Legendre_TransferMatrix( style, tempInfo, productFrame, crossSection, 
@@ -275,6 +449,19 @@ def EEpMuP_TransferMatrix( style, tempInfo, productFrame, crossSection, energyAn
         raise Exception( "Unsupported P(mu) for P(E',mu|E) = %s" % energyAngularData[0][0].moniker )
 
 def Legendre_TransferMatrix( style, tempInfo, productFrame, crossSection, LegendreData, multiplicity, comment = None ) :
+    """
+    This function calculates multi-group product matices for MT = 6 LAW = 1, LANG = 1 data. This function is for internal use.
+
+    :param style:               This is the multi-group style for the multi-group data.
+    :param tempInfo:            This is a dictionary with needed data.
+    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param crossSection:        This is the pointwise linear cross section for the reaction.
+    :param LegendreData:        This is the distribution data for the product.
+    :param multiplicity:        This is the product's multiplicity.
+    :param comment:             This is a comment that is written to the Merced input file.
+    
+    :returns:                   The number and energy conserving product matices.
+    """
 
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
@@ -288,7 +475,20 @@ def Legendre_TransferMatrix( style, tempInfo, productFrame, crossSection, Legend
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
 def doubleDifferential_EEpMuP( style, tempInfo, productFrame, crossSection, EEpMuPData, multiplicity, comment = None ) :
+    """
+    This function calculates multi-group product matices for MT = 6 LAW = 1, LANG = 11-15 data. This function is for internal use. 
+
+    :param style:               This is the multi-group style for the multi-group data.                                         
+    :param tempInfo:            This is a dictionary with needed data.
+    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param crossSection:        This is the pointwise linear cross section for the reaction.
+    :param EEpMuPData:          This is the distribution data for the product.                                                  
+    :param multiplicity:        This is the product's multiplicity.
+    :param comment:             This is a comment that is written to the Merced input file.                                     
     
+    :returns:                   The number and energy conserving product matices.                                               
+    """
+
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
     
@@ -302,6 +502,21 @@ def doubleDifferential_EEpMuP( style, tempInfo, productFrame, crossSection, EEpM
 
 def uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, angularData, energyData, 
         multiplicity, comment = None, weight = None ) :
+    """
+    This function calculates multi-group product matices for uncorrelated energy and angular distributions.
+
+    :param style:               This is the multi-group style for the multi-group data.                                         
+    :param tempInfo:            This is a dictionary with needed data.
+    :param productFrame:        This is the frame the product data are in and must always be center-of-mass for two-body reactions.
+    :param crossSection:        This is the pointwise linear cross section for the reaction.
+    :param angularData:         This is the angular distribution data for the product.                                                  
+    :param energyData:          This is the energy distribution data for the product.                                                  
+    :param multiplicity:        This is the product's multiplicity.
+    :param comment:             This is a comment that is written to the Merced input file.                                     
+    :param weight:              This is the pointwise linear weight to multiply the kernal of the integral by.
+    
+    :returns:                   The number and energy conserving product matices.                                               
+    """
 
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
@@ -359,8 +574,21 @@ def uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, produc
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
 def discreteGammaAngularData(style, tempInfo, gammaEnergy, crossSection, angularData, multiplicity, comment = None):
-    """Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used
-    for pair-production which pass angularData as None."""
+    """
+    This function calculates multi-group product matices for a discrete photon distribution.
+    Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used
+    for pair-production which pass angularData as None.
+
+    :param style:               This is the multi-group style for the multi-group data.                                         
+    :param tempInfo:            This is a dictionary with needed data.
+    :param gammaEnergy:         This is the energy of the discrete photon.
+    :param crossSection:        This is the pointwise linear cross section for the reaction.
+    :param angularData:         This is the angular distribution data for the product.                                                  
+    :param multiplicity:        This is the product's multiplicity.
+    :param comment:             This is a comment that is written to the Merced input file.                                     
+    
+    :returns:                   The number and energy conserving product matices.                                               
+    """
 
     from fudge.processing import miscellaneous as miscellaneousModule
 
@@ -399,19 +627,31 @@ def discreteGammaAngularData(style, tempInfo, gammaEnergy, crossSection, angular
 
 def primaryGammaAngularData( style, tempInfo, crossSection, energyData, angularData, multiplicity = 1, comment = None ) :
     """
+    This function calculates multi-group product matices for a primary photon distribution from a capture reaction.
     Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. massRatio is the
     target mass divide by the sum of the projectile and target masses.
 
     This function perform the integration 
 
-        TM = \int_g dE \int_h dE' S(E) M(E) f(E) P(E -> E') / \int_g dE f(E)
+        :math:`TM = \int_g dE \int_h dE' S(E) M(E) f(E) P(E -> E') / \int_g dE f(E)`
 
-    where \int_g is the integral of E from E_i to E_{i+1}, \int_g is the integral of E' from E'_j to E'_{j+1}, S(E) is the cross section,
-    M(E) is the products multiplicity, f(E) is the flux weighting and P(E -> E') is the probability for a projectile of energy E producing
-    a primary gamma of energy E' for binding energy bindingEnergy. This function assumes that M(E) is a constant. For primary gamma's captured
-    into binding energy bindingEnergy P(E -> E') = deltaFunction( E' - ( bindingEnergy + massRatio E ) ) where massRatio = mt / ( mp + mt ),
-    mp is the projectile's mass and mt is the target's mass. Note, this formula is from the ENDF manual which ignores the recoil of the residual
-    nucleus.
+    where :math:`\int_g` is the integral of :math:`E` from :math:`E_i` to :math:`E_{i+1}`, :math:`\int_g` is the integral of :math:`E'`
+    from :math:`E'_j` to :math:`E'_{j+1}`, :math:`S(E)` is the cross section, :math:`M(E)` is the products multiplicity, 
+    :math:`f(E)` is the flux weighting and :math:`P(E -> E')` is the probability for a projectile of energy :math:`E producing`
+    a primary gamma of energy :math:`E'` for binding energy bindingEnergy. This function assumes that :math:`M(E)` is a constant. 
+    For primary gamma's captured into binding energy bindingEnergy :math:`P(E -> E')` = deltaFunction( E' - ( bindingEnergy + massRatio E ) ) 
+    where massRatio = :math:`mt / ( mp + mt )`, mp is the projectile's mass and mt is the target's mass. Note, this formula is 
+    from the ENDF manual which ignores the recoil of the residual nucleus.
+
+    :param style:               This is the multi-group style for the multi-group data.                                         
+    :param tempInfo:            This is a dictionary with needed data.
+    :param crossSection:        This is the pointwise linear cross section for the reaction.
+    :param energyData:          This is the energy of the discrete photon.
+    :param angularData:         This is the angular distribution data for the product.                                                  
+    :param multiplicity:        This is the product's multiplicity.
+    :param comment:             This is a comment that is written to the Merced input file.                                     
+
+    :returns:                   The number and energy conserving product matices.                                               
     """
 
     reactionSuite = tempInfo['reactionSuite']
@@ -463,6 +703,20 @@ def primaryGammaAngularData( style, tempInfo, crossSection, energyData, angularD
     return( TM_1, TM_E )
 
 def NBodyPhaseSpace( style, tempInfo, crossSection, numberOfProducts, mTotal, Q, multiplicity = 1, comment = None ) :
+    """
+    This function calculates multi-group product matices for an n-body phase space distribution.
+
+    :param style:               This is the multi-group style for the multi-group data.                                         
+    :param tempInfo:            This is a dictionary with needed data.
+    :param crossSection:        This is the pointwise linear cross section for the reaction.
+    :param numberOfProducts:    This is the number of products.
+    :param mTotal:              This is total mass of the particles.
+    :param Q:                   This is the Q-value.
+    :param multiplicity:        This is the product's multiplicity.
+    :param comment:             This is a comment that is written to the Merced input file.                                     
+    
+    :returns:                   The number and energy conserving product matices.                                               
+    """
 
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
@@ -477,6 +731,18 @@ def NBodyPhaseSpace( style, tempInfo, crossSection, numberOfProducts, mTotal, Q,
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
 def KalbachMann_TransferMatrix( style, tempInfo, crossSection, particlesData, KalbachMannData, multiplicity = 1, comment = None ) :
+    """
+    This function calculates multi-group product matices for a Kalbach/Mann distribution.
+
+    :param style:               This is the multi-group style for the multi-group data.                                         
+    :param tempInfo:            This is a dictionary with needed data.
+    :param crossSection:        This is the pointwise linear cross section for the reaction.
+    :param KalbachMannData:     This is the Kalbach/Mann data.
+    :param multiplicity:        This is the product's multiplicity.
+    :param comment:             This is a comment that is written to the Merced input file.                                     
+
+    :returns:                   The number and energy conserving product matices.                                               
+    """
 
     logFile = tempInfo['logFile'], 
     workDir = tempInfo['workDir']
@@ -494,23 +760,37 @@ def KalbachMann_TransferMatrix( style, tempInfo, crossSection, particlesData, Ka
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'], tempInfo['restart'] ) )
 
 def executeCommand( logFile, executable, cmd, workDir, workFile, restart, productOffset = 0 ) :
-    # FIXME remove unused argument logFile?
     """
-    Runs executable (presumably Merced) on a single input, parses resulting output file and returns two transfer matrices:
-     - 1st has constant weight (conserves number of particles)
-     - 2nd is weighted by E' (conserves energy)
+    This function runs *executable* (presumably Merced) on a single input, parses resulting output file and returns two transfer matrices:
 
-    If executable fails, create a '.err' file in the working directory (for easier searching)
+     - the first returned matric has weight 1 (i.e., conserves number of particles)
+     - the second returned matrix has weight E' (i.e., conserves energy)
 
-    @param logFile: currently unused! Remove argument?
-    @param executable: compiled executable to run, generally FUDGE/bin/merced
-    @param cmd: full text of executable input file
-    @param workDir: directory where executable will be run. processProtare creates new workDir for each projectile/target/temperature
-    @param workFile: list of form [reaction identifier, product identifier], e.g. ['r0001','n'] or ['r0045','photon__b']. Used to generate unique file names.
-    @param restart: boolean. If True, check whether executable was previously run for this input and if so skip re-running (useful for resuming jobs that timed out).
+    If executable fails, a file named workFile + '_in.err' is created in the working directory for easier searching.
+
+    :param logFile:         Currently unused! Remove argument?
+    :param executable:      Executable to run which is generally Merced.
+    :param cmd:             String which will be written as the input file for *executable*.
+    :param workDir:         Directory where executable will be run. processProtare.py creates new workDir for each projectile/target/temperature.
+    :param workFile:        List of form [reaction identifier, product identifier] (e.g., ['r0001','n'] or ['r0045','photon__b'])
+                            used to generate unique file name for the input and output files.
+    :param restart:         boolean. If True, check whether executable was previously run for this input and if so skip re-running 
+                            (useful for resuming jobs that timed out).
+    :param productOffset:   The product energy group where the reaction threshold energy resides.
+
+    :returns:               The number and energy conserving product matices.
     """
 
     def checkNegative_l0( TM_EEpL, weight, f ) :
+        """
+        This function counts the number of negative l=0 elements in the product matrix *TM_EEpL*.
+
+        :param TM_EEpL:     The product matrix to check.
+        :param weight:      A string indicating if the weight is 1 or E'. Oops, need to fix the calling string.
+        :param f:           Oops, this needs to be changed to fOut which is a stream where issues are written.
+
+        :returns:           int that is the number of negative l=0 elements found.
+        """
 
         negative_l0Counter, largestNegative = 0, 0.
         for ig in sorted( TM_EEpL.keys( ) ) :
@@ -584,8 +864,26 @@ def executeCommand( logFile, executable, cmd, workDir, workFile, restart, produc
     return( TM1, TME )
 
 def parseOutputFile( file, productOffset, firstLine = None ) :
+    """
+    This function parses the Merced output file that contains the product matrices.
+
+    :param file:            Path to the Merced output file.
+    :param productOffset:   The product energy group where the reaction threshold energy resides.
+    :param firstLine:       This is the first list that should be in output file which is use to verify that the file can be read.
+
+    :returns:               The tuple (number product matrices, energy weighted product matrices, dictionary ).
+    """
 
     def checkKeyValue( lineNumber, keyValue, _key ) :
+        """
+        This function parses a key/value string (e.g., 'EinBin = 87') where the value is a python int.
+
+        :param lineNumber:  The line number where *keyValue* string was read.
+        :param keyValue:    The key/value string.
+        :param _key:        The expect name of the key.
+
+        :returns:           The value which is a python int.
+        """
 
         try :
             key, value = keyValue.split( '=' )
@@ -599,6 +897,16 @@ def parseOutputFile( file, productOffset, firstLine = None ) :
             raise TypeError( 'bad value type %s at line %d' % ( type(value), lineNumber ) )
 
     def parseCrossSection( paras, lineNumber, ls, file ) :
+        """
+        This function skips over a multi-group cross section in the merced output file.
+
+        :param paras:           Dictionary with the number of Legendre orders, the number of projectile groups and the number of product groups.
+        :param lineNumber:      Next line number in *ls* to parse.
+        :param ls:              A python list of lines in the Merced output file.
+        :param file:            Path to the Merced output file.
+
+        :returns:               Next line number to parse in *ls*.
+        """
 
         s1 = ls[lineNumber].split( ':' )                        # This line should start as 'Cross section: n = '
         n1 = int( s1[1].split( '=' )[1] )
@@ -608,6 +916,17 @@ def parseOutputFile( file, productOffset, firstLine = None ) :
         return( lineNumber )
 
     def parseTransferMatrix( paras, lineNumber, ls, file, productOffset ) :
+        """
+        This function parses a product matrix from the output file *file*.
+
+        :param paras:           Dictionary with the number of Legendre orders, the number of projectile groups and the number of product groups.
+        :param lineNumber:      Next line number in *ls* to parse.
+        :param ls:              A python list of lines in the Merced output file.
+        :param file:            Path to the Merced output file.
+        :param productOffset:   The product energy group where the reaction threshold energy resides.
+
+        :returns:               Product matrix and next line number to parse in *ls*.
+        """
 
         s1 = ls[lineNumber].split( ":" )                      # This line should start as 'Integrals, weight = ...'
         EBins = checkKeyValue( lineNumber, s1[1], 'numEinBins' )
@@ -678,6 +997,23 @@ def parseOutputFile( file, productOffset, firstLine = None ) :
 
 def commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = None, energy_in_unit = None, weight = None,
         photonFrame = xDataEnumsModule.Frame.lab, legendreMax = None, modifiedProductGroup = None ) :
+    """
+    This function converts common data needed to calculate any of the distribution product matrices to a list of string and returns the list.
+
+    :param comment:                 This is a comment that is written to the Merced input file.
+    :param style:                   This is the multi-group style for the multi-group data.
+    :param tempInfo:                This is a dictionary with needed data.
+    :param crossSection:            This is the pointwise linear cross section for the reaction.
+    :param productFrame:            This is the frame the product data are in.
+    :param multiplicity:            This is the product's multiplicity.
+    :param energy_in_unit:          The unit that the energy will be converted to before processing.
+    :param weight:                  This is the pointwise linear weight to multiply the kernal of the integral by.
+    :param photonFrame:             This is the frame of the photon data.
+    :param legendreMax:             This is the maximum Legendre order that the product matrices are to be calculated to.
+    :param modifiedProductGroup:    This is a subset of the product groups to handle an issue in Merced.
+
+    :returns:                   A python list of strings representing the common data.
+    """
 
     reactionSuite = tempInfo['reactionSuite']
     projectileName = reactionSuite.projectile
@@ -708,6 +1044,15 @@ def commonDataToString( comment, style, tempInfo, crossSection, productFrame, mu
     return( s )
 
 def GBToString( name, gb, energy_in_unit ) :
+    """
+    This function returns a string representation of the multi-group boundaries that will be writted to the Merced input file.
+
+    :param name:                Either the string 'Projectile' or 'Product'.
+    :param gb:                  The list of multi-group boundaries.
+    :param energy_in_unit:      The unit that the boundaries will be converted to before processing.
+
+    :returns:                   A python list of strings representing the multi-group boundaries.
+    """
 
     boundaries = gb.boundaries
     factor = 1
@@ -718,6 +1063,14 @@ def GBToString( name, gb, energy_in_unit ) :
     return( s )
 
 def fluxToString( flux, energy_in_unit ) :
+    """
+    This function returns a string representation of the flux that will be writted to the Merced input file.
+
+    :param flux:                The flux function.
+    :param energy_in_unit:      The unit that the flux energies will be converted to before processing.
+
+    :returns:                   A python list of strings representing the flux.
+    """
 
     flux0 = flux.getFluxAtLegendreOrder( 0 )
     if( energy_in_unit is not None ) : flux0 = flux0.convertAxisToUnit( 1, energy_in_unit )
@@ -730,11 +1083,29 @@ def fluxToString( flux, energy_in_unit ) :
     return( startOfNewData + '\n'.join( s ) )
 
 def crossSectionToString( style, crossSection, energy_in_unit = None ) :
+    """
+    This function returns a string representation of the cross section that will be writted to the Merced input file.
+
+    :param style:               This is not used.
+    :param crossSection:        The cross section for the reaction.
+    :param energy_in_unit:      The unit that the cross section energies will be converted to before processing.
+
+    :returns:                   A python list of strings representing the cross section.
+    """
 
     if( energy_in_unit is not None ) : crossSection = crossSection.copy( ).convertAxisToUnit( 1, energy_in_unit )
     return( startOfNewData + '\n'.join( twoDToString( "Cross section", crossSection ) ) )
 
 def multiplicityToString( style, _multiplicity, energy_in_unit = None ) :
+    """
+    This function returns a string representation of the cross section that will be writted to the Merced input file.
+
+    :param style:               The style of the multiplicity to process.
+    :param _multiplicity:       The cross section function.
+    :param energy_in_unit:      The unit that the multiplicity energies will be converted to before processing.
+
+    :returns:                   A python list of strings representing the multiplicity.
+    """
 
     form = style.findFormMatchingDerivedStyle( _multiplicity )
     multiplicity = form.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 )
@@ -742,6 +1113,17 @@ def multiplicityToString( style, _multiplicity, energy_in_unit = None ) :
     return( startOfNewData + '\n'.join( twoDToString( "Multiplicity", multiplicity ) ) )
 
 def angularToString( angularData, crossSection, weight = None, twoBody = False, changeInterpolationQualifierWarning = False ) :
+    """
+    This function returns a string representation of the angular data that will be writted to the Merced input file.
+
+    :param angularData:                         The angular data.
+    :param crossSection:                        The cross section for the reaction.
+    :param weight:                              This is the pointwise linear weight to multiply the kernal of the integral by.
+    :param twoBody:                             A boolean indicating if the interaction is two-body.
+    :param changeInterpolationQualifierWarning: A boolean indicating if a warning message should be printed if the angular data's interpolation qualifier is not used.
+
+    :returns:                                   A python list of strings representing the angular distribution.
+    """
 
     weightString = ''
     if( weight is not None ) : weightString = startOfNewData + '\n'.join( twoDToString( "weight", weight, addExtraBlankLine = False ) ) + '\n'
@@ -818,8 +1200,25 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False, 
     return( startOfNewData + weightString + s )
 
 def energyFunctionToString( energyData, weight = None ) :
+    """
+    This function returns a string representation of the energy data for an uncorrelated distribution that will 
+    be writted to the Merced input file.
+
+    :param energyData:          The energy data.
+    :param weight:              This is the pointwise linear weight to multiply the kernal of the integral by.
+
+    :returns:                   A python list of strings representing the energy distribution.
+    """
 
     def getParameter( data, label ) :
+        """
+        This function returns a string representation of the energy parameter data that will be writted to the Merced input file.
+
+        :param data:        The parameter's data.
+        :param label:       The name of the parameter.
+
+        :returns:                   A python list of strings representing the parameter.
+        """
 
         _linlin = data.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
         sData = [ startOfNewData, "%s: n = %d" % ( label, len( _linlin ) ) ]
@@ -873,6 +1272,15 @@ def energyFunctionToString( energyData, weight = None ) :
     return( sProcess, sSpecific, startOfNewData + '\n'.join( sData ) )
 
 def EEpPDataToString( EEpPData, changeInterpolationQualifierWarning = False ) :
+    """
+    This function returns a string representation of the energy data for an uncorrelated distribution that will 
+    be writted to the Merced input file.
+
+    :param energyData:          The energy data.
+    :param changeInterpolationQualifierWarning: A boolean indicating if a warning message should be printed if the angular data's interpolation qualifier is not used.
+
+    :returns:                   A python list of strings representing the energy distribution.
+    """
 
     s  = startOfNewData
     s += "EEpPData: n = %d\n" % len( EEpPData )
@@ -903,6 +1311,14 @@ def EEpPDataToString( EEpPData, changeInterpolationQualifierWarning = False ) :
     return( s )
 
 def LEEpPDataToString( LEEpPData ) :
+    """
+    This function returns a string representation of the ENDL I = 4 data with l > 0 distribution data 
+    that will be writted to the Merced input file.
+
+    :param LEEpPData:           The ENDL I = 4 data.
+
+    :returns:                   A python list of strings representing the distribution.
+    """
 
     s  = startOfNewData
     s += "LEEpPData: n = %d\n" % len( LEEpPData )
@@ -915,6 +1331,15 @@ def LEEpPDataToString( LEEpPData ) :
     return( s )
 
 def LegendreDataToString( LegendreData, changeInterpolationQualifierWarning = False ) :
+    """
+    This function returns a string representation of the MT = 6 LAW = 1, LANG = 1 distribution data 
+    that will be writted to the Merced input file.
+
+    :param LegendreData:                        The distribution data.
+    :param changeInterpolationQualifierWarning: A boolean indicating if a warning message should be printed if the angular data's interpolation qualifier is not used.
+
+    :returns:                   A python list of strings representing the distribution.
+    """
 
     s = [ 'Legendre data by incident energy:  n = %d' % len( LegendreData ) ]
 
@@ -942,6 +1367,14 @@ def LegendreDataToString( LegendreData, changeInterpolationQualifierWarning = Fa
     return( startOfNewData + '\n'.join( s ) )
 
 def EMuEpPDataToString( EMuEpPData ) :
+    """
+    This function returns a string representation of the MF = 6, LAW = 7 distribution data 
+    that will be writted to the Merced input file.
+
+    :param EMuEpPData:          The distribution data.
+
+    :returns:                   A python list of strings representing the distribution.
+    """
 
     s  = startOfNewData
     s += "EMuEpPData: n = %d\n" % len( EMuEpPData )
@@ -965,6 +1398,14 @@ def EMuEpPDataToString( EMuEpPData ) :
     return( s )
 
 def EEpMuPDataToString( EEpMuPData ) :
+    """
+    This function returns a string representation of the MT = 6 LAW = 1, LANG = 11-15 distribution data 
+    that will be writted to the Merced input file.
+
+    :param EMuEpPData:          The distribution data.
+
+    :returns:                   A python list of strings representing the distribution.
+    """
 
     s  = startOfNewData
     s += "EEpMuPData: n = %d\n" % len( EEpMuPData )
@@ -988,6 +1429,15 @@ def EEpMuPDataToString( EEpMuPData ) :
     return( s )
 
 def KalbachMannDataToString( KalbachMannData, energy_in_unit ) :
+    """
+    This function returns a string representation of the Kalbach/Mann distribution data 
+    that will be writted to the Merced input file.
+
+    :param EMuEpPData:          The distribution data.
+    :param energy_in_unit:      The unit that the energies will be converted to before processing.
+
+    :returns:                   A python list of strings representing the distribution.
+    """
 
     nForm = 4
     if( KalbachMannData.aSubform.data is None ) : nForm = 3
@@ -1021,6 +1471,15 @@ def KalbachMannDataToString( KalbachMannData, energy_in_unit ) :
     return( s )
 
 def oneDToString( data, factor = 1 ) :
+    """
+    This function takes a list of floats and returns a list of strings representations of the floats that will be 
+    written to the Merced input file.
+
+    :oaram data:        A list of floats.
+    :oaram factor:      A number to scale each value in *data* by.
+
+    :returns:           A python list of strings representing *data*.
+    """
 
     i = 1
     a = [ "" ]
@@ -1032,6 +1491,17 @@ def oneDToString( data, factor = 1 ) :
     return( " ".join( a ) )
 
 def twoDToString( label, data, addHeader = True, addExtraBlankLine = True ) :
+    """
+    This function takes a list of points (x,y) and returns a list of strings representations of the floats that will be 
+    written to the Merced input file.
+
+    :param label:               A string indicating the type of data.
+    :param data:                The data to convert to strings.
+    :param addHeader:           A boolean indicating if a header is written that contains *label* and the number of data points.
+    :param addExtraBlankLine:   A boolean indicating if an extra blank line is added at the end.
+
+    :returns:           A python list of strings representing *data*.
+    """
 
     if( isinstance( data, XYs1dModule.XYs1d ) ) :
         if( data.interpolation not in [ linlin, flat ] ) :
@@ -1053,6 +1523,15 @@ def twoDToString( label, data, addHeader = True, addExtraBlankLine = True ) :
     return( a )
 
 def threeDToString( data, linearizeXYs = False ) :
+    """
+    This function takes a pointwise 2d function (i.e., f(x,y)) and returns a list of strings representations of the data that will be 
+    written to the Merced input file.
+
+    :param data:                The pointwise 2d data (i.e., f(x,y)).
+    :param linearizeXYs:        A boolean indicating if the data are to be converted to poinwise data and linearized.
+
+    :returns:           A python list of strings representing *data*.
+    """
 
     a = []
     wFmt = " %s : n = %%d" % ( doubleFmt )
@@ -1072,6 +1551,15 @@ def threeDToString( data, linearizeXYs = False ) :
     return( "\n".join( a ) )
 
 def threeDListToString( data, linearizeXYs = False ) :
+    """
+    This function takes a pointwise 2d function (i.e., f(x,y)) and returns a list of strings representations of the data that will be 
+    written to the Merced input file.
+
+    :param data:
+    :param linearizeXYs:        A boolean indicating if the data are to be converted to poinwise data and linearized.
+
+    :returns:               A python list of strings representing *data*.
+    """
 
     a = []
     wFmt = " %s : n = %%d" % ( doubleFmt )
@@ -1086,6 +1574,13 @@ def threeDListToString( data, linearizeXYs = False ) :
     return( "\n".join( a ) )
 
 def addTMs( TMs ) :
+    """
+    Returns the sum of the product matrices in *TMs*.
+
+    :param TMs:             A list of product matrices.
+
+    :returns:               Returns a product matrix that is the sum of the product matrices in *TMs*.
+    """
 
     TM = TMs.pop( 0 )
     for i1 in sorted( TM.keys( ) ) :

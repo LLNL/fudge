@@ -5,7 +5,31 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""Kalbach-Mann double differential distribution classes."""
+"""
+This module contains classes and functions supporting Kalbach-Mann double differential distribution.
+
+    This module contains the following classes:
+
+    +-----------+-----------------------------------------------------------------------+
+    | Class     | Description                                                           |
+    +===========+=======================================================================+
+    | Form      | Class representing the **GNDS** KalbachMann distribution. This        |
+    |           | distribution has 3 child nodes, with names "f", "r" and "a".          |
+    |           | The "a" child node is optional as it can be calculated.               |
+    +-----------+-----------------------------------------------------------------------+
+    | Subform   | Base class for :py:class:`FSubform`, :py:class:`FSubform`,            |
+    |           | and :py:class:`FSubform` classes.                                     |
+    +-----------+-----------------------------------------------------------------------+
+    | FSubform  | This class represents the KalbachMann child node named "r".           |
+    +-----------+-----------------------------------------------------------------------+
+    | RSubform  | This class represents the KalbachMann child node named "r".           |
+    +-----------+-----------------------------------------------------------------------+
+    | ASubform  | This class represents the KalbachMann child node named "r".           |
+    +-----------+-----------------------------------------------------------------------+
+    | XYs2d     | The :py:class:`XYs2d` class used to store the data for each of        |
+    |           | the child nodes.                                                      |
+    +-----------+-----------------------------------------------------------------------+
+"""
 
 import math
 from fudge.core.math import fudgemath as fudgemathModule
@@ -34,7 +58,7 @@ KalbachMann_a_parameters = { IDsPoPsModule.neutron  : { 'M' : 1, 'm' : 0.5, 'I' 
                              IDsPoPsModule.photon   : { 'M' : 0, 'm' : 0.0, 'I' : 0.0 } }
 
 class XYs2d(multiD_XYsModule.XYs2d):
-    '''Special XYs2d class for Kalbach/Mann functions r and a to make sure 'unitbase-unscaled' interpolation qualifier.'''
+    """Special XYs2d class for Kalbach/Mann functions r and a to make sure 'unitbase-unscaled' interpolation qualifier."""
 
     def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none, interpolationQualifier=None, **kwargs):
 
@@ -44,7 +68,19 @@ class XYs2d(multiD_XYsModule.XYs2d):
         return function
 
 class Subform( baseModule.Subform ) :
-    """Abstract base class for Kalback/Mann subforms."""
+    """
+    Abstract base class for Kalback/Mann child nodes "f", "r" and "a".
+
+    The following table list the primary members of this class:
+
+    +-----------+-----------------------------------------------------------+
+    | Member    | Description                                               |
+    +===========+===========================================================+
+    | data      | This member stores the actual data as a 2d function.      |
+    +-----------+-----------------------------------------------------------+
+
+    :param data:    2d function.
+    """
 
     ancestryMembers = ( 'data', )
 
@@ -60,11 +96,18 @@ class Subform( baseModule.Subform ) :
         if( data is not None ) : self.data.setAncestor( self )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         if( self.data is not None ) : self.data.convertUnits( unitMap )
 
     def copy( self ) :
+        """
+        Returns a copy of *self*.
+        """
 
         newData = None
         if self.data is not None: newData = self.data.copy( )
@@ -81,10 +124,21 @@ class Subform( baseModule.Subform ) :
         return 0
 
     def isEmptyASubform( self ) :
+        """
+        Returns True if *self* is an :py:class:`ASubform` instance and if its *data* member is None, and False otherwise.
+        """
 
         return( ( self.moniker == ASubform.moniker ) and ( self.data is None ) )
 
     def toXML_strList( self, indent = "", **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         if( self.isEmptyASubform( ) ) : return( [] )
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
@@ -96,6 +150,15 @@ class Subform( baseModule.Subform ) :
 
     @staticmethod
     def defaultAxes( moniker, energyUnit ) :
+        """
+        Returns an :py:class:`Axes` instance for the type of Kalbach/Mann data specified by the argument *moniker*.
+        In general, this should not be called has each data type has their own **defaultAxes** method.
+
+        :param moniker:     The moniker for the type of Kalbach/Mann data.
+        :param energyUnit:  Unit for the energy data.
+
+        :return:            An :py:class:`Axes` instance.
+        """
 
         axes = axesModule.Axes(3)
         axes[2] = axesModule.Axis( 'energy_in',  2, energyUnit )
@@ -108,38 +171,82 @@ class Subform( baseModule.Subform ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
-        """This is currently not called but should be."""
+        """
+        This is currently not called but should be.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *node*.
+        """
 
         pass
 
 class FSubform( Subform ) :
+    """
+    Class representing the Kalbach/Mann "f" data which represents the output going energy probability distribution P(E'|E).
+    """
 
     moniker = 'f'
 
     @staticmethod
     def defaultAxes( energyUnit ) :
+        """
+        Returns an :py:class:`Axes` instance for the "f" type of Kalbach/Mann data.
+
+        :param energyUnit:  Unit for the energy data.
+
+        :return:            An :py:class:`Axes` instance.
+        """
 
         return( Subform.defaultAxes( FSubform.moniker, energyUnit ) )
 
 class RSubform( Subform ) :
+    """
+    Class representing the Kalbach/Mann "r" data which represents the Kalbach/Mann output going pre-compound fraction r(E,E').
+    """
 
     moniker = 'r'
 
     @staticmethod
     def defaultAxes( energyUnit ) :
+        """
+        Returns an :py:class:`Axes` instance for the "r" type of Kalbach/Mann data.
+
+        :param energyUnit:  Unit for the energy data.
+
+        :return:            An :py:class:`Axes` instance.
+        """
 
         return( Subform.defaultAxes( RSubform.moniker, energyUnit ) )
 
 class ASubform( Subform ) :
+    """
+    Class representing the Kalbach/Mann "a" data which represents the Kalbach/Mann output going angular function a(E,E').
+    """
 
     moniker = 'a'
 
     @staticmethod
     def defaultAxes( energyUnit ) :
+        """
+        Returns an :py:class:`Axes` instance for the "a" type of Kalbach/Mann data.
+
+        :param energyUnit:  Unit for the energy data.
+
+        :return:            An :py:class:`Axes` instance.
+        """
 
         return( Subform.defaultAxes( ASubform.moniker, energyUnit ) )
 
 class Form( baseModule.Form ) :
+    """
+    This class represents the **GNDS** KalbachMann distribution. This distribution has 3 child nodes, with names "f", "r" and "a".
+    The "a" child node is optional as it can be calculated.
+    """
 
     moniker = 'KalbachMann'
     subformAttributes = ( 'fSubform', 'rSubform', 'aSubform' )
@@ -153,13 +260,22 @@ class Form( baseModule.Form ) :
         baseModule.Form.__init__( self, label, productFrame, ( _fSubform, _rSubform, _aSubform ) )
 
     def convertUnits( self, unitMap ) :
-        "See documentation for reactionSuite.convertUnits."
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.fSubform.convertUnits( unitMap )
         self.rSubform.convertUnits( unitMap )
         self.aSubform.convertUnits( unitMap )
 
     def check( self, info ) :
+        """
+        Does a check of *self*'s data.
+
+        :param info:        A dictionary with parameters used for determining if a difference is relevant.
+        """
 
         from fudge import warning
         warnings = []
@@ -188,7 +304,25 @@ class Form( baseModule.Form ) :
         return warnings
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+        """
+        This method calculates the average energy and momentum of the outgoing particle as a function of projectile energy.
+        Average means over all outgoing angle and energy.
 
+        :param style:   The style instance which the calculated data will belong to.
+        :param indent:  If this method does any printing, this is the amount of indentation of the printed line.
+        :param kwargs:  A dictionary that contains data not in *self* that is needed to calculate the average energy and momentum.
+        """
+
+        multiplicity = kwargs['multiplicity']
+        energyAccuracy = kwargs['energyAccuracy']
+        momentumAccuracy = kwargs['momentumAccuracy']
+
+        mass1 = kwargs['projectileMass']
+        mass2 = kwargs['targetMass']
+        massx = kwargs['productMass']
+        EMin = kwargs['EMin']
+        EMax = kwargs['EMax']
+        
         def sqrtE_MuComAverage( f, r, a, tolerance ) :          # This still needs to be tested.?????????
 
             def u_mu_func( energy_out, parameters ) :
@@ -208,6 +342,12 @@ class Form( baseModule.Form ) :
             return( _sqrtE_mu_com )
 
         def calculateAverageProductDataAtEnergy( self, Ein, suppressNoResidualInPoPs = True ) :
+            """
+            Calculates the average energy and momentum at projectile energy *Ein*.
+
+            :param Ein:                         The energy of the projectile.
+            :param suppressNoResidualInPoPs:    If False, a warning is printed about needed masses missing from PoPs.
+            """
 
             multiplicity = self.multiplicity.evaluate( Ein )
             if( multiplicity == 0 ) : return( 0.0, 0.0 )
@@ -219,6 +359,9 @@ class Form( baseModule.Form ) :
             return( multiplicity * ( E_com + Ex_com + E_mu ), multiplicity * math.sqrt( 2. * massx ) * ( math.sqrt( m1x * Ein ) + _sqrtE_mu_com ) )
 
         class CalculateDepositionInfo :
+            """
+            Class that stores data needed by the function :py:func:`calculateAverageProductDataAtEnergy`. For internal use.
+            """
 
             def __init__( self, KalbackMannSelf, multiplicity, massx, m1x ) :
 
@@ -229,6 +372,11 @@ class Form( baseModule.Form ) :
                 self.mode = 0
 
             def evaluateAtX( self, E ) :
+                """
+                Evaluates the outgoing energy and momentum at the projectile energy *E*. For internal use.
+
+                :param E:   Energy of the projectile.
+                """
 
                 Eout, pout = calculateAverageProductDataAtEnergy( self, E )
                 if( self.mode == 0 ) : return( Eout, pout )
@@ -236,6 +384,9 @@ class Form( baseModule.Form ) :
                 return( pout )
 
             def setTolerances( self, relativeTolerance, absoluteTolerance ) :
+                """
+                Sets the relative and absolute tolerance members. For internal use.
+                """
 
                 self.relativeTolerance = relativeTolerance
                 self.absoluteTolerance = absoluteTolerance
@@ -281,11 +432,29 @@ class Form( baseModule.Form ) :
         return( [ aveEnergy ], [ aveMomentum ] )
 
     def calculate_a( self, energy_in, energy_out_cmMin, energy_out_cmMax, accuracy = 1e-6, **kwargs ) :
+        """
+        Returns the calculated value of a(E,E') at E = *energy_in* per the formula.
+
+        :param energy_in:           Energy of the projectile.
+        :param energy_out_cmMin:    The minimum outgoing particle energy in the center of mass.
+        :param energy_out_cmMax:    The maximum outgoing particle energy in the center of mass.
+        :param accuracy:            The accuracy that the XYs1d instance of a(E,E') is calculated to.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An XYs1d instance of a(E,E') at E = *energy_in*.
+        """
 
         suppressNoResidualInPoPs = kwargs.get('suppressNoResidualInPoPs')
         reactionSuite = self.rootAncestor
 
         def getParticleData( particleID ) :
+            """
+            This function returns needed information about particle *particleID*.
+
+            :param particleID:      A GNDS PoPs id.
+
+            :return:                particleID, Z, N, A and mass.
+            """
 
             particle = reactionSuite.PoPs[particleID]
             if particleID in reactionSuite.PoPs.aliases:
@@ -349,12 +518,22 @@ class Form( baseModule.Form ) :
         if( ea < R3 ) : R3 = ea
 
         def calculate_a2( energy_out_cm ) :
+            """
+            Returns the calculated value of a(E,E') at E = *energy_in* and E' = *energy_out_cm* per the formula.
+
+            :param energy_out_cm:       The outgoing particle energy in the center of mass.
+
+            :return:                    The value of a(E,E').
+            """
 
             eb = energy_out_cm * ( AWRb + AWRB ) / AWRB + Sb
             X1, X3 = R1 * eb / ea, R3 * eb / ea
             return( X1 * ( C1 + C2 * X1 * X1 ) + C3 * Ma * mb * X3**4 )
 
         class Thicken_a :
+            """
+            The class needed by the function thickenXYList to store data and evaluate a(E,E').
+            """
 
             def __init__( self, calculate_a2, relativeTolerance, absoluteTolerance ) :
 
@@ -363,6 +542,13 @@ class Form( baseModule.Form ) :
                 self.absoluteTolerance = absoluteTolerance
 
             def evaluateAtX( self, x ) :
+                """
+                Calls calculate_a2 and returns the calculated value of a(E,E') at E = *energy_in* and E' = *x* per the formula.
+
+                :param energy_out_cm:       The outgoing particle energy in the center of mass.
+
+                :return:                    The value of a(E,E').
+                """
 
                 return( self.calculate_a2( x ) )
 
@@ -384,28 +570,47 @@ class Form( baseModule.Form ) :
         return( XYs1dModule.XYs1d( data = a, axes = axes, outerDomainValue = energy_in * energyFactor ) )
 
     def copy( self ) :
+        """
+        Returns a copy of *self*.
+        """
 
         return( Form( self.label, self.productFrame, self.fSubform.copy( ), self.rSubform.copy( ), self.aSubform.copy( ) ) )
 
     __copy__ = copy
 
     def domainUnitConversionFactor( self, unitTo ) :
+        """
+        Returns the conversion factor of *self*'s projectile energy to unit *unitTo*.
+
+        :param unitTo:      The unit to calculate the conversion factor for.
+
+        :return:            The conversion factor.
+        """
 
         if( unitTo is None ) : return( 1. )
         return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
 
     @property
     def domainMin(self):
+        """
+        Returns the minimum projectile energy given in the f(E'|E) data.
+        """
 
         return self.fSubform.data.domainMin
 
     @property
     def domainMax(self):
+        """
+        Returns the maximum projectile energy given in the f(E'|E) data.
+        """
 
         return self.fSubform.data.domainMax
 
     @property
     def domainUnit(self):
+        """
+        Returns the unit of the projectile given in the f(E'|E) data.
+        """
 
         return self.fSubform.data.axes[-1].unit
 
@@ -413,12 +618,27 @@ class Form( baseModule.Form ) :
         """
         Calculates the angular probabilty at mu given the Kalbach/Mann parameters r and a. Note, the caller is required to 
         have evaluated r(E,E') and a(E,E') at the required incident energy E and outgoing energy E' befure calling this function.
+
+        :param mu:      The value of mu.
+        :param _r:      The Kalbach/Mann parameters r.
+        :param _a:      The Kalbach/Mann parameters a.
+
+        :return:        Angular probabilty at *mu*.
         """
 
         amu = _a * mu
         return( 0.5 * _a * ( math.cosh( amu ) + _r * math.sinh( amu ) ) / math.sinh( _a ) )
 
     def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
+        """
+        Calculates the outgoing particle's energy spectrum at projectile energy *energyIn* for frame *frame*,
+
+        :param energy_in:           Energy of the projectile.
+        :param frame:               The frame to calculate the energy spectrum in.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    XYs1d instance for the energy spectrum.
+        """
 
         muMin = kwargs.get('muMin', -1.0)
         muMax = kwargs.get('muMax',  1.0)
@@ -450,6 +670,12 @@ class Form( baseModule.Form ) :
     def fixDomains(self, energyMin, energyMax, domainToFix):
         """
         Calls the **fixDomains** for the **fSubform**, **rSubform** and **aSubform** members.
+
+        :param energyMin:       The minimum projectile energy the data should be limited to.
+        :param energyMax:       The maximum projectile energy the data should be limited to.
+        :param domainToFix:     Specifies whether the minimum, maximum and both energy points are to be fixed.
+
+        :return:                The number of energy limits moved.
         """
 
         numberOfFixes  = self.fSubform.fixDomains(energyMin, energyMax, domainToFix)
@@ -459,6 +685,14 @@ class Form( baseModule.Form ) :
         return numberOfFixes
 
     def spectrum( self, frame, **kwargs ) :
+        """
+        Returns an XYs3d instance representing *self*'s P(E',mu|E) in the requested frame.
+
+        :param frame:               The frame the spectrum is returned in.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    A XYs3d instance.
+        """
 
         if frame != xDataEnumsModule.Frame.lab:
             return( self.toPointwise_withLinearXYs( **kwargs ) )
@@ -471,22 +705,57 @@ class Form( baseModule.Form ) :
         return( xys3d )
 
     def spectrumAtEnergy( self, energyIn, frame, **kwargs ) :
+        """
+        Returns an XYs2d instance representing *self*'s P(E',mu|E=energyIn) in the requested frame.
+
+        :param energyIn:            Energy of the projectile.
+        :param frame:               The frame the spectrum is returned in.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    A XYs2d instance.
+        """
 
         class EnergyAngualarAtEnergyCOM :
+            """
+            The class needed by the function energyAngularSpectrumFromCOMSpectrumToLabAtEnergy to store data and evaluate the
+            angular distribution in the center-of-mass.
+            """
 
             def __init__( self, KalbachMannSelf, rAtEnergy, aAtEnergy ) :
+                """
+                :KalbachMannSelf:       The Kalbach/Mann instance.
+                :param rAtEnergy:       r(E,E') at the specified projectile energy,
+                :param aAtEnergy:       a(E,E') at the specified projectile energy,
+                """
 
                 self.KalbachMannSelf = KalbachMannSelf
                 self.rAtEnergy = rAtEnergy
                 self.aAtEnergy = aAtEnergy
 
             def probabilityCOM( self, energyPrimeCOM, muCOM ) :
+                """
+                Calculates the probability for the outgoing particle to go out at energy *energyPrimeCOM* and angle *muCOM*.
+
+                :param energyPrimeCOM:      Energy of the outgoing particle in the center-of-mass..
+                :param muCOM:               Mu of the outgoing particle in the center-of-mass.
+                """
 
                 _r = rAtEnergy.evaluate( energyPrimeCOM )
                 _a = aAtEnergy.evaluate( energyPrimeCOM )
                 return( self.KalbachMannSelf.muProbability( muCOM, _r, _a ) )
 
         def fOfMu( projectileIsPhoton, EnergyOut, probability, rAtEnergy, aAtEnergy ) :
+            """
+            Returns an XYs1d representation of f(mu) at outgoing energy *EnergyOut*.
+
+            :param projectileIsPhoton:      True if the outgoing particle is a photon and False otherwise.
+            :param EnergyOut:               Energy of the outgoing particle.
+            :param probability:             f(E=energyIn, E').
+            :param rAtEnergy:               r(E=energyIn, E').
+            :param aAtEnergy:               a(E=energyIn, E').
+
+            :return:                        An XYs1d representation of f(mu).
+            """
 
             _r = rAtEnergy.evaluate( EnergyOut )
             _a = aAtEnergy.evaluate( EnergyOut )
@@ -518,8 +787,12 @@ class Form( baseModule.Form ) :
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
         """
-        Returns a pointwise represent of self in the center of mass frame. The returned data is as a XYs2d instance.
+        Returns a pointwise represent of self in the center of mass frame. The returned data is as a XYs3d instance.
         This method will be deprecated, use spectrum method instead.
+
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:                    An :py:class:`energyAngularModule.XYs3d` instance.
         """
 
         def fOfMu( accuracy, projectileIsPhoton, Ep, f, r, a ) :
@@ -560,6 +833,14 @@ class Form( baseModule.Form ) :
         return( xys3d )
 
     def getFRAatEnergy_asLinearPointwise( self, E, **kwargs ) :
+        """
+        Returns f(E,E'), r(E,E') and a(E,E') at E = *E*.
+
+        :param E:                   The energy of the projectile.
+        :param kwargs:              A dictionary that contains data to control the way this method acts.
+
+        :return:        XYs1d instances of f(E,E'), r(E,E') and a(E,E') at E = *E*.
+        """
 
         epsilon, fra_accuracy = 1e-8, 1e-6
         _f = self.fSubform.data.evaluate( E )
@@ -584,6 +865,16 @@ class Form( baseModule.Form ) :
         return( f, r, a )
 
     def processMC_cdf( self, style, tempInfo, indent, **kwargs ) :
+        """
+        Returns an instance of self with (xs, pdf, cdf) data for f, r and a as needed for Monte Carlo transport.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+        :param kwargs:          A dictionary that contains data to control the way this method acts.
+
+        :return:                An instance of self.
+        """
 
         oldData = self.fSubform.data
         subform = energyModule.XYs2d( axes = oldData.axes, interpolation = oldData.interpolation,
@@ -608,6 +899,15 @@ class Form( baseModule.Form ) :
         return( _form )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
+        """
+        Returns a multi-group representation of *self*.
+
+        :param style:           The style for the returned data.
+        :param tempInfo:        Dictionary of data needed to calculate the data.
+        :param indent:          The indentation for any verbosity.
+
+        :return:                A multi-group representation of *self*.
+        """
 
         from fudge.processing import group as groupModule
         from fudge.processing.deterministic import transferMatrices as transferMatricesModule
@@ -660,7 +960,17 @@ class Form( baseModule.Form ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
-        """Translate <KalbachMann> element from xml."""
+        """
+        Parse *element* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
         childArrays = {}
@@ -686,6 +996,17 @@ class Form( baseModule.Form ) :
 
     @staticmethod
     def calculate_S_ab_MeV( Z_AB, N_AB, Z_C, N_C, I_ab ) :
+        """
+        Calculates the S_a or S_b fucntion.
+
+        :param Z_AB:        The Z_A or Z_B value.
+        :param N_AB:        The N_A or N_B value.
+        :param Z_C:         The Z_C value.
+        :param N_C:         The N_C value.
+        :param I_ab:        The I_a or I_b value.
+
+        :return:            S_a or S_b.
+        """
 
         A_AB, A_C = float( Z_AB + N_AB ), float( Z_C + N_C )
         invA_AB_third = 1.0 / math.pow( A_AB, 1.0 / 3.0 )

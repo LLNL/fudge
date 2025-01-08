@@ -415,7 +415,7 @@ bool Lgdata::Legendre_data_range::to_unit_base( )
   {
     char Str[1024];
 
-    sprintf( Str, "bad energy range: (Eout_min = %.17e, Eout_max = %.17e: diff = %e)",  Eout_min, Eout_max, scale );
+    snprintf( Str, sizeof( Str ), "bad energy range: (Eout_min = %.17e, Eout_max = %.17e: diff = %e)",  Eout_min, Eout_max, scale );
     Msg::DebugInfo( "Lgdata::Legendre_data_range::to_unit_base", Str );
     return false;
   }

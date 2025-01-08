@@ -17,7 +17,7 @@ from fudge import GNDS_formatVersion as GNDS_formatVersionModule
 from fudge import GNDS_file as GNDS_fileModule
 from fudge import reactionSuite as reactionSuiteModule
 
-summaryDocStringFUDGE = '''Converts a GNDS file to a GNDS, allowing the new file to have different parameters (e.g., format, energyUnit).'''
+summaryDocString__FUDGE = '''Converts a GNDS file to a GNDS, allowing the new file to have different parameters (e.g., format, energyUnit).'''
 
 description = """Read a GNDS file into Fudge, then write back to the GNDS/xml format.  Intent is to test 
 for errors during reading or writing.  Sample usage: python3 gnds2gnds.py n-001_H_001.xml.

@@ -6,6 +6,8 @@
 # <<END-copyright>>
 
 import functools
+
+import PoPs.warning
 from fudge import styles as stylesModule
 from LUPY import enums as enumsModule
 
@@ -87,11 +89,12 @@ class Context:
         'include' takes precedence over 'exclude', 'threshold' can be used with either 'include' or 'exclude'
         """
 
-        if threshold is None and include is None and exclude is None: return self
         newWarningList = []
         screened = {}
+        if threshold is None and include is None and exclude is None:
+            return self, screened
         for warning in self.warningList:
-            if isinstance(warning, Context):
+            if isinstance(warning, (Context, PoPs.warning.Context)):
                 newContext, newScreened = warning.filter(threshold, include, exclude)
                 if newContext: newWarningList.append(newContext)
                 for key in newScreened:
@@ -341,7 +344,19 @@ class WrongExternalFileChecksum(Warning):
         return s
 
 
+class EvaluationDomainMinTooHigh(Warning):
+
+    def __init__(self, expected, obj):
+        Warning.__init__(self, Level.Severe, obj)
+        self.expected = expected
+
+    def __str__(self):
+        s = f"Evaluation starts at incident energy {self.obj.domainMin} {self.obj.domainUnit}, expected {self.expected}"
+        return s
+
+
 # resonance region:
+
 
 class BadScatteringRadius(Warning):
 
@@ -499,13 +514,14 @@ class RRmultipleRegions(Warning):
 
 class URRdomainMismatch(Warning):
 
-    def __init__(self, Lval, Jval, obj=None):
+    def __init__(self, Lval, Jval, name, obj=None):
         Warning.__init__(self, Level.Fatal, obj)
         self.Lval = Lval
         self.Jval = Jval
+        self.name = name
 
     def __str__(self):
-        return "Unresolved L=%i / J=%.1f widths don't span URR energy limits" % (self.Lval, self.Jval)
+        return "Unresolved L=%i / J=%.1f %s doesn't span URR energy limits" % (self.Lval, self.Jval, self.name)
 
     def __eq__(self, other):
         return self.Lval == other.Lval and self.Jval == other.Jval
@@ -920,8 +936,12 @@ class FlatIncidentEnergyInterpolation(Warning):
 
 
 class MissingInterpolationQualifier(Warning):
-    def __init__(self, obj=None):
-        Warning.__init__(self, Level.Moderate, obj)
+    def __init__(self, transportable=True, obj=None):
+        if transportable:
+            level = Level.Moderate
+        else:
+            level = Level.Pedantic
+        Warning.__init__(self, level, obj)
 
     def __str__(self):
         return "Missing interpolationQualifier for outgoing energy spectrum (should be 'unitBase', 'correspondingPoints', etc.)"

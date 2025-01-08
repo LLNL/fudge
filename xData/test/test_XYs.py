@@ -101,7 +101,7 @@ class Test_XYs(xData.unittest.TestCaseWithIsClose):
         self.assertIsClose(a, 0.666657, absTol=5e-7)
 
     def test_one_over_E(self):
-        """
+        r"""
         Mathematica says the answer is \int_0.5^20e6 dE/E = 17.5044
         :return:
         """

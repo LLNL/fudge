@@ -5,23 +5,49 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+"""
+This module containes all the classes for handling GNDS axes and its child nodes.
+
+This module contains the following classes:
+
+    +---------------+-------------------------------------------------------------------------------------------+
+    | Class         | Description                                                                               |
+    +===============+===================+=======================================================================+
+    | Vector        | This class is used to represent multi-group data and to perform some math operations on   |
+    |               | the data.                                                                                 |
+    +---------------+-------------------------------------------------------------------------------------------+
+"""
+
 import numpy
 
 class Vector:
-    """Class to store a mathematical vector that perform several vector operations."""
+    """
+    This class is used to represent multi-group data and to perform some math operations on the data. In essence,
+    multi-group data are a set of numbers. All of the multi-group data can be added, subtracted, multiplied or divided 
+    by a number (i.e., a scalar). In addition, two instances of :py:class:`Vector` can be added or subtracted.
+    In this latter case, both instances must be the same length or at least one must have a length of 0.
+    When both instances have the same length, each datum in one instance is added (substracted) to the 
+    datum in the other instance at the same index. When one instances has length of 0, it is treated as
+    having the same length as the other instance but with all its data being 0.0's.
+
+    The following table list the primary members of this class:
+
+    +-----------+---------------------------------------------------------------+
+    | Member    | Description                                                   |
+    +===========+===============================================================+
+    | vector    | The list of floats.                                           |
+    +-----------+---------------------------------------------------------------+
+    """
 
     def __init__(self, size=0, values=None):
         """
-        Initialize an instance of Vector.
-
         The input arguments are optional and the default behaviour is an instance of Vector with self.vector = numpy.array([]).
         If only the size argument is provided, self.vector is a 1-D numpy array with length corresponding to this size
         argument. If only the values argument is given, self.vector is a 1-D numpy.array with these values as entries. If
         both the size and values arguments are given, the latter is expected to be a number.
 
-        The optional input arguments are as follows:
-        :size: The size of the  vector (default = 0).
-        :values: The values of the vector (default = None).
+        :size:      The size of the  vector (default = 0).
+        :values:    The values of the vector (default = None).
         """
 
         if size == 0 and values is None:
@@ -49,10 +75,11 @@ class Vector:
     
     def __add__(self, otherVectorOrScalar):
         """
-        Add scalar or Vector given in the input argument to self.
+        This method adds *otherVectorOrScalar* to *self*.
 
-        :otherVectorOrScalar: Vector or scalar to add.
-        :returns: A new instance of Vector.
+        :otherVectorOrScalar:   :py:class:`Vector` instance or a scalar.
+
+        :returns:               A new instance of :py:class:`Vector`.
         """
 
         if len(self) == 0:
@@ -71,7 +98,11 @@ class Vector:
 
     def __iadd__(self, otherVectorOrScalar):
         """
-        In-place addition.
+        In-place addition. See :py:func:`__add__`.
+
+        :otherVectorOrScalar:   :py:class:`Vector` or scalar.
+
+        :returns:               This method returns *self*.
         """
 
         self = self.__add__(otherVectorOrScalar)
@@ -82,26 +113,33 @@ class Vector:
 
     def __sub__(self, otherVectorOrScalar):
         """
-        Subtract the vector or scalar given in the input argument from self.vector.
+        This method subtracts *otherVectorOrScalar* from *self*.
 
-        :otherVectorOrScalar: Vector or scalar to subract.
-        :returns: A new instance of Vector.
+        :otherVectorOrScalar:   :py:class:`Vector` or scalar.
+
+        :returns:               A new instance of :py:class:`Vector`.
         """
+
         return self.__add__(-otherVectorOrScalar)
 
     def __rsub__(self, otherVectorOrScalar):
         """
-        Subtract input argument from self.vector.
+        This method subtracts *self* from *otherVectorOrScalar*.
+
+        :otherVectorOrScalar:   :py:class:`Vector` or scalar.
+
+        :returns:               A new instance of :py:class:`Vector`.
         """
 
         return -self.__sub__(otherVectorOrScalar)
 
     def __mul__(self, scalarValue):
         """
-        Multiply self.vector by a scalar.
+        This method multiply *self* by scalar.
 
-        :scalarValue: Multiplication scalar.
-        :returns: A new instance of Vector.
+        :scalarValue:           Multiplication scalar.
+
+        :returns:               A new instance of :py:class:`Vector`.
         """
         checkScalarValidity(scalarValue, 'multiplication')
 
@@ -111,9 +149,11 @@ class Vector:
 
     def __imul__(self, scalarValue):
         """
-        In-place multiplication
+        In-place multiplication. See :py:func:`__mul__'.
 
-        :scalarValue: Multiplication scalar.
+        :scalarValue:           Multiplication scalar.
+        
+        :returns:               This method returns *self*.
         """
         self = self.__mul__(scalarValue)
 
@@ -121,39 +161,48 @@ class Vector:
 
     def __neg__(self):
         """
-        Negation of self.vector.
+        Thie method returns new instance of :py:class:`Vector` whose values of the negation of *self*'s values.
 
-        :returns: A new instance of Vector.
+        :returns:               A new instance of :py:class:`Vector`.
         """
 
         return Vector(values=-self.vector)
 
     def __truediv__(self, scalarValue):
         """
-        True division of self.vector by the input scalar argument.
+        True division of *self* by *scalarValue*.
 
-        :scalarValue: Division scalar.
-        :returns: A new instance of Vector.
+        :scalarValue:           Division scalar.
+
+        :returns:               A new instance of :py:class:`Vector`.
         """
+
         checkScalarValidity(scalarValue, 'division')
         with numpy.errstate(divide='raise'):
             return Vector(values=self.vector/scalarValue)
 
     def __itruediv__(self, scalarValue):
         """
-        In-place true division.
+        In-place true division. See :py:func:`__truediv__`.
+
+        :scalarValue:           Division scalar.
+
+        :returns:               This method returns *self*.
         """
+
         self = self.__truediv__(scalarValue)
 
         return self
 
     def __getitem__(self, index):
         """
-        Return value of self.vector at location specified by the input scalar argument.
+        This method return the value of *self* at index *index*.
 
-        :index: Index of the self.vector value to return.
-        :returns: A numpy.float64 value.
+        :index:         Index of the value to return.
+
+        :returns:       A numpy.float64 value.
         """
+
         return self.vector[index]
 
     def __setitem__(self, index, newScalarValue):
@@ -170,56 +219,72 @@ class Vector:
 
     def __len__(self):
         """
-        Returns the length of self.vector.
+        This method returns the number of values in *self*.
+
+        :returns:       A python int.
         """
 
         return len(self.vector)
 
     def __str__(self):
         """
-        Return a string representation of self.vector.
+        This method returns a string representation of *self*'s values.
+
+        :returns:       A python str.
         """
+
         return str(self.vector)
 
     @property
     def sum(self):
         """
-        Return the sum of self.vector.
+        This method returns the sum of the *self*'s values.
+
+        :returns:       A python float.
         """
+
         return self.vector.sum()
 
     @property
     def isSorted(self):
         """
-        Return a boolean indicating whether self.vector is sorted.
+        This methoe returns True if the values of *self* are sorted and False otherwise.
+
+        :returns:       A python boolean.
         """
+
         return all(numpy.sort(self.vector) == self.vector)
     
     @property
     def size(self):
         """
-        Return the length of self.vector.
+        This method returns number of values in *self*.
+
+        :returns:       A python int.
         """
+
         return self.vector.size
 
     def reverse(self):
         """
-        Return self.vector in reversed order.
+        This method reverses the ordering of the value in *self*.
         """
 
         def copy(self):
             """
-            Return a copy of self.
+            Return a copy of self. Why is this here?
             """
+
             return Vector(values=self.vector)
+
         self.vector = self.vector[::-1]
 
 def checkScalarValidity(scalarValue, operation):
     """
-    Check validity of a scalar argument.
+    This function check if *scalarValue* is a valid number.
 
-    :scalarValue: The scalar value to test.
-    :operation: A string with the name of the operation/method in which the string argument is used.
+    :scalarValue:       The scalar to test.
+    :operation:         A string with the name of the calling function used in the Exception string.
     """
 
     if not isinstance(scalarValue, (int, float)):

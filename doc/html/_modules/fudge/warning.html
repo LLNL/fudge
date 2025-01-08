@@ -45,6 +45,8 @@
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
 <span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">import</span> <span class="nn">PoPs.warning</span>
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">styles</span> <span class="k">as</span> <span class="n">stylesModule</span>
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
 
@@ -126,11 +128,12 @@
 <span class="sd">        &#39;include&#39; takes precedence over &#39;exclude&#39;, &#39;threshold&#39; can be used with either &#39;include&#39; or &#39;exclude&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">include</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span>
         <span class="n">newWarningList</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">screened</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">include</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">,</span> <span class="n">screened</span>
         <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warningList</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">warning</span><span class="p">,</span> <span class="n">Context</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">warning</span><span class="p">,</span> <span class="p">(</span><span class="n">Context</span><span class="p">,</span> <span class="n">PoPs</span><span class="o">.</span><span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">)):</span>
                 <span class="n">newContext</span><span class="p">,</span> <span class="n">newScreened</span> <span class="o">=</span> <span class="n">warning</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">newContext</span><span class="p">:</span> <span class="n">newWarningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newContext</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">newScreened</span><span class="p">:</span>
@@ -380,7 +383,19 @@
         <span class="k">return</span> <span class="n">s</span></div>
 
 
+<div class="viewcode-block" id="EvaluationDomainMinTooHigh"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.EvaluationDomainMinTooHigh">[docs]</a><span class="k">class</span> <span class="nc">EvaluationDomainMinTooHigh</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expected</span> <span class="o">=</span> <span class="n">expected</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Evaluation starts at incident energy </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">domainMin</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">domainUnit</span><span class="si">}</span><span class="s2">, expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">expected</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+
 <span class="c1"># resonance region:</span>
+
 
 <div class="viewcode-block" id="BadScatteringRadius"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadScatteringRadius">[docs]</a><span class="k">class</span> <span class="nc">BadScatteringRadius</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
@@ -538,13 +553,14 @@
 
 <div class="viewcode-block" id="URRdomainMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.URRdomainMismatch">[docs]</a><span class="k">class</span> <span class="nc">URRdomainMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lval</span><span class="p">,</span> <span class="n">Jval</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lval</span><span class="p">,</span> <span class="n">Jval</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Fatal</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lval</span> <span class="o">=</span> <span class="n">Lval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span> <span class="o">=</span> <span class="n">Jval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Unresolved L=</span><span class="si">%i</span><span class="s2"> / J=</span><span class="si">%.1f</span><span class="s2"> widths don&#39;t span URR energy limits&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;Unresolved L=</span><span class="si">%i</span><span class="s2"> / J=</span><span class="si">%.1f</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> doesn&#39;t span URR energy limits&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lval</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">Lval</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">Jval</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">Jval</span></div>
@@ -959,8 +975,12 @@
 
 
 <div class="viewcode-block" id="MissingInterpolationQualifier"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MissingInterpolationQualifier">[docs]</a><span class="k">class</span> <span class="nc">MissingInterpolationQualifier</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transportable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">transportable</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Pedantic</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Missing interpolationQualifier for outgoing energy spectrum (should be &#39;unitBase&#39;, &#39;correspondingPoints&#39;, etc.)&quot;</span></div>

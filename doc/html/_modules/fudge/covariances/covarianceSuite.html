@@ -50,6 +50,7 @@
 
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">GNDS_formatVersion</span> <span class="k">as</span> <span class="n">GNDS_formatVersionModule</span>
@@ -125,7 +126,7 @@
             <span class="n">interaction</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interaction</span><span class="o">.</span><span class="n">TNSL</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span> <span class="o">=</span> <span class="n">interaction</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__sourcePath</span> <span class="o">=</span> <span class="n">sourcePath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcePath</span> <span class="o">=</span> <span class="n">sourcePath</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__externalFiles</span> <span class="o">=</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">ExternalFiles</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__externalFiles</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
@@ -146,6 +147,22 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the sourcePath member which is the path to the covarianceSuite file for self if self is from a file.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sourcePath</span> <span class="p">)</span>
+
+    <span class="nd">@sourcePath</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">sourcePath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets *self*&#39;s *sourcePath* to *path*.</span>
+
+<span class="sd">        :param path:        The new *sourcePath*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Path must be a str or None, got &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sourcePath</span> <span class="o">=</span> <span class="n">path</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">styles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -44,7 +44,19 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
-<span class="sd">&quot;&quot;&quot;Base classes for distributions.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains abstract base classes for distribution forms and sub-forms.</span>
+
+<span class="sd">This module contains the following classes:</span>
+<span class="sd">        </span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Class         | Description                                                           |</span>
+<span class="sd">    +===============+=======================================================================+ </span>
+<span class="sd">    | Form          | Abstract base class for all forms.                                    |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------+</span>
+<span class="sd">    | Subform       | Abstract base class for all sub-forms.                                |</span>
+<span class="sd">    +---------------+-----------------------------------------------------------------------+</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
 <span class="kn">from</span> <span class="nn">xData</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">xDataEnumsModule</span>
@@ -54,6 +66,25 @@
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">abstractClasses</span> <span class="k">as</span> <span class="n">abstractClassesModule</span>
 
 <div class="viewcode-block" id="Form"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form">[docs]</a><span class="k">class</span> <span class="nc">Form</span><span class="p">(</span> <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Form</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract base class for all forms.</span>
+
+<span class="sd">    The following table list the primary members of this class:</span>
+
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | Member        | Description                                                   |</span>
+<span class="sd">    +===============+===============================================================+</span>
+<span class="sd">    | label         | Unique label for the form within the distribution instance.   |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | productFrame  | The frame the product data are in.                            |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+<span class="sd">    | subForms      | The list of sub-forms for the form.                           |</span>
+<span class="sd">    +---------------+---------------------------------------------------------------+</span>
+
+<span class="sd">    :param label:               The label for this form.</span>
+<span class="sd">    :param productFrame:        The frame the product data are specified in.</span>
+<span class="sd">    :param subForms:            The list of sub-forms for the form. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
@@ -72,11 +103,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the label for *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
 
     <span class="nd">@label</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the label of *self* to *value*.</span>
+
+<span class="sd">        :param value:   The value of the new label for *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
             <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;value must be a string&#39;</span> <span class="p">)</span>
@@ -84,6 +123,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">product</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the :py:class:`productModule.Product` instance that *self* is in.</span>
+
+<span class="sd">        :return:    A :py:class:`productModule.Product` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">product</span> <span class="k">as</span> <span class="n">productModule</span>
 
@@ -91,17 +135,26 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">productFrame</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the frame the product data are specified in.&quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__productFrame</span> <span class="p">)</span>
 
     <span class="nd">@productFrame</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">productFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the distribution&#39;s product frame.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the frame the product data are specified in.</span>
+
+<span class="sd">        :param frame:       The frame for the product.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__productFrame</span> <span class="o">=</span> <span class="n">xDataEnumsModule</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">checkEnumOrString</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Form.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts all data in *self* per *unitMap*.</span>
+
+<span class="sd">        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;subforms&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
             <span class="k">for</span> <span class="n">subform_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subforms</span> <span class="p">:</span>
@@ -110,7 +163,13 @@
 
 <div class="viewcode-block" id="Form.findEntity"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.findEntity">[docs]</a>    <span class="k">def</span> <span class="nf">findEntity</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Find specific subform within the form. Overrides ancestry.findEntity.</span>
+<span class="sd">        Overrides :py:meth:`ancestryModule.Ancestry.findEntity`.</span>
+
+<span class="sd">        :param entityName:  Name is the desired entry in *self*.</span>
+<span class="sd">        :param attribute:   Name of an attribute in *self*.</span>
+<span class="sd">        :param value:       Value of the named attribute.</span>
+
+<span class="sd">        :return:            The entry matching *entityName* or *attribute*/*value*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">subform_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subforms</span> <span class="p">:</span>
@@ -118,14 +177,37 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">Ancestry</span><span class="o">.</span><span class="n">findEntity</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.isTwoBody"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.isTwoBody">[docs]</a>    <span class="k">def</span> <span class="nf">isTwoBody</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns True if the form represents a two-body interaction and False otherwise.</span>
+
+<span class="sd">        :return:    Boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.isSpecified"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.isSpecified">[docs]</a>    <span class="k">def</span> <span class="nf">isSpecified</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns *True*. However, this method is overwritten in the :py:class:`Unspecified` class and that</span>
+<span class="sd">        method returns False.  That is, for all distribution classes except the :py:class:`Unspecified`, the </span>
+<span class="sd">        **isSpecified** method return True.</span>
+
+<span class="sd">        :return:                Boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.residualMass"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.residualMass">[docs]</a>    <span class="k">def</span> <span class="nf">residualMass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">PoPs</span><span class="p">,</span> <span class="n">residualZA</span><span class="p">,</span> <span class="n">massUnit</span><span class="p">,</span> <span class="n">compoundMass</span><span class="p">,</span> <span class="n">product</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the mass of the residual from the specified data. If the residual is not in the</span>
+<span class="sd">        is not in *PoPs*, the residual mass is estimated.</span>
+
+<span class="sd">        :param PoPs:            A GNDS PoPs instance.</span>
+<span class="sd">        :param residualZA:      The ZA of the residual.</span>
+<span class="sd">        :param massUnit:        The unit of the mass value returned.</span>
+<span class="sd">        :param compoundMass:    The mass of the compound.</span>
+<span class="sd">        :param product:         The :py:class:`productModule.Product` other than *self* is desired.</span>
+<span class="sd">        :param verbose:         If greater than 0, a warning message if residual is not in *PoPs*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">residual</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">residualSymbol</span> <span class="o">=</span> <span class="n">chemicalElementMiscPoPsModule</span><span class="o">.</span><span class="n">symbolFromZ</span><span class="p">[</span><span class="n">residualZA</span><span class="o">//</span><span class="mi">1000</span><span class="p">]</span>
@@ -143,10 +225,25 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">_residualMass</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a pointwise represent of *self*.</span>
+
+<span class="sd">        :param kwargs:              A dictionary that contains data to control the way this method acts.</span>
+
+<span class="sd">        :return:                    ?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">subforms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Form.toXML_strList"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Form.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
+
+<span class="sd">        :param indent:          The amount of indentation for each line. Child nodes and text may be indented more.</span>
+<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+
+<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
 
@@ -163,6 +260,9 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Subform"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Subform">[docs]</a><span class="k">class</span> <span class="nc">Subform</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract base class for all distribution sub-forms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -170,6 +270,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Subform.XMLStartTagString"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.base.Subform.XMLStartTagString">[docs]</a>    <span class="k">def</span> <span class="nf">XMLStartTagString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">extraAttributesAsStrings</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">emptyTag</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the XML start tag of *self*.</span>
+
+<span class="sd">        :return:        Python str instance for the XML start tag of *self*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">emptyTagStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">emptyTag</span> <span class="p">)</span> <span class="p">:</span> <span class="n">emptyTagStr</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>

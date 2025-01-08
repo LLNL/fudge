@@ -30,7 +30,7 @@ def getCoulombWavefunctions(rho, eta, L):
 SQRTTWOPI = math.sqrt(2.0*math.pi)
 
 def coulombNormalizationFactor(L, eta):
-    """
+    r"""
     Coulomb wavefunction normalization factor (see DLMF Eq. 33.2.5 or Abramowitz & Stegun Eq. 14.1.7),
     :math:`C_\\ell(\\eta)={2^\\ell e^{2\pi\\eta}|\Gamma(\\ell+1+i\\eta)|}/{(2\\ell+1)!}`
 
@@ -72,7 +72,7 @@ def coulombNormalizationFactor(L, eta):
     return cnorm
 
 def coulombPenetrationFactor(L, rho, eta):
-    """
+    r"""
     Compute the Coulomb penetrability, :math:`P_\\ell`,
     :math:`P_\\ell(\\rho,\\eta)={\\rho}/{(A_\\ell(\\rho,\\eta))^2}`
     where :math:`(A_\\ell(\\rho,\\eta))^2=(G_\\ell(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2`
@@ -117,7 +117,7 @@ def coulombPenetrationFactor(L, rho, eta):
     return pen
 
 def coulombPhi(L, rho, eta):
-    """
+    r"""
     Compute the Coulomb phase, :math:`\\varphi_\\ell`, :math:`\\varphi_\\ell(\\rho,\\eta)=\\arg(G_\\ell(\\rho,\\eta)+iF_\\ell(\\rho,\\eta))`
 
     Because we're working with numpy arrays of :math:`\\eta` (for parallelization ala' Caleb's tricks), the logic
@@ -177,7 +177,7 @@ def coulombPhi(L, rho, eta):
     return phi
 
 def coulombShiftFactor(L, rho, eta):
-    """
+    r"""
     Compute the Coulomb shift, :math:`S_\ell`, :math:`S_\\ell(\\rho,\\eta)=({\\rho}/{A_\\ell(\\rho,\\eta)})({\partial A_\\ell(\\rho,\\eta)}/{\partial\\rho})`
     where :math:`(A_\\ell(\\rho,\\eta))^2=(G_\\ell(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2`
 

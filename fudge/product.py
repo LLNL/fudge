@@ -93,15 +93,6 @@ class Product( ancestryModule.AncestryIO ) :
         self.__distribution = distributionModule.Component( )
         self.__distribution.setAncestor( self )
 
-    def __cmp__( self, other ) :
-        """Compares self to other."""
-
-        if( self.pid < other.pid ) : return( -1 )
-        if( self.pid > other.pid ) : return(  1 )
-        if( self.__outputChannel < other.outputChannel ) : return( -1 )
-        if( self.__outputChannel > other.outputChannel ) : return(  1 )
-        return( 0 )
-
     def  __str__( self ) :
         """Converts product object to a string representation."""
 
@@ -275,11 +266,24 @@ class Product( ancestryModule.AncestryIO ) :
 
         return self.multiplicity.isSpecified() and self.distribution.isSpecified()
 
-    def listOfProducts(self):
-        """Returns, as a set, the list of PoP's ids for all products (i.e., outgoing particles) for *self*."""
+    def listOfProducts(self, finalOnly=False, includeQualifier=True):
+        '''
+        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.
 
-        products = set([self.__pid])
-        if self.__outputChannel is not None: products.update(self.__outputChannel.listOfProducts())
+        :param finalOnly:           If `True`, only final product ids are returned, otherwise, all are returned..
+        :param includeQualifier:    If `True`, particle qualifiers are include in ids, otherwise, they are stripped from ids.
+
+        :return:                    A python set instance.
+        '''
+
+        products = set()
+        if not (finalOnly and self.__outputChannel is not None):
+            pid = self.__pid
+            if not includeQualifier:
+                pid = miscPoPsModule.idWithQualifierRemoved(pid)
+            products.add(pid)
+        if self.__outputChannel is not None:
+            products.update(self.__outputChannel.listOfProducts(finalOnly=finalOnly, includeQualifier=includeQualifier))
 
         return products
 
@@ -502,13 +506,13 @@ class Product( ancestryModule.AncestryIO ) :
 
         return averageMomentum
 
-    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particles, productID, legendreOrder):
+    def multiGroupProductMatrix(self, multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder):
         """
         Returns the multi-group, product matrix for the requested label for the requested product index for the requested Legendre order.
 
         :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles: The list of particles to be transported.
+        :param particleIDs: The list of particles to be transported.
         :param productID: Particle id for the requested product.
         :param legendreOrder: Requested Legendre order.
         """
@@ -520,17 +524,17 @@ class Product( ancestryModule.AncestryIO ) :
                 productMatrix = matrixModule.Matrix()
 
         else:
-            productMatrix = self.outputChannel.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particles, productID, legendreOrder)
+            productMatrix = self.outputChannel.multiGroupProductMatrix(multiGroupSettings, temperatureInfo, particleIDs, productID, legendreOrder)
 
         return productMatrix
 
-    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particles, productID):
+    def multiGroupProductArray(self, multiGroupSettings, temperatureInfo, particleIDs, productID):
         """
         Returns the full multi-group, total product array for the requested label for the requested product id.
 
         :param multiGroupSettings: MG instance to instruct deterministic methods on what data are being requested.
         :param temperatureInfo: TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.
-        :param particles: The list of particles to be transported.
+        :param particleIDs: The list of particles to be transported.
         :param productID: Particle id for the requested product.
         """
 
@@ -542,33 +546,33 @@ class Product( ancestryModule.AncestryIO ) :
                 if form is not None:
                     productArray = productArrayModule.ProductArray(form.multiGroupSubform.array.constructArray())
         else:
-            productArray = self.outputChannel.multiGroupProductArray(multiGroupSettings, temperatureInfo, particles, productID)
+            productArray = self.outputChannel.multiGroupProductArray(multiGroupSettings, temperatureInfo, particleIDs, productID)
 
         return productArray
 
-    def check( self, info ):
+    def check(self, info):
         """ check product multiplicity, distribution and breakup products (if applicable) """
         from fudge import warning
         warnings = []
 
-        multWarnings = self.multiplicity.check( info )
+        multWarnings = self.multiplicity.check(info)
         if multWarnings:
-            warnings.append( warning.Context("Multiplicity:", multWarnings) )
+            warnings.append(warning.Context("Multiplicity:", multWarnings))
 
-        if( ( self.label in info['transportables'] ) and ( not self.distribution.hasData( ) ) ) :
-            warnings.append( warning.MissingDistribution( self.label, self ) )
+        if self.label in info['transportables'] and not self.distribution.hasData():
+            warnings.append(warning.MissingDistribution(self.label, self))
 
-        distributionWarnings = self.distribution.check( info )
+        distributionWarnings = self.distribution.check(info)
         if distributionWarnings:
-            warnings.append( warning.Context("Distribution:", distributionWarnings) )
+            warnings.append(warning.Context("Distribution:", distributionWarnings))
 
         if self.__outputChannel is not None:
             parentIsTwoBody = info['isTwoBody']
             info['isTwoBody'] = self.__outputChannel.genre == enumsModule.Genre.twoBody
             for decayProduct in self.__outputChannel:
-                decayWarnings = decayProduct.check( info )
+                decayWarnings = decayProduct.check(info)
                 if decayWarnings:
-                    warnings.append( warning.Context("Decay product: %s" % decayProduct.label, decayWarnings) )
+                    warnings.append(warning.Context("Decay product: %s" % decayProduct.label, decayWarnings))
             info['isTwoBody'] = parentIsTwoBody # reset to parent channel
 
         return warnings
@@ -585,8 +589,7 @@ class Product( ancestryModule.AncestryIO ) :
 
         pid = self.pid
         pops = self.findAttributeInAncestry('PoPs')
-        particle = pops[pid]
-        if isinstance(particle, PoPsParticleModule.Alias): pid = pops[particle.pid].id
+        pid = pops.final(pid).id                # Some legacy files have meta-stable as a product instead of a particle (e.g., Sc46_m1 instead of Sc46_e2).
 
         if pid not in _reactionProducts: _reactionProducts[pid] = reactionProductsModule.ReactionProduct(category, 0)
         _reactionProducts[pid].multiplicity += multiplicity

@@ -12,9 +12,44 @@ from . import values as valuesModule
 from . import base as baseModule
 from . import XYs1d as XYs1dModule
 
+"""
+This module containes all the classes for handling a GNDS xs_pdf_cdf1d data container and its children.
+
+This module contains the following classes:
+
+    +-------------------+---------------------------------------------------------------------------------------+
+    | Class             | Description                                                                           |
+    +===================+=======================================================================================+
+    | Data              | This is the base class for the classes :py:class:`Xs`, :py:class:`Pdf` and            |
+    |                   | :py:class:`Cdf`.                                                                      |
+    +-------------------+---------------------------------------------------------------------------------------+
+    | Xs                | This class stores the domain values of the pdf.                                       |
+    +-------------------+---------------------------------------------------------------------------------------+
+    | Pdf               | This class stores the probability density function (pdf) values.                      |
+    +-------------------+---------------------------------------------------------------------------------------+
+    | Cdf               | This class stores the cumulative distribution function (cdf) values of the pdf.       |
+    +-------------------+---------------------------------------------------------------------------------------+
+    | Xs_pdf_cdf1d      | This class represents a GNDS xs_pdf_cdf1d data container.                             |
+    +-------------------+---------------------------------------------------------------------------------------+
+"""
+
 class Data(ancestryModule.AncestryIO):
+    """
+    This is the base class for the classes :py:class:`Xs`, :py:class:`Pdf` and :py:class:`Cdf`.
+
+    The following table list the primary members of this class:
+
+    +-----------+-------------------------------------------------------------------+
+    | Member    | Description                                                       |
+    +===========+===================================================================+
+    | values    | This is the list of values (i.e., data) for the derived class.    |
+    +-----------+-------------------------------------------------------------------+
+    """
 
     def __init__( self, values ) :
+        """
+        :param values:      This is the list of values (i.e., data) for the derived class.
+        """
 
         if( not( isinstance( values, valuesModule.Values ) ) ) : raise TypeError( 'Not a values type' )
         ancestryModule.AncestryIO.__init__(self)
@@ -22,18 +57,42 @@ class Data(ancestryModule.AncestryIO):
         self.values = values
 
     def __len__( self ) :
+        """
+        This method returns the number of values of the domain which is the same as for the pdf and cdf.
+
+        :returns:       A python int.
+        """
 
         return( len( self.values ) )
 
     def copy( self ) :
+        """
+        This method returns a copy of *self*.
+
+        :returns:       An instance of self.
+        """
 
         return( self.__class__( self.values ) )
 
     def offsetScaleData( self, offset, scale ) :
+        """
+        This method modifies every value in *self* by multiply it by *scale* and adding *offset*.
+
+        :param offset:      The offset to apply to each value.
+        :param scale:       The multiplicative scale factor to apply to each value.
+        """
 
         self.values.offsetScaleValues( offset, scale )
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         XMLStringList = '%s<%s>' % ( indent, self.moniker )
         XMLStringList += ''.join(self.values.toXML_strList('', **kwargs))
@@ -43,6 +102,17 @@ class Data(ancestryModule.AncestryIO):
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
+        """
 
         xPath.append(node.tag)
 
@@ -53,24 +123,70 @@ class Data(ancestryModule.AncestryIO):
         return data1
 
 class Xs( Data ) :
+    """
+    This class stores the domain values of the pdf. 
+    """
 
     moniker = 'xs'
 
 class Pdf( Data ) :
+    """
+    This class stores the probability density function (pdf) values.
+    """
 
     moniker = 'pdf'
 
 class Cdf( Data ) :
+    """
+    This class stores the cumulative distribution function (cdf) value of the pdf. 
+    """
 
     moniker = 'cdf'
 
 class Xs_pdf_cdf1d( baseModule.XDataFunctional ) :
+    """
+    This class represents a GNDS xs_pdf_cdf1d data container.
+
+    The following table list the primary members of this class:
+
+    +-------------------+-----------------------------------------------------------------------+
+    | Member            | Description                                                           |
+    +===========+===============================================================================+
+    | xs                | This is the domain values of the pdf.                                 |
+    +-------------------+-----------------------------------------------------------------------+
+    | pdf               | This is the probability density function (pdf) values.                |
+    +-------------------+-----------------------------------------------------------------------+
+    | cdf               | This is the cumulative distribution function (cdf) values of the pdf. |
+    +-------------------+-----------------------------------------------------------------------+
+    | interpolation     | This is the interpolation for the xs and pdf.                         |
+    +-------------------+-----------------------------------------------------------------------+
+    | axes              | This is the axes member.                                              |
+    +-------------------+-----------------------------------------------------------------------+
+    | outerDomainValue  | This is the domain value for the next higher dimension for            |
+    |                   | a function that is embedded in a high dimensional functions.          |
+    +-------------------+-----------------------------------------------------------------------+
+    | index             | This is the index member use by some xData classes.                   |
+    +-------------------+-----------------------------------------------------------------------+
+    | label             | This is the label member use by some xData classes.                   |
+    +-------------------+-----------------------------------------------------------------------+
+
+    """
 
     moniker = 'xs_pdf_cdf1d'
     dimension = 1
     ancestryMembers = ( 'xs', 'pdf', 'cdf' )
 
     def __init__(self, _xs, _pdf, _cdf, axes=None, label=None, index=None, outerDomainValue=None, interpolation=enumsModule.Interpolation.linlin):
+        """
+        :param xs:                  This is the domain values of the pdf.
+        :param pdf:                 This is the probability density function (pdf) values.
+        :param cdf:                 This is the cumulative distribution function (cdf) values of the pdf.
+        :param interpolation:       This is the interpolation for the xs and pdf.
+        :param axes:                This is the axes member. 
+        :param outerDomainValue:    This is the domain value for the next higher dimension for a function that is embedded in a high dimensional functions.
+        :param index:               This is the index member use by some xData classes.
+        :param label:               This is the label member use by some xData classes.
+        """
 
         baseModule.XDataFunctional.__init__(self, axes=axes, label=label, index=index, outerDomainValue=outerDomainValue)
 
@@ -92,26 +208,44 @@ class Xs_pdf_cdf1d( baseModule.XDataFunctional ) :
             raise ValueError('lenghts not the same: %s %s %s' % ( len(_xs), len(_pdf), len(_cdf) ))
 
     def __len__( self ) :
+        """
+        This method returns the number of values of the domain which is the same as for the pdf and cdf.
+
+        :returns:       A python int.
+        """
 
         return( len( self.__xs ) )
 
     @property
     def xs( self ) :
+        """
+        This method returns a reference to *self* xs child.
+        """
 
         return( self.__xs )
 
     @property
     def pdf( self ) :
+        """
+        This method returns a reference to *self* pdf child.
+        """
 
         return( self.__pdf )
 
     @property
     def cdf( self ) :
+        """
+        This method returns a reference to *self* cdf child.
+        """
 
         return( self.__cdf )
 
     def convertUnits( self, unitMap ) :
-        """See documentation for reactionSuite.convertUnits."""
+        """
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         axes = self.axes
         if( axes is None ) : axes = self.ancestor.axes.copy( )      # BRB FIXME, the prior line should have worked.
@@ -121,20 +255,35 @@ class Xs_pdf_cdf1d( baseModule.XDataFunctional ) :
         self.fixValuePerUnitChange( factors )
 
     def copy( self ) :
+        """
+        This method returns a copy of *self*.
+
+        :returns:       An instance of self.
+        """
 
         return( self.__class__( self.xs.copy( ), self.pdf.copy( ), self.cdf.copy( ), 
                 outerDomainValue = self.outerDomainValue, axes = self.axes, interpolation = self.interpolation ) )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        This method returns an :py:class:`XYs1dModule.XYs1d` representation of *self*'s pdf.
+
+        :param kwargs:      Not used but present to be compatible with other similar methods.
+
+        :returns:           An instance of :py:class:`XYs1dModule.XYs1d`.
+        """
 
         _pdf, _cdf = self.to_pdf_and_cdf( )
         return( _pdf.toPointwise_withLinearXYs( **kwargs ) )
 
     def to_pdf_and_cdf( self ) :
         """
-        Returns two XYs1d instances. One for the pdf and one for the cdf. The interpolation is the same as self's interpolation.
-        Ergo, the interpolation for the cdf is not correct as, in general, the correct cdf interpolation is not defined in GNDS.
-        The units for the cdf will be correct but not the label.
+        This method returns two :py:class:`XYs1dModule.XYs1d` representation of *self*. One representing the pdf and one 
+        representing the cdf.  The interpolation is the same as self's interpolation.  Ergo, the interpolation for the cdf 
+        is not correct as, in general, the correct cdf interpolation is not defined in GNDS. The units for the cdf will be 
+        correct but not the label.
+
+        :returns:           Tow instances of :py:class:`XYs1dModule.XYs1d`.
         """
 
         _pdf = []
@@ -156,6 +305,14 @@ class Xs_pdf_cdf1d( baseModule.XDataFunctional ) :
         return( _pdf, _cdf )
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         xs_pdf_cdf1d_singleLine = kwargs.get('xs_pdf_cdf1d_singleLine', True)
         incrementalIndent = kwargs.get('incrementalIndent', '  ')
@@ -179,13 +336,26 @@ class Xs_pdf_cdf1d( baseModule.XDataFunctional ) :
         return XML_strList
 
     def toLinearXYsClass( self ) :
+        """
+        This method always returns the class :py:class:`XYs1dModule.XYs1d`.
+
+        :returns:       The class :py:class:`XYs1dModule.XYs1d`.
+        """
 
         return( XYs1dModule.XYs1d )
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
-        Parses *node* into class *cls*.
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
         """
 
         attributes, extraAttributes = baseModule.XDataFunctional.parseBareNodeCommonAttributes(node, xPath, allowInterapolation=True) # parseBareNodeCommonAttributes adds to xPath.
@@ -217,13 +387,13 @@ class Xs_pdf_cdf1d( baseModule.XDataFunctional ) :
     @classmethod
     def fromXYs(cls, xys, outerDomainValue=None, thinEpsilon=None):
         '''
-        Creates an **Xs_pdf_cdf1d** instance for an **XYs1d** instance. If *thinEpsilon* is not None, then points are
-        thinned so that the returned cdf has cdf[i+1] - cdf[i] > *thinEpsilon*.
+        This method creates an :py:class:`Xs_pdf_cdf1d` instance for an :py:class:`XYs1dModule.XYs1d` instance. 
+        If *thinEpsilon* is not None, then points are thinned so that the returned cdf has cdf[i+1] - cdf[i] > *thinEpsilon*.
 
-        :param cls:                 The **Xs_pdf_cdf1d** class create.
-        :param xys:                 The **XYs1d** to convert to an **Xs_pdf_cdf1d**.
-        :param outerDomainValue:    The value of the *outerDomainValue* for the returned **XYs1d** instance. If None, taken from *xys*.
-        :param thinEpsilon:         Set the thinning parameter.
+        :param cls:                 The :py:class:`Xs_pdf_cdf1d` class of the returned instance.
+        :param xys:                 The :py:class:`XYs1dModule.XYs1d` to convert to an `Xs_pdf_cdf1d` instance.
+        :param outerDomainValue:    The value of the *outerDomainValue* for the returned instance. If None, taken from *xys*.
+        :param thinEpsilon:         The thinning parameter.
         '''
 
         if xys.interpolation not in [enumsModule.Interpolation.linlin, enumsModule.Interpolation.flat]:

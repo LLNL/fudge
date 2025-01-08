@@ -213,36 +213,36 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ):
         :return: sigma(E,mu,Eprime)
         """
 
-        beta = ( eprime - energy ) / kT
+        beta = (eprime - energy) / kT
         alpha = (eprime + energy - 2.0 * mu * math.sqrt(energy * eprime)) / (principalAWR * kT)
         SCT = False
 
         alpha_lookup = alpha
         beta_lookup = beta
-        if not self.asymmetric: beta_lookup = abs( beta_lookup )                 # S(-beta) = S(beta)
+        if not self.asymmetric: beta_lookup = abs(beta_lookup)                 # S(-beta) = S(beta)
         if self.calculatedAtThermal:
             beta_lookup *= temperatureFactor
             alpha_lookup *= temperatureFactor
 
-        try :
-            Sab_term = getS_alpha_beta( alpha_lookup, beta_lookup ) * math.exp( -0.5 * beta )
-        except NeedShortCollisionTime :
+        try:
+            Sab_term = getS_alpha_beta(alpha_lookup, beta_lookup) * math.exp(-0.5 * beta)
+        except NeedShortCollisionTime:
             SCT = True
-            Sab_term = primaryScatterer.shortCollisionTime( alpha, beta, temperature )
+            Sab_term = primaryScatterer.shortCollisionTime(alpha, beta, temperature)
 
-        result = prefactor * math.sqrt( eprime / energy ) * Sab_term
+        result = prefactor * math.sqrt(eprime / energy) * Sab_term
 
         for atom in secondaryAtoms:
-            atom_Sab_term = Sab_term
             if isinstance(atom.selfScatteringKernel.kernel, incoherentInelasticModule.SCTApproximation):
                 # this atom only contributes when SCT is used
                 if not SCT:
                     atom_Sab_term = 0
                 else:
-                    atom_Sab_term = atom.shortCollisionTime( alpha, beta, temperature )
-            result += atom.numberPerMolecule * atom.boundAtomCrossSection.getValueAs('b') / ( 2.0 * kT ) * math.sqrt( eprime / energy ) * atom_Sab_term
+                    atom_Sab_term = atom.shortCollisionTime(alpha, beta, temperature)
+                result += atom.numberPerMolecule * atom.boundAtomCrossSection.getValueAs('b') / (
+                        2.0 * kT) * math.sqrt(eprime / energy) * atom_Sab_term
 
-        return( result )
+        return result
 
     def generate_eprime_grid(energy, significant_digits=None):
         """

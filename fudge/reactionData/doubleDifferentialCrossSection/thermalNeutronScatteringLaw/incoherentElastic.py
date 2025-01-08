@@ -29,6 +29,14 @@ class BoundAtomCrossSection(physicalQuantityModule.PhysicalQuantity):
     moniker = 'boundAtomCrossSection'
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
         moniker = self.moniker
@@ -60,12 +68,22 @@ class DebyeWallerIntegral( ancestryModule.AncestryIO ) :
 
     def convertUnits( self, unitMap ) :
         """
-        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         self.__function1d.convertUnits( unitMap )
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
         moniker = self.moniker
@@ -82,6 +100,17 @@ class DebyeWallerIntegral( ancestryModule.AncestryIO ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param node:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *node*.
+        """
 
         xPath.append( node.tag )
 
@@ -105,6 +134,9 @@ class Form( baseModule.Form ) :
 
     @property
     def domainUnit( self ) :
+        """
+        This method rReturns the energy unit of the projectile.
+        """
 
         invUnit = 1 / PQUModule.PQU( 1, self.DebyeWallerIntegral.function1d.axes[0].unit )
         return( str( invUnit.unit ) )
@@ -126,6 +158,17 @@ class Form( baseModule.Form ) :
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
+        """
+        Parse *node* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param node:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *node*.
+        """
 
         xPath.append(node.tag)
 

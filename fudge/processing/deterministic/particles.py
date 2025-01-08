@@ -5,10 +5,31 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
+
+"""
+This module contains the following classes:
+
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Class                                 | Description                                                                       |
+    +=======================================+===================================================================================+
+    | Particle                              |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Particles                             |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Flux                                  |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | Fluxes                                |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+    | ProcessedFlux                         |                                                                                   |
+    +---------------------------------------+-----------------------------------------------------------------------------------+
+"""
+
+
 import re
 import numpy
 
 from fudge import styles as stylesModule
+from fudge import enums as fudgeEnumsModule
 
 from fudge.processing import flux as fluxModule
 from fudge.processing import transporting as transportingModule
@@ -37,6 +58,8 @@ class Particle(ancestryModule.AncestryIO):
         """
         Constructor for Particle class.
         """
+
+        self.conserve = None  # conserve flag is set by Particles.process()
 
         if isinstance(particleInstanceOrJustID, Particle):
             self.__particleID = particleInstanceOrJustID.particleID
@@ -158,7 +181,7 @@ class Particle(ancestryModule.AncestryIO):
 
     def nearestProcessedFluxToTemperature(self, temperature):
         """
-        Returns the multi-group flux with its temperature closes to teh input argument.
+        Returns the multi-group flux with its temperature closes to the input argument.
 
         :param temperature: The temperature of the desired flux.
         """
@@ -217,7 +240,6 @@ class Particle(ancestryModule.AncestryIO):
 
                 self.fineMultiGroup = transportingModule.MultiGroup('', fineGroupBoundariesVector)
 
-
 class Particles(suitesModule.Suite):
     """ This holds a dictionary of particles, whose keys are the particles' names (i.e., PoPs ID). """
 
@@ -257,7 +279,7 @@ class Particles(suitesModule.Suite):
         if not isinstance(reactionSuite, reactionSuiteModule.ReactionSuite):
             raise TypeError(f'First argument is not of type {reactionSuiteModule.ReactionSuite}.')
 
-        assert styleLabel in reactionSuite.styles, f'Second argument {styleLabel} is not a style label in the reactionSuite provided as the fiirst argument'
+        assert styleLabel in reactionSuite.styles, f'Second argument {styleLabel} is not a style label in the reactionSuite provided as the first argument'
 
         style = reactionSuite.styles[styleLabel]
         if isinstance(style, stylesModule.SnElasticUpScatter):
@@ -266,6 +288,7 @@ class Particles(suitesModule.Suite):
         assert isinstance(style, stylesModule.HeatedMultiGroup), f'The style label {styleLabel} does not yield a heatedMultiGroup style.'
 
         for particle in self:
+            particle.conserve = style.transportables[particle.particleID].conserve
             groupBoundaries = style.transportables[particle.particleID].group.boundaries
             particle.process(groupBoundaries)
     
@@ -396,22 +419,55 @@ def CollapseMatrix(preCollapsedMatrix, multiGroupSettings, particles, temperatur
         product = particles[productID]
         productCollapsedIndices = product.collapseIndices
         productCollapsedIndices[0] = 0
-        productCollapsedIndices[-1] = preCollapsedMatrix.numberOfRows
+        productCollapsedIndices[-1] = preCollapsedMatrix.numberOfColumns
 
-        unitWeight = [1] * preCollapsedMatrix.numberOfRows
+        # weight by 1 to conserve number, or weight by mean E' to conserve energy:
+        conserveEnergy = particles[productID].conserve is fudgeEnumsModule.Conserve.energyOut
+        if conserveEnergy:
+            gbs = particles[productID].fineMultiGroup.boundaries
+            unitWeight = [0.5 * (gbs[idx] + gbs[idx+1]) for idx in range(len(gbs)-1)]
+        else:
+            unitWeight = [1] * preCollapsedMatrix.numberOfRows
+
         productCollapsed = matrixModule.Matrix()
         for rowIndex in range(preCollapsedMatrix.numberOfRows):
             productCollapsedRow = collapseRow(preCollapsedMatrix[rowIndex, :], productCollapsedIndices, unitWeight, returnNormalized=False)
             productCollapsed.append(productCollapsedRow)
 
         projectileCollapsed = matrixModule.Matrix()
-        for columnIndex in range(preCollapsedMatrix.numberOfColumns):
+        for columnIndex in range(productCollapsed.numberOfColumns):
             projectileCollapsedColumn = collapseRow(productCollapsed[:, columnIndex], projectileCollapsedIndices, processedFlux, returnNormalized=True)
             projectileCollapsed.append(projectileCollapsedColumn)
+
+        if conserveEnergy:
+            # re-weight by average outgoing energy in new bins:
+            gbs = particles[productID].multiGroup.boundaries
+            newWeight = [0.5 * (gbs[idx] + gbs[idx+1]) for idx in range(len(gbs)-1)]
+            for idx, row in enumerate(projectileCollapsed.matrix):
+                row /= newWeight[idx]
 
         projectileCollapsed = projectileCollapsed.transpose()
 
         return projectileCollapsed
+
+
+def collapseVector(preCollapsedVector, multiGroupSettings, particles, temperature):
+    """
+    Collapse and return a multi-group vector.
+
+    :param preCollapsedMatrix: The vector to collapse.
+    :param multiGroupSettings: Object instance to instruct deterministic methods on what data are being requested.
+    :param particles: The list of particles to be transported.
+    :param temperature: The temperature of the flux to use when collapsing.
+    """
+    if not isinstance(preCollapsedVector, vectorModule.Vector):
+        raise TypeError(f'The first argument is expected to of the type {vectorModule.Vector}')
+
+    projectile = particles[multiGroupSettings.projectileID]
+    processedFlux = projectile.nearestProcessedFluxToTemperature(temperature).multiGroupFlux
+    projectileCollapsedIndices = projectile.collapseIndices
+
+    return collapseRow(preCollapsedVector, projectileCollapsedIndices, processedFlux, returnNormalized=True)
 
 
 def collapseRow(preCollapsedVector, collapseIndices, collapseWeight, returnNormalized):
@@ -435,7 +491,7 @@ def collapseRow(preCollapsedVector, collapseIndices, collapseWeight, returnNorma
             collapseIndexStop = collapseIndices[collapseVectorIndex+1]
             for collapseIndex in range(collapseIndexStart, collapseIndexStop):
                 fluxSum += collapseWeight[collapseIndex]
-                valueSum = collapseWeight[collapseIndex] * preCollapsedVector[collapseIndex]
+                valueSum += collapseWeight[collapseIndex] * preCollapsedVector[collapseIndex]
 
             if returnNormalized and fluxSum > 0:
                 collapsedVector[collapseVectorIndex] = valueSum / fluxSum

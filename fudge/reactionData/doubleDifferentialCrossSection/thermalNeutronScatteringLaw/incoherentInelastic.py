@@ -82,12 +82,22 @@ class T_effective( ancestryModule.AncestryIO ) :
 
     def convertUnits(self, unitMap):
         """
-        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         self.__function1d.convertUnits( unitMap )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -99,6 +109,17 @@ class T_effective( ancestryModule.AncestryIO ) :
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
     
         xPath.append( element.tag )
 
@@ -129,10 +150,23 @@ class PhononSpectrum(ancestryModule.AncestryIO):
         return self.__xys1d
 
     def convertUnits(self, unitMap):
+        """
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.__xys1d.convertUnits( unitMap )
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         xmlList = ['%s<%s>' % (indent, self.moniker)]
         xmlList += self.__xys1d.toXML_strList(indent + '  ', **kwargs)
@@ -140,6 +174,18 @@ class PhononSpectrum(ancestryModule.AncestryIO):
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
+
         xPath.append(element.tag)
         assert element[0].tag == XYs1dModule.XYs1d.moniker
         function1d = XYs1dModule.XYs1d.parseNodeUsingClass(element[0], xPath, linkData, **kwargs)
@@ -169,10 +215,23 @@ class GaussianApproximation(ancestryModule.AncestryIO):
         return self.__phononSpectrum
 
     def convertUnits(self, unitMap):
+        """
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         self.__phononSpectrum.convertUnits( unitMap )
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         xmlList = ['%s<%s>' % (indent, self.moniker)]
         xmlList += self.__phononSpectrum.toXML_strList(indent + '  ', **kwargs)
@@ -180,6 +239,18 @@ class GaussianApproximation(ancestryModule.AncestryIO):
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
+
         xPath.append(element.tag)
         assert element[0].tag == PhononSpectrum.moniker
         spectrum = PhononSpectrum.parseNodeUsingClass(element[0], xPath, linkData, **kwargs)
@@ -200,15 +271,39 @@ class SCTApproximation(ancestryModule.AncestryIO):
         ancestryModule.AncestryIO.__init__(self)
 
     def convertUnits(self, unitMap):
+        """
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
+        """
 
         pass # nothing to do
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         return [ '%s<%s/>' % ( indent, self.moniker ) ]
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs) :
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
     
         return cls()
 
@@ -225,17 +320,38 @@ class FreeGasApproximation(ancestryModule.AncestryIO):
 
     def convertUnits(self, unitMap):
         """
-        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         pass
 
     def toXML_strList(self, indent='', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         return [ '%s<%s/>' % ( indent, self.moniker ) ]
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs) :
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         return cls()
 
@@ -277,12 +393,22 @@ class SelfScatteringKernel(ancestryModule.AncestryIO):
 
     def convertUnits(self, unitMap):
         """
-        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         self.__kernel.convertUnits( unitMap )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -297,6 +423,17 @@ class SelfScatteringKernel(ancestryModule.AncestryIO):
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append(element.tag)
         kernel = None
@@ -335,12 +472,22 @@ class DistinctScatteringKernel(ancestryModule.AncestryIO):
 
     def convertUnits(self, unitMap):
         """
-        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         self.__kernel.convertUnits( unitMap )
 
     def toXML_strList( self, indent = '', **kwargs ) :
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -352,6 +499,17 @@ class DistinctScatteringKernel(ancestryModule.AncestryIO):
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append( element.tag )
         kernel = None
@@ -415,7 +573,9 @@ class ScatteringAtom(ancestryModule.AncestryIO):
 
     def convertUnits( self, unitMap ) :
         """
-        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all data in *self* per *unitMap*.
+        
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         self.mass.convertUnits( unitMap )
@@ -444,6 +604,14 @@ class ScatteringAtom(ancestryModule.AncestryIO):
         return( num / den )
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
         formatVersion = kwargs.get('formatVersion')
@@ -480,6 +648,17 @@ class ScatteringAtom(ancestryModule.AncestryIO):
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append(element.tag)
         formatVersion = kwargs.get('formatVersion')
@@ -562,6 +741,9 @@ class Form(baseModule.Form):
 
     @property
     def domainUnit(self):
+        """
+        This method rReturns the energy unit of the projectile.
+        """
 
         return str(self.getPrimaryScatterer().e_max.unit)
 
@@ -604,6 +786,14 @@ class Form(baseModule.Form):
                 primaryKernel.axes[3].unit, primaryKernel.axes[3].values.values ]
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
         formatVersion = kwargs.get('formatVersion')
@@ -641,6 +831,17 @@ class Form(baseModule.Form):
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
+        """
+        Parse *element* into an instance of *cls*.
+        
+        :param cls:         Form class to return.
+        :param element:     Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        
+        :return: an instance of *cls* representing *element*.
+        """
 
         xPath.append(element.tag)
         formatVersion = kwargs.get('formatVersion')

@@ -10,7 +10,7 @@ import glob, os, shutil, filecmp
 
 PYTHON = sys.executable
 
-files = sorted( glob.glob( 't*.py' ) )
+files = sorted(list(glob.glob('t*.py')) + list(glob.glob('fractionalPower*.py')))
 
 if( os.path.exists( 'Out' ) ) : shutil.rmtree( 'Out' )
 os.mkdir( 'Out' )
@@ -20,7 +20,7 @@ for file in files :
     status = os.system( '%s %s > Out/%s.out' % ( PYTHON, file, base ) )
     if( status ) : print( '=========== %s ===========' % file )
 
-outs = sorted( glob.glob( 'Out/t*.out' ) )
+outs = sorted( glob.glob( 'Out/*.out' ) )
 for out in outs :
     file = os.path.basename( out )
     if( not( filecmp.cmp( os.path.join( 'Out.checked', file ), out ) ) ) : print( 'ERROR: %s' % out )

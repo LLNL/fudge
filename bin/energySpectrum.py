@@ -25,6 +25,7 @@ from PoPs.decays import misc as PoPsDecayMiscModule
 from LUPY import times as timesModule
 from LUPY import argumentsForScripts as argumentsForScriptsModule
 from fudge import styles as stylesModule
+from fudge.reactionData import crossSection as crossSectionModule
 from fudge.productData import multiplicity as multiplicityModule
 from fudge.productData.distributions import energy as energyModule
 
@@ -38,7 +39,7 @@ outputLog = None
 accuracy = 1e-3
 lowerUpperEpsilon = -1e-7
 
-summaryDocStringFUDGE = '''For the specified projectile energy and product, outputs energy spectra by reaction and also summed spectra.'''
+summaryDocString__FUDGE = '''For the specified projectile energy and product, outputs energy spectra by reaction and also summed spectra.'''
 
 description = '''
     Outputs the energy spectrum for the specified outgoing particle at the specified incident energy from 
@@ -130,7 +131,10 @@ if( args.energyUnit != protare.domainUnit ) :
     unitConversionTime = unitConversionTime.toString( current = False )
 
 crossSectionUnit = 'b'
-if( len( protare.reactions ) > 0 ) : crossSectionUnit = protare.reactions[0].crossSection[-1].axes[0].unit
+for reaction in protare.reactions:
+    if hasattr(reaction.crossSection[-1], 'axes'):
+        crossSectionUnit = reaction.crossSection[-1].axes[0].unit
+        break
 
 energyAxes = energyModule.defaultAxes( args.energyUnit )
 spectrumAxes = energyAxes.copy( )
@@ -336,6 +340,8 @@ def getSpectrum(reactions, reactionSuffix):
     totalCrossSection = 0.0
     for reactionIndex, reaction in enumerate( reactions ) :
         reactionCounter += 1
+        if isinstance(reaction.crossSection.evaluated, crossSectionModule.CoulombPlusNuclearElastic):
+            continue    # FIXME ignoring CP elastic scattering
         spectrum, crossSection = reactionSpectrum(reaction, productID, args.energy, spectrum, discreteGammaData, totalCrossSection, reactionSuffix)
         totalCrossSection += crossSection
     return( spectrum, discreteGammaData, totalCrossSection )

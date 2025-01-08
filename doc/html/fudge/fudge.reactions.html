@@ -201,6 +201,12 @@ The <em>energyMin</em> argument is ignored. Instead, it is calculated from the m
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.isCoulombReaction">
+<span class="sig-name descname"><span class="pre">isCoulombReaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.isCoulombReaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.isCoulombReaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <strong>True</strong> if <em>self</em> is a Coulomb reaction and <strong>False</strong> otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.isFission">
 <span class="sig-name descname"><span class="pre">isFission</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.isFission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.isFission" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -229,8 +235,47 @@ The <em>energyMin</em> argument is ignored. Instead, it is calculated from the m
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.listOfProducts">
-<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.listOfProducts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns, as a set, the list of PoP’s ids for all products (i.e., outgoing particles) for <em>self</em>.</p>
+<span class="sig-name descname"><span class="pre">listOfProducts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">finalOnly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeQualifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.listOfProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.listOfProducts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>finalOnly</strong> – If <cite>True</cite>, only final product ids are returned, otherwise, all are returned..</p></li>
+<li><p><strong>includeQualifier</strong> – If <cite>True</cite>, particle qualifiers are include in ids, otherwise, they are stripped from ids.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A python set instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.multiGroupAvailableEnergy">
+<span class="sig-name descname"><span class="pre">multiGroupAvailableEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupAvailableEnergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupAvailableEnergy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the multi-group, total available energy for the requested label. This is a cross section weighted available energy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
+<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.multiGroupAvailableMomentum">
+<span class="sig-name descname"><span class="pre">multiGroupAvailableMomentum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupAvailableMomentum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupAvailableMomentum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the multi-group, total available momentum for the requested label. This is a cross section weighted available momentum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
+<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -280,6 +325,76 @@ The <em>energyMin</em> argument is ignored. Instead, it is calculated from the m
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.multiGroupDepositionEnergy">
+<span class="sig-name descname"><span class="pre">multiGroupDepositionEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupDepositionEnergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupDepositionEnergy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the multi-group, deposition energy for the requested label.</p>
+<p>This is a cross section weighted deposition energy for the reaction. The deposition energy is calculated by subtracting
+the average energy from each transportable particle from the available energy. The list of transportable particles is specified
+via the list of particle specified in the <em>particleIDs</em> argument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>multiGroupSettings</strong> – MG instance to instruct deterministic methods on what data are being requested.</p></li>
+<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.multiGroupDepositionMomentum">
+<span class="sig-name descname"><span class="pre">multiGroupDepositionMomentum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupDepositionMomentum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupDepositionMomentum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the multi-group, total deposition momentum for the requested label.</p>
+<p>This is a cross section weighted deposition momentum for the reaction. The deposition momentum is calculated by
+subtracting the average momentum from each transportable particle from the available momentum. The list of transportable
+particles is specified via the list of particle specified in the <em>particleIDs</em> argument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>multiGroupSettings</strong> – MG instance to instruct deterministic methods on what data are being requested.</p></li>
+<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.multiGroupFissionMatrix">
+<span class="sig-name descname"><span class="pre">multiGroupFissionMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupFissionMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupFissionMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the multi-group, fission neutron transfer matrix for the requested label for the requested Legendre order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
+<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>legendreOrder</strong> – Requested Legendre order.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.multiGroupGain">
+<span class="sig-name descname"><span class="pre">multiGroupGain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectileID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupGain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupGain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns multi-group, gain for the requested particle and label.</p>
+<p>This is a cross section weighted gain summed over all reactions. If productID and projectileID are the same, then the multi-group 
+cross section is subtracted for the returned value to indicate that the projectileID as been absorted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
+<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
+<li><p><strong>producID</strong> – The particle PoPs’ id for the whose gain is to be calculated.</p></li>
+<li><p><strong>projectileID</strong> – The particle PoPs’ id for the projectile.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.multiGroupMultiplicity">
 <span class="sig-name descname"><span class="pre">multiGroupMultiplicity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupMultiplicity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupMultiplicity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the multi-group, total multiplicity for the requested label for the requested product.</p>
@@ -297,14 +412,14 @@ The <em>energyMin</em> argument is ignored. Instead, it is calculated from the m
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.multiGroupProductArray">
-<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupProductArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupProductArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the full multi-group, total product array for the requested label for the requested product id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – MG instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 </ul>
 </dd>
@@ -313,16 +428,31 @@ The <em>energyMin</em> argument is ignored. Instead, it is calculated from the m
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.multiGroupProductMatrix">
-<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">multiGroupProductMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particleIDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupProductMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupProductMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the multi-group, product matrix for the requested label for the requested productID for the requested Legendre order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
 <li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
+<li><p><strong>particleIDs</strong> – The list of particles to be transported.</p></li>
 <li><p><strong>productID</strong> – Particle id for the requested product.</p></li>
 <li><p><strong>legendreOrder</strong> – Requested Legendre order.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.multiGroupQ">
+<span class="sig-name descname"><span class="pre">multiGroupQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeFinalProducts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.multiGroupQ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.multiGroupQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the multi-group, total Q for the requested label. This is a cross section weighted Q summed over all reactions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
+<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
+<li><p><strong>includeFinalProducts</strong> – Boolean value indicating whether to include the contriibution from the final fission product data.</p></li>
 </ul>
 </dd>
 </dl>
@@ -341,7 +471,18 @@ The <em>energyMin</em> argument is ignored. Instead, it is calculated from the m
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overrwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.
+The overrwritten method must construct a class of instance <em>cls</em> using <em>node</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">xmlNodeMode.XML_node</span></code> instance.</p></li>
+<li><p><strong>xPath</strong> – List containing xPath to current node, useful mostly for debugging.</p></li>
+<li><p><strong>linkData</strong> – dict that collects unresolved links.</p></li>
+<li><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -384,6 +525,11 @@ The <em>energyMin</em> argument is ignored. Instead, it is calculated from the m
 <dt class="sig sig-object py" id="fudge.reactions.base.Base_reaction.toXML_strList">
 <span class="sig-name descname"><span class="pre">toXML_strList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/base.html#Base_reaction.toXML_strList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.base.Base_reaction.toXML_strList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods must be overwritten by the derived class. It must return a Python list of strings that are the XML representation of <em>self</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – A dictionary that contains data to control the way this method acts.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -459,15 +605,10 @@ that do not have enough information to be used for transport but may still conta
 <dl class="py class">
 <dt class="sig sig-object py" id="fudge.reactions.incompleteReaction.IncompleteReaction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.reactions.incompleteReaction.</span></span><span class="sig-name descname"><span class="pre">IncompleteReaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ENDF_MT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fissionGenre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FissionGenre.none</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/incompleteReaction.html#IncompleteReaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.incompleteReaction.IncompleteReaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.reactions.base.Base_reaction2" title="fudge.reactions.base.Base_reaction2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base_reaction2</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.reactions.reaction.Reaction" title="fudge.reactions.reaction.Reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reaction</span></code></a></p>
 <p>Similar to the base &lt;reaction&gt; class, except it generally does not contain
 a complete description of products, and cannot be used for transport. It must contain a crossSection
 and outputChannel, but the list of products may be empty.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="fudge.reactions.incompleteReaction.IncompleteReaction.moniker">
-<span class="sig-name descname"><span class="pre">moniker</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'reaction'</span></em><a class="headerlink" href="#fudge.reactions.incompleteReaction.IncompleteReaction.moniker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 </section>
@@ -539,83 +680,6 @@ As with the summedReaction, ‘outputChannel’ should be a channels.simpleOutpu
 <dt class="sig sig-object py" id="fudge.reactions.reaction.Reaction.moniker">
 <span class="sig-name descname"><span class="pre">moniker</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'reaction'</span></em><a class="headerlink" href="#fudge.reactions.reaction.Reaction.moniker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fudge.reactions.reaction.Reaction.multiGroupAvailableEnergy">
-<span class="sig-name descname"><span class="pre">multiGroupAvailableEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#Reaction.multiGroupAvailableEnergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.reaction.Reaction.multiGroupAvailableEnergy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the multi-group, total available energy for the requested label. This is a cross section weighted available energy.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
-<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fudge.reactions.reaction.Reaction.multiGroupAvailableMomentum">
-<span class="sig-name descname"><span class="pre">multiGroupAvailableMomentum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#Reaction.multiGroupAvailableMomentum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.reaction.Reaction.multiGroupAvailableMomentum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the multi-group, total available momentum for the requested label. This is a cross section weighted available momentum.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
-<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fudge.reactions.reaction.Reaction.multiGroupFissionMatrix">
-<span class="sig-name descname"><span class="pre">multiGroupFissionMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#Reaction.multiGroupFissionMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.reaction.Reaction.multiGroupFissionMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the multi-group, fission neutron transfer matrix for the requested label for the requested Legendre order.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
-<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>particles</strong> – The list of particles to be transported.</p></li>
-<li><p><strong>legendreOrder</strong> – Requested Legendre order.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fudge.reactions.reaction.Reaction.multiGroupGain">
-<span class="sig-name descname"><span class="pre">multiGroupGain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">productID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectileID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#Reaction.multiGroupGain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.reaction.Reaction.multiGroupGain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns multi-group, gain for the requested particle and label.</p>
-<p>This is a cross section weighted gain summed over all reactions. If productID and projectileID are the same, then the multi-group 
-cross section is subtracted for the returned value to indicate that the projectileID as been absorted.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
-<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>producID</strong> – The particle PoPs’ id for the whose gain is to be calculated.</p></li>
-<li><p><strong>projectileID</strong> – The particle PoPs’ id for the projectile.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fudge.reactions.reaction.Reaction.multiGroupQ">
-<span class="sig-name descname"><span class="pre">multiGroupQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiGroupSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperatureInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeFinalProducts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactions/reaction.html#Reaction.multiGroupQ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactions.reaction.Reaction.multiGroupQ" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the multi-group, total Q for the requested label. This is a cross section weighted Q summed over all reactions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>multiGroupSettings</strong> – Object instance to instruct deterministic methods on what data are being requested.</p></li>
-<li><p><strong>temperatureInfo</strong> – TemperatureInfo instance whose HeatedMultiGroup or SnElasticUpScatter label specifies the multi-group data to retrieve.</p></li>
-<li><p><strong>includeFinalProducts</strong> – Boolean value indicating whether to include the contriibution from the final fission product data.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactions.reaction.Reaction.processCoulombPlusNuclearMuCutoff">

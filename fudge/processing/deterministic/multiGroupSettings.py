@@ -43,7 +43,6 @@ class Settings:
         """
 
         matchPoPsID = [x for x in dir(popsIDsModule) if isinstance(getattr(popsIDsModule, x), str) and particleID == getattr(popsIDsModule, x)]
-        assert len(matchPoPsID) < 2
 
         return len(matchPoPsID) > 0
 
@@ -125,7 +124,7 @@ class MG(Settings):
 
         if styleLabel not in suite:
             if self.raiseOnError:
-                raise KeyError(f'Style Label {styleLabel} not found in suite')
+                raise KeyError(f'Style Label {styleLabel} not found in suite: %s.' % suite.toXLink())
             else:
                 return None
 

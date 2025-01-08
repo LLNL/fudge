@@ -16,9 +16,9 @@ value = 0.000000000000000e+00, significantDigits = 16, order = 0, isPercent = Fa
 uncertainty = 
 
 a1 * a2
-0.000 +/- 0.017 eV**2
-value = 0.000000000000000e+00, significantDigits = 4, order = 0, isPercent = False, unit = "eV**2"
-uncertainty = value = 1.690000000000000e-02, significantDigits = 2, order = -2, isPercent = False
+0.00 +/- 0.26 eV**2
+value = 0.000000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = "eV**2"
+uncertainty = value = 2.600000000000000e-01, significantDigits = 2, order = -1, isPercent = False
 
 a1 / a2
 Divide by zero
@@ -39,9 +39,9 @@ value = 0.000000000000000e+00, significantDigits = 16, order = 0, isPercent = Fa
 uncertainty = 
 
 a1 * a2
-1.44 +/- 0.48 eV**2
+1.44 +/- 0.40 eV**2
 value = 1.440000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = "eV**2"
-uncertainty = value = 4.800000000000000e-01, significantDigits = 2, order = -1, isPercent = False
+uncertainty = value = 4.000000000000000e-01, significantDigits = 2, order = -1, isPercent = False
 
 a1 / a2
 1.
@@ -69,12 +69,12 @@ uncertainty = value = 2.385372088375313e-01, significantDigits = 2, order = -1, 
 a1 * a2
 0.00 +/- 0.16 eV**2
 value = 0.000000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = "eV**2"
-uncertainty = value = 1.581518257877537e-01, significantDigits = 2, order = -1, isPercent = False
+uncertainty = value = 1.560000000000000e-01, significantDigits = 2, order = -1, isPercent = False
 
 a1 / a2
 0.00 +/- 0.11
 value = 0.000000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = ""
-uncertainty = value = 1.098276567970512e-01, significantDigits = 2, order = -1, isPercent = False
+uncertainty = value = 1.083333333333333e-01, significantDigits = 2, order = -1, isPercent = False
 
 
 1.20 +/- 0.20 eV
@@ -97,7 +97,7 @@ uncertainty = value = 2.385372088375313e-01, significantDigits = 2, order = -1, 
 a1 * a2
 0.00 +/- 0.16 eV**2
 value = 0.000000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = "eV**2"
-uncertainty = value = 1.581518257877537e-01, significantDigits = 2, order = -1, isPercent = False
+uncertainty = value = 1.560000000000000e-01, significantDigits = 2, order = -1, isPercent = False
 
 a1 / a2
 Divide by zero

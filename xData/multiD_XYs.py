@@ -6,9 +6,37 @@
 # <<END-copyright>>
 
 """
-This module contains the XYsnd classes for n > 1. 
-"""
+This module contains the classes for representing a 
 
+    -) 2d function :math:`f(x,y)` as a list of :math:`x_i` for :math:`x_i < x_{i+1}` with each :math:`x_i`
+        having an associated 1d function :math:`f_i(x)`.
+    -) 3d function :math:`g(x,y,z)` as a list of :math:`x_i` for :math:`x_i < x_{i+1}` with each :math:`x_i`
+        having an associated 2d function :math:`g_i(y,z)`.
+
+This module contains the following classes:
+
+    +-----------+-------------------------------------------------------------------------------------------------------+
+    | Class     | Description                                                                                           |
+    +===========+=======================================================================================================+
+    | XYsnd     | Base class for classes :py:class:`XYs2d` and :py:class:`XYs3d`.                                       |
+    +-----------+-------------------------------------------------------------------------------------------------------+
+    | XYs2d     | This class stores a 2d function :math:`f(x,y)` as a list of :math:`x_i` for :math:`x_i < x_{i+1}`     |
+    |           | with each :math:`x_i` having an associated 1d function :math:`f_i(x)`.                                |
+    +-----------+-------------------------------------------------------------------------------------------------------+
+    | XYs3d     | This class stores a 3d function :math:`g(x,y,z)` as a list of :math:`x_i` for :math:`x_i < x_{i+1}`   |
+    |           | with each :math:`x_i` having an associated 2d function :math:`g_i(y,z)`.                              |
+    +-----------+-------------------------------------------------------------------------------------------------------+
+
+
+This module contains the following functions:
+
+    +-----------------------------------+-----------------------------------------------------------------------+
+    | Class                             | Description                                                           |
+    +===================================+=======================================================================+
+    | flatInterpolationToLinearPoint    | This function returns a domain for converting the flat interpolation  |
+    |                                   | function into a smeared pointwise lin-lin interpolation function.     |
+    +-----------------------------------+-----------------------------------------------------------------------+
+"""
 
 """
 Missing methods
@@ -38,6 +66,17 @@ from . import series1d as series1dModule
 from . import xs_pdf_cdf as xs_pdf_cdfMoudle
 
 def flatInterpolationToLinearPoint( lowerDomain, upperDomain, domain, epsilon ) :
+    """
+    This function returns a domain for converting the flat interpolation function into a smeared pointwise lin-lin interpolation function.
+    The new point will be in the range (*lowerDomain*, *upperDomain*).  For internal use.
+
+    :param lowerDomain:     The point at or below *domain*.
+    :param upperDomain:     The point at of above *domain*.
+    :param domain:          The point that will be moved.
+    :param epsilon:         The fractional amount to move the new domain value from *domain*.
+
+    :returns:       A python float.
+    """
 
     if( domain < 0 ) :
         domain *= ( 1.0 - epsilon )
@@ -52,12 +91,49 @@ def flatInterpolationToLinearPoint( lowerDomain, upperDomain, domain, epsilon ) 
     return( domain )
             
 class XYsnd( baseModule.XDataFunctional ) :
+    """
+    This class is the base class for classes :py:class:`XYs2d` and :py:class:`XYs3d`. These classes store a function
+    as a list of (domain-value, lower dimentional function). For example, let :math:`f_d` be a function of dimension
+    :math:`d` and let :math:`x` be the outer most independent axes of :math:`f_d` (i.e., :math:`f_d(x, y, ...)`, then :math:`f_d`
+    is effectively stored as a list of (math:`x, f_{d-1}(y, ...)`) where :math:`f_{d-1}(y, ...)` is a function
+    of one less dimension then :math:`f_d` and is not a function of :math:`x`. For each math:`f_{d-1}(y, ...)`
+    its associated :math:`x` is its outerDomainValue member. The function math:`f_{d-1}(y, ...)` are called
+    sub-function of *self*.
+
+    The following table list the primary members of this class:
+
+    +---------------------------+---------------------------------------------------------------+
+    | Member                    | Description                                                   |
+    +===========================+===============================================================+
+    | label                     | This is the label member use by some xData classes.           |
+    +---------------------------+---------------------------------------------------------------+
+    | axes                      | This is the axes member.                                      |
+    +---------------------------+---------------------------------------------------------------+
+    | interpolation             | This describes how to interpolation between two consecutive   |
+    |                           | domain points.                                                |
+    +---------------------------+---------------------------------------------------------------+
+    | interpolationQualifier    | This is an additional interpolation rule mainly needed for    |
+    |                           | distributions in ensure that interpolation produces physical  |
+    |                           | results.                                                      |
+    +---------------------------+---------------------------------------------------------------+
+    | outerDomainValue          | This is the domain value for the next higher dimension for    |
+    |                           | a function that is embedded in a high dimensional functions.  |
+    +---------------------------+---------------------------------------------------------------+
+    | index                     | This is the index member use by some xData classes.           |
+    +---------------------------+---------------------------------------------------------------+
+    """
 
     def __init__(self, interpolation=enumsModule.Interpolation.linlin, axes=None,
             index=None, valueType=enumsModule.ValueType.float64, outerDomainValue=None, label=None, 
             interpolationQualifier=enumsModule.InterpolationQualifier.none):
         """
-        Abstract base class constructor for XYsnd class.
+        :param interpolation:               This is the interpolation rule.
+        :param interpolationQualifier:      An additional interpolation rule mainly needed for distributions.
+        :param axes:                        This is the axes for the function.
+        :param index:                       This is the index member use by some xData classes.
+        :param valueType:                   This is currently not used.
+        :param outerDomainValue:            This is the domain value for the next higher dimension for a function that is embedded in a high dimensional functions.
+        :param label:                       This is the label member.
         """
 
         baseModule.XDataFunctional.__init__(self, axes, index=index, valueType=valueType, outerDomainValue=outerDomainValue, label=label)
@@ -73,14 +149,31 @@ class XYsnd( baseModule.XDataFunctional ) :
         self.__functionals = []
 
     def __len__( self ) :
+        """
+        This method returns the number of sub-functions *self* contains.
+
+        :returns:       A python int.
+        """
 
         return( len( self.__functionals ) )
 
     def __getitem__( self, index ) :
+        """
+        This method returns the number of sub-functions (i.e., function of one less dimension) that *self* contains.
+
+        :param index:   The index of the sub-function to return.
+
+        :returns:       A function of one less dimension than *self*.
+        """
 
         return( self.__functionals[index] )
 
     def __setitem__( self, index, functional ) :
+        """
+        This method adds *functional* to *self* at the specified index.
+
+        :param index:   The index of the sub-function to return.
+        """
 
         index1, functional1 = self._set_insertCommon( index, functional.outerDomainValue, functional )
         if( index1 is not None ) :
@@ -91,6 +184,13 @@ class XYsnd( baseModule.XDataFunctional ) :
             self.__functionals[index1] = functional1
 
     def  __mul__( self, other ) :
+        """
+        This method multiplies *self* by *other* and returns a new instance with the results.
+
+        :param other:   A python float that *self* is multiplied by.
+
+        :returns:       An instance that is the same class as *self*.
+        """
 
         try :
             value = float( other )
@@ -107,58 +207,110 @@ class XYsnd( baseModule.XDataFunctional ) :
 
     @property
     def domainMin( self ) :
+        """
+        This method returns the minimum domain value for *self*.
+
+        :returns:       A python float.
+        """
 
         return( self.__functionals[0].outerDomainValue )
 
     @property
     def domainMax( self ) :
+        """
+        This method returns the maximum domain value for *self*.
+
+        :returns:       A python float.
+        """
 
         return( self.__functionals[-1].outerDomainValue )
 
     @property
     def domainUnit( self ) :
+        """
+        This method returns the domain unit for *self*.
+
+        :returns:       A python str.
+        """
 
         return( self.getAxisUnitSafely( self.dimension ) )
 
     @property
     def domainGrid( self ) :
+        """
+        This method returns all domain values for *self* as a python list.
+
+        :returns:           A python list.
+        """
 
         return( [ functional.outerDomainValue for functional in self ] )
 
     @property
     def rangeMin( self ) :
+        """
+        This method returns the minimum range value for *self*.
+
+        :returns:       A python float.
+        """
 
         return( min( [ func.rangeMin for func in self ] ) )
 
     @property
     def rangeMax( self ) :
+        """
+        This method returns the maximum range value for *self*.
+
+        :returns:       A python float.
+        """
 
         return( max( [ func.rangeMax for func in self ] ) )
 
     @property
     def rangeUnit( self ) :
+        """
+        This method returns the range unit for *self*.
+
+        :returns:       A python str.
+        """
 
         return( self.getAxisUnitSafely( 0 ) )
 
     @property
     def functionals( self ) :
-        """Returns self's __functionals."""
+        """
+        This method returns a reference to self's __functionals which is currently a python list.
+
+        :returns:           A python list.
+        """
 
         return( self.__functionals )
 
     @property
     def functionNdsName( self ) :
-        """Returns the node name for the child "function#ds"."""
+        """
+        Returns the node name for the child "function#ds" which depends on the dimension of *self*.
+
+        :returns:       A python str.
+        """
 
         return( "function%dds" % ( self.dimension - 1 ) )
 
     def append( self, functional ) :
+        """
+        Thie method appends *functional* to the list of self's functions by calling the :py:func:`insert` method.
+
+        :param functional:  The function of one less dimension than *self* to append to *self*.
+        """
 
         self.insert( len( self ), functional )
 
     def insert( self, index, functional, outerDomainValue = None ) :
         """
-        Inserts functional at index. If outerDomainValue is None, outerDomainValue is take from the outerDomainValue of functional.
+        Inserts *functional* at *index*. If *outerDomainValue* is None, outerDomainValue is take from the outerDomainValue of *functional*.
+
+        :param index:               The index where *functional* is placed in *self*'s list of functions.
+        :param functional:          The function of one less dimension than *self* to append to *self*.
+        :param outerDomainValue:    The outer domain value for *functional*.
         """
 
         if( outerDomainValue is None ) : outerDomainValue = functional.outerDomainValue
@@ -172,8 +324,11 @@ class XYsnd( baseModule.XDataFunctional ) :
 
     def insertAtValue( self, functional, outerDomainValue = None ) :
         """
-        Inserts functional at the appropriate index for outerDomainValue. The inserted functional instance will have outerDomainValue outerDomainValue, 
-        even if functional as a outerDomainValue.
+        This method inserts *functional* at the appropriate index for *outerDomainValue*. If *outerDomainValue* is not None,
+        the inserted functional instance will have outerDomainValue set to *outerDomainValue*, even if functional has an outerDomainValue.
+
+        :param functional:          The function of one less dimension than *self* to append to *self*.
+        :param outerDomainValue:    The outerDomainValue for *functional*.
         """
 
         if( outerDomainValue is None ) : outerDomainValue = functional.outerDomainValue
@@ -191,11 +346,30 @@ class XYsnd( baseModule.XDataFunctional ) :
         self.insert( index, functional, outerDomainValue = outerDomainValue )
 
     def pop( self, index ):
+        """
+        This method removes (pops) the function at *index*.
+
+        :param index:   The index of the function to remove from *self*.
+
+        :returns:       The popped function.
+        """
 
         return self.__functionals.pop( index )
 
     def _set_insertCommon( self, index, outerDomainValue, functional ) :
-        """For internal use only."""
+        """
+        This method checks if it is valid to add *functional* to *self*.
+        If (None, None) is returned, then this method added *functional* to self and no further action is needed;
+        otherwise, the caller is responsible for add *functional* at the proper location in *self*.
+        If the users needs to add *functional*, they must use the index returned by *self*.
+        For internal use only.
+
+        :param index:               The index if *self*'s sub-function list with *functional* will reside.
+        :param outerDomainValue:    The domain value of *self* where *functional* will reside.
+        :param functional:          The sub-function to be added.
+
+        :returns:                   The tuple (None, None) or (index, functional).
+        """
 
         if( not( isinstance( functional, self.allowedSubElements( ) ) ) ) :
             raise TypeError( 'Invalid class "%s" for insertion into "%s".' % ( functional.__class__, self.__class__ ) )
@@ -223,7 +397,9 @@ class XYsnd( baseModule.XDataFunctional ) :
 
     def convertUnits( self, unitMap ) :
         """
-        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all data in *self* per *unitMap*.
+
+        :param unitMap:     A dictionary in which each key is a unit that will be replaced by its value which must be an equivalent unit.
         """
 
         for functional in self : functional.convertUnits( unitMap )
@@ -233,6 +409,11 @@ class XYsnd( baseModule.XDataFunctional ) :
         self.fixValuePerUnitChange( factors )
 
     def copy( self ) :
+        """
+        This method returns a copy of *self*.
+
+        :returns:       A new instance of *self*.
+        """
 
         axes = self.axes.copy()
         multid_xys = self.__class__( interpolation = self.interpolation, index = self.index,
@@ -243,15 +424,27 @@ class XYsnd( baseModule.XDataFunctional ) :
     __copy__ = copy
 
     def copyDataToNestedLists( self ) :
+        """
+        This method returns the data in *self* as a nested list of python lists. The depth of the nesting is *self*'s dimension + 1.
+
+        :returns:   A nested list of python lists with the nesting being *self*'s dimension + 1.
+        """
 
         return( [ [ subData.outerDomainValue, subData.copyDataToNestedLists( ) ] for subData in self ] )
 
     def evaluate(self, domainValue, extrapolation=enumsModule.Extrapolation.none, interpolationQualifier=None, **kwargs):
         """
-        Evaluates the function at the domain point domainValue.
-        Interpolation is used if domainValue is between two sub-functions. However, if one of the
-        sub-functions is within domainValue * epsilon of domainValue then that sub-function is returned.
-        If both sub-functions are within domainValue * epsilon of domainValue, the closest is returned.
+        Thid method evaluates the *self* at the domain point *domainValue*.
+        *Self*'s Interpolation is used if domainValue is between two sub-functions. However, if one of the
+        sub-functions is within *domainValue* * epsilon of *domainValue* then that sub-function is returned where
+        *epsilon* is a value in *kwargs* with key "epsilon". The default value if 0.0 is used if *kwargs* does not
+        contain the key "epsilon".  If two sub-functions are within *domainValue* * epsilon of domainValue, the closest is returned.
+
+        :param domainValue:             The domain value to evaulate *self* at.
+        :param extrapolation:           If *domainValue* is outside the domain of *self*, this argument defines how to extrapolate.
+        :param interpolationQualifier:  If not None, this interpolation qualifier is used instead of that of *self*.
+
+        :returns:                       A function of one less dimension than *self*.
         """
         epsilon = kwargs.get('epsilon', 0.0)
         if interpolationQualifier is None:
@@ -408,7 +601,12 @@ class XYsnd( baseModule.XDataFunctional ) :
 
     def findInstancesOfClassInChildren( self, cls, level = 9999 ) :
         """
-        Finds all instances of class *cls* in self's children, grand-children, etc.
+        This method finds all instances of class *cls* in self's children, grand-children, etc.
+
+        :param cls:     The class to find.
+        :param level:   The maximum depth to search in *self*.
+
+        :returns:       A python list of the instances found.
         """
 
         foundInstances = []
@@ -422,14 +620,15 @@ class XYsnd( baseModule.XDataFunctional ) :
 
     def integrate( self, **limits ):
         """
-        Integrate a XYsnd function. Supports limits for each axis.
+        This method returns the integral of *self* over the domain defined in *limits*. Supports limits for each axis.
+
         Example:
         >XYsnd.integrate( energy_in = ('1e-5 eV', '10 eV'), energy_out = ('1 keV', '10 keV') )
 
-        :param limits: dictionary containing limits for each independent axis (keyed by axis label or index).
-        If an independent axis is missing from the dictionary, integrate over the entire domain of that axis.
+        :param limits:  A dictionary containing limits for each independent axis (keyed by axis label or index).
+                        If an independent axis is missing from the dictionary, integrate over the entire domain of that axis.
 
-        :return: float
+        :return:        A python float.
         """
 
         domainMin, domainMax = None, None
@@ -457,10 +656,16 @@ class XYsnd( baseModule.XDataFunctional ) :
 
     def interpolateAtValue(self, value, unitBase=False, extrapolation=enumsModule.Extrapolation.none):
         """
-        Returns a functional with dimension one less than self that is the interpolation of self at value. 
-        If value is outside the domain of self and extrapolation is 'none' a raise is executed. Otherwise,
-        a flat interpolated functional is returned.  If unitBase is True, then unit base interpolation is performed on 
+        This method returns a functional with dimension one less than self that is the interpolation of self at value. 
+        If value is outside the domain of *self* and *extrapolation* is none, a raise is executed. Otherwise,
+        a flat interpolated functional is returned.  If *unitBase* is True, then unit base interpolation is performed on 
         the lowest dimension and the dependent data.  This method is deprecated (see evaluate).
+
+        :param value:           The domain value to evaluate *self* at.
+        :param unitBase:        A python boolean.
+        :param extrapolation:   If *domainValue* is outside the domain of *self*, this argument defines how to extrapolate.
+
+        :returns:                       A function of one less dimension than *self*.
         """
 
         if extrapolation not in enumsModule.Extrapolation: raise ValueError( 'Invalid extrapolation value = "%s"' % extrapolation )
@@ -498,7 +703,9 @@ class XYsnd( baseModule.XDataFunctional ) :
 
     def getBoundingSubFunctions( self, value ) :
         """
-        Returns the tuple flag, functional1, functional2, frac, interpolation and interpolationQualifier.
+        This method returns the two sub-functions of *self* whose outerDomainValues bound *value*.
+        Additonal information is also returned.
+        The returned inforamtion is the tuple (flag, functional1, functional2, frac, interpolation, interpolationQualifier).
 
         Flag is one of
             +-------+---------------------------------------------------------------------------+
@@ -514,6 +721,12 @@ class XYsnd( baseModule.XDataFunctional ) :
             +-------+---------------------------------------------------------------------------+
 
         If flag is None then functional1, functional2 and frac are also None.  If flag is not '' then functional2 is None.
+        The data frac, interpolation and interpolationQualifier give the fraction position of *value* between the 
+        two sub-functions, and how to interpolate between the two returned sub-functions. this method is mainly for internal use.
+
+        :param value:   The domain value which is between the two returned sub-functions outerDomainValues.
+
+        :returns:       A tuple containing information about the bounding sub-functions.
         """
 
         interpolation = self.interpolation
@@ -541,6 +754,15 @@ class XYsnd( baseModule.XDataFunctional ) :
         return( '', functional1, functional2, frac, interpolation, interpolationQualifier )
 
     def normalize( self, insitu = True, dimension = None ) :
+        """
+        This method normalizes the data in *self* at dimension. If *dimension* is greater than or equal to *self*'s dimension,
+        then *self* is normalized. Otherwise, normalize is called on each sub-fuction of *self*.
+
+        :param insitu:          If True, *self* is normalized and returned.
+        :param dimension:       The argument determines at what dimension the data are normalized.
+
+        :returns:               A *self* like instance.
+        """
 
         selfsDimension = self.dimension
         if( dimension is None ) : dimension = selfsDimension
@@ -556,6 +778,13 @@ class XYsnd( baseModule.XDataFunctional ) :
         return( multid_xys )
 
     def domainUnitConversionFactor( self, unitTo ) :
+        """
+        This method returns the factor needed to convert self's domain to unit *unitTo*.
+
+        :param unitTo:      The unit for converting self's domain.
+
+        :returns:           A float.
+        """
 
         if( unitTo is None ) : return( 1. )
         return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
@@ -564,11 +793,13 @@ class XYsnd( baseModule.XDataFunctional ) :
         """
         Returns a new instance with self sliced between ``domainMin`` and ``domainMax``.
 
-        :param domainMin:   [optional] the lower x-value of the slice, default is domain minimum of self,
-        :param domainMax:   [optional] the upper x-value of the slice, default is domain maximum of self,
-        :param fill:        [optional] if True, points are added at domainMin and domainMax if they are not in self,
-                                       else only existing points in the range [domainMin, domainMax] are included.
-        :param dullEps:     [optional] (Currently not implemented) the lower and upper points are dulled, default is 0.
+        :param domainMin:   The lower domain value of the slice, default is domain minimum of self,
+        :param domainMax:   The upper domain value of the slice, default is domain maximum of self,
+        :param fill:        If True, points are added at domainMin and domainMax if they are not in self,
+                            otherwise only existing points in the range [domainMin, domainMax] are included.
+        :param dullEps:     (Currently not implemented) the lower and upper points are dulled, default is 0.
+
+        :returns:           A *self* like instance.
         """
 
         if( domainMin is None ) : domainMin = self.domainMin
@@ -608,7 +839,15 @@ class XYsnd( baseModule.XDataFunctional ) :
 
     def fixDomains(self, domainMin, domainMax, fixToDomain, tweakLower=False, **kwargs):
         """
-        Sets domain minimum and maximum per the arguments.
+        This method calls :py:func:`domainSlice` to trim the domain of *self* per the arguments.
+
+        :param domainMin:       The lower limit of the domain.
+        :param domainMax:       The upper limit of the domain.
+        :param fixToDomain:     An instance of :py:class:`enumsModule.FixDomain` that specifies which limits are to be fixed.
+        :param tweakLower:      If True and the domain minimum only needs to be moved a little, then the first sub-function's outerDomainValue is set to *domainMin*.
+        :param kwargs:          A dictionary of extra arguments that controls how the domain is fixed.
+
+        :returns:               1 if *self*'s domain changed and 0 otherwise.
         """
 
         OldDomainMin = self.domainMin
@@ -636,22 +875,48 @@ class XYsnd( baseModule.XDataFunctional ) :
         return 1
 
     def rangeUnitConversionFactor( self, unitTo ) :
+        """
+        This method returns the scale factor needed to convert the *self*'s range to unit *unitTo*.
+
+        :returns:   A python float.
+        """
 
         if( unitTo is None ) : return( 1. )
         return( PQUModule.PQU( '1 ' + self.rangeUnit ).getValueAs( unitTo ) )
 
     def scaleDependent( self, value, insitu = False ) :
+        """
+        This method scales the range of *self* by *value*. If *insitu* is True, *self* is scaled and returned; otherwise, a 
+        copy of *self* is scaled and returned.
+
+        :param value:       The scale fractor.
+        :param insitu:      If True, *self* is scales and returned.
+
+        :returns:           A *self* like instance.
+        """
 
         multid_xys = self
         if( not( insitu ) ) : multid_xys = self.copy( )
         for functional in multid_xys : functional.scaleDependent( value, insitu = True )
 
     def toLinearXYsClass(self):
-        '''Returns self.__class__ since that is the linear class for this dimensional data.'''
+        """
+        This method returns self.__class__ since that is the linear class for this dimensional data.
+
+        :returns:   Always returns the class for *self*.
+        """
 
         return self.__class__
 
     def toPointwiseLinear( self, **kwargs ) :
+        """
+        This method returns an instance of *self*'s that is lin-lin interpolable. This method only works in *self*'s
+        interpolation is "lin-lin" or "flat" and executes a raise if not..
+
+        :param kwargs:      A dictionary of extra arguments that controls how linearize is done.
+
+        :returns:           A *self* like instance.
+        """
 
         if self.interpolation not in [enumsModule.Interpolation.flat, enumsModule.Interpolation.linlin]:
             raise TypeError( 'Unsupported interpolation = "%s".' % self.interpolation )
@@ -698,6 +963,13 @@ class XYsnd( baseModule.XDataFunctional ) :
         return( pointwiseLinear )
 
     def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        This function returns a instance of *self*'s class with the lowest independent axis converted to an XYs1d instance.
+
+        :param kwargs:      A dictionary of extra arguments that controls how linearize is done.
+
+        :returns:           A *self* like instance.
+        """
 
         arguments = self.getArguments( kwargs, { 'cls' : None } )
         cls = arguments['cls']
@@ -714,6 +986,14 @@ class XYsnd( baseModule.XDataFunctional ) :
         return newMultiD
 
     def toXML_strList(self, indent = '', **kwargs):
+        """
+        Returns a list of str instances representing the XML lines of *self*.
+
+        :param indent:          The minimum amount of indentation.
+        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :return:                List of str instances representing the XML lines of self.
+        """
 
         formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
 
@@ -753,7 +1033,15 @@ class XYsnd( baseModule.XDataFunctional ) :
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
-        Translates XYsnd XML into the python XYsnd xData class.
+        Parse *node* into an instance of *cls*.
+
+        :param cls:         Form class to return.
+        :param node:        Node to parse.
+        :param xPath:       List containing xPath to current node, useful mostly for debugging.
+        :param linkData:    dict that collects unresolved links.
+        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+
+        :returns:           An instance of *cls* representing *node*.
         """
 
         attributes, extraAttributes = baseModule.XDataFunctional.parseBareNodeCommonAttributes(node, xPath, True) # parseBareNodeCommonAttributes adds to xPath.
@@ -788,16 +1076,23 @@ class XYsnd( baseModule.XDataFunctional ) :
     @classmethod
     def defaultAxes( cls, labelsUnits ) :
         """
-        :param labelsUnits: dictionary of form {
-                 0:('dependent label','dependent unit'),
-                 1:('1st independent label','1st independent unit'),
-                 2:('2nd independent label','2nd independent unit'), ... }
+        This class method returns an :py:class:`axesModule.Axes` suitable for class *cls* whose labels and units can be
+        set via *labelsUnits*. See :py:class:`axesModule.Axes` for how to use *labelsUnits*.
+
+
+        :param labelsUnits:     A dictionary that can specify labels and units for some of the axis.
+
         :return: new axes instance
         """
 
         return( axesModule.Axes(cls.dimension + 1, labelsUnits = labelsUnits ) )
 
 class XYs2d( XYsnd ) :
+    """
+    This classes represents a 2d function :math:`f(x,y)` effective as a list of :math:`x_i, f_i(y)` objects where :math:`x_i < x_{i+1}` and
+    :math:`f_i(y)` is a 1d function for :math:`f(x,y)` at :math:`x_i`. The :math:`x_i` is stored as the outerDomainValue of :math:`f_i(y)`.
+    The interpolation and interpolationQualifier define has to obtain f:math:`f(x,y)` between :math:`x_i` and :math:`x_{i+1}`.
+    """
 
     moniker = 'XYs2d'
     dimension = 2
@@ -809,6 +1104,11 @@ class XYs2d( XYsnd ) :
                 regionsModule.Regions1d, xs_pdf_cdfMoudle.Xs_pdf_cdf1d )
 
 class XYs3d( XYsnd ) :
+    """
+    This classes represents a 3function :math:`f(x,y,z)` effective as a list of :math:`x_i, f_i(y,z)` objects where :math:`x_i < x_{i+1}` and
+    :math:`f_i(y,z)` is a 2d function for :math:`f(x,y,z)` at :math:`x_i`. The :math:`x_i` is stored as the outerDomainValue of :math:`f_i(y,z)`.
+    The interpolation and interpolationQualifier define has to obtain f:math:`f(x,y,z)` between :math:`x_i` and :math:`x_{i+1}`.
+    """
 
     moniker = 'XYs3d'
     dimension = 3

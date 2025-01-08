@@ -17,53 +17,61 @@ import argparse
 import textwrap
 import shutil
 
+maxSpecialVariableLineIndex = 100       # Special variable definition must come before this line or script is ignored.
 numberOfColumns = shutil.get_terminal_size().columns
 
 parser = argparse.ArgumentParser(description=description)
 args = parser.parse_args()
 
+def addScriptsInBin(binPath, summaryDocString):
+
+    for scriptPath in binPath.glob('*.py'):
+        if scriptPath.name == thisScriptsName:
+            continue
+        with scriptPath.open('r') as fIn:
+            lines = fIn.readlines()
+            for index, line in enumerate(lines):
+                if index > maxSpecialVariableLineIndex:     # Extract check in case there are non-FUDGE scripts in bin directory.
+                    break
+                    print('        ', re.match(r'^summaryDocString__\s*=\s*.+$', line))
+                if re.match(r'^summaryDocString__[a-zA-Z]*\s*=\s*.+$', line):
+                    variable = line.split('=')[0].strip()
+                    exec(line)
+                    subModule = line.split('=')[0].strip().split('__')[1]
+                    if subModule not in summaryDocString:
+                        summaryDocString[subModule] = {}
+                    summaryDocString[subModule][scriptPath.name] = locals()[variable]
+                    break
+
 def printInfo(moduleName, scripts):
-    '''Prints the list of all python files in *scripts* that contain the line "'^summaryDocString%s\s*=\s*.+$' % moduleName".'''
+    r'''Prints the list of all python files in *scripts* that contain the line "'^summaryDocString__%s\s*=\s*.+$' % moduleName".'''
 
     print()
     print('Scripts in %s:' % moduleName)
-    data = {}
-    for script in scripts:
-        if script.name == thisScriptsName:
-            continue
-        with script.open('r') as fIn:
-            lines = fIn.readlines()
-            for line in lines:
-                if re.match('^summaryDocString%s\s*=\s*.+$' % moduleName, line):
-                    data[script.name] = line.split('=')[-1].strip().strip("'")
-                    break
-
     nameWidth = 0
-    for name in data:
+    for name in scripts:
         nameWidth = max(nameWidth, len(name))
     format = '%%-%ds - %%s' % nameWidth
 
     indent = 4 * ' '
     indent2 = (nameWidth + 3) * ' ' + indent
 
-    for name in data:
-        line = format % (name, data[name])
+    for name in sorted(scripts):
+        line = format % (name, scripts[name])
         print('\n'.join(textwrap.wrap(line, width=numberOfColumns,  initial_indent=indent, subsequent_indent=indent2)))
-
-def printSubInfo(subName, binDir):
-    '''Handles calling *printInfo* on submodule named *subName*.'''
-
-    subBinDir = pathlib.Path(binDir.parent) / subName / 'bin'
-    if subBinDir.exists():
-        printInfo(subName, sorted(subBinDir.glob('*.py')))
 
 binDir = pathlib.Path(__file__).resolve().parent
 thisScriptsName = pathlib.Path(__file__).name
 
-xDataBinDir = pathlib.Path(binDir.parent) / 'xData' / 'bin'
-
 scripts = sorted(binDir.glob('*.py'))
+subModules = {}
+for binPath in binDir.parent.glob('**/bin'):
+    addScriptsInBin(binPath, subModules)
 
-printInfo('FUDGE', scripts)
-printSubInfo('PoPs', binDir)
-printSubInfo('xData', binDir)
+for subModule in ['FUDGE', 'PoPs', 'xData']:
+    if subModule not in subModules:
+        continue
+    printInfo(subModule, subModules.pop(subModule))
+
+for subModule in subModules:
+    printInfoo(subModule, subModulessubModule)

@@ -128,16 +128,20 @@ class MultiGroup():
         """
 
         if self.size == 0:
-            indexValue = self.OutOfRangeStatus.noGroupBoundaries
+            indexValue = self.noGroupBoundaries
 
         elif energyValue < self.boundaries[0]:
-            indexValue =  0 if encloseOutOfRange else self.OutOfRangeStatus.belowLowestBoundary
+            indexValue =  0 if encloseOutOfRange else self.belowLowestBoundary
 
-        elif energyValue > self.boundaries[-1]:
-            indexValue =  self.size-2 if encloseOutOfRange else self.OutOfRangeStatus.aboveHighestBoundary
+        elif energyValue >= self.boundaries[-1]:
+            indexValue =  self.size-2 if encloseOutOfRange else self.aboveHighestBoundary
 
         else:
-            indexValue = numpy.argwhere(energyValue<=self.boundaries and energyValue>=self.boundaries)
+            indexValue = numpy.nonzero(energyValue < self.boundaries.vector)[0]
+            if indexValue.shape[0] > 0:
+                indexValue = indexValue[0] - 1
+            else:
+                indexValue = self.aboveHighestBoundary
 
         return indexValue
 

@@ -23,17 +23,18 @@ class Mode(enumsModule.Enum):
     nucleus = enumsModule.auto()
     nuclide = enumsModule.auto()
 
-lightParticleIDs = [{'p': Mode.familiar, 'h1':  Mode.nucleus, 'H1':  Mode.nuclide},
-                    {'d': Mode.familiar, 'h2':  Mode.nucleus, 'H2':  Mode.nuclide},
-                    {'t': Mode.familiar, 'h3':  Mode.nucleus, 'H3':  Mode.nuclide},
-                    {'h': Mode.familiar, 'he3': Mode.nucleus, 'He3': Mode.nuclide},
-                    {'a': Mode.familiar, 'he4': Mode.nucleus, 'He4': Mode.nuclide}]
+lightParticleIDs = [{IDsModule.familiarProton:   Mode.familiar, 'h1':  Mode.nucleus, 'H1':  Mode.nuclide},
+                    {IDsModule.familiarDeuteron: Mode.familiar, 'h2':  Mode.nucleus, 'H2':  Mode.nuclide},
+                    {IDsModule.familiarTriton:   Mode.familiar, 'h3':  Mode.nucleus, 'H3':  Mode.nuclide},
+                    {IDsModule.familiarHelion:   Mode.familiar, 'he3': Mode.nucleus, 'He3': Mode.nuclide},
+                    {IDsModule.familiarAlpha:    Mode.familiar, 'he4': Mode.nucleus, 'He4': Mode.nuclide}]
 
-orderedLightParticles = (IDsModule.photon, IDsModule.neutron, IDsModule.proton, 'd', 't', 'h', 'a')
+orderedLightParticles = (IDsModule.photon, IDsModule.neutron, IDsModule.proton, IDsModule.familiarDeuteron, 
+                         IDsModule.familiarTriton, IDsModule.familiarHelion, IDsModule.familiarAlpha)
 
 def sortLightParticle(ids):
     """
-    From a list of particle *ids*, this function returns the ids sorted. The sorting order is 'n', 'p', 'd', 't', 'a', 'g', 
+    From a list of particle *ids*, this function returns the ids sorted. The sorting order is 'n', 'p', 'd', 't', 'h', 'a', 'g', 
     (i.e., 'photon'). Other ids in the list are return after the ones mentioned and in the order they appear in the list.
     Note, an id will only appear once in the list even it appears more than once in *ids*.
 

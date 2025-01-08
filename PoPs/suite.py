@@ -177,8 +177,9 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
             xmlString += item.toXML_strList(indent2, **kwargs)
 
         if len(xmlString) == 1:
-            if kwargs.get('showEmptySuites', False):
-                xmlString = [xmlString[0][:-1] + '/>']
+            showEmptySuite = kwargs.get('showEmpty', False) or kwargs.get('showEmptySuite', False)
+            if showEmptySuite:
+                xmlString = ['%s%-24s <!-- suite -->' % (indent, ('<%s/>' % self.moniker))]
             else:
                 xmlString = []
         else:
