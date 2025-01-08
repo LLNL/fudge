@@ -10,7 +10,7 @@ import numpy
 from setuptools import setup, Extension
 
 # find numpy include path:
-numpyPath = os.path.join(numpy.get_include(), 'numpy')
+numpyPath = numpy.get_include()
 
 getBreitWignerSums = Extension('_getBreitWignerSums',
         sources=['getBreitWignerSums.c'],

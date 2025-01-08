@@ -31,12 +31,18 @@ class CustomInstall(install):
         binFolder = os.path.join(sys.prefix, 'bin')
         os.chdir('Merced')
         subprocess.check_call('make -j', shell=True)
-        shutil.copy('bin/merced', binFolder)
+        executable = "bin/merced"
+        if sys.platform.startswith('win'):
+            executable = "bin/merced.exe"
+        shutil.copy(executable, binFolder)
         os.chdir(workingFolder)
 
         os.chdir('fudge/processing/deterministic/upscatter')
         subprocess.check_call('make -j', shell=True)
-        shutil.copy('bin/calcUpscatterKernel', binFolder)
+        executable = "bin/calcUpscatterKernel"
+        if sys.platform.startswith('win'):
+            executable = "bin/calcUpscatterKernel.exe"
+        shutil.copy(executable, binFolder)
         os.chdir(workingFolder)
 
         super().run()
@@ -46,7 +52,6 @@ class CustomBuildExt(build_ext):
     def run(self):
         # find numpy include path:
         numpyPath = numpy.get_include()
-        numpyPath = os.path.join(numpyPath, 'numpy')
         assert os.path.isdir(numpyPath), 'Numpy path "%s" NOT FOUND' % numpyPath
 
         for ext in self.extensions:

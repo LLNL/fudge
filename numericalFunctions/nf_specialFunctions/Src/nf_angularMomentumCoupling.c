@@ -57,7 +57,6 @@
 */
 
 #include <stdlib.h>
-#include <math.h>
 
 #include "nf_specialFunctions.h"
 
