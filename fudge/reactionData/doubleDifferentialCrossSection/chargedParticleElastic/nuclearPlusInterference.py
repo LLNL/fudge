@@ -36,7 +36,7 @@ from . import misc as miscModule
 
 class CrossSection(miscModule.ChargedParticleElasticTerm):
     """
-    This class represents the :math:`\sigma(E)` part of :math:`\sigma(E) \, P(\mu|E)`
+    This class represents the :math:`\\sigma(E)` part of :math:`\\sigma(E) \\, P(\\mu|E)`
     """
 
     moniker = 'crossSection'
@@ -45,7 +45,7 @@ class CrossSection(miscModule.ChargedParticleElasticTerm):
 
 class Distribution( miscModule.ChargedParticleElasticTerm):
     """
-    This class represents the :math:`P(\mu|E)` part of :math:`\sigma(E) \, P(\mu|E)`.
+    This class represents the :math:`P(\\mu|E)` part of :math:`\\sigma(E) \\, P(\\mu|E)`.
     """
 
     moniker = 'distribution'
@@ -56,8 +56,8 @@ class Distribution( miscModule.ChargedParticleElasticTerm):
 class NuclearPlusInterference( ancestryModule.AncestryIO ):
     """
     This class represents the nuclear + interference term of the elastic scattering of two nuclei and
-    stores the double differential cross section as the product :math:`\sigma(E) \, P(\mu|E)`.
-    In :math:`P(\mu|E)` the :math:`\mu` ranges from muMin to muCutoff where muCutoff is a member of this
+    stores the double differential cross section as the product :math:`\\sigma(E) \\, P(\\mu|E)`.
+    In :math:`P(\\mu|E)` the :math:`\\mu` ranges from muMin to muCutoff where muCutoff is a member of this
     class and muMin is -muCutoff for identical particles and -1 otherwise.
 
     The following table list the primary members of this class:
@@ -65,7 +65,7 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
     +-------------------+-------------------------------------------------------------------------------+
     | Member            | Description                                                                   |
     +===================+===============================================================================+
-    | muCutoff          | The maximum :math:`\mu` value the data represent.                             |
+    | muCutoff          | The maximum :math:`\\mu` value the data represent.                            |
     +-------------------+-------------------------------------------------------------------------------+
     | crossSection      | The cross section part of the nuclear + interference term.                    |
     +-------------------+-------------------------------------------------------------------------------+
@@ -77,7 +77,7 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
 
     def __init__( self, muCutoff, crossSection = None, distribution = None ):
         """
-        :param muCutoff:        The maximum :math:`\mu` value the data represent.
+        :param muCutoff:        The maximum :math:`\\mu` value the data represent.
         :param crossSection:    The cross section part of the nuclear + interference term.
         :param distribution:    The distribution part of the nuclear + interference term.
         """
@@ -175,7 +175,7 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
 
     def dSigma_dMu(self, energy, accuracy=1e-3, muMax=None, probability=False):
         """
-        Returns :math:`d\sigma / d\mu` at the specified projdctile energy.
+        Returns :math:`d\\sigma / d\\mu` at the specified projdctile energy.
                 
         :param energy:          Energy of the projectile.
         :param accuracy:        This argument is not used.
@@ -207,10 +207,10 @@ class NuclearPlusInterference( ancestryModule.AncestryIO ):
         return _dSigma_dMu
 
     def evaluate( self, E, mu, phi = 0.0 ) :
-        r"""
-        Returns the :math:`d\sigma / d \Omega(energy,\mu,\phi) for Rutherford scattering. Note, Rutherford
+        """
+        Returns the :math:`d\\sigma / d \\Omega(energy,\\mu,\\phi) for Rutherford scattering. Note, Rutherford
         scattering is independent of phi but phi is listed as an argument to be consistent with others
-        :math:`d\sigma / d\Omega` that may depend on phi.
+        :math:`d\\sigma / d\\Omega` that may depend on phi.
 
         :param energy:  Projectile energy.
         :param mu:      Scattering angle cosine.

@@ -149,7 +149,7 @@ def fixMuRange(data, epsilon=1e-6):
     """
     This function ensures that the range of mu in *data* is [-1, 1] by adding 0.0's to the missing ranges. Note, *data* is modified.
 
-    :param data:        A python list of :math:`P(\mu)`.
+    :param data:        A python list of :math:`P(\\mu)`.
     :param epsilon:     The relative amount to add a point below (above) the first (last) point in addition to the point at -1 (1).
     """
 
