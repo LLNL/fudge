@@ -32,6 +32,8 @@ This module contains classes and functions supporting Kalbach-Mann double differ
 """
 
 import math
+from abc import ABC
+
 from fudge.core.math import fudgemath as fudgemathModule
 
 from pqu import PQU as PQUModule
@@ -41,6 +43,7 @@ from xData import base as xDataBaseModule
 from xData import axes as axesModule
 from xData import values as valuesModule
 from xData import XYs1d as XYs1dModule
+from xData import regions as regionsModule
 from xData import multiD_XYs as multiD_XYsModule
 
 from PoPs import specialNuclearParticleID as specialNuclearParticleIDPoPsModule
@@ -57,8 +60,11 @@ KalbachMann_a_parameters = { IDsPoPsModule.neutron  : { 'M' : 1, 'm' : 0.5, 'I' 
                              'He3'                  : { 'M' : 0, 'm' : 1.0, 'I' : 7.72 }, 'He4' : { 'M' : 0, 'm' : 2.0, 'I' : 28.3 },
                              IDsPoPsModule.photon   : { 'M' : 0, 'm' : 0.0, 'I' : 0.0 } }
 
+
 class XYs2d(multiD_XYsModule.XYs2d):
-    """Special XYs2d class for Kalbach/Mann functions r and a to make sure 'unitbase-unscaled' interpolation qualifier."""
+    """
+    Special XYs2d class for Kalbach/Mann functions r and a to make sure 'unitbase-unscaled' interpolation qualifier.
+    """
 
     def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none, interpolationQualifier=None, **kwargs):
 
@@ -67,7 +73,22 @@ class XYs2d(multiD_XYsModule.XYs2d):
 
         return function
 
-class Subform( baseModule.Subform ) :
+
+class Regions2d(regionsModule.Regions2d):
+    """
+    special regions2d class for Kalbach/Mann functions.
+    """
+
+    def evaluate(self, domainValue, extrapolation=xDataEnumsModule.Extrapolation.none,
+                 interpolationQualifier=None, **kwargs):
+
+        # FIXME need to implement interpolationQualifier
+        function = regionsModule.Regions1d.evaluate(self, domainValue)
+
+        return function
+
+
+class Subform(baseModule.Subform, ABC):
     """
     Abstract base class for Kalback/Mann child nodes "f", "r" and "a".
 
@@ -82,18 +103,20 @@ class Subform( baseModule.Subform ) :
     :param data:    2d function.
     """
 
-    ancestryMembers = ( 'data', )
+    ancestryMembers = ('data',)
 
-    def __init__( self, data ) :
+    def __init__(self, data):
 
-        baseModule.Subform.__init__( self )
-        if( ( self.moniker == ASubform.moniker ) and ( data is None ) ) :
+        baseModule.Subform.__init__(self)
+        if (self.moniker == ASubform.moniker) and (data is None):
             pass
-        else :
-            if( not( isinstance( data, xDataBaseModule.XDataFunctional ) ) ) : raise TypeError( 'invalid data for KalbachMannCoefficient' )
-            if( data.dimension != 2 ) : raise TypeError( 'invalid dimension = %s for KalbachMannCoefficient' % data.dimension )
+        else:
+            if not isinstance(data, xDataBaseModule.XDataFunctional):
+                raise TypeError( 'invalid data for KalbachMannCoefficient' )
+            if data.dimension != 2:
+                raise TypeError('invalid dimension = %s for KalbachMannCoefficient' % data.dimension)
         self.data = data
-        if( data is not None ) : self.data.setAncestor( self )
+        if data is not None: self.data.setAncestor(self)
 
     def convertUnits( self, unitMap ) :
         """

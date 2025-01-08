@@ -54,7 +54,7 @@ class Distribution( miscModule.ChargedParticleElasticTerm):
 
 
 class NuclearPlusInterference( ancestryModule.AncestryIO ):
-    """
+    r"""
     This class represents the nuclear + interference term of the elastic scattering of two nuclei and
     stores the double differential cross section as the product :math:`\\sigma(E) \\, P(\\mu|E)`.
     In :math:`P(\\mu|E)` the :math:`\\mu` ranges from muMin to muCutoff where muCutoff is a member of this

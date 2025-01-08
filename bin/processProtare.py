@@ -218,21 +218,7 @@ args.temperatures.sort()
 preProcessedStyles = reactionSuite.styles.preProcessingStyles()
 
 if args.cullProcessedData:
-    stylesToRemove = []
-    for style in reactionSuite.styles:
-        if not isinstance(style, preProcessedStyles):
-            stylesToRemove.append(style.label)
-    reactionSuite.removeStyles(stylesToRemove)
-
-    # applicationData requires special handling:
-    from fudge.processing.deterministic import tokens as deterministicTokensModule
-    from fudge.resonances import probabilityTables as probabilityTablesModule
-    for label in (deterministicTokensModule.multiGroupReactions,
-                  deterministicTokensModule.multiGroupDelayedNeutrons,
-                  deterministicTokensModule.multiGroupIncompleteProducts,
-                  probabilityTablesModule.LLNLProbabilityTablesToken):
-        if label in reactionSuite.applicationData:
-            reactionSuite.applicationData.pop(label)
+    reactionSuite.cullProcessedData()
 
 for style in reactionSuite.styles:                 # Fail on detection of existing processed data.
     if not isinstance(style, preProcessedStyles): 

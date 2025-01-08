@@ -24,6 +24,9 @@ from fudge import product as productModule
 from fudge.productData import averageProductEnergy as averageProductEnergyModule
 from fudge.processing import nuclearPlusCoulombInterference as nuclearPlusCoulombInterferenceModule
 from fudge.processing.deterministic import tokens as deterministicTokensModule
+from fudge.reactionData.doubleDifferentialCrossSection.photonScattering import incoherentDoppler as photoAtomicIncoherentDopplerModule
+
+photoAtomicIncoherentDoppler = 'LLNL::photoAtomicIncoherentDoppler'
 
 class Institution(ancestryModule.AncestryIO):
 
@@ -50,6 +53,16 @@ class Institution(ancestryModule.AncestryIO):
 
         self.__data.append( item )
         item.setAncestor( self )
+        setattr(self, item.moniker, item)
+
+    def convertUnits(self, unitMap):
+        '''
+        This method calls convertUnits on the item of *self* if it has a *convertUnits* method.
+        '''
+
+        for item in self.__data:
+            if hasattr(item, 'convertUnits'):
+                item.convertUnits(unitMap)
 
     def findLinks( self, links ) :
 
@@ -121,6 +134,13 @@ class Institution(ancestryModule.AncestryIO):
             for child in node:
                 if child.tag == averageProductEnergyModule.Component.moniker:
                     institution.append(averageProductEnergyModule.Component.parseNodeUsingClass(child, xPath, linkData))
+                else:                       # This should not happen.
+                    raise Exception('Unsupported child "%s" for institution "%s".' % (child.tag, label))
+        elif label == photoAtomicIncoherentDoppler:
+            institution = cls(label)
+            for child in node:
+                if child.tag == photoAtomicIncoherentDopplerModule.Reactions.moniker:
+                    institution.append(photoAtomicIncoherentDopplerModule.Reactions.parseNodeUsingClass(child, xPath, linkData))
                 else:                       # This should not happen.
                     raise Exception('Unsupported child "%s" for institution "%s".' % (child.tag, label))
         else :

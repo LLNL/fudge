@@ -90,9 +90,9 @@ try:
             if hasattr(topLevel, 'convertUnits') and args.energyUnit != 'eV':
                 topLevel.convertUnits({'eV': args.energyUnit})
             if hasattr(topLevel, 'saveAllToFile'):
-                topLevel.saveAllToFile(outFile)
+                topLevel.saveAllToFile(outFile, formatVersion=args.formatVersion)
             else:
-                topLevel.saveToFile(outFile)
+                topLevel.saveToFile(outFile, formatVersion=args.formatVersion)
             break
 except Exception as err:
     sys.stderr.write('WARNING: ENDF write error: %s\n' % err)
