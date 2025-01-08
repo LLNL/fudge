@@ -19,6 +19,7 @@ from xData import axes as axesModule
 from xData.Documentation import documentation as documentationModule
 
 from fudge import physicalQuantity as physicalQuantityModule
+from fudge import targetInfo as targetInfoModule
 
 from fudge.processing import flux as fluxModule
 from fudge.processing import transportables as transportablesModule
@@ -332,7 +333,7 @@ class Styles(ancestryModule.AncestryIO_base):
         _evaluateds = self.getStylesOfClass( Evaluated )
         _styles = self.chains( ends = True, _styles = _evaluateds )
         if( len( _styles ) == 0 ) : raise Exception( '''No evaluated style found.''' )
-        if( len( _styles ) > 1 ) : raise Exception( '''Multiple (%d) evaluated styles.''' % ( len( styleList ) ) )
+        if( len( _styles ) > 1 ) : raise Exception( '''Multiple (%d) evaluated styles.''' % ( len( _styles ) ) )
 
         return( self[_styles[0][0].label] )
 
@@ -706,7 +707,8 @@ class Evaluated( StyleWithTemperature ) :
     moniker = 'evaluated'
     sortOrderIndex = 0
 
-    def __init__( self, label, derivedFrom, temperature, projectileEnergyDomain, library, version, date = None ) :
+    def __init__( self, label, derivedFrom, temperature, projectileEnergyDomain, library, version,
+                  date = None, targetInfo = None ) :
 
         StyleWithTemperature.__init__( self, label, derivedFrom, temperature, date = date )
 
@@ -717,6 +719,8 @@ class Evaluated( StyleWithTemperature ) :
         self.__version = version
 
         self.projectileEnergyDomain = projectileEnergyDomain
+
+        self.targetInfo = targetInfo
 
     @property
     def library( self ) :
@@ -755,6 +759,27 @@ class Evaluated( StyleWithTemperature ) :
         self.__projectileEnergyDomain = value
 
     @property
+    def targetInfo(self):
+        """
+        Target info property (stores isotopic abundances for TNSL evaluations).
+        """
+
+        if self.__targetInfo is None and self.derivedFromStyle is not None:
+            return self.derivedFromStyle.targetInfo
+        return self.__targetInfo
+
+    @targetInfo.setter
+    def targetInfo(self, value):
+        """
+        Setter for target info property
+        """
+
+        if not isinstance(value, (targetInfoModule.TargetInfo, type(None))):
+            raise TypeError("Expected TargetInfo instance, got '%s' instead" % type(value))
+        if value is not None: value.setAncestor(self)
+        self.__targetInfo = value
+
+    @property
     def version( self ) :
         """
         Version property, i.e. the version of this library's release.
@@ -788,14 +813,23 @@ class Evaluated( StyleWithTemperature ) :
 
         return 0
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
         """Return styles XML node and its child nodes as a list"""
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        xmlStringList = ['%s<%s %s library="%s" version="%s">' % (indent, self.moniker, self.XMLCommonAttributes(), self.library, self.version)]
+        xmlStringList = ['%s<%s %s library="%s" version="%s">' %
+                         (indent, self.moniker, self.XMLCommonAttributes(), self.library, self.version)]
         xmlStringList += self.toXML_strListCommon(indent2, **kwargs)
-        if( self.__projectileEnergyDomain is not None ) : xmlStringList += self.projectileEnergyDomain.toXML_strList( indent2, **kwargs )
+        if self.__projectileEnergyDomain is not None:
+            xmlStringList += self.projectileEnergyDomain.toXML_strList(indent2, **kwargs)
+        if self.targetInfo is not None:
+            # targetInfo was introduced in GNDS-2.1
+            formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
+            versionTuple = GNDS_formatVersionModule.versionComponents(formatVersion)
+            if versionTuple[:2] >= (2, 1):
+                xmlStringList += self.targetInfo.toXML_strList(indent2, **kwargs)
+
         xmlStringList[-1] += '</%s>' % self.moniker
 
         return xmlStringList
@@ -806,17 +840,26 @@ class Evaluated( StyleWithTemperature ) :
 
         label, derivedFrom, date, temperature = StyleWithTemperature.parseNodeBase(node, xPath, linkData, **kwargs)
 
-        library = node.get( 'library' )
-        version = node.get( 'version' )
-        _projectileEnergyDomain = node.find( ProjectileEnergyDomain.moniker )
-        if( _projectileEnergyDomain is not None ) : _projectileEnergyDomain = ProjectileEnergyDomain.parseNodeUsingClass(_projectileEnergyDomain, xPath, linkData, **kwargs)
+        library = node.get('library')
+        version = node.get('version')
+        _projectileEnergyDomain = node.find(ProjectileEnergyDomain.moniker)
+        if _projectileEnergyDomain is not None:
+            _projectileEnergyDomain = ProjectileEnergyDomain.parseNodeUsingClass(
+                _projectileEnergyDomain, xPath, linkData, **kwargs)
 
         evaluated = cls(label, derivedFrom, temperature, _projectileEnergyDomain, library, version, date=date)
         evaluated.parseCommonChildNodes(node, xPath, linkData, **kwargs)
 
+        _targetInfo = node.find(targetInfoModule.TargetInfo.moniker)
+        if _targetInfo is not None:
+            _targetInfo = targetInfoModule.TargetInfo.parseNodeUsingClass(
+                _targetInfo, xPath, linkData, **kwargs)
+            evaluated.targetInfo = _targetInfo
+
         xPath.pop()
 
         return evaluated
+
 
 class ProjectileEnergyDomain( ancestryModule.AncestryIO ) :
     """
@@ -871,6 +914,7 @@ class ProjectileEnergyDomain( ancestryModule.AncestryIO ) :
         xPath.pop()
 
         return PED
+
 
 class CrossSectionReconstructed(StyleWithTemperature):
     """

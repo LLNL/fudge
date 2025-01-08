@@ -58,6 +58,7 @@
 <span class="kn">from</span> <span class="nn">xData.Documentation</span> <span class="kn">import</span> <span class="n">documentation</span> <span class="k">as</span> <span class="n">documentationModule</span>
 
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">physicalQuantity</span> <span class="k">as</span> <span class="n">physicalQuantityModule</span>
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">targetInfo</span> <span class="k">as</span> <span class="n">targetInfoModule</span>
 
 <span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="kn">import</span> <span class="n">flux</span> <span class="k">as</span> <span class="n">fluxModule</span>
 <span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="kn">import</span> <span class="n">transportables</span> <span class="k">as</span> <span class="n">transportablesModule</span>
@@ -371,7 +372,7 @@
         <span class="n">_evaluateds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStylesOfClass</span><span class="p">(</span> <span class="n">Evaluated</span> <span class="p">)</span>
         <span class="n">_styles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">(</span> <span class="n">ends</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">_styles</span> <span class="o">=</span> <span class="n">_evaluateds</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">_styles</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;&#39;&#39;No evaluated style found.&#39;&#39;&#39;</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">_styles</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;&#39;&#39;Multiple (</span><span class="si">%d</span><span class="s1">) evaluated styles.&#39;&#39;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">_styles</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;&#39;&#39;Multiple (</span><span class="si">%d</span><span class="s1">) evaluated styles.&#39;&#39;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">_styles</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">_styles</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="p">)</span></div>
 
@@ -745,7 +746,8 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;evaluated&#39;</span>
     <span class="n">sortOrderIndex</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">projectileEnergyDomain</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">projectileEnergyDomain</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span>
+                  <span class="n">date</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">targetInfo</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="n">StyleWithTemperature</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="n">date</span> <span class="p">)</span>
 
@@ -756,6 +758,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__version</span> <span class="o">=</span> <span class="n">version</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">projectileEnergyDomain</span> <span class="o">=</span> <span class="n">projectileEnergyDomain</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetInfo</span> <span class="o">=</span> <span class="n">targetInfo</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">library</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
@@ -794,6 +798,27 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__projectileEnergyDomain</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">targetInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Target info property (stores isotopic abundances for TNSL evaluations).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__targetInfo</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">derivedFromStyle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">derivedFromStyle</span><span class="o">.</span><span class="n">targetInfo</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__targetInfo</span>
+
+    <span class="nd">@targetInfo</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">targetInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for target info property</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">targetInfoModule</span><span class="o">.</span><span class="n">TargetInfo</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected TargetInfo instance, got &#39;</span><span class="si">%s</span><span class="s2">&#39; instead&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">value</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__targetInfo</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">version</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Version property, i.e. the version of this library&#39;s release.</span>
@@ -827,14 +852,23 @@
 
         <span class="k">return</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="Evaluated.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Evaluated.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Evaluated.toXML_strList"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.Evaluated.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return styles XML node and its child nodes as a list&quot;&quot;&quot;</span>
 
-        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
 
-        <span class="n">xmlStringList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> library=&quot;</span><span class="si">%s</span><span class="s1">&quot; version=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">XMLCommonAttributes</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)]</span>
+        <span class="n">xmlStringList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> library=&quot;</span><span class="si">%s</span><span class="s1">&quot; version=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span>
+                         <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">XMLCommonAttributes</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)]</span>
         <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXML_strListCommon</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__projectileEnergyDomain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectileEnergyDomain</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__projectileEnergyDomain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectileEnergyDomain</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetInfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># targetInfo was introduced in GNDS-2.1</span>
+            <span class="n">formatVersion</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;formatVersion&#39;</span><span class="p">,</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
+            <span class="n">versionTuple</span> <span class="o">=</span> <span class="n">GNDS_formatVersionModule</span><span class="o">.</span><span class="n">versionComponents</span><span class="p">(</span><span class="n">formatVersion</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">versionTuple</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetInfo</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
         <span class="n">xmlStringList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
 
         <span class="k">return</span> <span class="n">xmlStringList</span></div>
@@ -845,17 +879,26 @@
 
         <span class="n">label</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">temperature</span> <span class="o">=</span> <span class="n">StyleWithTemperature</span><span class="o">.</span><span class="n">parseNodeBase</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">library</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;library&#39;</span> <span class="p">)</span>
-        <span class="n">version</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;version&#39;</span> <span class="p">)</span>
-        <span class="n">_projectileEnergyDomain</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">ProjectileEnergyDomain</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">_projectileEnergyDomain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">_projectileEnergyDomain</span> <span class="o">=</span> <span class="n">ProjectileEnergyDomain</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">_projectileEnergyDomain</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">library</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;library&#39;</span><span class="p">)</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+        <span class="n">_projectileEnergyDomain</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">ProjectileEnergyDomain</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_projectileEnergyDomain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_projectileEnergyDomain</span> <span class="o">=</span> <span class="n">ProjectileEnergyDomain</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span>
+                <span class="n">_projectileEnergyDomain</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">evaluated</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">_projectileEnergyDomain</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">)</span>
         <span class="n">evaluated</span><span class="o">.</span><span class="n">parseCommonChildNodes</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+        <span class="n">_targetInfo</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">targetInfoModule</span><span class="o">.</span><span class="n">TargetInfo</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_targetInfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_targetInfo</span> <span class="o">=</span> <span class="n">targetInfoModule</span><span class="o">.</span><span class="n">TargetInfo</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span>
+                <span class="n">_targetInfo</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">evaluated</span><span class="o">.</span><span class="n">targetInfo</span> <span class="o">=</span> <span class="n">_targetInfo</span>
+
         <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">evaluated</span></div></div>
+
 
 <div class="viewcode-block" id="ProjectileEnergyDomain"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.ProjectileEnergyDomain">[docs]</a><span class="k">class</span> <span class="nc">ProjectileEnergyDomain</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -910,6 +953,7 @@
         <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">PED</span></div></div>
+
 
 <div class="viewcode-block" id="CrossSectionReconstructed"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.styles.CrossSectionReconstructed">[docs]</a><span class="k">class</span> <span class="nc">CrossSectionReconstructed</span><span class="p">(</span><span class="n">StyleWithTemperature</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

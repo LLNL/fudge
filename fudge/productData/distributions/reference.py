@@ -114,7 +114,11 @@ class Form( linkModule.Link, baseModule.Form ) :
         """     
 
         # temporary solution:
-        return( self.referenceInstance.processMC_cdf( style, tempInfo, indent ) )
+        tempInfo['viaReference'] = True
+        instance = self.referenceInstance.processMC_cdf(style, tempInfo, indent)
+        tempInfo['viaReference'] = False
+
+        return instance
 
         # better solution: add another link pointing to the processed version of what this points to:
         """

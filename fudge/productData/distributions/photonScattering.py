@@ -131,3 +131,9 @@ class IncoherentPhotonScattering :
     class Form(BaseForm):
 
         moniker = 'incoherentPhotonScattering'
+
+class IncoherentBoundToFreePhotonScattering :
+
+    class Form(BaseForm):
+
+        moniker = 'incoherentBoundToFreePhotonScattering'

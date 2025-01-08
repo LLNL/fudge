@@ -44,22 +44,26 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
     - Install FUDGE:
 
-          pip install git+https://github.com/LLNL/fudge.git@6.7.1
+          # Install latest available version:
+          pip install git+https://github.com/LLNL/fudge.git
+
+      Or,
+
+          # Install a tagged release:
+          pip install git+https://github.com/LLNL/fudge.git@fudge6.8.0
 
 
 - Installation by cloning the git repository and building with the unix `make` command: 
   This is the typical mode for active FUDGE maintenance and development.
   The following steps are recommended:
 
-    - Ensure that NumPy (version 1.15 or later) is installed
+    - Ensure that NumPy (version 1.15 or greater) is installed
 
     - Clone FUDGE in the current directory: 
      
-        ```
         git clone https://github.com/LLNL/fudge.git
-        # or using SSH (requires creating a github account and registering an ssh key):
-        git clone git@github.com:LLNL/fudge.git
-        ```
+            # or using SSH (requires creating a github account and registering an ssh key):
+            git clone git@github.com:LLNL/fudge.git
      
     - Build FUDGE:
 
@@ -81,6 +85,18 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
       - on Windows, the environment variable should be added to the registry (see for 
           example <http://www.support.tabs3.com/main/R10463.htm>)
+
+### Notes for Windows users:
+
+FUDGE installations are now regularly tested on Github CI using Windows with the MinGW environment.
+Compiling C extensions on Windows may require an extra step: if command 'cc.exe' is not available,
+locate a C compiler and set environment variable CC to that compiler.  For example,
+```
+set CC=gcc
+pip install git+https://github.com/LLNL/fudge.git
+```
+
+Please let us know if you run into trouble installing or using FUDGE on Windows!
 
 ### Differences between FUDGE installed via `pip install` vs. via `make`:
 

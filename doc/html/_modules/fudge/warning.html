@@ -1019,6 +1019,16 @@
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">fraction</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">fraction</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="UnphysicalDiscreteOrPrimaryPhotonMultiplicity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnphysicalDiscreteOrPrimaryPhotonMultiplicity">[docs]</a><span class="k">class</span> <span class="nc">UnphysicalDiscreteOrPrimaryPhotonMultiplicity</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Max multiplicity for discrete or primary photons should be 1&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Multiplicity &gt; 1 for primary or discrete photon&quot;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="MadlandNixBadParameters"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MadlandNixBadParameters">[docs]</a><span class="k">class</span> <span class="nc">MadlandNixBadParameters</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">EFL</span><span class="p">,</span> <span class="n">EFH</span><span class="p">,</span> <span class="n">minTm</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>

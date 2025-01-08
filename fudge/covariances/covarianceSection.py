@@ -23,6 +23,7 @@ from .covarianceMatrix import CovarianceMatrix
 from .mixed import MixedForm
 from .summed import SummedCovariance
 
+
 class CovarianceSection(suitesModule.Suite):
     """
     A covarianceSuite contains sections, where each section represents either a self-covariance for one quantity,
@@ -52,7 +53,7 @@ class CovarianceSection(suitesModule.Suite):
         :param columnData: xData.link.link pointing to data corresponding to columns of the covariance matrix
         """
 
-        suitesModule.Suite.__init__( self, [Covariance] )
+        suitesModule.Suite.__init__(self, [Covariance])
         self.label = label
 
         self.rowData = rowData
@@ -82,51 +83,55 @@ class CovarianceSection(suitesModule.Suite):
         except IndexError:
             return self[0]
 
-    def check( self, info ):
+    def check(self, info):
         """ check each section """
 
         from fudge import warning
         warnings = []
         for form in self:
-            formWarnings = form.check( info )
+            formWarnings = form.check(info)
             if formWarnings:
-                warnings.append( warning.Context( "Form '%s':" % form.label, formWarnings ) )
+                warnings.append(warning.Context("Form '%s':" % form.label, formWarnings))
 
         return warnings
 
-    def findInstancesOfClassInChildren(self, cls, level = 9999):
+    def findInstancesOfClassInChildren(self, cls, level=9999):
 
         foundInstances = ancestryModule.Ancestry.findInstancesOfClassInChildren(self, cls, level)
         foundInstances += suitesModule.Suite.findInstancesOfClassInChildren(self, cls, level)
 
         return foundInstances
-    
-    def fix( self, **kw ): 
+
+    def fix(self, **kw):
         """assemble some useful info, to be handed down to children's check() functions"""
         info = {}
         warnings = []
-        if self.rowData is None:    info['rowENDF_MFMT'] = None
-        else:                       info['rowENDF_MFMT'] = self.rowData['ENDF_MFMT']
-        if self.columnData is None: info['columnENDF_MFMT'] = None
-        else:                       info['columnENDF_MFMT'] = self.columnData['ENDF_MFMT']
-        info.update( kw )
-        for form in self: warnings += form.fix( **info )
+        if self.rowData is None:
+            info['rowENDF_MFMT'] = None
+        else:
+            info['rowENDF_MFMT'] = self.rowData['ENDF_MFMT']
+        if self.columnData is None:
+            info['columnENDF_MFMT'] = None
+        else:
+            info['columnENDF_MFMT'] = self.columnData['ENDF_MFMT']
+        info.update(kw)
+        for form in self: warnings += form.fix(**info)
         return warnings
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
         formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
         moniker = self.monikerByFormat.get(formatVersion, self.moniker)
-        xmlString = [indent+'<%s label="%s"' % (moniker, self.label)]
+        xmlString = [indent + '<%s label="%s"' % (moniker, self.label)]
         if self.crossTerm: xmlString[0] += ' crossTerm="true"'
         xmlString[0] += '>'
-        for dataPointer in ('rowData','columnData'):
+        for dataPointer in ('rowData', 'columnData'):
             if getattr(self, dataPointer) is not None:
-                xmlString.append( getattr(self, dataPointer).toXML( indent2, **kwargs ) )
+                xmlString.append(getattr(self, dataPointer).toXML(indent2, **kwargs))
         for form in self:
-            xmlString += form.toXML_strList( indent2, **kwargs )
+            xmlString += form.toXML_strList(indent2, **kwargs)
         xmlString[-1] += '</%s>' % moniker
         return xmlString
 
@@ -134,22 +139,22 @@ class CovarianceSection(suitesModule.Suite):
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
         """Translate <section> element from xml."""
 
-        xPath.append( '%s[@label="%s"]' % (element.tag, element.get('label') ) )
+        xPath.append('%s[@label="%s"]' % (element.tag, element.get('label')))
 
-        linkData['typeConversion'] = {'domainMin':float, 'domainMax':float}
+        linkData['typeConversion'] = {'domainMin': float, 'domainMax': float}
         rowData_ = RowData.parseNodeUsingClass(element[0], xPath, linkData, **kwargs)
         columnData_ = None
-        if element[1].tag=="columnData":
+        if element[1].tag == "columnData":
             columnData_ = ColumnData.parseNodeUsingClass(element[1], xPath, linkData, **kwargs)
         del linkData['typeConversion']
-        section_ = cls( element.get('label'), rowData_, columnData_ )
+        section_ = cls(element.get('label'), rowData_, columnData_)
         start = 2 if (columnData_ is not None) else 1
         for form in element[start:]:
             formClass = {
-                    CovarianceMatrix.moniker: CovarianceMatrix,
-                    MixedForm.moniker: MixedForm,
-                    SummedCovariance.moniker: SummedCovariance,
-                    }.get( form.tag )
+                CovarianceMatrix.moniker: CovarianceMatrix,
+                MixedForm.moniker: MixedForm,
+                SummedCovariance.moniker: SummedCovariance,
+            }.get(form.tag)
             if formClass is None:
                 raise Exception("encountered unknown covariance matrix form '%s'" % form.tag)
             section_.add(formClass.parseNodeUsingClass(form, xPath, linkData, **kwargs))
@@ -158,12 +163,13 @@ class CovarianceSection(suitesModule.Suite):
 
         return section_
 
-class DataLink( linkModule.Link, abc.ABC ):
+
+class DataLink(linkModule.Link, abc.ABC):
     """
     Base class for RowData and ColumnData. Both are links but with some additional attributes.
     """
 
-    def __init__( self, link=None, root=None, path=None, label=None, relative=False, ENDF_MFMT=None, dimension=None):
+    def __init__(self, link=None, root=None, path=None, label=None, relative=False, ENDF_MFMT=None, dimension=None):
         linkModule.Link.__init__(self, link=link, root=root, path=path, label=label, relative=relative)
         self.ENDF_MFMT = ENDF_MFMT
         if dimension is not None:
@@ -194,9 +200,9 @@ class DataLink( linkModule.Link, abc.ABC ):
     copy = __deepcopy__
     """
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
         formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
 
         if formatVersion == GNDS_formatVersionModule.version_1_10:
@@ -212,15 +218,15 @@ class DataLink( linkModule.Link, abc.ABC ):
                 for attr in ('domainMin', 'domainMax', 'domainUnit'):
                     if getattr(slice_, attr) is not None:
                         attributeStr += ' %s="%s"' % (attr, getattr(slice_, attr))
-            XMLList = [ '%s<%s%s href="%s"/>' % ( indent, self.moniker, attributeStr, self.build_href( **kwargs ) ) ]
-        else:   # GNDS-2.0 or later
+            XMLList = ['%s<%s%s href="%s"/>' % (indent, self.moniker, attributeStr, self.build_href(**kwargs))]
+        else:  # GNDS-2.0 or later
             attrs = ""
             for attr in ('ENDF_MFMT', 'dimension'):
                 if getattr(self, attr) is not None:
                     attrs += ' %s="%s"' % (attr, getattr(self, attr))
             closeTag = ">" if self.slices else "/>"
 
-            XMLList = ['%s<%s%s href="%s"%s' % ( indent, self.moniker, attrs, self.build_href( **kwargs ), closeTag )]
+            XMLList = ['%s<%s%s href="%s"%s' % (indent, self.moniker, attrs, self.build_href(**kwargs), closeTag)]
             if self.slices:
                 XMLList += self.slices.toXML_strList(indent2, **kwargs)
                 XMLList[-1] += "</%s>" % self.moniker
@@ -234,13 +240,13 @@ class DataLink( linkModule.Link, abc.ABC ):
         if (linkElement.get('L') or linkElement.get('domainMin')
                 and linkData['formatVersion'] == GNDS_formatVersionModule.version_1_10):
             attrs1_10 = {attr: linkElement.attrib.pop(attr) for attr in
-                              ('domainMin', 'domainMax', 'L', 'domainUnit') if attr in linkElement.attrib}
-            if 'L' in attrs1_10:    # angular distribution covariance
+                         ('domainMin', 'domainMax', 'L', 'domainUnit') if attr in linkElement.attrib}
+            if 'L' in attrs1_10:  # angular distribution covariance
                 attrs1_10['domainValue'] = attrs1_10['L']
                 attrs1_10['dimension'] = 1
                 attrs1_10['outerDimension'] = 2
                 del attrs1_10['L']
-            else:   # energy distribution covariance
+            else:  # energy distribution covariance
                 attrs1_10['dimension'] = 2
                 attrs1_10['outerDimension'] = 1
 
@@ -252,13 +258,14 @@ class DataLink( linkModule.Link, abc.ABC ):
             instance.slices.add(Slice(**attrs1_10))
         return instance
 
-class RowData( DataLink ):
 
+class RowData(DataLink):
     moniker = 'rowData'
 
-class ColumnData( DataLink ):
 
+class ColumnData(DataLink):
     moniker = 'columnData'
+
 
 class Slice(ancestryModule.AncestryIO):
     """
@@ -267,8 +274,9 @@ class Slice(ancestryModule.AncestryIO):
     """
 
     moniker = "slice"
-    def __init__(self, dimension:int, domainUnit:str = None, domainMin:float = None, domainMax:float = None,
-                 domainValue:float = None):
+
+    def __init__(self, dimension: int, domainUnit: str = None, domainMin: float = None, domainMax: float = None,
+                 domainValue: float = None):
 
         if domainValue is not None:
             assert domainMin is None and domainMax is None, "domainValue must not be supplied along with domainMin/Max"
@@ -286,44 +294,50 @@ class Slice(ancestryModule.AncestryIO):
         self.__domainValue = domainValue
 
     @property
-    def dimension(self): return self.__dimension
+    def dimension(self):
+        return self.__dimension
 
     @property
-    def label(self): return str(self.__dimension)
+    def label(self):
+        return str(self.__dimension)
 
     @property
-    def domainUnit(self): return self.__domainUnit
+    def domainUnit(self):
+        return self.__domainUnit
 
     @property
-    def domainMin(self): return self.__domainMin
+    def domainMin(self):
+        return self.__domainMin
 
     @property
-    def domainMax(self): return self.__domainMax
+    def domainMax(self):
+        return self.__domainMax
 
     @property
-    def domainValue(self): return self.__domainValue
+    def domainValue(self):
+        return self.__domainValue
 
-    def toXML_strList(self, indent = '', **kwargs):
+    def toXML_strList(self, indent='', **kwargs):
 
         attributesStr = ""
         for attr in ('domainMin', 'domainMax', 'domainValue', 'domainUnit'):
             if getattr(self, attr) is not None:
                 attributesStr += ' %s="%s"' % (attr, getattr(self, attr))
-        xmlStringList = [ '%s<%s dimension="%d"%s/>' % ( indent, self.moniker, self.__dimension, attributesStr ) ]
+        xmlStringList = ['%s<%s dimension="%d"%s/>' % (indent, self.moniker, self.__dimension, attributesStr)]
         return xmlStringList
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        xPath.append( node.tag )
+        xPath.append(node.tag)
         slice_ = cls(node.get('dimension'), node.get('domainUnit'),
-                       node.get('domainMin'), node.get('domainMax'), node.get('domainValue'))
-        xPath.pop( )
+                     node.get('domainMin'), node.get('domainMax'), node.get('domainValue'))
+        xPath.pop()
         return slice_
 
-class Slices( suitesModule.Suite ):
 
+class Slices(suitesModule.Suite):
     moniker = "slices"
 
     def __init__(self):
-        suitesModule.Suite.__init__( self, [Slice] )
+        suitesModule.Suite.__init__(self, [Slice])

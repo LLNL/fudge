@@ -28,8 +28,9 @@ from PoPs import IDs as IDsPoPsModule
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
 from PoPs.families import unorthodox as unorthodoxModule
+from PoPs.chemicalElements import chemicalElement as chemicalElementModule
 
-from fudge import enums as enumsModule
+from fudge import enums as enumsModule, targetInfo
 from fudge import physicalQuantity as physicalQuantityModule
 from fudge import styles as stylesModule
 from fudge import reactionSuite as reactionSuiteModule
@@ -182,6 +183,13 @@ def ITYPE_2(fileName, MAT, MTDatas, info, evaluation, verbose):
         # Unfortunately libraries use different conventions for TNSL MAT numbers, and ZSYMAM can only be 11 chars
         raise Exception("Cannot determine TNSL target ZA or id from filename %s" % fileName)
 
+    targetInfo_ = None
+    info.boundAtomCrossSections = []
+    if 7 in MTDatas[451]:
+        # ENDF-6 now (as of 2023) supports listing isotopic abundances within TNSL. Parse those into 'targetInfo'
+        dat = MTDatas[451][7]
+        targetInfo_, info.boundAtomCrossSections = readMF7_info(info, dat)
+
     target = toGNDSMiscModule.getTypeNameGamma(info, ZA)
     if targetID is None: targetID = "tnsl-" + target.id
     tnsl_target = unorthodoxModule.Particle(targetID)
@@ -193,6 +201,10 @@ def ITYPE_2(fileName, MAT, MTDatas, info, evaluation, verbose):
 
     interaction = enumsModule.Interaction.TNSL
     info.principalScattererPid = target.id
+    if len(info.boundAtomCrossSections) > 1:
+        # switch principal scattering atom to chemical element:
+        popsParticle = info.PoPs[target.id]
+        info.principalScattererPid = popsParticle.chemicalElementSymbol
     info.scatterers = scatterers
     evaluatedStyle.documentation.endfCompatible.body = info.documentation
     endfFileToGNDSMisc.completeDocumentation(info, evaluatedStyle.documentation)
@@ -222,6 +234,8 @@ def ITYPE_2(fileName, MAT, MTDatas, info, evaluation, verbose):
     reactionSuite = reactionSuiteModule.ReactionSuite(info.projectile, targetID, evaluation, style=evaluatedStyle,
                                                       interaction=interaction,
                                                       formatVersion=info.formatVersion, MAT=MAT, PoPs=info.PoPs)
+    if targetInfo_ is not None:
+        reactionSuite.styles.getEvaluatedStyle().targetInfo = targetInfo_
 
     for reaction in reactions:
         reactionSuite.reactions.add(reaction)
@@ -345,18 +359,25 @@ def readMF7(info, MT, MF7):
         boundAtomCrossSection = incoherentInelasticModule.BoundAtomCrossSection(
             freeAtomCrossSection * ((massAMU + neutronMassAMU) / massAMU) ** 2, 'b')
 
+        boundAtomCrossSectionByNuclide = None
+        if hasattr(info, 'boundAtomCrossSections'):
+            boundAtomCrossSectionByNuclide = incoherentInelasticModule.BoundAtomCrossSectionByNuclide()
+            for bac in info.boundAtomCrossSections:
+                boundAtomCrossSectionByNuclide.add(bac)
+
         principalAtom = {
             'pid': pid,
             'numberPerMolecule': numberPerMolecule,
             'mass': incoherentInelasticModule.Mass(massAMU, 'amu'),
             'e_max': incoherentInelasticModule.E_max(b_n[3], 'eV'),
             'boundAtomCrossSection': boundAtomCrossSection,
+            'boundAtomCrossSectionByNuclide': boundAtomCrossSectionByNuclide,
             'selfScatteringKernel': None,  # principal scattering kernel is read after all scattering atoms
             'primaryScatterer': True,
             'e_critical': incoherentInelasticModule.E_critical(b_n[1], 'eV')
         }
 
-        if len(info.PoPs[pid].mass) == 0:
+        if pid in info.PoPs and len(info.PoPs[pid].mass) == 0:
             mass = massModule.Double(info.PoPsLabel, massAMU, quantityModule.stringToPhysicalUnit('amu'))
             info.PoPs[pid].mass.add(mass)
 
@@ -512,3 +533,41 @@ def readMF7(info, MT, MF7):
     if line != len(MF7): raise ValueError("Trailing data left in MT%i MF7!" % MT)
 
     return forms
+
+
+def readMF7_info(info, dat):
+    ZA, AWR, NA, dum, dum, dum = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(dat[0], range(2, 6))
+    neutronMassAMU = info.PoPs[IDsPoPsModule.neutron].mass.float('amu')
+
+    targetInfo_ = targetInfo.TargetInfo()
+    boundAtomCrossSections = []
+    line = 1
+    for element_idx in range(NA):
+        dum, dum, NAS, dum, tmp, NI = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(dat[line], range(2, 6))
+        assert tmp == NI * 6, f"Malformed line #{line} in MF=7 MT=451"
+        line += 1
+
+        element = None
+        for nuclide_index in range(NI):
+            ZAI, LISI, AFI, AWRI, SFI, dum = endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(dat[line])
+            if LISI != 0:
+                raise NotImplementedError("Isomeric state in MF=7 MT=451")
+            pops_nuclide = toGNDSMiscModule.getTypeNameGamma(info, int(ZAI))
+            info.PoPs.add(pops_nuclide)
+            massAMU = AWRI * neutronMassAMU
+            mass = massModule.Double(info.PoPsLabel, massAMU, quantityModule.stringToPhysicalUnit('amu'))
+            info.PoPs[pops_nuclide.id].mass.add(mass)
+
+            boundAtomCrossSections.append(incoherentInelasticModule.BoundAtomCrossSection(
+                SFI * ((massAMU + neutronMassAMU) / massAMU) ** 2, 'b', label=pops_nuclide.id))
+            nuclide = targetInfo.Nuclide(pops_nuclide.id, AFI)
+
+            if element is None:
+                symbol = pops_nuclide.findClassInAncestry(chemicalElementModule.ChemicalElement).symbol
+                element = targetInfo.ChemicalElement(symbol)
+            element.nuclides.add(nuclide)
+            line += 1
+
+        targetInfo_.isotopicAbundances.chemicalElements.add(element)
+
+    return targetInfo_, boundAtomCrossSections

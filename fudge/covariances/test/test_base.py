@@ -14,6 +14,7 @@ dbrown, 12/5/2012
 """
 
 import unittest, copy, os
+
 defaultAccuracy = 0.001
 
 from fudge import GNDS_formatVersion as GNDS_formatVersionModule
@@ -31,29 +32,34 @@ from xData import values as valuesModule
 from xData import xDataArray as arrayModule
 
 TEST_DATA_PATH, this_filename = os.path.split(__file__)
-HEvaluation =  reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH+os.sep+'n-001_H_001.endf.gnds.xml')
-HCovariance =  covarianceSuite.CovarianceSuite.readXML_file(TEST_DATA_PATH+os.sep+'n-001_H_001.endf.gndsCov.xml', reactionSuite=HEvaluation)
+HEvaluation = reactionSuite.ReactionSuite.readXML_file(TEST_DATA_PATH + os.sep + 'n-001_H_001.endf.gnds.xml')
+HCovariance = covarianceSuite.CovarianceSuite.readXML_file(TEST_DATA_PATH + os.sep + 'n-001_H_001.endf.gndsCov.xml',
+                                                           reactionSuite=HEvaluation)
 
 
-class TestCaseBase( unittest.TestCase ):
+class TestCaseBase(unittest.TestCase):
 
-    def assertXMLListsEqual(self,x1,x2):
+    def assertXMLListsEqual(self, x1, x2):
 
-        listAssertEqual = getattr( self, 'assertCountEqual', None )
-        if( listAssertEqual is None ) : listAssertEqual = getattr( self, 'assertItemsEqual' )
+        listAssertEqual = getattr(self, 'assertCountEqual', None)
+        if listAssertEqual is None: listAssertEqual = getattr(self, 'assertItemsEqual')
 
         x1List = []
         for line in x1:
-            if '\n' in line: x1List += [x.strip() for x in line.split('\n')]
-            else: x1List.append(line.strip())
+            if '\n' in line:
+                x1List += [x.strip() for x in line.split('\n')]
+            else:
+                x1List.append(line.strip())
         x2List = []
         for line in x2:
-            if '\n' in line: x2List += [x.strip() for x in line.split('\n')]
-            else: x2List.append(line.strip())
-        return listAssertEqual( x1List, x2List )
+            if '\n' in line:
+                x2List += [x.strip() for x in line.split('\n')]
+            else:
+                x2List.append(line.strip())
+        return listAssertEqual(x1List, x2List)
 
 
-class Test_covariance_baseClass( TestCaseBase ):
+class Test_covariance_baseClass(TestCaseBase):
 
     def setUp(self):
         # The COMMARA-2.0 33 group structure
@@ -68,7 +74,8 @@ class Test_covariance_baseClass( TestCaseBase ):
         self.__groupUnit = 'eV'
 
     def test_toXML_strList(self):
-        self.assertXMLListsEqual( HCovariance.covarianceSections[1].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), '''<section label="n + H1">
+        self.assertXMLListsEqual(
+            HCovariance.covarianceSections[1].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), '''<section label="n + H1">
     <rowData ENDF_MFMT="33,2" href="$reactions#/reactionSuite/reactions/reaction[@label='n + H1']/crossSection/XYs1d[@label='eval']"/>
     <covarianceMatrix label="eval" type="relative">
       <gridded2d>
@@ -124,55 +131,64 @@ class Test_covariance_baseClass( TestCaseBase ):
             1.38214e-6 1.382147e-6 1.382163e-6 1.382198e-6 1.382261e-6 1.382429e-6 1.382767e-6 1.3834e-6 1.385085e-6 1.388459e-6 1.394774e-6 1.407383e-6 1.42415e-6 1.440862e-6 1.457522e-6 1.486546e-6 1.527724e-6 1.629195e-6 1.787167e-6 1.939871e-6 2.08749e-6 2.334251e-6 2.66336e-6 3.112254e-6 3.641625e-6 4.108091e-6 4.52471e-6 4.901068e-6 5.244362e-6 5.560091e-6 5.852539e-6 6.254789e-6 6.735669e-6 7.166157e-6 7.556201e-6 7.912795e-6 8.241029e-6 8.544692e-6 8.826672e-6 9.089206e-6 9.334051e-6 9.562619e-6 9.776049e-6 9.975277e-6 1.016108e-5 1.03341e-5 1.04949e-5 1.064394e-5 1.078164e-5 1.090834e-5 1.102436e-5 1.120251e-5 1.140421e-5 1.154645e-5 1.163173e-5 1.166215e-5 1.163957e-5 1.15657e-5 1.144209e-5 1.127023e-5 1.105156e-5 1.078748e-5 1.047934e-5 1.012849e-5 9.736244e-6 9.303929e-6 8.832838e-6 8.324258e-6 7.779475e-6 7.199755e-6 6.586351e-6 5.940506e-6 5.263449e-6 4.556393e-6 3.82053e-6 3.05704e-6 2.26708e-6 1.451788e-6 4.582898e-7 4.582898e-7 4.582898e-7 4.582898e-7 4.582898e-7 4.582898e-7 4.582898e-7 4.582898e-7 4.582898e-7 4.582898e-7 4.582898e-7 4.5829e-7 4.582901e-7 4.582906e-7 4.582918e-7 4.582936e-7 4.582988e-7 4.583091e-7 4.583283e-7 4.583799e-7 4.584825e-7 4.58675e-7
             4.591887e-7 4.602152e-7 4.621391e-7 4.659831e-7 4.711002e-7 4.762078e-7 4.813054e-7 4.902011e-7 5.028512e-7 5.341547e-7 5.831873e-7 6.308564e-7 6.771316e-7 7.54806e-7 8.588407e-7 1.00126e-6 1.169749e-6 1.318512e-6 1.451543e-6 1.571822e-6 1.681608e-6 1.782635e-6 1.876257e-6 2.005102e-6 2.159247e-6 2.297355e-6 2.422598e-6 2.537207e-6 2.642808e-6 2.740612e-6 2.83154e-6 2.916308e-6 2.995478e-6 3.069499e-6 3.138735e-6 3.203485e-6 3.263996e-6 3.320475e-6 3.373097e-6 3.422013e-6 3.46735e-6 3.509221e-6 3.547725e-6 3.607258e-6 3.675664e-6 3.725305e-6 3.756959e-6 3.771276e-6 3.768826e-6 3.750122e-6 3.71564e-6 3.665832e-6 3.601128e-6 3.521952e-6 3.428714e-6 3.321822e-6 3.201677e-6 3.06868e-6 2.923227e-6 2.765714e-6 2.596533e-6 2.416075e-6 2.224728e-6 2.022876e-6 1.810902e-6 1.589185e-6 1.358097e-6 1.118008e-6 8.692832e-7 6.122806e-7 3.473533e-7 -4.90449e-7 -4.90449e-7 -4.90449e-7 -4.90449e-7 -4.90449e-7 -4.90449e-7 -4.90449e-7 -4.90449e-7 -4.90449e-7 -4.904491e-7 -4.904492e-7 -4.904492e-7 -4.904496e-7 -4.904501e-7 -4.904516e-7 -4.904543e-7 -4.904611e-7 -4.90475e-7 -4.90501e-7 -4.905701e-7 -4.907086e-7 -4.909682e-7 -4.916595e-7 -4.930421e-7 -4.956297e-7 -5.007897e-7 -5.076385e-7 -5.14452e-7 -5.212306e-7
             -5.330108e-7 -5.496654e-7 -5.904346e-7 -6.53302e-7 -7.135199e-7 -7.713386e-7 -8.673365e-7 -9.944789e-7 -1.166837e-6 -1.369005e-6 -1.546544e-6 -1.704777e-6 -1.847505e-6 -1.977543e-6 -2.097026e-6 -2.207605e-6 -2.359556e-6 -2.540977e-6 -2.703148e-6 -2.84986e-6 -2.983771e-6 -3.106814e-6 -3.220429e-6 -3.325711e-6 -3.423509e-6 -3.514489e-6 -3.599189e-6 -3.67804e-6 -3.751397e-6 -3.819558e-6 -3.88277e-6 -3.941244e-6 -3.995161e-6 -4.044677e-6 -4.089929e-6 -4.131037e-6 -4.193319e-6 -4.261829e-6 -4.307297e-6 -4.330723e-6 -4.332957e-6 -4.314757e-6 -4.276817e-6 -4.219782e-6 -4.14427e-6 -4.050874e-6 -3.94017e-6 -3.812723e-6 -3.669086e-6 -3.509803e-6 -3.335414e-6 -3.146449e-6 -2.943431e-6 -2.726879e-6 -2.4973e-6 -2.255199e-6 -2.00107e-6 -1.7354e-6 -1.458667e-6 -1.17134e-6 -8.738791e-7 -5.667356e-7 -2.503496e-7 7.484793e-8 4.084368e-7 -1.462924e-6 -1.462924e-6 -1.462924e-6 -1.462924e-6 -1.462924e-6 -1.462924e-6 -1.462924e-6 -1.462924e-6 -1.462924e-6 -1.462924e-6 -1.462924e-6 -1.462925e-6 -1.462925e-6 -1.462928e-6 -1.462931e-6 -1.462939e-6 -1.462958e-6 -1.462996e-6 -1.463069e-6 -1.463262e-6 -1.463648e-6 -1.46437e-6 -1.466298e-6 -1.47015e-6 -1.477363e-6 -1.491754e-6 -1.510871e-6 -1.529907e-6 -1.548862e-6 -1.58184e-6 -1.628539e-6 -1.743198e-6 -1.920787e-6 -2.091611e-6 -2.256145e-6
-            -2.530188e-6 -2.894323e-6 -3.389377e-6 -3.971517e-6 -4.483558e-6 -4.94037e-6 -5.352708e-6 -5.728591e-6 -6.074117e-6 -6.39402e-6 -6.833811e-6 -7.359212e-6 -7.829191e-6 -8.254672e-6 -8.643331e-6 -9.000747e-6 -9.331077e-6 -9.637484e-6 -9.92242e-6 -1.018781e-5 -1.043521e-5 -1.066586e-5 -1.088078e-5 -1.108083e-5 -1.126674e-5 -1.143909e-5 -1.159842e-5 -1.174516e-5 -1.187972e-5 -1.200244e-5 -1.218959e-5 -1.239845e-5 -1.254142e-5 -1.262132e-5 -1.264053e-5 -1.260118e-5 -1.250519e-5 -1.235436e-5 -1.215041e-5 -1.189497e-5 -1.158965e-5 -1.123601e-5 -1.083558e-5 -1.038989e-5 -9.900427e-6 -9.368679e-6 -8.796112e-6 -8.184171e-6 -7.53429e-6 -6.847886e-6 -6.126353e-6 -5.37107e-6 -4.583391e-6 -3.76465e-6 -2.916157e-6 -2.039198e-6 -1.135033e-6 -2.048958e-7 7.500079e-7 1.728501e-6</values></array></gridded2d></covarianceMatrix></section>'''.split('\n') )
+            -2.530188e-6 -2.894323e-6 -3.389377e-6 -3.971517e-6 -4.483558e-6 -4.94037e-6 -5.352708e-6 -5.728591e-6 -6.074117e-6 -6.39402e-6 -6.833811e-6 -7.359212e-6 -7.829191e-6 -8.254672e-6 -8.643331e-6 -9.000747e-6 -9.331077e-6 -9.637484e-6 -9.92242e-6 -1.018781e-5 -1.043521e-5 -1.066586e-5 -1.088078e-5 -1.108083e-5 -1.126674e-5 -1.143909e-5 -1.159842e-5 -1.174516e-5 -1.187972e-5 -1.200244e-5 -1.218959e-5 -1.239845e-5 -1.254142e-5 -1.262132e-5 -1.264053e-5 -1.260118e-5 -1.250519e-5 -1.235436e-5 -1.215041e-5 -1.189497e-5 -1.158965e-5 -1.123601e-5 -1.083558e-5 -1.038989e-5 -9.900427e-6 -9.368679e-6 -8.796112e-6 -8.184171e-6 -7.53429e-6 -6.847886e-6 -6.126353e-6 -5.37107e-6 -4.583391e-6 -3.76465e-6 -2.916157e-6 -2.039198e-6 -1.135033e-6 -2.048958e-7 7.500079e-7 1.728501e-6</values></array></gridded2d></covarianceMatrix></section>'''.split(
+                '\n'))
 
     def test_convertAxesToUnits(self):
 
-        listAssertEqual = getattr( self, 'assertCountEqual', None )
-        if( listAssertEqual is None ) : listAssertEqual = getattr( self, 'assertItemsEqual' )
+        listAssertEqual = getattr(self, 'assertCountEqual', None)
+        if (listAssertEqual is None): listAssertEqual = getattr(self, 'assertItemsEqual')
 
-        originalUnits=[a.unit for a in HCovariance.covarianceSections[1]['eval'].matrix.axes]
-        newUnits=["","MeV","MeV"]
+        originalUnits = [a.unit for a in HCovariance.covarianceSections[1]['eval'].matrix.axes]
+        newUnits = ["", "MeV", "MeV"]
 
         # convert to MeV
         HCovariance.covarianceSections[1]['eval'].convertAxesToUnits(newUnits)
-        listAssertEqual( newUnits, [ a.unit for a in HCovariance.covarianceSections[1]['eval'].matrix.axes ] )
+        listAssertEqual(newUnits, [a.unit for a in HCovariance.covarianceSections[1]['eval'].matrix.axes])
 
         # convert back
         HCovariance.covarianceSections[1]['eval'].convertAxesToUnits(originalUnits)
-        listAssertEqual( originalUnits, [ a.unit for a in HCovariance.covarianceSections[1]['eval'].matrix.axes ] )
+        listAssertEqual(originalUnits, [a.unit for a in HCovariance.covarianceSections[1]['eval'].matrix.axes])
 
     def test_toCovarianceMatrix(self):
-        self.assertXMLListsEqual(HCovariance.covarianceSections[1]['eval'].toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
-            HCovariance.covarianceSections[1]['eval'].toCovarianceMatrix().toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10))
+        self.assertXMLListsEqual(HCovariance.covarianceSections[1]['eval'].toXML_strList(
+            formatVersion=GNDS_formatVersionModule.version_1_10),
+                                 HCovariance.covarianceSections[1]['eval'].toCovarianceMatrix().toXML_strList(
+                                     formatVersion=GNDS_formatVersionModule.version_1_10))
 
     @unittest.skip("interactive test")
     def test_plot(self):
         from fudge import covariances
         # ...................... example matrix 'a' ......................
-        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
+                                               2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=valuesModule.Values([1.0000E-07, 1.1109E-01, 1.3534E+00, 1.9640E+01]))
-        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=linkModule.Link(link=axes[2].values, relative=True))
         myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.Symmetry.lower)
-        a=covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
-                                              type=covarianceEnumsModule.Type.relative)
+        a = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
+                                                          type=covarianceEnumsModule.Type.relative)
         a.plot()
 
     def test_toCorrelationMatrix(self):
         x = axesModule.Axes(3)
         x[0] = axesModule.Axis(index="0", label="matrix_elements", unit="")
-        x[2] = axesModule.Grid(index="2", label="row_energy_bounds", unit="eV", style=xDataEnumsModule.GridStyle.boundaries,
+        x[2] = axesModule.Grid(index="2", label="row_energy_bounds", unit="eV",
+                               style=xDataEnumsModule.GridStyle.boundaries,
                                values=valuesModule.Values([1e-5, 0.1e6, 1.0e6, 2.0e6, 20.0e6]))
-        x[1] = axesModule.Grid(index="1", label="column_energy_bounds", unit="eV", style=xDataEnumsModule.GridStyle.boundaries,
+        x[1] = axesModule.Grid(index="1", label="column_energy_bounds", unit="eV",
+                               style=xDataEnumsModule.GridStyle.boundaries,
                                values=linkModule.Link(x[2].values, relative=True))
         a = arrayModule.Diagonal(data=valuesModule.Values([0.0, 0.25, 0.16, 0.0]), shape=(4, 4))
         g = griddedModule.Gridded2d(x, a)
         m = covariances.covarianceMatrix.CovarianceMatrix(label='0', matrix=g, type='absolute')
         m.removeExtraZeros()
-        self.assertXMLListsEqual(m.getCorrelationMatrix().toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
-          """<gridded2d>
+        self.assertXMLListsEqual(
+            m.getCorrelationMatrix().toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
+            """<gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values>1e5 1e6 2e6</values></grid>
@@ -183,59 +199,67 @@ class Test_covariance_baseClass( TestCaseBase ):
             <values>1 0 1</values></array></gridded2d>""".split('\n'))
 
     def test_getRowBounds(self):
-        self.assertEqual( HCovariance.covarianceSections[1]['eval'].rowBounds(), (1.e-5, 2.e7) )
+        self.assertEqual(HCovariance.covarianceSections[1]['eval'].rowBounds(), (1.e-5, 2.e7))
 
     def test_getColumnBounds(self):
-        self.assertEqual( HCovariance.covarianceSections[1]['eval'].columnBounds(), (1.e-5, 2.e7) )
+        self.assertEqual(HCovariance.covarianceSections[1]['eval'].columnBounds(), (1.e-5, 2.e7))
 
     def test_toAbsolute_and_toRelative(self):
-        '''
+        """
         The constant covariance in  is 0.01 everywhere and relative.  So, in absolute covariance
         it is ::
 
             cov(E,E') = sigma(E)*0.0144*sigma(E')
 
         With a constant cross section of 1.5 b, the covariance should be (1.5 b)^2*0.0144 = 3.24e-2 b^2
-        '''
+        """
         import fudge.reactionData.crossSection
         XYs1d = fudge.reactionData.crossSection.XYs1d
-        ptwise = XYs1d( axes=XYs1d.defaultAxes(), data=[ [1e-5,1.5], [20.0e6,1.5] ] )
+        ptwise = XYs1d(axes=XYs1d.defaultAxes(), data=[[1e-5, 1.5], [20.0e6, 1.5]])
         original = copy.copy(HCovariance.covarianceSections[1]['eval'])
 
         # start as relative, so first call should do nothing
-        self.assertEqual( HCovariance.covarianceSections[1]['eval'].toRelative().toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), original.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10) )
+        self.assertEqual(HCovariance.covarianceSections[1]['eval'].toRelative().toXML_strList(
+            formatVersion=GNDS_formatVersionModule.version_1_10),
+                         original.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10))
 
         # call to absolute better change things
         self.assertNotEqual(
             HCovariance.covarianceSections[1]['eval'].toAbsolute(ptwise).toXML_strList(),
-            [ x.replace('relative','absolute').replace('eval','toAbsolute') for x in original.toXML_strList() ] )
+            [x.replace('relative', 'absolute').replace('eval', 'toAbsolute') for x in original.toXML_strList()])
 
         # call to relative better bring us back
-        self.assertEqual( HCovariance.covarianceSections[1]['eval'].toRelative().toXML_strList(), original.toXML_strList() )
+        self.assertEqual(HCovariance.covarianceSections[1]['eval'].toRelative().toXML_strList(),
+                         original.toXML_strList())
 
     def test_check(self):
 
-        listAssertEqual = getattr( self, 'assertCountEqual', None )
-        if( listAssertEqual is None ) : listAssertEqual = getattr( self, 'assertItemsEqual' )
+        listAssertEqual = getattr(self, 'assertCountEqual', None)
+        if (listAssertEqual is None): listAssertEqual = getattr(self, 'assertItemsEqual')
 
-        listAssertEqual( HCovariance.covarianceSections[1].check( { 'checkUncLimits' : False, 'negativeEigenTolerance' : 1e-8, 'eigenvalueRatioTolerance' : 1e8 } ), [] )
+        listAssertEqual(HCovariance.covarianceSections[1].check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 1e-8, 'eigenvalueRatioTolerance': 1e8}), [])
 
-    def test_fix(self): pass
+    def test_fix(self):
+        pass
 
     def test_group1(self):
-        '''a covariance on a a coarse group whose group boundaries align with the COMMARA-2.0 group boundaries'''
-        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', ''), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        """a covariance on a a coarse group whose group boundaries align with the COMMARA-2.0 group boundaries"""
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', ''), 1: ('column_energy_bounds', 'MeV'),
+                                               2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=valuesModule.Values([1.0000E-07, 1.1109E-01, 1.3534E+00, 1.9640E+01]))
-        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=linkModule.Link(link=axes[2].values, relative=True))
         myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0],
                                     symmetry=arrayModule.Symmetry.lower)
         a = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
-                                         type=covarianceEnumsModule.Type.relative)
+                                                          type=covarianceEnumsModule.Type.relative)
 
-        self.assertEqual( list( map( str, a.check(
-            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [] )
+        self.assertEqual(list(map(str, a.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001}))), [])
         self.assertXMLListsEqual(a.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10), '''<covarianceMatrix label="eval" type="relative">
     <gridded2d>
       <axes>
@@ -273,10 +297,10 @@ class Test_covariance_baseClass( TestCaseBase ):
         self.assertEqual(g.matrix.axes[0].unit, '')
         self.assertEqual(g.matrix.axes[1].unit, 'eV')
         self.assertEqual(g.matrix.axes[2].unit, 'eV')
-        self.assertEqual( list( map(str, g.check(
-            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [])
+        self.assertEqual(list(map(str, g.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001}))), [])
         self.assertXMLListsEqual(g.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
-            '''<covarianceMatrix label="eval" type="relative">
+                                 '''<covarianceMatrix label="eval" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
@@ -290,7 +314,8 @@ class Test_covariance_baseClass( TestCaseBase ):
         4 4 4 4 4 4 4 4 4 4 5.5516702901548e-16 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 5.5516702901548e-16 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 5.5516702901548e-16 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 1.3879175725387e-16 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 9
         1.3879175725387e-16 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 9 9 1.3879175725387e-16 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 9 9 9 1.3879175725387e-16 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 9 9 9 9 1.3879175725387e-16 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
         1 9 9 9 9 9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 25 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 25 25 25 0 0 0 0
-        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 25 25 25 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 25 25 25 25 25</values></array></gridded2d></covarianceMatrix>'''.split('\n'))
+        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 25 25 25 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 25 25 25 25 25</values></array></gridded2d></covarianceMatrix>'''.split(
+                                     '\n'))
 
         if False:
             a.matrix.plot()
@@ -299,21 +324,24 @@ class Test_covariance_baseClass( TestCaseBase ):
             g.plot(xlog=True, ylog=True)
 
     def test_group2(self):
-        '''a covariance on a coarse group whose group boundaries don't quite align with the COMMARA-2.0 group boundaries'''
-        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', ''), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        """a covariance on a coarse group whose group boundaries don't quite align with the COMMARA-2.0 group boundaries"""
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', ''), 1: ('column_energy_bounds', 'MeV'),
+                                               2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=valuesModule.Values([1.0e-5, 0.100, 1.0, 20.0]))
-        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=linkModule.Link(link=axes[2].values, relative=True))
         myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0],
                                     symmetry=arrayModule.Symmetry.lower)
         a = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
-                                         type=covarianceEnumsModule.Type.relative)
+                                                          type=covarianceEnumsModule.Type.relative)
 
-        self.assertEqual( list( map(str, a.check(
-            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [])
+        self.assertEqual(list(map(str, a.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001}))), [])
         self.assertXMLListsEqual(a.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
-                         """<covarianceMatrix label="eval" type="relative">
+                                 """<covarianceMatrix label="eval" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
@@ -330,10 +358,10 @@ class Test_covariance_baseClass( TestCaseBase ):
         self.assertEqual(g.matrix.axes[0].unit, 'b**2')
         self.assertEqual(g.matrix.axes[1].unit, 'MeV')
         self.assertEqual(g.matrix.axes[2].unit, 'MeV')
-        self.assertEqual( list( map(str, g.check(
-            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [])
+        self.assertEqual(list(map(str, g.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001}))), [])
         self.assertXMLListsEqual(g.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
-                         '''<covarianceMatrix label="eval" type="relative">
+                                 '''<covarianceMatrix label="eval" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
@@ -347,7 +375,8 @@ class Test_covariance_baseClass( TestCaseBase ):
         4 4 4 4 4 4 4 4 4 4 0 0 0 0 2.75084805457208 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 0 0 0 0 2.75084805457208 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 0 0 0 0 2.22739395496322 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.238846945779 3.18579319060795 0 0 0 0 0.68771201364302 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3.02974147792267 9
         0 0 0 0 0.68771201364302 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3.02974147792267 9 9 0 0 0 0 0.68771201364302 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3.02974147792267 9 9 9 0 0 0 0 0.68771201364302 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3.02974147792267 9 9 9 9 0 0 0 0 0.231346553833719 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432 0.336400337996432
         1.019206057215 3.02760304196789 3.02760304196789 3.02760304196789 3.02760304196789 12.0275994719183 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16.5899915500892 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16.5899915500892 25 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16.5899915500892 25 25 25 0 0 0 0
-        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16.5899915500892 25 25 25 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16.5899915500892 25 25 25 25 25</values></array></gridded2d></covarianceMatrix>'''.split('\n'))
+        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16.5899915500892 25 25 25 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16.5899915500892 25 25 25 25 25</values></array></gridded2d></covarianceMatrix>'''.split(
+                                     '\n'))
 
         if False:
             a.matrix.plot()
@@ -356,24 +385,27 @@ class Test_covariance_baseClass( TestCaseBase ):
             g.plot(xlog=True, ylog=True)
 
     def test_group3(self):
-        '''a covariance on a fine group whose group boundaries don't align with the COMMARA-2.0 group boundaries at all'''
-        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'), 2: ('row_energy_bounds', 'MeV')})
-        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        """a covariance on a fine group whose group boundaries don't align with the COMMARA-2.0 group boundaries at all"""
+        axes = axesModule.Axes(3, labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
+                                               2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.Grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=valuesModule.Values([1.0e-5, 0.100, 1.0, 20.0]))
-        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit, style=xDataEnumsModule.GridStyle.boundaries,
+        axes[1] = axesModule.Grid(axes[1].label, axes[1].index, axes[1].unit,
+                                  style=xDataEnumsModule.GridStyle.boundaries,
                                   values=linkModule.Link(link=axes[2].values, relative=True))
         myMatrix = arrayModule.Full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0],
                                     symmetry=arrayModule.Symmetry.lower)
         a = covariances.covarianceMatrix.CovarianceMatrix('eval', matrix=griddedModule.Gridded2d(axes, myMatrix),
-                                         type=covarianceEnumsModule.Type.absolute)
+                                                          type=covarianceEnumsModule.Type.absolute)
 
         import numpy
         fineBoundaries = numpy.linspace(1e-11, 20.0, num=100).tolist()
 
-        self.assertEqual( list( map(str, a.check(
-            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [])
+        self.assertEqual(list(map(str, a.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001}))), [])
         self.assertXMLListsEqual(a.toXML_strList(formatVersion=GNDS_formatVersionModule.version_1_10),
-                         '''<covarianceMatrix label="eval" type="absolute">
+                                 '''<covarianceMatrix label="eval" type="absolute">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
@@ -389,10 +421,10 @@ class Test_covariance_baseClass( TestCaseBase ):
         self.assertEqual(g.matrix.axes[0].unit, 'b**2')
         self.assertEqual(g.matrix.axes[1].unit, 'keV')
         self.assertEqual(g.matrix.axes[2].unit, 'keV')
-        self.assertEqual( list( map(str, g.check(
-            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})) ), [])
+        self.assertEqual(list(map(str, g.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001}))), [])
         self.assertXMLListsEqual(g.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
-                         """<covarianceMatrix label="eval" type="absolute">
+                                 """<covarianceMatrix label="eval" type="absolute">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="keV" style="boundaries">
@@ -450,7 +482,8 @@ class Test_covariance_baseClass( TestCaseBase ):
         25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 0 0 0 0 1.25000000117562 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25
         25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 0 0 0 0 1.25000000117562 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25
         25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 0 0 0 0 1.25000000117562 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25
-        25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25</values></array></gridded2d></covarianceMatrix>""".split('\n'))
+        25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25</values></array></gridded2d></covarianceMatrix>""".split(
+                                     '\n'))
 
         if False:
             a.matrix.plot()
@@ -459,16 +492,20 @@ class Test_covariance_baseClass( TestCaseBase ):
             g.plot(xlog=True, ylog=True)
 
     def test_removeExtraZeros(self):
-        x=axesModule.Axes(3)
-        x[0]=axesModule.Axis(index="0", label="matrix_elements", unit="")
-        x[2]=axesModule.Grid(index="2", label="row_energy_bounds", unit="eV", style=xDataEnumsModule.GridStyle.boundaries, values=valuesModule.Values([1e-5,0.1e6,1.0e6,2.0e6,20.0e6]))
-        x[1]=axesModule.Grid(index="1", label="column_energy_bounds", unit="eV", style=xDataEnumsModule.GridStyle.boundaries, values=linkModule.Link(x[2].values, relative=True))
-        a=arrayModule.Diagonal(data=valuesModule.Values([0.0,0.25,0.25,0.0]),shape=(4,4))
-        g=griddedModule.Gridded2d(x,a)
-        m=covariances.covarianceMatrix.CovarianceMatrix(label='0', matrix=g, type='relative')
+        x = axesModule.Axes(3)
+        x[0] = axesModule.Axis(index="0", label="matrix_elements", unit="")
+        x[2] = axesModule.Grid(index="2", label="row_energy_bounds", unit="eV",
+                               style=xDataEnumsModule.GridStyle.boundaries,
+                               values=valuesModule.Values([1e-5, 0.1e6, 1.0e6, 2.0e6, 20.0e6]))
+        x[1] = axesModule.Grid(index="1", label="column_energy_bounds", unit="eV",
+                               style=xDataEnumsModule.GridStyle.boundaries,
+                               values=linkModule.Link(x[2].values, relative=True))
+        a = arrayModule.Diagonal(data=valuesModule.Values([0.0, 0.25, 0.25, 0.0]), shape=(4, 4))
+        g = griddedModule.Gridded2d(x, a)
+        m = covariances.covarianceMatrix.CovarianceMatrix(label='0', matrix=g, type='relative')
         m.removeExtraZeros()
         self.assertXMLListsEqual(m.toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
-              """<covarianceMatrix label="0" type="relative">
+                                 """<covarianceMatrix label="0" type="relative">
   <gridded2d>
     <axes>
       <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
@@ -482,14 +519,14 @@ class Test_covariance_baseClass( TestCaseBase ):
     def test_getUncertaintyVector(self):
         # Test it as-is
         asIs = HCovariance.covarianceSections[1]['eval'].getUncertaintyVector()
-        self.assertAlmostEqual(asIs[0][1],  0.0013097557024117131 ) # 1e-05 eV point
-        self.assertAlmostEqual(asIs[-1][1], 0.0013147246860084434 ) # 20000000.0 eV point
+        self.assertAlmostEqual(asIs[0][1], 0.0013097557024117131)  # 1e-05 eV point
+        self.assertAlmostEqual(asIs[-1][1], 0.0013147246860084434)  # 20000000.0 eV point
 
         # Try making it absolute
         absolute = HCovariance.covarianceSections[1]['eval'].getUncertaintyVector(relative=False)
-        self.assertAlmostEqual(absolute[0][1],  0.02676661285142459 ) # 1e-05 eV point
-        self.assertAlmostEqual(absolute[-1][1], 0.0006346783462167692 ) # 20000000.0 eV point
+        self.assertAlmostEqual(absolute[0][1], 0.02676661285142459)  # 1e-05 eV point
+        self.assertAlmostEqual(absolute[-1][1], 0.0006346783462167692)  # 20000000.0 eV point
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     unittest.main()

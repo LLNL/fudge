@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.8", "3.12", "3.x"]
+        python-version: ["3.8", "3.12", "3.13"]
 
     steps:
     - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
       run: python -m pip install --upgrade pip setuptools wheel numpy h5py matplotlib
 
     - name: Build
-      run: make PYTHON=python
+      run: make PYTHON=python CC=gcc
 
     - name: Run check
       run:  |

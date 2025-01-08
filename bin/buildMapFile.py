@@ -201,7 +201,7 @@ for file in args.files :
     try :
         name, data = GNDS_fileModule.type(file)
     except :
-        if args.verbose > 2: print('    WARNING: Invalid file "%s".' % file)
+        print('    WARNING: Invalid file "%s".' % file)
         continue
     if( name == reactionSuiteModule.ReactionSuite.moniker ) :
         if data['interaction'] is None:

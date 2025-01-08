@@ -194,6 +194,7 @@ class FissionEnergyRelease( ancestryModule.AncestryIO ) :
     """
 
     moniker = 'fissionEnergyRelease'
+    keyName = 'label'
 
     ancestryMembers = ( 'promptProductKE',      'promptNeutronKE',      'delayedNeutronKE', 'promptGammaEnergy',
                         'delayedGammaEnergy',   'delayedBetaEnergy',    'neutrinoEnergy',   'nonNeutrinoEnergy',
