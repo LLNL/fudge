@@ -25,18 +25,19 @@ from xData import link as linkModule
 
 from pqu import PQU
 
+
 class DependenceOnProcessedGroupWidth(enumsModule.Enum):
-    '''Defines enums of processed width dependencies.'''
+    """Defines enums of processed width dependencies."""
 
     inverse = enumsModule.auto()
     direct = enumsModule.auto()
 
-class ShortRangeSelfScalingVariance(ancestryModule.AncestryIO, base.Covariance):
 
+class ShortRangeSelfScalingVariance(ancestryModule.AncestryIO, base.Covariance):
     moniker = 'shortRangeSelfScalingVariance'
 
-    def __init__(self, label, type=covarianceEnumsModule.Type.absolute, 
-                dependenceOnProcessedGroupWidth=DependenceOnProcessedGroupWidth.inverse, matrix=None):
+    def __init__(self, label, type=covarianceEnumsModule.Type.absolute,
+                 dependenceOnProcessedGroupWidth=DependenceOnProcessedGroupWidth.inverse, matrix=None):
 
         ancestryModule.AncestryIO.__init__(self)
         self.__label = label
@@ -45,12 +46,13 @@ class ShortRangeSelfScalingVariance(ancestryModule.AncestryIO, base.Covariance):
         self.matrix = matrix
 
     @property
-    def label(self): return self.__label
+    def label(self):
+        return self.__label
 
     @label.setter
     def label(self, value):
         if value is not None:
-            if not isinstance(value, str): raise TypeError( 'label must be a string' )
+            if not isinstance(value, str): raise TypeError('label must be a string')
         self.__label = value
 
     def copy(self):
@@ -67,11 +69,11 @@ class ShortRangeSelfScalingVariance(ancestryModule.AncestryIO, base.Covariance):
         self.__dependenceOnProcessedGroupWidth = DependenceOnProcessedGroupWidth.checkEnumOrString(value)
 
     @property
-    def domainUnit( self ):
+    def domainUnit(self):
         return self.matrix.axes[-1].unit
 
     @property
-    def isSymmetric( self ):
+    def isSymmetric(self):
         return True
 
     @property
@@ -95,57 +97,58 @@ class ShortRangeSelfScalingVariance(ancestryModule.AncestryIO, base.Covariance):
         self.__matrix.setAncestor(self)
 
     @property
-    def gridded2d(self): return self.matrix     # convenience method
+    def gridded2d(self):
+        return self.matrix  # convenience method
 
-    def check( self, info ):
+    def check(self, info):
         """
         Check that matrix is diagonal and all elements >= 0
         """
         from fudge import warning
         warnings = []
 
-        if not isinstance( self.matrix.array, arrayModule.Diagonal ):
-            warnings.append( warning.InvalidShortRangeVarianceData( type(self.matrix.array) ) )
+        if not isinstance(self.matrix.array, arrayModule.Diagonal):
+            warnings.append(warning.InvalidShortRangeVarianceData(type(self.matrix.array)))
         eigenvals = self.matrix.array.constructArray().diagonal()
-        if any( eigenvals < 0 ):
-            warnings.append( warning.NegativeEigenvalues(negativeCount=(eigenvals < 0).sum(),
-                    worstCase=eigenvals.min(), obj=self) )
+        if any(eigenvals < 0):
+            warnings.append(warning.NegativeEigenvalues(negativeCount=(eigenvals < 0).sum(),
+                                                        worstCase=eigenvals.min(), obj=self))
         return warnings
 
-    def convertUnits( self, unitMap ):
+    def convertUnits(self, unitMap):
 
         self.matrix.convertUnits(unitMap)
 
-    def rowBounds(self,unit=None):
+    def rowBounds(self, unit=None):
         """Get the bounds of the row.  If unit is specified, return the bounds in that unit."""
         factor = 1
         if unit:
             factor = PQU.PQU(1, self.matrix.axes[-1].unit).getValueAs(unit)
-        return( self.matrix.axes[-1].values[0] * factor, self.matrix.axes[-1].values[-1] * factor )
+        return (self.matrix.axes[-1].values[0] * factor, self.matrix.axes[-1].values[-1] * factor)
 
-    def columnBounds(self,unit=None):
+    def columnBounds(self, unit=None):
         """Get the bounds of the column.  If unit is specified, return the bounds in that unit."""
         if isinstance(self.matrix.axes[-2].values, linkModule.Link): return self.rowBounds(unit)
         factor = 1
         if unit:
             factor = PQU.PQU(1, self.matrix.axes[-1].unit).getValueAs(unit)
-        return( self.matrix.axes[-1].values[0] * factor, self.matrix.axes[-1].values[-1] * factor )
+        return (self.matrix.axes[-1].values[0] * factor, self.matrix.axes[-1].values[-1] * factor)
 
-    def toCovarianceMatrix( self, domain=None ):
+    def toCovarianceMatrix(self, domain=None):
         raise NotImplementedError("Not yet implemented for ShortRangeSelfScalingVariance")
 
-    def getUncertaintyVector( self, theData=None, relative=True ):
+    def getUncertaintyVector(self, theData=None, relative=True):
         raise NotImplementedError("Not yet implemented for ShortRangeSelfScalingVariance")
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
         attrs = ''
         if self.label is not None: attrs = ' label="%s"' % self.label
-        xmlString = [ '%s<%s%s type="%s" dependenceOnProcessedGroupWidth="%s">' %
-                      ( indent, self.moniker, attrs, self.type, self.dependenceOnProcessedGroupWidth ) ]
-        xmlString += self.matrix.toXML_strList( indent2, **kwargs )
+        xmlString = ['%s<%s%s type="%s" dependenceOnProcessedGroupWidth="%s">' %
+                     (indent, self.moniker, attrs, self.type, self.dependenceOnProcessedGroupWidth)]
+        xmlString += self.matrix.toXML_strList(indent2, **kwargs)
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
@@ -154,11 +157,12 @@ class ShortRangeSelfScalingVariance(ancestryModule.AncestryIO, base.Covariance):
 
         label = element.get('label')
         if label is not None:
-            xPath.append( '%s[@label="%s"]' % (element.tag, label))
+            xPath.append('%s[@label="%s"]' % (element.tag, label))
         else:
-            xPath.append( element.tag )
-        matrix_ = griddedModule.Gridded2d.parseNodeUsingClass(element.find(griddedModule.Gridded2d.moniker), xPath, linkData, **kwargs)
-        srssv = cls( label = label, type=element.get('type'),
-            dependenceOnProcessedGroupWidth=element.get('dependenceOnProcessedGroupWidth'), matrix=matrix_ )
+            xPath.append(element.tag)
+        matrix_ = griddedModule.Gridded2d.parseNodeUsingClass(element.find(griddedModule.Gridded2d.moniker), xPath,
+                                                              linkData, **kwargs)
+        srssv = cls(label=label, type=element.get('type'),
+                    dependenceOnProcessedGroupWidth=element.get('dependenceOnProcessedGroupWidth'), matrix=matrix_)
         xPath.pop()
         return srssv

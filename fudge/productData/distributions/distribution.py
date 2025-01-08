@@ -58,7 +58,7 @@ class Component( abstractClassesModule.Component ) :
                 LLNL_angularEnergyModule.LLNLAngularEnergyForm,
                 uncorrelatedModule.Form, LegendreModule.Form, referenceModule.Form,
                 referenceModule.CoulombPlusNuclearElastic, referenceModule.ThermalNeutronScatteringLaw,
-                photonScatteringModule.CoherentPhotonScattering.Form, photonScatteringModule.IncoherentPhotonScattering.Form, 
+                photonScatteringModule.CoherentPhotonScattering.Form, photonScatteringModule.IncoherentPhotonScattering.Form, photonScatteringModule.IncoherentBoundToFreePhotonScattering.Form,
                 multiGroupModule.Form, unspecifiedModule.Form, branching3dModule.Form ) )
 
     def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):

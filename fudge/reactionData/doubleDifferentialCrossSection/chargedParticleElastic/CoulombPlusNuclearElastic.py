@@ -219,8 +219,9 @@ class Form( baseModule.Form ):
         self.__kCoefficient = (A / (A + 1)) * math.sqrt( 2 * mass1 ) / hbar_c * 1e-14        # 1e-14 = sqrt( barn )
 
     def dSigma_dMu(self, energy, muCutoff, accuracy=1e-3, epsilon=1e-6, excludeRutherfordScattering=False, probability=False):
+
         """
-        This function returns :math:`d\\sigma / d\\mu` at the specified incident energy if *probability* is False and :math:`P(\mu)` otherwise
+        This function returns :math:`d\\sigma / d\\mu` at the specified incident energy if *probability* is False and :math:`P(\\mu)` otherwise
         if True..  The :math:`\\mu` domain goes from muMin to *muCutoff*. For identical particles, muMin is set to -*muCutoff* otherwise it is -1.
 
         :param energy:                          Energy of the projectile.

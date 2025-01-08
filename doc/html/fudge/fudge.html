@@ -480,6 +480,12 @@ they be well-formed xml. Codes reading in GNDS files are free to ignore any unre
 <span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#Institution.append"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.Institution.append" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.institution.Institution.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#Institution.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.Institution.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method calls convertUnits on the item of <em>self</em> if it has a <em>convertUnits</em> method.</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="fudge.institution.Institution.data">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#fudge.institution.Institution.data" title="Permalink to this definition">¶</a></dt>
@@ -2632,6 +2638,12 @@ unitMap is a dictionary with old/new unit pairs where the old unit is the key (e
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fudge.reactionSuite.ReactionSuite.cullProcessedData">
+<span class="sig-name descname"><span class="pre">cullProcessedData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.cullProcessedData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.cullProcessedData" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method removes all processed data from <em>self</em>.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactionSuite.ReactionSuite.cullStyles">
 <span class="sig-name descname"><span class="pre">cullStyles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">styleName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removeDocumentation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removeApplicationData</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.cullStyles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.cullStyles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes all forms from each component except for the requested style or, if it is not present
@@ -3520,7 +3532,7 @@ call with argument ‘showEmptySuite=True’.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="fudge.styles.Evaluated">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.styles.</span></span><span class="sig-name descname"><span class="pre">Evaluated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivedFrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectileEnergyDomain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">library</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#Evaluated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.Evaluated" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.styles.</span></span><span class="sig-name descname"><span class="pre">Evaluated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivedFrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectileEnergyDomain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">library</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targetInfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#Evaluated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.Evaluated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.styles.StyleWithTemperature" title="fudge.styles.StyleWithTemperature"><code class="xref py py-class docutils literal notranslate"><span class="pre">StyleWithTemperature</span></code></a></p>
 <p>Style for data entered by an evaluator.</p>
 <dl class="py method">
@@ -3562,6 +3574,12 @@ call with argument ‘showEmptySuite=True’.</p>
 <dt class="sig sig-object py" id="fudge.styles.Evaluated.sortOrderIndex">
 <span class="sig-name descname"><span class="pre">sortOrderIndex</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#fudge.styles.Evaluated.sortOrderIndex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="fudge.styles.Evaluated.targetInfo">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">targetInfo</span></span><a class="headerlink" href="#fudge.styles.Evaluated.targetInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Target info property (stores isotopic abundances for TNSL evaluations).</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.styles.Evaluated.toXML_strList">
@@ -4376,7 +4394,7 @@ the list of style classes contains exactly one occurence of the “evaluated” 
 <dl class="py class">
 <dt class="sig sig-object py" id="fudge.suites.ExclusiveSuite">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.suites.</span></span><span class="sig-name descname"><span class="pre">ExclusiveSuite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allowedClasses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_href</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#ExclusiveSuite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.ExclusiveSuite" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.suites.Suite" title="fudge.suites.Suite"><code class="xref py py-class docutils literal notranslate"><span class="pre">Suite</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.suites.Suite" title="fudge.suites.Suite"><code class="xref py py-class docutils literal notranslate"><span class="pre">Suite</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.suites.ExclusiveSuite.fixDomains">
 <span class="sig-name descname"><span class="pre">fixDomains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energyMin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energyMax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#ExclusiveSuite.fixDomains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.ExclusiveSuite.fixDomains" title="Permalink to this definition">¶</a></dt>
@@ -4463,8 +4481,7 @@ the list of style classes contains exactly one occurence of the “evaluated” 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.suites.Reactions.asSortedList">
 <span class="sig-name descname"><span class="pre">asSortedList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PoPs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#Reactions.asSortedList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.Reactions.asSortedList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a sorted list of the reactions.
-This method uses a reaction’s reactionProducts method to determine sorting order.</p>
+<dd><p>Returns a list of the reactions sorted. This method uses a reaction’s reactionProducts method to determine sorting order.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -4495,10 +4512,14 @@ reactionSuite (‘reactions’, ‘sums’, ‘productions’ and ‘fissionComp
 <span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newItem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setAncestor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">addLazyParsingHelper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#Suite.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.Suite.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds newItem to the suite. If another item in the suite has the same label as newItem, a KeyError is raised.
 If newItem is not an allowed class, a TypeError is raised.</p>
-<p>&#64;param newItem: item to add
-&#64;param setAncestor: if True, set item’s ancestor to self
-&#64;param addLazyParsingHelper: defer type checking when lazy parsing is enabled
-&#64;return:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>newItem</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -4599,7 +4620,7 @@ The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.suites.Suite.parseNodeUsingClass">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseNodeUsingClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkData</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/suites.html#Suite.parseNodeUsingClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.suites.Suite.parseNodeUsingClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method must be overwritten by the derived class.</p>
+<dd><p>This method must be overrwritten by the derived class.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -5592,6 +5613,13 @@ proper unitbase/correspondingPoints treatment is unclear. Distribution should en
 <dt class="sig sig-object py" id="fudge.warning.UnorthodoxParticleNotImplemented">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">UnorthodoxParticleNotImplemented</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particleId</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#UnorthodoxParticleNotImplemented"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.UnorthodoxParticleNotImplemented" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="fudge.warning.UnphysicalDiscreteOrPrimaryPhotonMultiplicity">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">UnphysicalDiscreteOrPrimaryPhotonMultiplicity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#UnphysicalDiscreteOrPrimaryPhotonMultiplicity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.UnphysicalDiscreteOrPrimaryPhotonMultiplicity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+<p>Max multiplicity for discrete or primary photons should be 1</p>
 </dd></dl>
 
 <dl class="py exception">

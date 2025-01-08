@@ -52,8 +52,8 @@ from fudge.resonances import common as resonancesCommonModule
 from .. import toGNDSMisc as toGNDSMiscModule
 from .. import endf_endl as endf_endlModule
 
-def deriveMT3MF3FromMT1_2(info, reactionSuite):
 
+def deriveMT3MF3FromMT1_2(info, reactionSuite):
     totalCrossSection, elasticCrossSection = None, None
     for reaction in reactionSuite.sums.crossSectionSums:
         if reaction.ENDF_MT == 1:
@@ -64,12 +64,12 @@ def deriveMT3MF3FromMT1_2(info, reactionSuite):
         if reaction.ENDF_MT == 2:
             elasticCrossSection = reaction.crossSection.evaluated
             break
-    if totalCrossSection is None: raise Exception( 'No total cross section for calculating non-elastic' )
-    if elasticCrossSection is None: raise Exception( 'No elastic cross section for calculating non-elastic' )
+    if totalCrossSection is None: raise Exception('No total cross section for calculating non-elastic')
+    if elasticCrossSection is None: raise Exception('No elastic cross section for calculating non-elastic')
 
     try:
         form = totalCrossSection - elasticCrossSection
-    except:
+    except Exception:
         totalCrossSection = totalCrossSection.toPointwise_withLinearXYs(accuracy=1e-3, lowerEps=1e-6)
         elasticCrossSection = elasticCrossSection.toPointwise_withLinearXYs(accuracy=1e-3, lowerEps=1e-6)
         form = totalCrossSection - elasticCrossSection
@@ -77,8 +77,8 @@ def deriveMT3MF3FromMT1_2(info, reactionSuite):
     form.label = info.style
     return form
 
-def checkProductList(outputChannel, productList):
 
+def checkProductList(outputChannel, productList):
     if outputChannel is None:
         return
     for product in outputChannel:
@@ -89,8 +89,9 @@ def checkProductList(outputChannel, productList):
                 continue
             productList[product.pid] -= multiplicity
 
-def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSectionOnly, doCovariances, verbose, reconstructResonances = True):
 
+def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSectionOnly, doCovariances, verbose,
+            reconstructResonances=True):
     warningList = []
 
     info.totalOrPromptFissionNeutrons = {}
@@ -98,11 +99,13 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
     info.PoPsOverrides = {}
 
     if 452 in MTDatas:
-        info.totalOrPromptFissionNeutrons[totalToken] = getTotalOrPromptFission(info, 452, MTDatas, totalToken, warningList)
+        info.totalOrPromptFissionNeutrons[totalToken] = getTotalOrPromptFission(info, 452, MTDatas, totalToken,
+                                                                                warningList)
     if 455 in MTDatas:
         info.delayedFissionDecayChannel = getDelayedFission(info, 455, MTDatas, warningList)
     if 456 in MTDatas:
-        info.totalOrPromptFissionNeutrons[promptToken] = getTotalOrPromptFission(info, 456, MTDatas, promptToken, warningList)
+        info.totalOrPromptFissionNeutrons[promptToken] = getTotalOrPromptFission(info, 456, MTDatas, promptToken,
+                                                                                 warningList)
     if 458 in MTDatas:
         info.fissionEnergyReleaseData = MTDatas[458]
     sys.stdout.flush()
@@ -153,10 +156,10 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
     incompleteReactions = []
     nonElastic = []
     delayInsertingSummedReaction = []
-    linksToCheck = []   # links that may need to be updated after reading resonances
+    linksToCheck = []  # links that may need to be updated after reading resonances
     SpecialLRProducts = []
 
-    for MT in MTList :
+    for MT in MTList:
         crossSection = None
         if MT in MTs2Skip: continue
         if (singleMTOnly is not None) and (MT != singleMTOnly): continue
@@ -167,8 +170,8 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
         elif MT in range(102, 108):
             channelProcess = outputChannelModule.Processes.inclusive
         elif MT in continuumMTs:
-                for discreteMT in continuumMTs[MT]:
-                    if discreteMT in MTList: channelProcess = outputChannelModule.Processes.continuum
+            for discreteMT in continuumMTs[MT]:
+                if discreteMT in MTList: channelProcess = outputChannelModule.Processes.continuum
 
         warningList = []
         MTData = MTDatas[MT]
@@ -179,17 +182,18 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                         21: enumsModule.FissionGenre.thirdChance,
                         38: enumsModule.FissionGenre.fourthChance}.get(MT, enumsModule.FissionGenre.none)
 
-        # Sometimes excited states are identified in MF8. Read this before reading distributions to make sure info is present.
+        # Sometimes excited states are identified in MF8.
+        # Read this before reading distributions to make sure info is present.
         LMF, radioactiveDatas = readMF8(info, MT, MTData, warningList)
 
         doParseReaction = 3 in MTData
         if not doParseReaction:
             if MT == 3: doParseReaction = (12 in MTData) or (13 in MTData)
-        if doParseReaction:     # normal reaction, with cross section and distributions
+        if doParseReaction:  # normal reaction, with cross section and distributions
             try:
                 crossSection, outputChannel, MFKeys, LRProducts = parseReaction(
                     info, info.target, info.projectileZA, info.targetZA, MT, MTData, warningList,
-                    parseCrossSectionOnly=parseCrossSectionOnly, channelProcess=channelProcess )
+                    parseCrossSectionOnly=parseCrossSectionOnly, channelProcess=channelProcess)
             except KeyboardInterrupt:
                 raise
             except:
@@ -215,22 +219,22 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                 reaction = reactionModule.Reaction(None, outputChannel.genre, ENDF_MT=MT, fissionGenre=fissionGenre)
                 endf_endlModule.setReactionsOutputChannelFromOutputChannel(info, reaction, outputChannel)
                 if hasattr(info, 'dSigma_form'):
-                    reaction.doubleDifferentialCrossSection.add( info.dSigma_form )
+                    reaction.doubleDifferentialCrossSection.add(info.dSigma_form)
                     del info.dSigma_form
                     crossSection = crossSectionModule.CoulombPlusNuclearElastic(
-                            link = reaction.doubleDifferentialCrossSection.evaluated,
-                            label = info.style, relative = True )
-                reaction.crossSection.add( crossSection )
-                if( MT == 5 ) :
+                        link=reaction.doubleDifferentialCrossSection.evaluated,
+                        label=info.style, relative=True)
+                reaction.crossSection.add(crossSection)
+                if MT == 5:
                     MT5Reaction = reaction
-                elif( MT in fissionMTs and haveTotalFission ) :     # This is 1st, 2nd, etc. chance fission but total is also present.
-
-                    fissionComponents.append( reaction )
-                else :
-                    if( MT in summedReactionsInfo ) :
-                        delayInsertingSummedReaction.append( reaction )
-                    else :
-                        reactions.append( [ MT, reaction ] )
+                elif MT in fissionMTs and haveTotalFission:
+                    # This is 1st, 2nd, etc. chance fission but total is also present.
+                    fissionComponents.append(reaction)
+                else:
+                    if MT in summedReactionsInfo:
+                        delayInsertingSummedReaction.append(reaction)
+                    else:
+                        reactions.append([MT, reaction])
         else:
             if 12 in MTData:
                 # MF=12-15 is occasionally provided without corresponding MF=3, e.g. ENDF-VIII.1 g-069_Tm_169
@@ -245,75 +249,84 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                 MFList = []
                 for MF in [4, 5, 6]:
                     if MF in MTData: MFList.append('%d' % MF)
-                if MFList != []: warningList.append('MT = %d has MF = %s data and no MF 3 data' % (MT, ', '.join(MFList)))
+                if MFList: warningList.append(
+                    'MT = %d has MF = %s data and no MF 3 data' % (MT, ', '.join(MFList)))
 
-        for radioactiveData in radioactiveDatas : # Get radioactive production data (if any) from MF 8-10. Cross section form depends on value of LMF.
-            if( LMF in [ 3, 6, 9 ] ) :  # Cross section is reference to MF3.
+        for radioactiveData in radioactiveDatas:
+            # Get radioactive production data (if any) from MF 8-10. Cross section form depends on value of LMF.
+            if LMF in [3, 6, 9]:  # Cross-section is reference to MF3.
                 productionCrossSection = reaction.crossSection.evaluated
                 if MT in summedReactions:
                     productionCrossSection = crossSection
                 productionCrossSection = crossSectionModule.Reference(link=productionCrossSection, label=info.style)
                 linksToCheck.append(productionCrossSection)
-            elif( LMF == 10 ) :         # MF10 data is cross section. Product's multipliticy is 1.
+            elif LMF == 10:  # MF10 data is cross-section. Product's multiplicity is 1.
                 productionCrossSection = radioactiveData[4]
-            else :
-                raise Exception( "Unknown LMF=%d encountered in MF=8 for MT=%d" % ( LMF, MT ) )
+            else:
+                raise Exception("Unknown LMF=%d encountered in MF=8 for MT=%d" % (LMF, MT))
 
             ZAP = radioactiveData[0]
             ELFS = radioactiveData[1]
             LFS = radioactiveData[2]
 
-            if( LMF in [ 9, 10 ] ) :
-                Q = toGNDSMiscModule.returnConstantQ( info.style, radioactiveData[6], productionCrossSection )
+            if LMF in [9, 10]:
+                Q = toGNDSMiscModule.returnConstantQ(info.style, radioactiveData[6], productionCrossSection)
             else:
                 Q = outputChannel.Q[info.style]
 
-            if MT==18:
+            if MT == 18:
                 outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
                 outputChannel.Q.add(Q)
-                icr = incompleteReactionModule.IncompleteReaction('fission', outputChannel.genre, MT, fissionGenre=enumsModule.FissionGenre.total)
-                endf_endlModule.setReactionsOutputChannelFromOutputChannel( info, icr, outputChannel )
-                
-                icr.crossSection.add( productionCrossSection )
-                incompleteReactions.append( icr )
+                icr = incompleteReactionModule.IncompleteReaction('fission', outputChannel.genre, MT,
+                                                                  fissionGenre=enumsModule.FissionGenre.total)
+                endf_endlModule.setReactionsOutputChannelFromOutputChannel(info, icr, outputChannel)
+
+                icr.crossSection.add(productionCrossSection)
+                incompleteReactions.append(icr)
                 continue
 
-            if( LMF == 6 ) :      # Product multiplicity is in MF6, so production channel multiplicity needs to refer to it:
-                residual = toGNDSMiscModule.getTypeNameGamma( info, ZAP, level = ELFS, levelIndex = LFS )
-                residualID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(residual.id, info.specialNuclearParticleID)
+            if LMF == 6:  # Product multiplicity is in MF6, so production channel multiplicity needs to refer to it:
+                residual = toGNDSMiscModule.getTypeNameGamma(info, ZAP, level=ELFS, levelIndex=LFS)
+                residualID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(residual.id,
+                                                                                         info.specialNuclearParticleID)
                 MF6prod = outputChannel.getProductsWithName(residualID)
 
-                if( len( MF6prod ) != 1 ) : # problem appears in JEFF-3.2 Y90 and Y91
-                    info.missingRadioactiveProduct.append('Unique MT%d radioactive product %s not found in product list!' % (MT, residualID))
+                if len(MF6prod) != 1:  # problem appears in JEFF-3.2 Y90 and Y91
+                    info.missingRadioactiveProduct.append(
+                        'Unique MT%d radioactive product %s not found in product list!' % (MT, residualID))
                     continue
 
-                multiplicity = multiplicityModule.Reference( label = info.style, link = MF6prod[0].multiplicity )
-            else :
+                multiplicity = multiplicityModule.Reference(label=info.style, link=MF6prod[0].multiplicity)
+            else:
                 multiplicity = radioactiveData[3]
 
-            try :
+            try:
                 if crossSection is None:
-                    crossSectionData = [[reactionSuite.styles[0].projectileEnergyDomain.min, 1.0], [reactionSuite.styles[0].projectileEnergyDomain.max, 1.0]]
-                    crossSection = crossSectionModule.XYs1d(data=crossSectionData, axes=crossSectionModule.defaultAxes(reactionSuite.styles[0].projectileEnergyDomain.unit))
-                residual = toGNDSMiscModule.newGNDSParticle( info, toGNDSMiscModule.getTypeNameGamma( info, ZAP, level = ELFS, levelIndex = LFS ),
-                        crossSection, multiplicity = multiplicity )
-            except :
-                info.logs.write( '\nMT = %s\n' % MT )
+                    crossSectionData = [[reactionSuite.styles[0].projectileEnergyDomain.min, 1.0],
+                                        [reactionSuite.styles[0].projectileEnergyDomain.max, 1.0]]
+                    crossSection = crossSectionModule.XYs1d(data=crossSectionData, axes=crossSectionModule.defaultAxes(
+                        reactionSuite.styles[0].projectileEnergyDomain.unit))
+                residual = toGNDSMiscModule.newGNDSParticle(
+                    info, toGNDSMiscModule.getTypeNameGamma(info, ZAP, level=ELFS, levelIndex=LFS),
+                    crossSection, multiplicity=multiplicity)
+            except:
+                info.logs.write('\nMT = %s\n' % MT)
                 raise
 
             productionOutputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.production)
-            productionOutputChannel.Q.add( Q )
-            productionOutputChannel.products.add( productionOutputChannel.products.uniqueLabel( residual ) )
-            productionOutputChannel.process = "%s%s" % (reactionSuite.target,
-                        endf_endlModule.endfMTtoC_ProductLists[MT].reactionLabel.replace('z,', reactionSuite.projectile+',') )
+            productionOutputChannel.Q.add(Q)
+            productionOutputChannel.products.add(productionOutputChannel.products.uniqueLabel(residual))
+            productionOutputChannel.process = "%s%s" % (
+                reactionSuite.target, endf_endlModule.endfMTtoC_ProductLists[MT].reactionLabel.replace(
+                    'z,', reactionSuite.projectile + ','))
 
-            production = productionModule.Production( None, productionOutputChannel.genre, ENDF_MT = MT )
-            endf_endlModule.setReactionsOutputChannelFromOutputChannel( info, production, productionOutputChannel )
-            production.crossSection.add( productionCrossSection )
-            productions.append( production )
+            production = productionModule.Production(None, productionOutputChannel.genre, ENDF_MT=MT)
+            endf_endlModule.setReactionsOutputChannelFromOutputChannel(info, production, productionOutputChannel)
+            production.crossSection.add(productionCrossSection)
+            productions.append(production)
 
-        if( verbose > 0 ) :
-            for warning in warningList : info.logs.write( "       WARNING: %s\n" % warning, stderrWriting = True )
+        if verbose > 0:
+            for warning in warningList: info.logs.write("       WARNING: %s\n" % warning, stderrWriting=True)
 
     for MT, reaction in reactions:
         if reaction.label in reactionSuite.reactions:
@@ -331,84 +344,98 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                 if multiplicity > 0:
                     missingProduct.append(product)
             if len(missingProduct) > 0:
-                warningList.append('For MT=%s, product list does not match MT. Missing products are %s.' % (MT, ','.join(missingProduct)))
+                warningList.append('For MT=%s, product list does not match MT. Missing products are %s.' % (
+                    MT, ','.join(missingProduct)))
                 print('  WARNING: %s' % warningList[-1])
-        reactionSuite.reactions.add( reaction )
+        reactionSuite.reactions.add(reaction)
 
-    for reaction in delayInsertingSummedReaction :
-        reactionSuite.reactions.add( reaction )
+    for reaction in delayInsertingSummedReaction:
+        reactionSuite.reactions.add(reaction)
 
-    if( MT5Reaction is not None ) :
-        reactionSuite.reactions.add( MT5Reaction )
+    if MT5Reaction is not None:
+        reactionSuite.reactions.add(MT5Reaction)
 
-# BRB, The channelIDs should be in a common area?????
-    channelIDs = { 1 : 'total', 3 : 'nonelastic', 4 : '(z,n)', 103 : '(z,p)', 104 : '(z,d)', 105 : '(z,t)', 106 : '(z,He3)', 107 :'(z,alpha)' }
+    # BRB, The channelIDs should be in a common area?????
+    channelIDs = {1: 'total', 3: 'nonelastic', 4: '(z,n)', 103: '(z,p)', 104: '(z,d)', 105: '(z,t)', 106: '(z,He3)',
+                  107: '(z,alpha)'}
     if 3 in summedReactions: summedReactionsInfo[3] = nonElastic
     if 1 in summedReactions:
         if 2 in MTList:
-            summedReactionsInfo[1] = [ 2 ] + nonElastic
+            summedReactionsInfo[1] = [2] + nonElastic
         else:
             summedReactionsInfo[1] = nonElastic
-    summedReactionMTs = endfFileToGNDSMiscModule.niceSortOfMTs( list(summedReactions.keys( )), verbose = 0, logFile = info.logs )
-    for MT in ( 4, 3, 1 ) :
-        if( MT in summedReactionMTs ) :
-            summedReactionMTs.remove( MT )
-            summedReactionMTs.insert( 0, MT )
-    for i1, MT in enumerate( summedReactionMTs ) :
-        if( summedReactions[MT] is None ) : continue
+    summedReactionMTs = endfFileToGNDSMiscModule.niceSortOfMTs(list(summedReactions.keys()), verbose=0,
+                                                               logFile=info.logs)
+    for MT in (4, 3, 1):
+        if MT in summedReactionMTs:
+            summedReactionMTs.remove(MT)
+            summedReactionMTs.insert(0, MT)
+    for i1, MT in enumerate(summedReactionMTs):
+        if summedReactions[MT] is None: continue
         crossSection, outputChannel = summedReactions[MT]
         omitWhenWritingENDF = False
-        if( ( MT == 3 ) and ( crossSection is None ) ) : 
-            crossSection = deriveMT3MF3FromMT1_2( info, reactionSuite )
+        if (MT == 3) and (crossSection is None):
+            crossSection = deriveMT3MF3FromMT1_2(info, reactionSuite)
             omitWhenWritingENDF = True
-        summedCrossSection = sumsModule.CrossSectionSum( label = channelIDs[MT], ENDF_MT = MT )
-        for reaction in reactionSuite.reactions :
-            if( reaction.ENDF_MT in summedReactionsInfo[MT] ) : summedCrossSection.summands.append( sumsModule.Add( link = reaction.crossSection ) )
-        summedCrossSection.Q.add( outputChannel.Q[info.style] )
-        summedCrossSection.crossSection.add( crossSection )
-        if( omitWhenWritingENDF ):
-            info.ENDFconversionFlags.add( summedCrossSection, "omit" )
-        reactionSuite.sums.crossSectionSums.add( summedCrossSection )
+        summedCrossSection = sumsModule.CrossSectionSum(label=channelIDs[MT], ENDF_MT=MT)
+        for reaction in reactionSuite.reactions:
+            if reaction.ENDF_MT in summedReactionsInfo[MT]:
+                summedCrossSection.summands.append(sumsModule.Add(link=reaction.crossSection))
+        summedCrossSection.Q.add(outputChannel.Q[info.style])
+        summedCrossSection.crossSection.add(crossSection)
+        if omitWhenWritingENDF:
+            info.ENDFconversionFlags.add(summedCrossSection, "omit")
+        reactionSuite.sums.crossSectionSums.add(summedCrossSection)
 
         gammas = []
-        for product in outputChannel :
+        for product in outputChannel:
             particle = reactionSuite.PoPs[product.pid]
-            if( isinstance( particle, gaugeBosonModule.Particle ) ) :
-                gammas.append( product )
-            else :
-                if( product.outputChannel is not None ) :
-                    for product2 in product.outputChannel :
+            if isinstance(particle, gaugeBosonModule.Particle):
+                gammas.append(product)
+            else:
+                if product.outputChannel is not None:
+                    for product2 in product.outputChannel:
                         particle = reactionSuite.PoPs[product2.pid]
-                        if( isinstance( particle, gaugeBosonModule.Particle ) ) : gammas.append( product2 )
-        if( len( gammas ) > 0 ) :
+                        if isinstance(particle, gaugeBosonModule.Particle): gammas.append(product2)
+        if len(gammas) > 0:
             productChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
-            for QForm in outputChannel.Q : productChannel.Q.add( QForm )
-            for gamma in gammas : productChannel.products.add( productChannel.products.uniqueLabel( gamma ) )
-            productionReaction = orphanProductModule.OrphanProduct('Orphan product %s' % str(i1), productChannel.genre, ENDF_MT = MT )
-            endf_endlModule.setReactionsOutputChannelFromOutputChannel( info, productionReaction, productChannel )
-            crossSectionLink = crossSectionModule.Reference( link = summedCrossSection.crossSection.evaluated, label = info.style )
-            linksToCheck.append( crossSectionLink )
-            productionReaction.crossSection.add( crossSectionLink )
-            reactionSuite.orphanProducts.add( productionReaction )
+            for QForm in outputChannel.Q: productChannel.Q.add(QForm)
+            for gamma in gammas: productChannel.products.add(productChannel.products.uniqueLabel(gamma))
+            productionReaction = orphanProductModule.OrphanProduct('Orphan product %s' % str(i1), productChannel.genre,
+                                                                   ENDF_MT=MT)
+            endf_endlModule.setReactionsOutputChannelFromOutputChannel(info, productionReaction, productChannel)
+            crossSectionLink = crossSectionModule.Reference(link=summedCrossSection.crossSection.evaluated,
+                                                            label=info.style)
+            linksToCheck.append(crossSectionLink)
+            productionReaction.crossSection.add(crossSectionLink)
+            reactionSuite.orphanProducts.add(productionReaction)
 
-    for i1, reaction in enumerate( fissionComponents ) :  # 1st-chance, 2nd-chance, etc. Convert them to fissionComponent instances:
-        fissionComponent = fissionComponentModule.FissionComponent( None, reaction.outputChannel.genre, reaction.ENDF_MT, fissionGenre = reaction.fissionGenre )
-        endf_endlModule.setReactionsOutputChannelFromOutputChannel( info, fissionComponent, reaction.outputChannel )
-        for crossSection in reaction.crossSection : fissionComponent.crossSection.add( crossSection )
-        reactionSuite.fissionComponents.add( fissionComponent )
+    for i1, reaction in enumerate(fissionComponents):
+        # 1st-chance, 2nd-chance, etc. Convert them to fissionComponent instances:
+        fissionComponent = fissionComponentModule.FissionComponent(
+            None, reaction.outputChannel.genre, reaction.ENDF_MT, fissionGenre=reaction.fissionGenre)
+        endf_endlModule.setReactionsOutputChannelFromOutputChannel(info, fissionComponent, reaction.outputChannel)
+        for crossSection in reaction.crossSection: fissionComponent.crossSection.add(crossSection)
+        reactionSuite.fissionComponents.add(fissionComponent)
 
     unprocessedMTs = []
     for MT in extraMTs:
-        if MT in list(range(201,208)):
+        if MT in range(201, 208):
             outputChannel = outputChannelModule.OutputChannel(enumsModule.Genre.NBody)
-            label = 'Total %s production' % {201: 'neutron', 202: 'gamma', 203: 'proton', 204: 'deuteron', 205: 'triton', 206: 'helion', 207: 'alpha'}[MT]
-            productID = {201: IDsPoPsModule.neutron, 202: IDsPoPsModule.photon, 203: IDsPoPsModule.proton, 204: IDsPoPsModule.familiarDeuteron, 
-                    205: IDsPoPsModule.familiarTriton, 206: IDsPoPsModule.familiarHelion, 207: IDsPoPsModule.familiarAlpha}[MT]
+            label = 'Total %s production' % \
+                    {201: 'neutron', 202: 'gamma', 203: 'proton', 204: 'deuteron', 205: 'triton', 206: 'helion',
+                     207: 'alpha'}[MT]
+            productID = {201: IDsPoPsModule.neutron, 202: IDsPoPsModule.photon, 203: IDsPoPsModule.proton,
+                         204: IDsPoPsModule.familiarDeuteron,
+                         205: IDsPoPsModule.familiarTriton, 206: IDsPoPsModule.familiarHelion,
+                         207: IDsPoPsModule.familiarAlpha}[MT]
             incompleteReaction = incompleteReactionModule.IncompleteReaction(label, outputChannel.genre, ENDF_MT=MT)
-            crossSection, outputChannel, MFKeys, LRProducts = parseReaction(info, info.target, info.projectileZA, info.targetZA, 
-                    MT, MTDatas[MT], warningList, parseCrossSectionOnly=parseCrossSectionOnly, channelProcess=channelProcess)
+            crossSection, outputChannel, MFKeys, LRProducts = parseReaction(
+                info, info.target, info.projectileZA, info.targetZA, MT, MTDatas[MT], warningList,
+                parseCrossSectionOnly=parseCrossSectionOnly, channelProcess=channelProcess)
             if len(outputChannel.products) == 0:
-                productID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(productID, specialNuclearParticleIDPoPsModule.Mode.nuclide)
+                productID = specialNuclearParticleIDPoPsModule.specialNuclearParticleID(
+                    productID, specialNuclearParticleIDPoPsModule.Mode.nuclide)
                 product = toGNDSMiscModule.newGNDSParticle(info, productID, crossSection)
                 product.distribution.add(unspecifiedModule.Form(info.style, xDataEnumsModule.Frame.lab))
                 outputChannel.products.add(product)
@@ -421,74 +448,74 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
             endf_endlModule.setReactionsOutputChannelFromOutputChannel(info, incompleteReaction, outputChannel)
             incompleteReactions.append(incompleteReaction)
             if verbose > 0:
-                print()     # put messages for each extraMT on a separate line
+                print()  # put messages for each extraMT on a separate line
         elif MT in range(851, 871):
-            continue    # dealt with while parsing covariances
+            continue  # dealt with while parsing covariances
         else:
             unprocessedMTs.append(MT)
     if len(unprocessedMTs) > 0:
         print('INFO: the following MTs were not converted: %s.' % unprocessedMTs)
 
     for production in productions:
-        reactionSuite.productions.add( production )
+        reactionSuite.productions.add(production)
 
     for incompleteReaction in incompleteReactions:
         reactionSuite.incompleteReactions.add(incompleteReaction)
 
-    if hasattr( info, 'totalDelayedMultiplicity' ) :
-        fissionOutputchannel = reactionSuite.getReaction( 'fission' ).outputChannel
+    if hasattr(info, 'totalDelayedMultiplicity'):
+        fissionOutputchannel = reactionSuite.getReaction('fission').outputChannel
 
-        delayedNubar = sumsModule.MultiplicitySum( label = "delayed fission neutron multiplicity", ENDF_MT = 455 )
-        for neutron in fissionOutputchannel.fissionFragmentData.delayedNeutrons :
-            delayedNubar.summands.append( sumsModule.Add( link = neutron.product.multiplicity ) )
-        delayedNubar.multiplicity.add( info.totalDelayedMultiplicity )
-        reactionSuite.sums.multiplicitySums.add( delayedNubar )
+        delayedNubar = sumsModule.MultiplicitySum(label="delayed fission neutron multiplicity", ENDF_MT=455)
+        for neutron in fissionOutputchannel.fissionFragmentData.delayedNeutrons:
+            delayedNubar.summands.append(sumsModule.Add(link=neutron.product.multiplicity))
+        delayedNubar.multiplicity.add(info.totalDelayedMultiplicity)
+        reactionSuite.sums.multiplicitySums.add(delayedNubar)
 
-        totalNubar = sumsModule.MultiplicitySum( label = "total fission neutron multiplicity", ENDF_MT = 452 )
+        totalNubar = sumsModule.MultiplicitySum(label="total fission neutron multiplicity", ENDF_MT=452)
         for product in fissionOutputchannel.products:
             if product.pid == IDsPoPsModule.neutron:
-                totalNubar.summands.append( sumsModule.Add( product.multiplicity ) )
-        totalNubar.summands.append( sumsModule.Add( delayedNubar.multiplicity ) )
-        totalNubar.multiplicity.add( info.totalOrPromptFissionNeutrons[totalToken] )
-        reactionSuite.sums.multiplicitySums.add( totalNubar )
+                totalNubar.summands.append(sumsModule.Add(product.multiplicity))
+        totalNubar.summands.append(sumsModule.Add(delayedNubar.multiplicity))
+        totalNubar.multiplicity.add(info.totalOrPromptFissionNeutrons[totalToken])
+        reactionSuite.sums.multiplicitySums.add(totalNubar)
 
     warningList = []
-    try :               # Parse resonance section.
+    try:  # Parse resonance section.
         mf2 = None
-        if( 151 in MTDatas and not parseCrossSectionOnly ) :
-            mf2 = MTDatas.get( 151 ).get( 2 )    # Resonance data available.
-        if( mf2 ) :
-            info.logs.write( '    Reading resonances (MF=2 MT=151)\n' )
-            resonances, resonanceMTs = readMF2( info, mf2, warningList )
-            if info.LRP == 2: # LRP was read in from first line of ENDF file
+        if 151 in MTDatas and not parseCrossSectionOnly:
+            mf2 = MTDatas.get(151).get(2)  # Resonance data available.
+        if mf2:
+            info.logs.write('    Reading resonances (MF=2 MT=151)\n')
+            resonances, resonanceMTs = readMF2(info, mf2, warningList)
+            if info.LRP == 2:  # LRP was read in from first line of ENDF file
                 if resonances.resolved: resonances.resolved.evaluated.useForSelfShieldingOnly = True
                 if resonances.unresolved: resonances.unresolved.evaluated.useForSelfShieldingOnly = True
             reactionSuite.resonances = resonances
 
             if resonances.reconstructCrossSection:
                 # modify cross sections for relevant channels to indicate resonance contribution is needed:
-                resonanceLink = crossSectionModule.ResonanceLink( link = resonances )
+                resonanceLink = crossSectionModule.ResonanceLink(link=resonances)
 
-                for MT in resonanceMTs :
-                    MTChannels  = [ r1 for r1 in reactionSuite.reactions            if( r1.ENDF_MT == MT ) ]
-                    MTChannels += [ r1 for r1 in reactionSuite.sums.crossSectionSums   if( r1.ENDF_MT == MT ) ]
-                    MTChannels += [ r1 for r1 in reactionSuite.fissionComponents    if( r1.ENDF_MT == MT ) ]
-                    if( len( MTChannels ) == 0 ) :
-                        if( MT in ( 3, 18, 19 ) ) :
+                for MT in resonanceMTs:
+                    MTChannels = [r1 for r1 in reactionSuite.reactions if (r1.ENDF_MT == MT)]
+                    MTChannels += [r1 for r1 in reactionSuite.sums.crossSectionSums if (r1.ENDF_MT == MT)]
+                    MTChannels += [r1 for r1 in reactionSuite.fissionComponents if (r1.ENDF_MT == MT)]
+                    if len(MTChannels) == 0:
+                        if MT in (3, 18, 19):
                             continue
-                        else :
-                            warningList.append( 'Unable to find channel corresponding to resonance data for MT%d' % MT )
-                    elif( len( MTChannels ) == 1 ) :
+                        else:
+                            warningList.append('Unable to find channel corresponding to resonance data for MT%d' % MT)
+                    elif len(MTChannels) == 1:
                         crossSectionComponent = MTChannels[0].crossSection
 
-                        if( isinstance( crossSectionComponent[info.style], crossSectionModule.CoulombPlusNuclearElastic ) ) :
-                            continue                # Don't make any changes to Coulomb elastic scattering.
+                        if isinstance(crossSectionComponent[info.style], crossSectionModule.CoulombPlusNuclearElastic):
+                            continue  # Don't make any changes to Coulomb elastic scattering.
 
                         # break background up into resolved, unresolved and fast regions:
                         haveResolved = (resonances.resolved is not None and not
-                                resonances.resolved.evaluated.useForSelfShieldingOnly)
+                        resonances.resolved.evaluated.useForSelfShieldingOnly)
                         haveUnresolved = (resonances.unresolved is not None and not
-                                resonances.unresolved.evaluated.useForSelfShieldingOnly)
+                        resonances.unresolved.evaluated.useForSelfShieldingOnly)
 
                         if MT in (18, 19) and not haveUnresolved:
                             # convert to resonancesWithBackground only if resolved region includes fission widths,
@@ -497,10 +524,10 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                             if isinstance(resolved, resonancesCommonModule.EnergyIntervals):
                                 resolved = resolved[-1].evaluated
                             if hasattr(resolved, 'resonanceReactions'):
-                                if not any( [r.isFission() for r in resolved.resonanceReactions]):
+                                if not any([r.isFission() for r in resolved.resonanceReactions]):
                                     continue
-                            else: # Breit-Wigner, must resort to looking at column names
-                                if not any( ['fission' in c.name for c in resolved.resonanceParameters.table.columns] ):
+                            else:  # Breit-Wigner, must resort to looking at column names
+                                if not any(['fission' in c.name for c in resolved.resonanceParameters.table.columns]):
                                     continue
 
                         originalBackgroundForm = backgroundForm = crossSectionComponent[info.style]
@@ -512,10 +539,12 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
 
                         if MT == 3 and backgroundForm.domainMin > resonances.scatteringRadius.evaluated.domainMin:
                             # Address error appearing in several JEFF evaluations
-                            warningList.append("MT3 background cross section does not span resonance region. Assuming background == 0")
+                            warningList.append(
+                                "MT3 background cross section does not span resonance region. Assuming background == 0")
                             backgroundForm.prepend(crossSectionModule.XYs1d(
                                 axes=backgroundForm.axes,
-                                data=[[resonances.scatteringRadius.evaluated.domainMin, 0], [backgroundForm.domainMin, 0]])
+                                data=[[resonances.scatteringRadius.evaluated.domainMin, 0],
+                                      [backgroundForm.domainMin, 0]])
                             )
 
                         if haveUnresolved:
@@ -531,7 +560,8 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                         backgroundBoundaries = [region.domainMax for region in backgroundForm[:-1]]
 
                         missingBoundaries = {}
-                        if haveResolved and (haveUnresolved or haveFast) and resonances.resolved.domainMax not in backgroundBoundaries:
+                        if haveResolved and (
+                                haveUnresolved or haveFast) and resonances.resolved.domainMax not in backgroundBoundaries:
                             missingBoundaries[resonances.resolved.domainMax] = ['mergeWithNextRegion']
                         if haveUnresolved and haveFast and resonances.unresolved.domainMax not in backgroundBoundaries:
                             missingBoundaries[resonances.unresolved.domainMax] = ['mergeWithNextRegion']
@@ -545,16 +575,16 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                                 for boundary in sorted(missingBoundaries.keys()):
                                     if boundary not in backgroundForm.domainGrid:
                                         missingBoundaries[boundary].append('deletePoint')
-                                    bkForm2.append( backgroundForm.domainSlice(domainMin, boundary) )
+                                    bkForm2.append(backgroundForm.domainSlice(domainMin, boundary))
                                     domainMin = boundary
-                                bkForm2.append( backgroundForm.domainSlice(domainMin, backgroundForm.domainMax) )
+                                bkForm2.append(backgroundForm.domainSlice(domainMin, backgroundForm.domainMax))
 
-                            else:   # Regions1d
+                            else:  # Regions1d
                                 startIdx = 0
                                 for boundary in sorted(missingBoundaries.keys()):
                                     for idx in range(startIdx, len(backgroundForm)):
                                         if backgroundForm[idx].domainMax > boundary: break
-                                        bkForm2.append( backgroundForm[idx] )
+                                        bkForm2.append(backgroundForm[idx])
                                     # add the missing boundary:
                                     if boundary not in backgroundForm[idx].domainGrid:
                                         missingBoundaries[boundary].append('deletePoint')
@@ -562,7 +592,8 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                                         backgroundForm[idx].domainSlice(domainMin, boundary))
                                     domainMin = boundary
                                     startIdx = idx
-                                bkForm2.append( backgroundForm[idx].domainSlice(domainMin, backgroundForm[idx].domainMax) )
+                                bkForm2.append(
+                                    backgroundForm[idx].domainSlice(domainMin, backgroundForm[idx].domainMax))
 
                                 for region in backgroundForm[idx + 1:]:
                                     bkForm2.append(region)
@@ -583,11 +614,12 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                                 RRBack.index = None
                             else:
                                 RRBack = crossSectionModule.Regions1d(axes=backgroundForm.axes)
-                                for jdx in range(idx+1):
+                                for jdx in range(idx + 1):
                                     RRBack.append(backgroundForm[jdx])
-                            RRBack = crossSectionModule.ResolvedRegion( RRBack )
+                            RRBack = crossSectionModule.ResolvedRegion(RRBack)
                             if resonances.resolved.domainMax in missingBoundaries:
-                                info.ENDFconversionFlags.add( RRBack, ",".join(missingBoundaries[resonances.resolved.domainMax]) )
+                                info.ENDFconversionFlags.add(RRBack,
+                                                             ",".join(missingBoundaries[resonances.resolved.domainMax]))
                             idx += 1
 
                         startIdx = idx
@@ -597,49 +629,51 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                             if backgroundForm[idx].domainMax != resonances.unresolved.domainMax:
                                 warningList.append("Domain mismatch between unresolved resonances and background")
                                 info.doRaise.append(warningList[-1])
-                            if idx==startIdx:
+                            if idx == startIdx:
                                 URRBack = backgroundForm[idx]
                                 URRBack.index = None
                             else:
                                 URRBack = crossSectionModule.Regions1d(axes=backgroundForm.axes)
-                                for jdx in range(startIdx,idx+1):
+                                for jdx in range(startIdx, idx + 1):
                                     URRBack.append(backgroundForm[jdx])
-                            URRBack = crossSectionModule.UnresolvedRegion( URRBack )
+                            URRBack = crossSectionModule.UnresolvedRegion(URRBack)
                             if resonances.unresolved.domainMax in missingBoundaries:
-                                info.ENDFconversionFlags.add( URRBack, ",".join(missingBoundaries[resonances.unresolved.domainMax]) )
+                                info.ENDFconversionFlags.add(URRBack, ",".join(
+                                    missingBoundaries[resonances.unresolved.domainMax]))
                             idx += 1
 
                         startIdx = idx
                         if startIdx < len(backgroundForm):
-                            if startIdx == len(backgroundForm)-1:
+                            if startIdx == len(backgroundForm) - 1:
                                 fastBack = backgroundForm[startIdx]
                                 fastBack.index = None
                             else:
                                 fastBack = crossSectionModule.Regions1d(axes=backgroundForm.axes)
                                 for jdx in range(startIdx, len(backgroundForm)):
                                     fastBack.append(backgroundForm[jdx])
-                            fastBack = crossSectionModule.FastRegion( fastBack )
+                            fastBack = crossSectionModule.FastRegion(fastBack)
 
-                        background_ = crossSectionModule.Background( RRBack, URRBack, fastBack )
+                        background_ = crossSectionModule.Background(RRBack, URRBack, fastBack)
                         crossSectionComponent.pop(info.style)
-                        crossSectionComponent.add( crossSectionModule.ResonancesWithBackground(
-                            info.style, resonanceLink, background_, backgroundForm.uncertainty ) )
+                        crossSectionComponent.add(crossSectionModule.ResonancesWithBackground(
+                            info.style, resonanceLink, background_, backgroundForm.uncertainty))
                         for link in linksToCheck:
                             if link.link is originalBackgroundForm:
-                                link.link = crossSectionComponent[ info.style ]
-                    else :
+                                link.link = crossSectionComponent[info.style]
+                    else:
                         raise NotImplementedError("Multiple reactions match resonance MT%d" % MT)
 
     except BadResonances as e:
-        warningList.append( '       ERROR: unable to parse resonances! Error message: %s' % e )
-        info.doRaise.append( warningList[-1] )
+        warningList.append('       ERROR: unable to parse resonances! Error message: %s' % e)
+        info.doRaise.append(warningList[-1])
 
-    MF12BaseMTsAndRange = [[50, 92], [600, 650], [650, 700], [700, 750], [750, 800], [800, 850], [900, 1000] ]
+    MF12BaseMTsAndRange = [[50, 92], [600, 650], [650, 700], [700, 750], [750, 800], [800, 850], [900, 1000]]
 
     if singleMTOnly is None:
-        for MTLO2, MF12_LO2 in sorted(info.MF12_LO2.items()):  # The logic below assumes MTs are in ascending order per base MT.
+        for MTLO2, MF12_LO2 in sorted(info.MF12_LO2.items()):
+            # The logic below assumes MTs are in ascending order per base MT.
             branchingBaseMT = None
-            for MTBase, MTEnd in MF12BaseMTsAndRange:             # Determine base MT for this MTLO2
+            for MTBase, MTEnd in MF12BaseMTsAndRange:  # Determine base MT for this MTLO2
                 if MTBase < MTLO2 < MTEnd:
                     branchingBaseMT = MTBase
                     break
@@ -684,22 +718,26 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                     finalParticle = toGNDSMiscModule.getPoPsParticle(info, residualZA, levelIndex=level,
                                                                      level=levelEnergy, levelUnit='eV')
 
-                particleLevelEnergy_eV = reactionSuite.PoPs[fullName].energy[0].value                   # Compare this value to level energy from the particle list (from MF3 Q-value).
+                particleLevelEnergy_eV = reactionSuite.PoPs[fullName].energy[0].value
+                # Compare this value to level energy from the particle list (from MF3 Q-value).
                 if levelEnergy != particleLevelEnergy_eV:
                     if particleLevelEnergy_eV < 1e-12:
                         warningList.append("MF12 parent level energy (%s) set to zero?" % particleLevelEnergy_eV)
                         info.doRaise.append(warningList[-1])
-                    elif abs(levelEnergy - particleLevelEnergy_eV ) < 1e-4 * particleLevelEnergy_eV:
+                    elif abs(levelEnergy - particleLevelEnergy_eV) < 1e-4 * particleLevelEnergy_eV:
                         MFLabel = '3'
-                                                                                            # Value with most precision wins.
-                        str1 = PQUModule.floatToShortestString(levelEnergy * 1e-20)          # 1e-20 to insure e-form is returned.
-                        str2 = PQUModule.floatToShortestString(particleLevelEnergy_eV * 1e-20)  # Want 1.23e-16 and not 12300 to differ
-                        if len(str1) > len(str2):                                   # length from 1.2345e-16 and not 12345.
+                        # Value with most precision wins.
+                        str1 = PQUModule.floatToShortestString(
+                            levelEnergy * 1e-20)  # 1e-20 to insure e-form is returned.
+                        str2 = PQUModule.floatToShortestString(
+                            particleLevelEnergy_eV * 1e-20)  # Want 1.23e-16 and not 12300 to differ
+                        if len(str1) > len(str2):  # length from 1.2345e-16 and not 12345.
                             reactionSuite.PoPs[fullName].energy[0].value = levelEnergy
                             MFLabel = '12'
                         if str1 != str2:
-                            warningList.append("MT%d MF12 level energy %s differs from MF3 value %s. Setting to MF%s value." %
-                                    (MTLO2, levelEnergy, particleLevelEnergy_eV, MFLabel))
+                            warningList.append(
+                                "MT%d MF12 level energy %s differs from MF3 value %s. Setting to MF%s value." %
+                                (MTLO2, levelEnergy, particleLevelEnergy_eV, MFLabel))
                     else:
                         warningList.append("MT%d MF12 parent level energy (%s) doesn't match known level" %
                                            (MTLO2, particleLevelEnergy_eV))
@@ -707,7 +745,7 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                 for i1, MF12 in enumerate(MF12_LO2):
                     try:
                         finalLevelEnergy = MF12['ESk']
-                        if finalLevelEnergy > 0.:   # Find particle in the particleList with energy = finalLevelEnergy
+                        if finalLevelEnergy > 0.:  # Find particle in the particleList with energy = finalLevelEnergy
                             finalParticles = [lev for lev in reactionSuite.PoPs[residualName].ancestor
                                               if lev.energy.float('eV') == finalLevelEnergy]
                             if len(finalParticles) == 1:
@@ -717,10 +755,12 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                                 idx = 0
                                 while True:
                                     idx += 1
-                                    finalParticleName = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex(residualName, idx)
+                                    finalParticleName = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex(
+                                        residualName, idx)
                                     if not reactionSuite.hasParticle(finalParticleName):
-                                        warningList.append("MF12 final level energy (%s eV) doesn't match known level when decaying out of level %s " %
-                                                           (finalLevelEnergy, MTLO2))
+                                        warningList.append(
+                                            "MF12 final level energy (%s eV) doesn't match known level when decaying out of level %s " %
+                                            (finalLevelEnergy, MTLO2))
                                         info.doRaise.append(warningList[-1])
                                     try:
                                         thisLevelEnergy = reactionSuite.PoPs[finalParticleName].energy.float('eV')
@@ -731,7 +771,7 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                                         raise
                                     if abs(thisLevelEnergy - finalLevelEnergy) < 1e-4 * finalLevelEnergy:
                                         finalParticle = reactionSuite.PoPs[finalParticleName]
-                                        break   # found it
+                                        break  # found it
                         else:
                             finalParticle = reactionSuite.PoPs[residualName]
                         gammaTransition = 1.
@@ -746,21 +786,22 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                         _decay.products.add(productModule.Product(IDsPoPsModule.photon, IDsPoPsModule.photon))
                         _decay.products.add(productModule.Product(finalParticle.id, finalParticle.id))
                         decayMode.decayPath.add(_decay)
-                        if MF12['LG'] == 2:    # internal conversion competes with gamma emission
+                        if MF12['LG'] == 2:  # internal conversion competes with gamma emission
                             from PoPs.decays import spectrum as spectrumModule
-                            Pgamma = spectrumModule.Shell(MF12['branching'][1], label=spectrumModule.Shell.total, unit='')
+                            Pgamma = spectrumModule.Shell(MF12['branching'][1], label=spectrumModule.Shell.total,
+                                                          unit='')
                             decayMode.photonEmissionProbabilities.add(Pgamma)
                         reactionSuite.PoPs[fullName].decayData.decayModes.add(decayMode)
                     except Exception as err:
                         warningList.append('raise somewhere in "for MF12 in MF12_LO2" loop: MT%d, %s' % (MT, err))
                         info.doRaise.append(warningList[-1])
-            else :
+            else:
                 raise Exception("Could not determine base MT for MF=12's MT=%s" % MTLO2)
 
     if doCovariances:
-        covarianceMFs = sorted(set([mf for mt in MTDatas.values() for mf in mt.keys() if mf>30]))
+        covarianceMFs = sorted(set([mf for mt in MTDatas.values() for mf in mt.keys() if mf > 30]))
         if covarianceMFs:
-            info.logs.write('    Reading covariances (MFs %s)\n' % ','.join(map(str,covarianceMFs)))
+            info.logs.write('    Reading covariances (MFs %s)\n' % ','.join(map(str, covarianceMFs)))
         try:
             """ parse covariances. This also requires setting up links from data to covariances, so we
             must ensure the links are synchronized """
@@ -786,7 +827,7 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                 evaluated = info.evaluatedStyle.copy()
                 evaluated.documentation.endfCompatible.body = None
                 covarianceSuite.styles.add(evaluated)
-                #covarianceSuite.removeExtraZeros() # disable for easier comparison to ENDF
+                # covarianceSuite.removeExtraZeros() # disable for easier comparison to ENDF
             else:
                 covarianceSuite = None
         except Exception as e:
@@ -862,13 +903,13 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
 
     if info.level > 0:  # AWR is for isomer mass. Adjust info.ZAMasses to GS mass:
         groundStateMass = info.massTracker.getMassAMU(info.targetZA) - PQUModule.PQU(
-            PQUModule.PQU_float.surmiseSignificantDigits(info.level),'eV/c**2').getValueAs('amu')
+            PQUModule.PQU_float.surmiseSignificantDigits(info.level), 'eV/c**2').getValueAs('amu')
         info.massTracker.addMassAMU(info.targetZA, groundStateMass)  # overwrite excited state mass
 
     for ZA in info.massTracker.amuMasses:
         if ZA in [1]: continue  # neutron already handled as special case
         mass = info.massTracker.amuMasses[ZA]
-        elementSymbol = chemicalElementMiscModule.symbolFromZ[ZA//1000]
+        elementSymbol = chemicalElementMiscModule.symbolFromZ[ZA // 1000]
         name = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA(elementSymbol, ZA % 1000)
         name = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex(name, 0)
         mass = massModule.Double(info.PoPsLabel, mass, quantityModule.stringToPhysicalUnit('amu'))
@@ -891,17 +932,17 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
         if particleID == reactionSuite.target: particleID = targetID
         if particleID == 'target':
             particle = reactionSuite.PoPs[targetID]
-        else :
+        else:
             particle = reactionSuite.PoPs[particleID]
 
         if isinstance(particle, nuclideModule.Particle): particle = particle.nucleus
 
-        if len(particle.spin) == 0: particle.spin.add( spin )
+        if len(particle.spin) == 0: particle.spin.add(spin)
         if spinParity[1]:
             parity = spinParity[1].value
             particle.parity.add(parityModule.Integer(info.PoPsLabel, parity, parityModule.baseUnit))
 
-    for reaction in reactionSuite.reactions:                                       # For two-body reactions, this sections decays an excited state
+    for reaction in reactionSuite.reactions:  # For two-body reactions, this sections decays an excited state
         if reaction.ENDF_MT == 2:
             continue
         if reaction.outputChannel.genre == enumsModule.Genre.twoBody:
@@ -910,7 +951,7 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                 particle = info.PoPs[residual.pid]
                 if isinstance(particle, nuclideModule.Particle):
                     addGroundState = particle.nucleus.index != 0
-                    if addGroundState:                      # gamma data should be in orphanProducts.
+                    if addGroundState:  # gamma data should be in orphanProducts.
                         groundState = particle.isotope.nuclides[0]
                         ZA = chemicalElementMiscModule.ZA(groundState)
                         multiplicity = residual.multiplicity[0].copy()
@@ -929,7 +970,8 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
     if reconstructResonances and reactionSuite.resonances is not None and reactionSuite.resonances.reconstructCrossSection:
         info.logs.write('    Reconstructing resonances\n')
         try:
-            reactionSuite.reconstructResonances(info.reconstructedStyle, info.reconstructedAccuracy, verbose=verbose, thin=True)
+            reactionSuite.reconstructResonances(info.reconstructedStyle, info.reconstructedAccuracy, verbose=verbose,
+                                                thin=True)
         except Exception as ex:
             warningList.append("Resonance reconstruction failed: %s" % ex)
             info.resonanceReconstructionFailed = str(ex)
@@ -939,7 +981,7 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
 
         energyMultiplicity = []
         if multiplicity.domainMax > crossSection.domainMax:
-                multiplicity = multiplicity.domainSlice(domainMax = crossSection.domainMax)
+            multiplicity = multiplicity.domainSlice(domainMax=crossSection.domainMax)
         for energyIn, multiplicityValue in multiplicity:
             crossSectionAtEnergy = crossSection.evaluate(energyIn)
             if crossSectionAtEnergy != 0: multiplicityValue /= crossSectionAtEnergy
@@ -986,7 +1028,7 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
             gammaProduction = gammaProduction[0]
             summands = [sumsModule.Add(link=r.multiplicity) for r in
                         gammaProduction.outputChannel.getProductsWithName(IDsPoPsModule.photon)]
-            if len(summands)==0:
+            if len(summands) == 0:
                 for _product in gammaProduction.outputChannel:
                     if _product.outputChannel is not None:
                         summands += [sumsModule.Add(link=r.multiplicity) for r in
@@ -997,7 +1039,7 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
                 name = gammaProduction.outputChannel.toString(MT=MT)
 
             multiplicitySum = sumsModule.MultiplicitySum(label=name + " total gamma multiplicity", ENDF_MT=MT)
-            for summand in summands : multiplicitySum.summands.append(summand)
+            for summand in summands: multiplicitySum.summands.append(summand)
             multiplicitySum.multiplicity.add(multiplicity)
             reactionSuite.sums.multiplicitySums.add(multiplicitySum)
 

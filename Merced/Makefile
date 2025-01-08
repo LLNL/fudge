@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-subDirs = Doc Src TestSuite bin
+subDirs = Doc MonteCarlo Src TestSuite bin
 
 .PHONY: default bin clean realclean check doc doSubDirs prefixDeploy
 

@@ -20,31 +20,35 @@ from xData import axes as axesModule
 
 from fudge import enums as enumsModule
 from fudge import styles as stylesModule, suites as suitesModule
-from . import covarianceSection as sectionModule, summed as summedModule, mixed as mixedModule, modelParameters as modelParametersModule
+from . import covarianceSection as sectionModule, summed as summedModule, mixed as mixedModule, \
+    modelParameters as modelParametersModule
 
-class CovarianceSections( suitesModule.Suite ):
+
+class CovarianceSections(suitesModule.Suite):
     """
     Most covariances are stored in 'sections', each representing either the internal covariance
     for a single quantity (i.e. cross section) or the cross-term between two quantities
     """
 
     moniker = 'covarianceSections'
-    legacyMemberNameMapping = { 'section' : sectionModule.CovarianceSection.moniker }
+    legacyMemberNameMapping = {'section': sectionModule.CovarianceSection.moniker}
 
     def __init__(self):
         suitesModule.Suite.__init__(self, (sectionModule.CovarianceSection,))
 
-class ParameterCovariances( suitesModule.Suite ):
+
+class ParameterCovariances(suitesModule.Suite):
     """
     Resolved and unresolved resonance parameters are stored inside the parameterCovariances.
     """
 
     moniker = 'parameterCovariances'
-    legacyMemberNameMapping = { 'section' : modelParametersModule.AverageParameterCovariance.moniker }
+    legacyMemberNameMapping = {'section': modelParametersModule.AverageParameterCovariance.moniker}
 
-    def __init__( self ):
+    def __init__(self):
         suitesModule.Suite.__init__(self, (modelParametersModule.ParameterCovariance,
-                                           modelParametersModule.AverageParameterCovariance) )
+                                           modelParametersModule.AverageParameterCovariance))
+
 
 class CovarianceSuite(ancestryModule.AncestryIO):
     """
@@ -59,15 +63,15 @@ class CovarianceSuite(ancestryModule.AncestryIO):
     moniker = 'covarianceSuite'
     ancestryMembers = ('externalFiles', 'styles', 'covarianceSections', 'parameterCovariances')
     childNodeOrder = {
-            GNDS_formatVersionModule.version_1_10 :       (  suitesModule.ExternalFiles.moniker,                 stylesModule.Styles.moniker,
-                                                             CovarianceSections.moniker,                         ParameterCovariances.moniker ),
-            GNDS_formatVersionModule.version_2_0_LLNL_4 : (  suitesModule.ExternalFiles.moniker,                 stylesModule.Styles.moniker,
-                                                             CovarianceSections.moniker,                         ParameterCovariances.moniker ),
-            GNDS_formatVersionModule.version_2_0:         (  suitesModule.ExternalFiles.moniker,                 stylesModule.Styles.moniker,
-                                                             CovarianceSections.moniker,                         ParameterCovariances.moniker ) }
+        GNDS_formatVersionModule.version_1_10: (suitesModule.ExternalFiles.moniker, stylesModule.Styles.moniker,
+                                                CovarianceSections.moniker, ParameterCovariances.moniker),
+        GNDS_formatVersionModule.version_2_0_LLNL_4: (suitesModule.ExternalFiles.moniker, stylesModule.Styles.moniker,
+                                                      CovarianceSections.moniker, ParameterCovariances.moniker),
+        GNDS_formatVersionModule.version_2_0: (suitesModule.ExternalFiles.moniker, stylesModule.Styles.moniker,
+                                               CovarianceSections.moniker, ParameterCovariances.moniker)}
 
-    def __init__( self, projectile, target, evaluation, interaction = None,
-                  formatVersion = GNDS_formatVersionModule.default, sourcePath = None ) :
+    def __init__(self, projectile, target, evaluation, interaction=None,
+                 formatVersion=GNDS_formatVersionModule.default, sourcePath=None):
         """
         :param projectile:  particle id
         :param target:      particle id
@@ -77,10 +81,11 @@ class CovarianceSuite(ancestryModule.AncestryIO):
 
         ancestryModule.AncestryIO.__init__(self)
 
-        if formatVersion not in GNDS_formatVersionModule.allowedPlus: raise Exception("Unsupported GNDS structure '%s'!" % str(formatVersion))
+        if formatVersion not in GNDS_formatVersionModule.allowedPlus: raise Exception(
+            "Unsupported GNDS structure '%s'!" % str(formatVersion))
 
-        self.projectile = projectile            #: The projectile
-        self.target = target                    #: The target
+        self.projectile = projectile  #: The projectile
+        self.target = target  #: The target
         self.evaluation = evaluation
 
         if interaction == enumsModule.Interaction.legacyTNSL:
@@ -90,24 +95,24 @@ class CovarianceSuite(ancestryModule.AncestryIO):
         self.sourcePath = sourcePath
 
         self.__externalFiles = suitesModule.ExternalFiles()
-        self.__externalFiles.setAncestor( self )
+        self.__externalFiles.setAncestor(self)
 
-        self.__styles = stylesModule.Styles( )
-        self.__styles.setAncestor( self )
+        self.__styles = stylesModule.Styles()
+        self.__styles.setAncestor(self)
 
         self.__covarianceSections = CovarianceSections()
-        self.__covarianceSections.setAncestor( self )
+        self.__covarianceSections.setAncestor(self)
 
         self.__parameterCovariances = ParameterCovariances()
-        self.__parameterCovariances.setAncestor( self )
+        self.__parameterCovariances.setAncestor(self)
 
-        self.formatVersion = formatVersion 
+        self.formatVersion = formatVersion
 
     @property
-    def sourcePath( self ) :
+    def sourcePath(self):
         """Returns the sourcePath member which is the path to the covarianceSuite file for self if self is from a file."""
 
-        return( self.__sourcePath )
+        return (self.__sourcePath)
 
     @sourcePath.setter
     def sourcePath(self, path):
@@ -124,7 +129,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
                 raise ValueError('Path must be a str or None, got "%s"' % type(path))
 
         self.__sourcePath = path
-    
+
     @property
     def styles(self):
         return self.__styles
@@ -142,46 +147,47 @@ class CovarianceSuite(ancestryModule.AncestryIO):
         return self.__parameterCovariances
 
     @property
-    def domainMin( self ) :
+    def domainMin(self):
         """Returns the minimum of the projectile energy for the evaluation. This needs to be fixed to handle multiple evaulation styles."""
 
-        return( self.styles[0].projectileEnergyDomain.min )
+        return (self.styles[0].projectileEnergyDomain.min)
 
     @property
-    def domainMax( self ) :
+    def domainMax(self):
         """Returns the maximum of the projectile energy for the evaluation. This needs to be fixed to handle multiple evaulation styles."""
 
-        return( self.styles[0].projectileEnergyDomain.min )
+        return (self.styles[0].projectileEnergyDomain.min)
 
     @property
-    def domainUnit( self ) :
+    def domainUnit(self):
         """Returns the unit of the projectile energy for the evaluation. This needs to be fixed to handle multiple evaulation styles."""
 
-        return( self.styles[0].projectileEnergyDomain.unit )
+        return (self.styles[0].projectileEnergyDomain.unit)
 
     @property
     def interaction(self):
         """Returns self's interaction."""
 
-        return(self.__interaction)
+        return (self.__interaction)
 
     @interaction.setter
     def interaction(self, value):
 
         if value is None:
             value = enumsModule.Interaction.nuclear
-            print('Need to specify interaction when calling CovarianceSuite.__init__. Setting it to "%s". Please update your code as in the future this will execute a raise.' % value)
+            print(
+                'Need to specify interaction when calling CovarianceSuite.__init__. Setting it to "%s". Please update your code as in the future this will execute a raise.' % value)
 
         self.__interaction = enumsModule.Interaction.checkEnumOrString(value)
 
-    def convertUnits( self, unitMap ) :
+    def convertUnits(self, unitMap):
         """
         unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { 'eV' : 'MeV', 'b' : 'mb' }).
         """
 
-        for style in self.styles: style.convertUnits( unitMap )
-        for section in self.covarianceSections: section.convertUnits( unitMap )
-        for mpsection in self.parameterCovariances: mpsection.convertUnits( unitMap )
+        for style in self.styles: style.convertUnits(unitMap)
+        for section in self.covarianceSections: section.convertUnits(unitMap)
+        for mpsection in self.parameterCovariances: mpsection.convertUnits(unitMap)
 
     def check(self, **kwargs):
         """
@@ -208,7 +214,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
             'maxRelUnc': 10.0,
             'theData': None,
             'negativeEigenTolerance': -1e-6,  # ignore smaller negative eigenvalues
-            'eigenvalueRatioTolerance': 1e-8, # warn if smallest eival < 1e-8 * biggest
+            'eigenvalueRatioTolerance': 1e-8,  # warn if smallest eival < 1e-8 * biggest
             'eigenvalueAbsoluteTolerance': 1e-14,
             'verbose': False,
         }
@@ -245,15 +251,18 @@ class CovarianceSuite(ancestryModule.AncestryIO):
                         stack.pop()
             return None
 
-        def get_edges(section_, style):   #: return list of all pointers from this section
+        def get_edges(section_, style):  #: return list of all pointers from this section
             form = section_[style]
-            if isinstance(form, summedModule.SummedCovariance): return [v.link for v in form]
+            if isinstance(form, summedModule.SummedCovariance):
+                return [v.link for v in form]
             elif isinstance(form, mixedModule.MixedForm):
                 edges = []
                 for part in form:
                     if isinstance(part, summedModule.SummedCovariance): edges += [v.link for v in part]
                 return edges
-        nodes = [sec for sec in self.covarianceSections if get_edges(sec, info['style'])]  # sections that contain pointers
+
+        nodes = [sec for sec in self.covarianceSections if
+                 get_edges(sec, info['style'])]  # sections that contain pointers
 
         if nodes:
             cycle = find_cycle(nodes, get_edges, info['style'])
@@ -273,7 +282,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
 
         return warning.Context('CovarianceSuite: %s + %s' % (self.projectile, self.target), warnings)
 
-    def fix( self, **kwargs ):
+    def fix(self, **kwargs):
         """
         Apply basic fixes to a covariance
 
@@ -291,29 +300,29 @@ class CovarianceSuite(ancestryModule.AncestryIO):
         from fudge import warning
         # default input options
         options = {
-            'removeNegativeEVs':True, 
-            'removeSmallEVs':False, 
-            'fixUncLimits':False, 
-            'minRelUnc':None, 
-            'maxRelUnc':None, 
-            'theData':None,
+            'removeNegativeEVs': True,
+            'removeSmallEVs': False,
+            'fixUncLimits': False,
+            'minRelUnc': None,
+            'maxRelUnc': None,
+            'theData': None,
             'negativeEigenTolerance': -1e-6,  # ignore smaller negative eigenvalues
-            'eigenvalueRatioTolerance': 1e-8, # warn if smallest eival < 1e-8 * biggest
+            'eigenvalueRatioTolerance': 1e-8,  # warn if smallest eival < 1e-8 * biggest
             'eigenvalueAbsoluteTolerance': 1e-14,
         }
         for key in kwargs:
             if key in options:
                 options[key] = kwargs[key]
             else:
-                raise KeyError( "fix() received unknown keyword argument '%s'" % key )
+                raise KeyError("fix() received unknown keyword argument '%s'" % key)
         # assemble some useful info, to be handed down to children's check() functions:
-        info = { 'covarianceSuite': self }
-        info.update( options )
+        info = {'covarianceSuite': self}
+        info.update(options)
         # do the fixing
         warnings = []
-        for section_ in self.covarianceSections: warnings += section_.fix( **info )
+        for section_ in self.covarianceSections: warnings += section_.fix(**info)
         return warning.Context('CovarianceSuite: %s + %s' % (self.projectile, self.target), warnings)
-    
+
     def removeExtraZeros(self):
         """
         Checks all covariance matrices for rows/columns of all zero, removes them if found.
@@ -335,7 +344,8 @@ class CovarianceSuite(ancestryModule.AncestryIO):
 
         formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
         if formatVersion in (GNDS_formatVersionModule.version_2_0_LLNL_3, GNDS_formatVersionModule.version_2_0_LLNL_4):
-            print('INFO: converting GNDS format from "%s" to "%s".' % (formatVersion, GNDS_formatVersionModule.version_2_0))
+            print('INFO: converting GNDS format from "%s" to "%s".' % (
+            formatVersion, GNDS_formatVersionModule.version_2_0))
             formatVersion = GNDS_formatVersionModule.version_2_0
         kwargs['formatVersion'] = formatVersion
         if formatVersion not in GNDS_formatVersionModule.allowed:
@@ -345,7 +355,8 @@ class CovarianceSuite(ancestryModule.AncestryIO):
         if interaction == enumsModule.Interaction.TNSL:
             interaction = enumsModule.Interaction.getTNSL_interaction(formatVersion)
         xmlString = ['%s<%s projectile="%s" target="%s" evaluation="%s" interaction="%s" format="%s">'
-                % (indent, self.moniker, self.projectile, self.target, self.evaluation, interaction, formatVersion)]
+                     % (
+                     indent, self.moniker, self.projectile, self.target, self.evaluation, interaction, formatVersion)]
         xmlString += self.externalFiles.toXML_strList(indent2, **kwargs)
         xmlString += self.styles.toXML_strList(indent2, **kwargs)
         xmlString += self.covarianceSections.toXML_strList(indent2, **kwargs)
@@ -357,16 +368,16 @@ class CovarianceSuite(ancestryModule.AncestryIO):
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag) # keep track of location in the tree, in case errors come up
+        xPath.append(element.tag)  # keep track of location in the tree, in case errors come up
 
-        linkData = {'reactionSuite': kwargs.get('reactionSuite'), 'unresolvedLinks':[]}
+        linkData = {'reactionSuite': kwargs.get('reactionSuite'), 'unresolvedLinks': []}
 
         sourcePath = kwargs.get('sourcePath')
         try:
             formatVersion = element.get('format')
             linkData['formatVersion'] = formatVersion
             CS = cls(element.get('projectile'), element.get('target'), element.get('evaluation'),
-                    element.get('interaction'), formatVersion, sourcePath=sourcePath)
+                     element.get('interaction'), formatVersion, sourcePath=sourcePath)
             for child in element:
                 if child.tag == 'styles':
                     CS.styles.parseNode(child, xPath, linkData, **kwargs)
@@ -379,7 +390,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
                 else:
                     print("Warning: encountered unexpected element '%s' in covarianceSuite!" % child.tag)
         except Exception:
-            print( 'Error encountered at xpath "%s" while parsing %s.' % ('/'.join(xPath), cls.moniker))
+            print('Error encountered at xpath "%s" while parsing %s.' % ('/'.join(xPath), cls.moniker))
             raise
 
         # fix links:
@@ -390,14 +401,14 @@ class CovarianceSuite(ancestryModule.AncestryIO):
                 if path.startswith('/covarianceSuite'):
                     root = CS
                 elif path.startswith('.'):
-                    root = link_    # relative link
+                    root = link_  # relative link
             elif link_.root == '$reactions':
                 root = linkData['reactionSuite']
             else:
                 root = None
 
             if root is None:
-                continue    # FIXME links to other files (i.e. cross-material covariances) currently broken
+                continue  # FIXME links to other files (i.e. cross-material covariances) currently broken
             try:
                 res = link_.follow(root)
                 link_.link = res
@@ -412,8 +423,16 @@ class CovarianceSuite(ancestryModule.AncestryIO):
 
         reactionSuite = kwargs.get('reactionSuite')
         if reactionSuite is not None:
+            errors = 0
             for externalLink in reactionSuite._externalLinks:
-                externalLink.link = externalLink.follow(self)
+                try:
+                    externalLink.link = externalLink.follow(self)
+                except ancestryModule.XPathNotFound:
+                    errors += 1
+                    print("Warning: link %s could not be resolved!" % externalLink.path)
+
+            if errors:
+                raise ancestryModule.XPathNotFound("Encountered %d broken xpath links!" % errors)
 
         return CovarianceSuite
 
@@ -424,6 +443,7 @@ class CovarianceSuite(ancestryModule.AncestryIO):
         """
 
         return CovarianceSuite.readXML_file(fileName, **kwargs)
+
 
 def read(fileName, **kwargs):
     """

@@ -300,6 +300,19 @@ class Product( ancestryModule.AncestryIO ) :
         energyAccuracy = kwargs['energyAccuracy']
         momentumAccuracy = kwargs['momentumAccuracy']
 
+        if 'MT504_data' in kwargs and self.pid == IDsPoPsModule.photon:
+            MT504_data = kwargs['MT504_data']
+
+            axes = averageProductEnergyModule.defaultAxes(energyUnit=energyUnit)
+            averageEnergy = averageProductEnergyModule.XYs1d(data=MT504_data['averageProductEnergy'], axes=axes, label=style.label)
+            self.averageProductEnergy.add(averageEnergy)
+
+            axes = averageProductMomentumModule.defaultAxes(energyUnit=energyUnit, momentumUnit=momentumUnit)
+            averageMomentum = averageProductMomentumModule.XYs1d(data=MT504_data['averageProductMomentum'], axes=axes, label=style.label) 
+            self.averageProductMomentum.add(averageMomentum)
+
+            return
+
         kwargs['product'] = self
         try :
             kwargs['productMass'] = reactionSuite.PoPs[self.pid].getMass( massUnit )
@@ -556,6 +569,15 @@ class Product( ancestryModule.AncestryIO ) :
         warnings = []
 
         multWarnings = self.multiplicity.check(info)
+
+        if self.pid == IDsPoPsModule.photon:
+            from fudge.productData.distributions import uncorrelated, energy as energyModule
+            distribution = self.distribution.evaluated
+            if isinstance(distribution, uncorrelated.Form) and isinstance(distribution.energySubform.data,
+                           (energyModule.DiscreteGamma, energyModule.PrimaryGamma)):
+                if self.multiplicity.evaluated.rangeMax > 1:
+                    multWarnings.append(warning.UnphysicalDiscreteOrPrimaryPhotonMultiplicity(self))
+
         if multWarnings:
             warnings.append(warning.Context("Multiplicity:", multWarnings))
 

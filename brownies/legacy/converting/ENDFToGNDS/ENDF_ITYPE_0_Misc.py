@@ -1954,7 +1954,8 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
                 NA = int(KalbachMannData['Lists'][0]['L2'])
                 dataPerPoint = NA + 2
 
-                fData = energyModule.XYs2d(axes=KalbachMann_f_Axes, interpolation=interpolation, interpolationQualifier=interpolationQualifier)
+                fData = [energyModule.XYs2d(axes=KalbachMann_f_Axes, interpolation=interpolation,
+                                           interpolationQualifier=interpolationQualifier)]
 
                 ra_interpolationQualifier = {
                     xDataEnumsModule.InterpolationQualifier.none: xDataEnumsModule.InterpolationQualifier.none,
@@ -1962,11 +1963,13 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
                     xDataEnumsModule.InterpolationQualifier.correspondingPoints: xDataEnumsModule.InterpolationQualifier.correspondingPoints
                 }[interpolationQualifier]
 
-                rData = KalbachMannModule.XYs2d(axes=KalbachMann_r_Axes, interpolation=interpolation, interpolationQualifier=ra_interpolationQualifier)
+                rData = [KalbachMannModule.XYs2d(axes=KalbachMann_r_Axes, interpolation=interpolation,
+                                                 interpolationQualifier=ra_interpolationQualifier)]
 
                 aData = None
                 if NA == 2:
-                    aData = KalbachMannModule.XYs2d(axes=KalbachMann_a_Axes, interpolation=interpolation, interpolationQualifier=ra_interpolationQualifier)
+                    aData = [KalbachMannModule.XYs2d(axes=KalbachMann_a_Axes, interpolation=interpolation,
+                                                     interpolationQualifier=ra_interpolationQualifier)]
 
                 priorE, priorEp_f_r_ = -1, [-1, -1, -1]
                 for i1, data in enumerate(KalbachMannData['Lists']):
@@ -1977,32 +1980,48 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
                     priorEp_f_r__ = [Ep_, f_, r_]
                     if value == priorE:
                         if i1 == 1:
-                            fData.pop(0)
-                            rData.pop(0)
+                            fData[-1].pop(0)
+                            rData[-1].pop(0)
                             if aData is not None:
-                                aData.pop(0)
+                                aData[-1].pop(0)
                         else:
                             if priorEp_f_r_ == priorEp_f_r__:
                                 continue        # For TENDL files with duplicate data.
-                            print('\nMT=%d' % MT)
-                            print(value, priorEp_f_r_)
-                            print(priorE, priorEp_f_r__)
-                            raise NotImplementedError('hell - need to support regions')
+
+                            # Discontinuous data, need to split into regions
+                            fData.append(KalbachMannModule.XYs2d(axes=KalbachMann_f_Axes, interpolation=interpolation,
+                                                                 interpolationQualifier=interpolationQualifier))
+                            rData.append(KalbachMannModule.XYs2d(axes=KalbachMann_r_Axes, interpolation=interpolation,
+                                                                 interpolationQualifier=ra_interpolationQualifier))
+                            if aData is not None:
+                                aData.append(
+                                    KalbachMannModule.XYs2d(axes=KalbachMann_a_Axes, interpolation=interpolation,
+                                                            interpolationQualifier=ra_interpolationQualifier))
+
                     priorE, priorEp_f_r_ = value, priorEp_f_r__
                     if Ep_[-2] == Ep_[-1]:
                         Ep_[-1] *= 1.00000001
-                    fData.append(energyModule.XYs1d(data=(Ep_, f_), dataForm='xsandys', axes=KalbachMann_f_Axes,
+                    fData[-1].append(energyModule.XYs1d(data=(Ep_, f_), dataForm='xsandys', axes=KalbachMann_f_Axes,
                                                  outerDomainValue=value, interpolation=interpolationLEP))
-                    rData.append(XYs1dModule.XYs1d(data=(Ep_, r_), dataForm= 'xsandys', axes=KalbachMann_r_Axes,
+                    rData[-1].append(XYs1dModule.XYs1d(data=(Ep_, r_), dataForm= 'xsandys', axes=KalbachMann_r_Axes,
                                                  outerDomainValue=value, interpolation=interpolationLEP))
                     if aData is not None:
                         a_ = data['data'][3::dataPerPoint]
-                        aData.append(XYs1dModule.XYs1d(data=(Ep_, a_), dataForm='xsandys', axes=KalbachMann_a_Axes,
+                        aData[-1].append(XYs1dModule.XYs1d(data=(Ep_, a_), dataForm='xsandys', axes=KalbachMann_a_Axes,
                                                      outerDomainValue=value, interpolation=interpolationLEP))
 
-                fSubform = KalbachMannModule.FSubform(fData)
-                rSubform = KalbachMannModule.RSubform(rData)
-                aSubform = KalbachMannModule.ASubform(aData)
+                def toRegionsIfNeeded(section):
+                    if section is None: return
+                    if len(section) == 1: return section[0]  # XYs2d
+                    regions_ = KalbachMannModule.Regions2d()
+                    for subsection in section:
+                        regions_.append(subsection)
+                    regions_.axes = regions_[0].axes
+                    return regions_
+
+                fSubform = KalbachMannModule.FSubform(toRegionsIfNeeded(fData))
+                rSubform = KalbachMannModule.RSubform(toRegionsIfNeeded(rData))
+                aSubform = KalbachMannModule.ASubform(toRegionsIfNeeded(aData))
                 form = KalbachMannModule.Form(info.style, frame, fSubform, rSubform, aSubform)
 
             elif( LANG in [ 11, 12, 13, 14, 15 ] ) :    # P(E',mu|E)
@@ -3146,7 +3165,7 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
             row -= 1
             col -= 1
             if row >= NNN or col >= row:
-                raise BadCovariance("Matrix indices out of range for MF32 LCOMP=2 matrix")
+                raise BadCovariance("Matrix indices out of range for MF32 LCOMP=2 matrix: (%d,%d) vs. %d" % (row,col,NNN))
             matrix[row, col:col+len(vals)] = vals
         for idx in range(NNN):    # symmetrize
             matrix[idx, idx:] = matrix[idx:, idx]
@@ -3642,6 +3661,7 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
 
             # find URR section corresponding to each row in the matrix:
             matrixSections = []
+            urr_warnings = []
             for L, J, averageParams in LJs:
                 conversionFlag = []
                 for key in sorted(averageParams):
@@ -3651,15 +3671,25 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
 
                 lsections = [lsec for lsec in URR.Ls if lsec.L == L]
                 if len(lsections) == 0:
-                    raise BadCovariance("No match in MF2 for MF32 URR section with L=%d" % L)
+                    urr_warnings.append("No match in MF2 for MF32 URR section with L=%d" % L)
+                    continue
                 lsection, = lsections
                 jsections = [jsec for jsec in lsection.Js if jsec.J == J]
                 if len(jsections) == 0:
-                    raise BadCovariance("No match in MF2 for MF32 URR section with L=%d, J=%d" % (L, J))
+                    urr_warnings.append("No match in MF2 for MF32 URR section with L=%d, J=%d" % (L, J))
+                    continue
                 jsection, = jsections
                 matrixSections.append([lsection.L, jsection.J, jsection.levelSpacing, conversionFlag])
                 for idx in range(MPAR-1):
                     matrixSections.append([lsection.L, jsection.J, jsection.widths[idx], conversionFlag])
+
+            if urr_warnings:
+                print("Errors encountered in MF=32 URR covariance section:")
+                for warning in urr_warnings:
+                    print("    " + warning)
+                warningList += urr_warnings
+                info.doRaise.append("Encountered malformed MF=32 URR data")
+                continue
 
             assert len(matrixSections) == len(matrix)
 

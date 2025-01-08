@@ -156,6 +156,7 @@ class Base_reaction(ancestryModule.AncestryIO):
         warnings = []
 
         reactionSuite = self.rootAncestor
+        energyUnit = reactionSuite.domainUnit
 
         def particleZA(particleID):
 
@@ -166,7 +167,7 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         try:
 # BRB6 hardwired
-            info['Q'] = self.getQ('eV', final=False)
+            info['Q'] = self.getQ(energyUnit, final=False)
         except ValueError:
             pass
         cpcount = sum([(particleZA(prod.pid) // 1000) > 0 for prod in self.__outputChannel])
@@ -193,12 +194,12 @@ class Base_reaction(ancestryModule.AncestryIO):
         if not isinstance(self, (productionModule.Production, fissionComponentModule.FissionComponent,
                                  incompleteReactionModule.IncompleteReaction)):
             try:
-                Q = self.getQ('eV', final=False)
-                Qcalc = info['availableEnergy_eV']
+                Q = self.getQ(energyUnit, final=False)
+                Qcalc = info['availableEnergy']
                 if Qcalc is None: raise ValueError  # caught below. Skips Q-value check for elemental targets
                 for prod in self.__outputChannel:
                     try:
-                        productMass = prod.getMass('eV/c**2')
+                        productMass = prod.getMass(f'{energyUnit}/c**2')
                     except Exception:
                         warnings.append(warning.UnknownMass(prod.pid))
                         raise ValueError("Unknown mass")
@@ -211,10 +212,10 @@ class Base_reaction(ancestryModule.AncestryIO):
 
                     Qcalc -= productMass * productMultiplicity
 
-                if abs(Q-Qcalc) > PQUModule.PQU(info['dQ']).getValueAs('eV'):
+                if abs(Q-Qcalc) > PQUModule.PQU(info['dQ']).getValueAs(energyUnit):
                     if self.__outputChannel.process != outputChannelModule.Processes.continuum:
                         warnings.append(
-                            warning.Q_mismatch(PQUModule.PQU(Qcalc,'eV'), PQUModule.PQU(Q,'eV'), self))
+                            warning.Q_mismatch(PQUModule.PQU(Qcalc, energyUnit), PQUModule.PQU(Q, energyUnit), self))
             except ValueError:
                 pass    # this test only works if multiplicity and Q are both constant for all non-gamma products
 
