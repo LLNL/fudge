@@ -52,7 +52,7 @@ class RutherfordScattering( ancestryModule.AncestryIO ):
 
     @property
     def etaCoefficient( self ) :
-        r"""This method returns the parameter :math:`\eta \, \sqrt{E} = Z_1 \, Z_2 \, sqrt{\alpha^2 \mu m_1 / 2}`."""
+        """This method returns the parameter :math:`\\eta \\, \\sqrt{E} = Z_1 \\, Z_2 \\, sqrt{\\alpha^2 \\mu m_1 / 2}`."""
 
         return( self.ancestor.etaCoefficient )
 
@@ -64,7 +64,7 @@ class RutherfordScattering( ancestryModule.AncestryIO ):
 
     @property
     def kCoefficient( self ) :
-        r"""This function returns the coefficient for the particle wave number (i.e., :math:`k(E) / \sqrt{E}`)."""
+        """This function returns the coefficient for the particle wave number (i.e., :math:`k(E) / \\sqrt{E}`)."""
 
         return( self.ancestor.kCoefficient )
 
@@ -89,11 +89,11 @@ class RutherfordScattering( ancestryModule.AncestryIO ):
             self.domainUnit = newUnit
 
     def crossSectionVersusEnergy(self, muMax, accuracy=1e-3, energyMin=None, energyMax=None):
-        r"""
-        Returns the partial Rutherford cross section by Integrating :math:`d\sigma / d\mu` from muMin to *muMax*. For identical particles, muMin 
+        """
+        Returns the partial Rutherford cross section by Integrating :math:`d\\sigma / d\\mu` from muMin to *muMax*. For identical particles, muMin 
         is set to -*muMax* otherwise it is -1.
 
-        :param muMax:           The upper limit for the :amth:`\mu` integration.
+        :param muMax:           The upper limit for the :amth:`\\mu` integration.
         :param accuracy:        The lin-lin interpolation accuracy of the returned cross section.
         :param energyMin:       The minimum projectile energy for the returned cross section.
         :param energyMax:       The maximum projectile energy for the returned cross section.
@@ -130,10 +130,10 @@ class RutherfordScattering( ancestryModule.AncestryIO ):
 
 
     def dSigma_dMuVersusEnergy(self, muMax, accuracy=1e-3, energyMin=None, energyMax=None):
-        r"""
-        Returns :math:`d\sigma(E) / d\mu`.
+        """
+        Returns :math:`d\\sigma(E) / d\\mu`.
 
-        :param muMax:           The upper limit for the :amth:`\mu` integration.
+        :param muMax:           The upper limit for the :amth:`\\mu` integration.
         :param accuracy:        The lin-lin interpolation accuracy of the returned cross section.
         :param energyMin:       The minimum projectile energy for the returned cross section.
         :param energyMax:       The maximum projectile energy for the returned cross section.
@@ -159,13 +159,13 @@ class RutherfordScattering( ancestryModule.AncestryIO ):
         return xys2d
 
     def dSigma_dMu(self, energy, accuracy=1e-3, muMax=0.999, probability=False):
-        r"""
-        Returns :math:`d\sigma / d\mu` at the specified projdctile energy if *probability* is False, otherwise :math:`P(mu)` is returned..
+        """
+        Returns :math:`d\\sigma / d\\mu` at the specified projdctile energy if *probability* is False, otherwise :math:`P(mu)` is returned..
 
         :param energy:          Energy of the projectile.
         :param accuracy:        The lin-lin interpolation accuracy of the returned data.
         :param muMax:           Slices the upper domain mu to this value.
-        :param probability:     If True :math:`P(mu)` is returned instead of :math:`d\sigma / d\mu`.
+        :param probability:     If True :math:`P(mu)` is returned instead of :math:`d\\sigma / d\\mu`.
 
         :return:                A :py:class:`angularModule.XYs1d` instance.
         """
@@ -224,10 +224,10 @@ class RutherfordScattering( ancestryModule.AncestryIO ):
         return energyUnit, energyMin, energyMax
 
     def evaluate( self, energy, mu, phi = 0.0 ) :
-        r"""
-        Returns the :math:`d\sigma / d \Omega(energy,\mu,\phi) for Rutherford scattering. Note, Rutherford 
+        """
+        Returns the :math:`d\\sigma / d \\Omega(energy,\\mu,\\phi) for Rutherford scattering. Note, Rutherford 
         scattering is independent of phi but phi is listed as an argument to be consistent with others 
-        :math:`d\sigma / d\Omega` that may depend on phi.
+        :math:`d\\sigma / d\\Omega` that may depend on phi.
 
         :param energy:  Projectile energy.
         :param mu:      Scattering angle cosine.
