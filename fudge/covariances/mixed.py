@@ -223,12 +223,12 @@ class MixedForm(ancestryModule.AncestryIO, base.Covariance):
                 commonColAxis.values.values = add_values(commonColAxis.values, cc.matrix.axes[1].values)
 
         # Now sum up the components
-        commonMatrix = numpy.mat(firstCovMtx.group((commonRowAxis.values.values, commonColAxis.values.values),
+        commonMatrix = numpy.asmatrix(firstCovMtx.group((commonRowAxis.values.values, commonColAxis.values.values),
                                                    (commonRowAxis.unit,
                                                     commonColAxis.unit)).matrix.array.constructArray())
         for c in summands[1:]:
             cc = make_common_type(c)
-            commonMatrix += numpy.mat(cc.group((commonRowAxis.values.values, commonColAxis.values.values),
+            commonMatrix += numpy.asmatrix(cc.group((commonRowAxis.values.values, commonColAxis.values.values),
                                                (commonRowAxis.unit, commonColAxis.unit)).matrix.array.constructArray())
 
         # Now create the instance of the resulting CovarianceMatrix

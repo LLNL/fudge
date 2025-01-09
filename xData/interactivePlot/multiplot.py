@@ -822,7 +822,7 @@ class IndividualPlotOptions(QWidget):
         for i in range(len(self.axisHandle.lines)):
             irow = i + 1
             # row variables
-            legendLabel = self.axisHandle.legend_.legendHandles[i].get_label()
+            legendLabel = self.axisHandle.legend_.legend_handles[i].get_label()
             rowName = '%3.3d%s' % (i, legendLabel)
 
             # checkbox: toggle plot selection

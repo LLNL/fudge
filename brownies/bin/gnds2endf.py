@@ -38,7 +38,8 @@ parser.add_argument('--useRedsFloatFormat', action='store_true',            help
 parser.add_argument('gnds',                                                 help='GNDS file to translate.')
 parser.add_argument('output', nargs='?', default=None,                      help='The translated ENDF file.')
 
-if( __name__ == '__main__' ) :
+
+if __name__ == '__main__':
     args = parser.parse_args( )
 
     gndsCov = None
