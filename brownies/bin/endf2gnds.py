@@ -52,11 +52,11 @@ inFile = args.inFile
 outFile = args.outputFile
 if outFile is None:
     outFile = os.path.basename(inFile) + '.gnds.xml'
-    outCovFile = os.path.basename(inFile) + '.gnds-covar.xml'
+    outCovFile = os.path.basename(inFile) + '.gndsCov.xml'
 elif '.xml' in outFile:
-    outCovFile = outFile.replace('.xml', '-covar.xml')
+    outCovFile = outFile.replace('.xml', '.gndsCov.xml')
 else:
-    outCovFile = outFile + "-covar.xml"
+    outCovFile = outFile + ".gndsCov.xml"
 
 try:
     kwargs = {}
