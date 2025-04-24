@@ -28,17 +28,17 @@ def parse( utfil ):
                 fin.next()  # interpolation line
 
                 for idx in range(npoints):
-                    xsc.append( map(float, fin.next().split()) )
+                    xsc.append( list(map(float, fin.next().split())) )
 
-        for i in range(4): fin.next()
+        for i in range(4): next(fin)
         for line in fin:
             if line.startswith('EinBin'): continue
             if line.startswith('Integrals'): break
-            tm1.append( map(float, line.split()) )
+            tm1.append( list(map(float, line.split())) )
 
         for line in fin:
             if line.startswith('EinBin'): continue
-            tm2.append( map(float, line.split()) )
+            tm2.append( list(map(float, line.split())) )
 
     return numpy.array(xsc), numpy.array(tm1), numpy.array(tm2)
 

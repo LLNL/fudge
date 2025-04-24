@@ -849,7 +849,10 @@ class NonConstantMultiplicity(Warning):
 
 class Domain_mismatch(Warning):
     def __init__(self, lowBound, highBound, xscLowBound, xscHighBound, obj=None):
-        Warning.__init__(self, Level.Severe, obj)
+        level = Level.Severe
+        if lowBound <= xscLowBound and highBound >= xscHighBound:
+            level = Level.Moderate
+        Warning.__init__(self, level, obj)
         self.lowBound, self.highBound = lowBound, highBound
         self.xscLowBound, self.xscHighBound = xscLowBound, xscHighBound
 

@@ -264,9 +264,9 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
         theUncertainty = copy.copy(numpy.diag(theCorrelationMatrix))
         theUncertainty[theUncertainty < 0.0] = 0.0
         theUncertainty = numpy.sqrt(theUncertainty)
-        for i1 in range(theCorrelationMatrix.shape[0]):
-            for i2 in range(theCorrelationMatrix.shape[1]):
-                theCorrelationMatrix[i1, i2] /= (theUncertainty[i1] * theUncertainty[i2])
+        with numpy.errstate(divide='ignore', invalid='ignore'):
+            theCorrelationMatrix /= theUncertainty
+            theCorrelationMatrix /= theUncertainty[:,numpy.newaxis]
 
         # Return the result
         tridata = theCorrelationMatrix[numpy.tri(theCorrelationMatrix.shape[0], dtype=bool)].tolist()

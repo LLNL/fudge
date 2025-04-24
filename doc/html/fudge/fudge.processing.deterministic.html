@@ -550,8 +550,8 @@ that will be writted to the Merced input file.</p>
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.discreteGammaAngularData">
 <span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">discreteGammaAngularData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gammaEnergy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#discreteGammaAngularData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.discreteGammaAngularData" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function calculates multi-group product matices for a discrete photon distribution.
-Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used
-for pair-production which pass angularData as None.</p>
+Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored.
+This routine is also used for processing branching3d distributions which pass angularData as None.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -714,7 +714,7 @@ written to the Merced input file.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.transferMatrices.primaryGammaAngularData">
-<span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">primaryGammaAngularData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energyData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#primaryGammaAngularData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.primaryGammaAngularData" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.transferMatrices.</span></span><span class="sig-name descname"><span class="pre">primaryGammaAngularData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossSection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energyData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angularData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#primaryGammaAngularData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.primaryGammaAngularData" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function calculates multi-group product matrices for a primary photon distribution from a capture reaction.
 Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. massRatio is the
 target mass divide by the sum of the projectile and target masses.</p>
@@ -929,32 +929,22 @@ temperature of the target.</p>
 <tr class="row-even"><td><p>rescaleCrossSection</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>analyzeMatrix</p></td>
-<td><p>This function is not used.</p></td>
-</tr>
 </tbody>
 </table>
 </div></blockquote>
 <dl class="py function">
 <dt class="sig sig-object py" id="fudge.processing.deterministic.multiGroupUpScatter.SnElasticUpScatter">
-<span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.multiGroupUpScatter.</span></span><span class="sig-name descname"><span class="pre">SnElasticUpScatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#SnElasticUpScatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.SnElasticUpScatter" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function generates input for and calls the code which includes a target temperature when calculating product matrices for
-neutron elastic scattering.</p>
+<span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.multiGroupUpScatter.</span></span><span class="sig-name descname"><span class="pre">SnElasticUpScatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#SnElasticUpScatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.SnElasticUpScatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function generates input for and calls the code which includes a target temperature when
+calculating product matrices for neutron elastic scattering.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>style</strong> – This is not used.</p></li>
 <li><p><strong>tempInfo</strong> – This is a dictionary with needed data.</p></li>
-<li><p><strong>comment</strong> – This is not used.</p></li>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="fudge.processing.deterministic.multiGroupUpScatter.analyzeMatrix">
-<span class="sig-prename descclassname"><span class="pre">fudge.processing.deterministic.multiGroupUpScatter.</span></span><span class="sig-name descname"><span class="pre">analyzeMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">TM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempInfo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/multiGroupUpScatter.html#analyzeMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.processing.deterministic.multiGroupUpScatter.analyzeMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function is not used and should be deleted.</p>
 </dd></dl>
 
 <dl class="py function">

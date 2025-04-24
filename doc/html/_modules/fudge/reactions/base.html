@@ -199,16 +199,18 @@
 
         <span class="k">def</span> <span class="nf">particleZA</span><span class="p">(</span><span class="n">particleID</span><span class="p">):</span>
 
-            <span class="n">particle</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">particleID</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">particle</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
-                <span class="n">particle</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span> <span class="n">particle</span><span class="o">.</span><span class="n">pid</span> <span class="p">]</span>
+            <span class="n">particle</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="n">particleID</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">chemicalElementMiscPoPsModule</span><span class="o">.</span><span class="n">ZA</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
 
+
+        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMax</span>
+        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;isTwoBody&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">genre</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Genre</span><span class="o">.</span><span class="n">twoBody</span>
         <span class="k">try</span><span class="p">:</span>
-<span class="c1"># BRB6 hardwired</span>
             <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span><span class="n">energyUnit</span><span class="p">,</span> <span class="n">final</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">pass</span>
+            <span class="c1"># Q is energy-dependent. Compute Q at threshold</span>
+            <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMin</span><span class="p">)</span>
+
         <span class="n">cpcount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([(</span><span class="n">particleZA</span><span class="p">(</span><span class="n">prod</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span> <span class="o">//</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">])</span>
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;CoulombOutputChannel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpcount</span> <span class="o">&gt;</span> <span class="mi">1</span>
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;ContinuumOutputChannel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">process</span> <span class="o">==</span> <span class="n">outputChannelModule</span><span class="o">.</span><span class="n">Processes</span><span class="o">.</span><span class="n">continuum</span>
@@ -222,7 +224,6 @@
         <span class="k">if</span> <span class="n">crossSectionWarnings</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Cross section:&quot;</span><span class="p">,</span> <span class="n">crossSectionWarnings</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="s1">&#39;Q&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span> <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
         <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;CoulombOutputChannel&#39;</span><span class="p">]</span>
         <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;ContinuumOutputChannel&#39;</span><span class="p">]</span>
 
@@ -231,9 +232,9 @@
 
         <span class="c1"># compare calculated and listed Q-values:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">productionModule</span><span class="o">.</span><span class="n">Production</span><span class="p">,</span> <span class="n">fissionComponentModule</span><span class="o">.</span><span class="n">FissionComponent</span><span class="p">,</span>
-                                 <span class="n">incompleteReactionModule</span><span class="o">.</span><span class="n">IncompleteReaction</span><span class="p">)):</span>
+                                 <span class="n">incompleteReactionModule</span><span class="o">.</span><span class="n">IncompleteReaction</span><span class="p">,</span> <span class="n">orphanProductModule</span><span class="o">.</span><span class="n">OrphanProduct</span><span class="p">)):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span><span class="n">energyUnit</span><span class="p">,</span> <span class="n">final</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">Q</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
                 <span class="n">Qcalc</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;availableEnergy&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">Qcalc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span>  <span class="c1"># caught below. Skips Q-value check for elemental targets</span>
                 <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
@@ -277,9 +278,6 @@
             <span class="k">if</span> <span class="n">ZAsum</span> <span class="o">!=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;compoundZA&#39;</span><span class="p">]:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">ZAbalanceWarning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
 
-        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMax</span>
-        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;isTwoBody&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">genre</span> <span class="o">==</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Genre</span><span class="o">.</span><span class="n">twoBody</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">productionModule</span><span class="o">.</span><span class="n">Production</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
                 <span class="n">productWarnings</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
@@ -292,6 +290,7 @@
 
         <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]</span>
         <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;isTwoBody&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;checkEnergyBalance&#39;</span><span class="p">]</span>
                 <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">productionModule</span><span class="o">.</span><span class="n">Production</span><span class="p">)</span>

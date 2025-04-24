@@ -1348,7 +1348,7 @@
 
         <span class="c1"># Compute the uncertainty itself</span>
         <span class="kn">import</span> <span class="nn">numpy</span>
-        <span class="n">phi</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mat</span><span class="p">(</span> <span class="n">phi</span> <span class="p">)</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asmatrix</span><span class="p">(</span> <span class="n">phi</span> <span class="p">)</span>
         <span class="n">theArray</span> <span class="o">=</span> <span class="n">theCovariance</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">coco</span> <span class="o">=</span> <span class="p">(</span><span class="n">phi</span> <span class="o">*</span> <span class="n">theArray</span> <span class="o">*</span> <span class="n">phi</span><span class="o">.</span><span class="n">T</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>

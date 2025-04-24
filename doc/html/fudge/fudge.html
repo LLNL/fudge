@@ -1696,8 +1696,24 @@ differential data for each product must be given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.outputChannel.OutputChannel.getProductsWithName">
-<span class="sig-name descname"><span class="pre">getProductsWithName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannel.html#OutputChannel.getProductsWithName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannel.OutputChannel.getProductsWithName" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of all the channel’s products with given name (‘gamma’,’n’, etc).</p>
+<span class="sig-name descname"><span class="pre">getProductsWithName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delayedNeutrons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannel.html#OutputChannel.getProductsWithName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannel.OutputChannel.getProductsWithName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of all the channel’s products with given name (‘photon’,’n’, etc).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.outputChannel.OutputChannel.iterateProducts">
+<span class="sig-name descname"><span class="pre">iterateProducts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">final</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delayedNeutrons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/outputChannel.html#OutputChannel.iterateProducts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.outputChannel.OutputChannel.iterateProducts" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an iterator that returns each product of <em>self</em>. If <em>final</em> is <strong>True</strong>, products with an
+output channel are not returned but, instead, their nested products are. Ergo, only final products are returned
+if <em>final</em> is <strong>True</strong>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>final</strong> – If <strong>True</strong>, only final products are returned; otherwise, only the products directly within <em>self</em> are returned.</p></li>
+<li><p><strong>delayedNeutrons</strong> – If <strong>True</strong>, delayed neutrons are also iterated over if present.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -2639,8 +2655,9 @@ unitMap is a dictionary with old/new unit pairs where the old unit is the key (e
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactionSuite.ReactionSuite.cullProcessedData">
-<span class="sig-name descname"><span class="pre">cullProcessedData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.cullProcessedData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.cullProcessedData" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method removes all processed data from <em>self</em>.</p>
+<span class="sig-name descname"><span class="pre">cullProcessedData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_reconstructed_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.cullProcessedData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.cullProcessedData" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method removes processed data from <em>self</em>.
+If include_reconstructed_data is True, then reconstructed data is also removed.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -3186,7 +3203,7 @@ Processed results will be stored as new forms inside the reactionSuite.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.reactionSuite.ReactionSuite.processSnElasticUpScatter">
-<span class="sig-name descname"><span class="pre">processSnElasticUpScatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreMax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incrementalIndent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span>&#160; <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.processSnElasticUpScatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.processSnElasticUpScatter" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">processSnElasticUpScatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legendreMax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incrementalIndent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span>&#160; <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workDir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">restart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/reactionSuite.html#ReactionSuite.processSnElasticUpScatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.reactionSuite.ReactionSuite.processSnElasticUpScatter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -4241,20 +4258,24 @@ AngularDistributionReconstructed and Realization).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.styles.Styles.preProcessingHeadInChainWithLabel">
-<span class="sig-name descname"><span class="pre">preProcessingHeadInChainWithLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#Styles.preProcessingHeadInChainWithLabel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.Styles.preProcessingHeadInChainWithLabel" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">preProcessingHeadInChainWithLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_reconstructed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#Styles.preProcessingHeadInChainWithLabel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.Styles.preProcessingHeadInChainWithLabel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the pre-processing head of the chain containing the label <em>label</em>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.styles.Styles.preProcessingOnly">
-<span class="sig-name descname"><span class="pre">preProcessingOnly</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#Styles.preProcessingOnly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.Styles.preProcessingOnly" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">preProcessingOnly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_reconstructed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#Styles.preProcessingOnly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.Styles.preProcessingOnly" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if self only contains pre-processed styles and False otherwise.</p>
+<p>&#64;param include_reconstructed: whether to count reconstructed resonances as pre-processed styles
+&#64;type include_reconstructed: bool</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fudge.styles.Styles.preProcessingStyles">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">preProcessingStyles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#Styles.preProcessingStyles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.Styles.preProcessingStyles" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">preProcessingStyles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_reconstructed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/styles.html#Styles.preProcessingStyles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.styles.Styles.preProcessingStyles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the list of style classes that can be processed. These are known as pre-processed styles.</p>
+<p>&#64;param include_reconstructed: whether to include CrossSectionReconstructed and AngularDistributionReconstructed
+&#64;type include_reconstructed: bool</p>
 </dd></dl>
 
 <dl class="py method">

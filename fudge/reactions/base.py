@@ -160,16 +160,18 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         def particleZA(particleID):
 
-            particle = reactionSuite.PoPs[particleID]
-            if hasattr(particle, 'id') and particle.id in reactionSuite.PoPs.aliases:
-                particle = reactionSuite.PoPs[ particle.pid ]
+            particle = reactionSuite.PoPs.final(particleID)
             return chemicalElementMiscPoPsModule.ZA(particle)
 
+
+        info['crossSectionDomain'] = self.crossSection.domainMin, self.crossSection.domainMax
+        info['isTwoBody'] = self.__outputChannel.genre == enumsModule.Genre.twoBody
         try:
-# BRB6 hardwired
             info['Q'] = self.getQ(energyUnit, final=False)
         except ValueError:
-            pass
+            # Q is energy-dependent. Compute Q at threshold
+            info['Q'] = self.outputChannel.Q.evaluated.evaluate(self.crossSection.domainMin)
+
         cpcount = sum([(particleZA(prod.pid) // 1000) > 0 for prod in self.__outputChannel])
         info['CoulombOutputChannel'] = cpcount > 1
         info['ContinuumOutputChannel'] = self.outputChannel.process == outputChannelModule.Processes.continuum
@@ -183,7 +185,6 @@ class Base_reaction(ancestryModule.AncestryIO):
         if crossSectionWarnings:
             warnings.append(warning.Context("Cross section:", crossSectionWarnings))
 
-        if 'Q' in info: del info['Q']
         del info['CoulombOutputChannel']
         del info['ContinuumOutputChannel']
 
@@ -192,9 +193,9 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         # compare calculated and listed Q-values:
         if not isinstance(self, (productionModule.Production, fissionComponentModule.FissionComponent,
-                                 incompleteReactionModule.IncompleteReaction)):
+                                 incompleteReactionModule.IncompleteReaction, orphanProductModule.OrphanProduct)):
             try:
-                Q = self.getQ(energyUnit, final=False)
+                Q = info['Q']
                 Qcalc = info['availableEnergy']
                 if Qcalc is None: raise ValueError  # caught below. Skips Q-value check for elemental targets
                 for prod in self.__outputChannel:
@@ -238,9 +239,6 @@ class Base_reaction(ancestryModule.AncestryIO):
             if ZAsum != info['compoundZA']:
                 warnings.append( warning.ZAbalanceWarning( self ) )
 
-        info['crossSectionDomain'] = self.crossSection.domainMin, self.crossSection.domainMax
-        info['isTwoBody'] = self.__outputChannel.genre == enumsModule.Genre.twoBody
-
         if not isinstance(self, productionModule.Production):
             for product in self.__outputChannel:
                 productWarnings = product.check(info)
@@ -253,6 +251,7 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         del info['crossSectionDomain']
         del info['isTwoBody']
+        del info['Q']
 
         if (info['checkEnergyBalance']
                 and not isinstance(self, productionModule.Production)

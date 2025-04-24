@@ -50,7 +50,7 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
       Or,
 
           # Install a tagged release:
-          pip install git+https://github.com/LLNL/fudge.git@fudge6.8.0
+          pip install git+https://github.com/LLNL/fudge.git@fudge6.9.0
 
 
 - Installation by cloning the git repository and building with the unix `make` command: 
@@ -90,7 +90,8 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
 FUDGE installations are now regularly tested on Github CI using Windows with the MinGW environment.
 Compiling C extensions on Windows may require an extra step: if command 'cc.exe' is not available,
-locate a C compiler and set environment variable CC to that compiler.  For example,
+locate a C compiler and set environment variable CC to that compiler before running 'make' or 'pip install'.
+For example,
 ```
 set CC=gcc
 pip install git+https://github.com/LLNL/fudge.git

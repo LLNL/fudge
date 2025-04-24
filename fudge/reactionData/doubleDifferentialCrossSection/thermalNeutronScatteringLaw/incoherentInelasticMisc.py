@@ -528,7 +528,8 @@ def process( self, style, energyMin, energyMax, temperature, kwargs ):
                 processes = nextProcesses
 
             results.sort()
-            return results
+
+        return results
 #</editor-fold>
 
     # incident energy grid:

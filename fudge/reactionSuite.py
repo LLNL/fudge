@@ -245,6 +245,14 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
         return self.__evaluation
 
+    @evaluation.setter
+    def evaluation(self, value):
+
+        if not isinstance(value, str):
+            raise TypeError("Value must be a string")
+
+        self.__evaluation = value
+
     @property
     def interaction(self):
         """Returns self's interaction."""
@@ -1088,16 +1096,17 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
         return( "%s%s + %s%s" % ( prefix, self.projectile, self.target, suffix ) )
 
-    def cullProcessedData(self):
+    def cullProcessedData(self, include_reconstructed_data=False):
         """
-        This method removes all processed data from *self*.
+        This method removes processed data from *self*.
+        If include_reconstructed_data is True, then reconstructed data is also removed.
         """
 
         from fudge import institution as institutionModule
         from fudge.resonances import probabilityTables as probabilityTablesModule
         from fudge.processing.deterministic import tokens as deterministicTokensModule
 
-        preProcessedStyles = self.styles.preProcessingStyles()
+        preProcessedStyles = self.styles.preProcessingStyles(not include_reconstructed_data)
 
         stylesToRemove = []
         for style in self.styles:
@@ -1859,64 +1868,72 @@ class ReactionSuite(ancestryModule.AncestryIO):
 
         addMultiGroupSumsModule.addMultiGroupSums(self, replace=replace)
 
-    def processSnElasticUpScatter( self, style, legendreMax, verbosity = 0, indent = '', incrementalIndent = '  ', logFile = None ) :
+    def processSnElasticUpScatter(self, style, legendreMax, verbosity = 0, indent = '',
+                                  incrementalIndent = '  ', logFile = None, workDir = None,
+                                  restart = False):
 
-        if( self.target == IDsPoPsModule.neutron ) : return
+        if self.target == IDsPoPsModule.neutron: return
 
-        if( not( isinstance( style, stylesModule.SnElasticUpScatter ) ) ) : raise TypeError("style must be an instance of stylesModule.SnElasticUpScatter, not %s" % type(style))
+        if not isinstance(style, stylesModule.SnElasticUpScatter):
+            raise TypeError("style must be an instance of stylesModule.SnElasticUpScatter, not %s"
+                            % type(style))
 
-        tempInfo = { 'reactionSuite' : self }
-        tempInfo['verbosity'] = verbosity
-        tempInfo['incrementalIndent'] = incrementalIndent
-        tempInfo['logFile'] = logFile
+        tempInfo = {
+            'reactionSuite' : self,
+            'verbosity': verbosity,
+            'incrementalIndent': incrementalIndent,
+            'logFile': logFile,
+            'temperature': style.temperature,
+            'legendreOrder': legendreMax,
+            'zeroPerTNSL': False,
+            'workDir': workDir,
+            'restart': restart,
+        }
+
         incidentEnergyUnit = self.domainUnit
-        tempInfo['temperature'] = style.temperature
-        tempInfo['legendreOrder'] = legendreMax
-
-        tempInfo['minEval'] = PQUModule.PQU( 1.e-11, 'MeV' ).getValueAs( incidentEnergyUnit )
-        tempInfo['maxEval'] = PQUModule.PQU( 20., 'MeV' ).getValueAs( incidentEnergyUnit )
+        tempInfo['minEval'] = PQUModule.PQU(1.e-11, 'MeV').getValueAs(incidentEnergyUnit)
+        tempInfo['maxEval'] = PQUModule.PQU(20., 'MeV').getValueAs(incidentEnergyUnit)
 
         massUnit = incidentEnergyUnit + '/c**2'
-        target = self.PoPs[self.target]
-        if( target.id in self.PoPs.aliases ) : target = self.PoPs[target.pid]
-        tempInfo['targetMassRatio'] = target.getMass( massUnit ) / self.PoPs[self.projectile].getMass( massUnit )
+        target = self.PoPs.final(self.target)
+        tempInfo['targetMassRatio'] = target.getMass(massUnit) / self.PoPs[self.projectile].getMass(massUnit)
         tempInfo['groupBoundaries'] = style.transportables[self.projectile].group
-        tempInfo['zeroPerTNSL'] = False
 
-        elasticReaction = self.getReaction( 'elastic' )
-        product = elasticReaction.outputChannel.getProductWithName( IDsPoPsModule.neutron )
+        elasticReaction = self.getReaction('elastic')
+        product = elasticReaction.outputChannel.getProductWithName(IDsPoPsModule.neutron)
 
-        TM_1, TM_E, averageEnergy, maxIncidentGroup = multiGroupUpScatterModule.SnElasticUpScatter( style, tempInfo, comment = '' )
+        TM_1, TM_E, averageEnergy, maxIncidentGroup = multiGroupUpScatterModule.SnElasticUpScatter(
+            style, tempInfo)
         style.upperCalculatedGroup = maxIncidentGroup
 
                 # multiply constant cross section into the distribution (upscatter code assumes sigma(E) = 1 )
-        groupedCrossSec = product.findAttributeInAncestry( 'crossSection' )[style.derivedFromStyle.label].array.values
-        TM_1 = multiGroupUpScatterModule.rescaleCrossSection( groupedCrossSec, TM_1 )
+        groupedCrossSec = product.findAttributeInAncestry('crossSection')[style.derivedFromStyle.label].array.values
+        TM_1 = multiGroupUpScatterModule.rescaleCrossSection(groupedCrossSec, TM_1)
 
         distribution = product.distribution                             # Put matrix into GNDS structures.
         derivedForm = distribution[style.derivedFrom]
         multiGroupSubform = derivedForm.multiGroupSubform
-        array = multiGroupSubform.array.constructArray( )
-        for incidentGroup in range( style.upperCalculatedGroup + 1, len( array ) ) :
-            if( incidentGroup not in TM_1 ) : TM_1[incidentGroup] = {}
-            for outgoingGroup in range( len( array[incidentGroup] ) ) :
-                if( outgoingGroup not in TM_1[incidentGroup] ) : TM_1[incidentGroup] = {}
-                TM_1[incidentGroup][outgoingGroup] = list( array[incidentGroup][outgoingGroup] )
+        array = multiGroupSubform.array.constructArray()
+        for incidentGroup in range(style.upperCalculatedGroup + 1, len(array)):
+            if incidentGroup not in TM_1: TM_1[incidentGroup] = {}
+            for outgoingGroup in range(len(array[incidentGroup])):
+                if outgoingGroup not in TM_1[incidentGroup]: TM_1[incidentGroup] = {}
+                TM_1[incidentGroup][outgoingGroup] = list(array[incidentGroup][outgoingGroup])
 
         tempInfo['productName'] = product.pid
-        tempInfo['groupedFlux'] = [ x for x in style.derivedFromStyle.multiGroupFlux.array.constructArray( )[:,0] ]
+        tempInfo['groupedFlux'] = [x for x in style.derivedFromStyle.multiGroupFlux.array.constructArray()[:,0]]
         tempInfo['incidentEnergyUnit'] = incidentEnergyUnit
-        tempInfo['crossSection']  = style.derivedFromStyle.findFormMatchingDerivedStyle( elasticReaction.crossSection )
-        multiGroup = groupModule.TMs2Form( style, tempInfo, TM_1, TM_E )
-        distribution.add( multiGroup )
+        tempInfo['crossSection']  = style.derivedFromStyle.findFormMatchingDerivedStyle(elasticReaction.crossSection)
+        multiGroup = groupModule.TMs2Form(style, tempInfo, TM_1, TM_E)
+        distribution.add(multiGroup)
 
         averageProductEnergy = product.averageProductEnergy
-        axes = averageProductEnergyModule.defaultAxes( energyUnit = incidentEnergyUnit )
-        averageEnergy = averageProductEnergyModule.XYs1d( data = averageEnergy, axes = axes, label = style.label )
-        averageEnergyMultiGroup = averageEnergy.processMultiGroup( style, tempInfo, indent )
-        grouped = averageEnergyMultiGroup.array.constructArray( )
-        array = averageProductEnergy[style.derivedFrom].array.constructArray( )
-        for incidentGroup in range( style.upperCalculatedGroup + 1, len( array ) ) : grouped[incidentGroup] = array[incidentGroup]
+        axes = averageProductEnergyModule.defaultAxes(energyUnit = incidentEnergyUnit)
+        averageEnergy = averageProductEnergyModule.XYs1d(data = averageEnergy, axes = axes, label = style.label)
+        averageEnergyMultiGroup = averageEnergy.processMultiGroup(style, tempInfo, indent)
+        grouped = averageEnergyMultiGroup.array.constructArray()
+        array = averageProductEnergy[style.derivedFrom].array.constructArray()
+        for incidentGroup in range(style.upperCalculatedGroup + 1, len(array)): grouped[incidentGroup] = array[incidentGroup]
         averageProductEnergy.add(groupModule.toMultiGroup1d(averageProductEnergyModule.Gridded1d, style, 
                 tempInfo, averageEnergyMultiGroup.axes, grouped, zeroPerTNSL=tempInfo['zeroPerTNSL']))
 

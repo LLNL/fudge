@@ -154,6 +154,13 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delayedNeutrons</span><span class="o">.</span><span class="n">fixDomains</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="FissionFragmentData.iterateProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.iterateProducts">[docs]</a>    <span class="k">def</span> <span class="nf">iterateProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is an iterator that returns each delayed neutron.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delayedNeutrons</span><span class="o">.</span><span class="n">iterateProducts</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="FissionFragmentData.listOfProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">finalOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.</span>

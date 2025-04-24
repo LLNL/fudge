@@ -228,10 +228,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">_subentry</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subentry&#39;</span><span class="p">)</span>
-        <span class="n">_retrievalDate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;retrievalDate&#39;</span><span class="p">),</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">_retrievalDate</span> <span class="o">=</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">Date</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;retrievalDate&#39;</span><span class="p">),</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_subentry</span><span class="p">,</span> <span class="n">_retrievalDate</span><span class="p">)</span></div></div>
+        <span class="n">exforDataSet</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_subentry</span><span class="p">,</span> <span class="n">_retrievalDate</span><span class="p">)</span>
+        <span class="n">exforDataSet</span><span class="o">.</span><span class="n">parseAncestryMembers</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+        <span class="k">return</span> <span class="n">exforDataSet</span></div></div>
 
 <div class="viewcode-block" id="ExforDataSets"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.exforDataSet.ExforDataSets">[docs]</a><span class="k">class</span> <span class="nc">ExforDataSets</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -307,7 +309,11 @@
 <span class="sd">        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__exforDataSets</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">ExforDataSets</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__exforDataSets</span><span class="o">.</span><span class="n">parseNode</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unsupported sub-child &quot;</span><span class="si">%s</span><span class="s1">&quot; for node &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

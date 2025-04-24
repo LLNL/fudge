@@ -901,6 +901,7 @@ def makeMultiplicityPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData=No
                          figsize=(20, 10),
                          outFile=None, plotStyle=None, useBokeh=False):
     import collections
+    from fudge.outputChannelData.fissionFragmentData import delayedNeutron
 
     # Defaults
     if gndsMap is None:
@@ -937,16 +938,18 @@ def makeMultiplicityPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData=No
         reactionSuite, covarianceSuite = gndsMap[endf]
 
         # Extract the data from the endf file & give the data rational names (esp. for nubar)
-        thisChannel = getReactions(reactionSuite, mt)[0].outputChannel
+        thisReaction = getReactions(reactionSuite, mt)[0]
+        thisChannel = thisReaction.outputChannel
         products = collections.OrderedDict()
         delayedTimeGroupIndex = 0
         for p in thisChannel.getProductsWithName(product):
-            if thisChannel.isFission():
-                if p.attributes['emissionMode'] == 'prompt':
-                    label = 'prompt'
-                else:
-                    label = 'delayed[timegroup #%i (%s)]' % (delayedTimeGroupIndex, p.attributes['decayRate'])
+            if thisReaction.isFission():
+                if isinstance(p, delayedNeutron.Product):
+                    rate = p.findAttributeInAncestry("rate")[evaluationStyle].float('1/s')
+                    label = 'delayed[timegroup #%i (%s)]' % (delayedTimeGroupIndex, rate)
                     delayedTimeGroupIndex += 1
+                else:
+                    label = 'prompt'
             else:
                 label = p.label
             products[label] = p.multiplicity.evaluated.toPointwise_withLinearXYs()
@@ -956,7 +959,7 @@ def makeMultiplicityPlot(gndsMap=None, xyData=None, xydyData=None, xdxydyData=No
 
         # The ENDF data to plot
         totalLegend = endf  # thisSetStyle['legend']
-        if thisChannel.isFission():
+        if thisReaction.isFission():
             totalLegend += ' (total nubar)'
         endfData.append(
             DataSet2d(

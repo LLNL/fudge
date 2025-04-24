@@ -281,6 +281,14 @@
 
         <span class="k">for</span> <span class="n">delayedNeutron1</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">delayedNeutron1</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div>
 
+<div class="viewcode-block" id="DelayedNeutrons.iterateProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutrons.iterateProducts">[docs]</a>    <span class="k">def</span> <span class="nf">iterateProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is an iterator that returns each delayed neutron.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">delayedNeutron</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">delayedNeutron</span><span class="o">.</span><span class="n">product</span></div>
+
 <div class="viewcode-block" id="DelayedNeutrons.listOfProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.delayedNeutron.DelayedNeutrons.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">finalOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns, as a python set, the list of PoPs ids for all products (i.e., outgoing particles) for *self*.</span>
