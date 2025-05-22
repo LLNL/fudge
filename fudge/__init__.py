@@ -5,8 +5,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from LUPY import checkPythonVersion
-
 from . import fudgeVersion as versionModule
 
 FUDGE_MAJORVERSION = versionModule.FUDGE_MAJORVERSION
