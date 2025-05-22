@@ -44,19 +44,6 @@ class CustomInstall(install):
         super().run()
 
 
-class CustomBuildExt(build_ext):
-    def run(self):
-        # find numpy include path:
-        import numpy
-        numpyPath = numpy.get_include()
-        assert os.path.isdir(numpyPath), 'Numpy path "%s" NOT FOUND' % numpyPath
-
-        for ext in self.extensions:
-            ext.include_dirs.append(numpyPath)
-
-        super().run()
-
-
 # This setup() is called by setuptools from pyproject.toml
 setup(
     scripts=glob.glob('bin/*.py'),
@@ -77,5 +64,5 @@ setup(
         f'PoPs @ {(cwd / "PoPs").as_uri()}',
         f'brownies @ {(cwd / "brownies").as_uri()}',
     ],
-    cmdclass={'install': CustomInstall, 'build_ext': CustomBuildExt}
+    cmdclass={'install': CustomInstall}
 )
