@@ -1465,12 +1465,41 @@ def toGNDS(self, evaluationLibrary, evaluationVersion, formatVersion=GNDS_format
 
         reactionSuite.orphanProducts.add( gammaProduction )
 
+    # add a few other summed cross sections if applicable:
+    for (MT, label, MT_range) in (
+        (4, '(z,n)', range(51,92)),
+        (103, '(z,p)', range(600,650)),
+        (104, '(z,d)', range(650,700)),
+        (105, '(z,t)', range(700,750)),
+        (106, '(z,h)', range(750,800)),
+        (107, '(z,a)', range(800,850)),
+    ):
+        reacs = [reac for reac in reactionSuite.reactions if reac.ENDF_MT in MT_range]
+        if len(reacs) > 1:
+
+            newSum = sumsModule.CrossSectionSum(label = label, ENDF_MT = MT)
+            summands = [sumsModule.Add(link = r.crossSection) for r in reacs]
+            for summand in summands : newSum.summands.append( summand )
+
+            newSumXsc = summands[0].link.toPointwise_withLinearXYs(upperEps=1e-8)
+            for summand in summands[1:]:
+                addend = summand.link.evaluated
+                if not newSumXsc.areDomainsMutual( addend ):
+                    newSumXsc, addend = newSumXsc.mutualify( -1e-7,0,0, addend, -1e-7,0,0 )
+                newSumXsc += addend
+
+            newSumXsc.label = newSumXsc.style = info.style
+            newSum.crossSection.add( newSumXsc )
+            newQ = max([reac.getQ('MeV', final=True) for reac in reacs])
+            newSum.Q.add( returnConstantQ( info.style, newQ, crossSection ) )
+            reactionSuite.sums.crossSectionSums.add( newSum )
+
     covarianceFileCS = covarianceDict(self.source)   #  Dictionary covariance filenames from the user-input directory, key: (C,S)
 
     if len(covarianceFileCS) > 0:
-        axes = axesModule.Axes(3, labelsUnits = { 0 : ( 'matrix_elements', '' ),
-                                                  1 : ( 'column_energy_bounds', 'MeV' ),
-                                                  2 : ( 'row_energy_bounds', 'MeV' ) } )
+        covarianceLabelsUnits = {0 : ( 'matrix_elements', '' ),
+                                 1 : ( 'column_energy_bounds', 'MeV' ),
+                                 2 : ( 'row_energy_bounds', 'MeV' ) }
 
         sectionList = []
         for (C,S) in covarianceFileCS.keys():
@@ -1517,6 +1546,7 @@ def toGNDS(self, evaluationLibrary, evaluationVersion, formatVersion=GNDS_format
 
                 def createCovarianceMatrix(covarianceEntry, label):
                     # helper method
+                    axes = axesModule.Axes(3, labelsUnits = covarianceLabelsUnits)
                     energyBounds = covarianceEntry[0]
                     rawMatrix = numpy.asarray(covarianceEntry[1])
                     Type=covarianceEntry[2]

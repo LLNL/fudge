@@ -1270,6 +1270,33 @@ class CyclicDependency(Warning):
         return self.xpath == other.xpath and self.cycle == other.cycle
 
 
+class NonMonotonicGrid(Warning):
+    def __init__(self, label, obj=None):
+        Warning.__init__(self, Level.Fatal, obj)
+        self.label = label  # 'row' or 'column'
+
+    def __str__(self):
+        return f"Covariance matrix {self.label} grid is not monotonic"
+
+    def __eq__(self, other):
+        return self.xpath == other.xpath and self.label == other.label
+
+
+class MatrixDimensionMismatch(Warning):
+    def __init__(self, matrixShape, gridShape, obj=None):
+        Warning.__init__(self, Level.Fatal, obj)
+        self.matrixShape = matrixShape
+        self.gridShape = gridShape
+
+    def __str__(self):
+        return f"Matrix shape {self.matrixShape} doesn't match grid shape {self.gridShape}"
+
+    def __eq__(self, other):
+        return (self.xpath == other.xpath and
+                self.matrixShape == other.matrixShape and
+                self.gridShape == other.gridShape)
+
+
 class NegativeVariance(Warning):
     def __init__(self, index, value, obj=None):
         Warning.__init__(self, Level.Severe, obj)

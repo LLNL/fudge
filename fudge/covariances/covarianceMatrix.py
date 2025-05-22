@@ -432,16 +432,30 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
         from fudge import warning
         warnings = []
 
+        rowGrid = list(self.matrix.axes[2].values)
         try:
             columnData = self.findAttributeInAncestry('columnData')
+            columnGrid = list(self.matrix.axes[1].values)
         except:
             columnData = None
+            columnGrid = rowGrid
+
+        if rowGrid != sorted(set(rowGrid)):
+            warnings.append(warning.NonMonotonicGrid("rows", obj=self))
+        if columnData and columnGrid != sorted(set(columnGrid)):
+            warnings.append(warning.NonMonotonicGrid("columns", obj=self))
+
+        A = self.matrix.array.constructArray()
+        if A.shape != (len(rowGrid)-1, len(columnGrid)-1):
+            warnings.append(warning.MatrixDimensionMismatch(
+                A.shape, (len(rowGrid), len(columnGrid)), obj=self))
 
         if columnData is not None or not info['checkUncLimits']:
+            # remaining checks don't apply to cross-terms yet
+            # FIXME also test FULL matrix including cross-terms
             return warnings
 
         # run variance and eigenvalue checks on original matrix, relative or absolute:
-        A = self.matrix.array.constructArray()
         variance = A.diagonal()
         if any(variance < 0):
             for badIndex in numpy.argwhere(variance < 0).flatten():
@@ -456,12 +470,9 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
             warnings.append(warning.NegativeEigenvalues(len(vals[vals < 0]), min(vals), self))
 
         # Check that the condition number of the matrix is reasonable
-        # FIXME disabled this warning for now. Better option: add severity to each warning and make this low severity
-        """
         minpos, maxpos = min(vals[vals >= 0]), max(vals[vals >= 0])
         if A.size != 1 and minpos / maxpos < info['eigenvalueRatioTolerance']:
             warnings.append(warning.BadEigenvalueRatio(minpos / maxpos, self))
-        """
 
         if self.type is not covarianceEnumsModule.Type.relative:
             # FIXME next line skips testing PFNS covariances

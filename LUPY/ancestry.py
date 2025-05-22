@@ -416,7 +416,7 @@ class Ancestry(abc.ABC):
         except XPathNotFound:
             raise XPathNotFound("Cannot locate path '%s'" % xPath)
 
-    def printNewMembers(self, cls2=None, exclude=False, width=3):
+    def printMembers(self, cls2=None, exclude=False, width=3):
         """
         This method prints the type of *self* and then prints all the member added since the base class *cls2*. That is, 
         those members which are not defined in by base class *cls2*.
@@ -459,16 +459,19 @@ class Ancestry(abc.ABC):
         if counter % width != 0:
             print()
 
+    def printNewMembers(self, exclude=False, width=3):
+        """
+        This method is deprecated, please use the method **printMembers** instead.
+        """
+
+        self.printMembers(Ancestry, exclude=exclude, width=width)
+
     def printNonAncestryMembers(self, exclude=False, width=3):
         """
-        This method prints the type of *self* and then prints all the member added by the derived class. That is, 
-        those members which are not defined by the :py:class:`Ancestry` class.
-
-        :param exclude:     If True, any member starting with an underscore (i.e., '_') is also not printed.
-        :param width:       The number of members printed per line.
+        This method is deprecated, please use the method **printMembers** instead.
         """
 
-        self.printNewMembers(Ancestry, exclude=exclude, width=width)
+        self.printMembers(Ancestry, exclude=exclude, width=width)
 
 class AncestryIO_base(Ancestry):
     """This class adds methods to read and write *self* to a file. Currently, its supports reading and writing to an XML file."""

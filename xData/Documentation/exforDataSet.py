@@ -228,6 +228,7 @@ class ExperimentalDataSets(ancestryModule.AncestryIO_base):
         ancestryModule.AncestryIO_base.__init__(self)
 
         self.__exforDataSets = ExforDataSets()
+        self.__exforDataSets.setAncestor(self)
 
     @property
     def exforDataSets(self):
