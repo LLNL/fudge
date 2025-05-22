@@ -52,11 +52,11 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
 
     # resonances may only contain a scattering radius:
     if not (resolvedCount + unresolvedCount) and self.scatteringRadius:
-        scatRadius = self.scatteringRadius.form
+        scatRadius = self.scatteringRadius.evaluated
         lowerBound, upperBound = scatRadius.domainMin, scatRadius.domainMax
         endf.append(endfFormatsModule.endfHeadLine(ZAM, ABN, 0, 0, 1, 0))
         endf.append(endfFormatsModule.endfHeadLine(lowerBound, upperBound, 0, 0, 0, 0))
-        AP = PQUModule.PQU(self.scatteringRadius.form.value, self.scatteringRadius.form.rangeUnit).getValueAs('10*fm')
+        AP = PQUModule.PQU(self.scatteringRadius.evaluated.value, self.scatteringRadius.evaluated.rangeUnit).getValueAs('10*fm')
         endf.append(endfFormatsModule.endfHeadLine(targetInfo['spin'], AP, 0, 0, 0, 0))
         endf.append(endfFormatsModule.endfSENDLineNumber())
         endfMFList[2][151] = endf

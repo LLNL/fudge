@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-summaryDocStringFUDGE = '''Prints the list of temperatures in a GNDS reactionSuite and labels for each processed style for each temperature.'''
+summaryDocString__FUDGE = '''Prints the list of temperatures in a GNDS reactionSuite and labels for each processed style for each temperature.'''
 
 description = '''For each GNDS reactionSuite file, prints the list of temperatures and labels for each processed style for each temperature.'''
 

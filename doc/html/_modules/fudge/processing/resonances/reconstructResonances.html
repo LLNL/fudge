@@ -428,7 +428,7 @@
 <span class="sd">May need to tweak the &#39;NEmax&#39; and &#39;numTasks&#39; variables for best performance.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="blockwise"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.reconstructResonances.blockwise">[docs]</a><span class="k">def</span> <span class="nf">blockwise</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
-    <span class="n">NEmax</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">NEmax</span> <span class="o">=</span> <span class="mi">50000</span>
     <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">E</span><span class="p">):</span>
             <span class="n">NE</span> <span class="o">=</span> <span class="mi">1</span>
@@ -2188,6 +2188,7 @@
 
         <span class="k">def</span> <span class="nf">vectorInv</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
             <span class="c1"># invert all MxM matrices in Nx(MxM) array</span>
+            <span class="c1"># FIXME are special cases for 2x2 and 3x3 matrices still useful? numpy.linalg.inv may end up faster</span>
             <span class="n">dim</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">dim</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
                 <span class="n">arrinv</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -2213,11 +2214,7 @@
                 <span class="n">arrinv</span><span class="p">[:,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">arr</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">arr</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">arr</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">arr</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">det</span>
                 <span class="k">return</span> <span class="n">arrinv</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="p">)</span>
-                <span class="n">NE</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NE</span><span class="p">):</span>
-                    <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-                <span class="k">return</span> <span class="n">result</span>
+                <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
 
         <span class="n">identity</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="n">NE</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">):</span>

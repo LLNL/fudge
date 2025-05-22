@@ -59,7 +59,7 @@
       <xs:element name="applicationData" type="ApplicationDataType" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="projectile" type="xs:NCName" use="required"/>
-    <xs:attribute name="target" type="xs:NCName" use="required"/>
+    <xs:attribute name="target" type="xs:string" use="required"/>
     <xs:attribute name="evaluation" type="xs:string" use="required"/>
     <xs:attribute name="projectileFrame" type="FrameEnum" use="required"/>
     <xs:attribute name="interaction" type="InteractionEnum" use="required"/>
@@ -97,6 +97,7 @@
     <xs:all>
       <xs:element name="temperature" type="PhysicalQuantity"/>
       <xs:element name="projectileEnergyDomain" type="RangeQuantityType"/>
+      <xs:element name="targetInfo" type="TargetInfoType" minOccurs="0"/>
       <xs:element name="documentation" type="DocumentationType"/>
     </xs:all>
     <xs:attribute name="label" type="xs:NCName" use="required"/>
@@ -149,6 +150,44 @@
     <xs:attribute name="algorithm" type="xs:string"/>
   </xs:complexType>
  
+  <!-- ========================== targetInfo ================================== -->
+
+  <xs:complexType name="TargetInfoType">
+    <xs:sequence>
+      <xs:element name="isotopicAbundances" type="IsotopicAbundancesType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="IsotopicAbundancesType">
+    <xs:sequence>
+      <xs:element name="chemicalElements" type="TargetInfo_ChemicalElementsType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TargetInfo_ChemicalElementsType">
+    <xs:sequence>
+      <xs:element name="chemicalElement" type="TargetInfo_ChemicalElementType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TargetInfo_ChemicalElementType">
+    <xs:sequence>
+      <xs:element name="nuclides" type="TargetInfo_NuclidesType"/>
+    </xs:sequence>
+    <xs:attribute name="symbol" type="xs:NCName"/>
+  </xs:complexType>
+
+  <xs:complexType name="TargetInfo_NuclidesType">
+    <xs:sequence>
+      <xs:element name="nuclide" type="TargetInfo_NuclideType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TargetInfo_NuclideType">
+    <xs:attribute name="pid" type="xs:NCName"/>
+    <xs:attribute name="atomFraction" type="xs:double"/>
+  </xs:complexType>
+
   <!-- ========================= DOCUMENTATION ================================ -->
 
   <xs:complexType name="DocumentationType">
@@ -631,7 +670,7 @@
       <xs:element name="charge" type="PoPs_quantity" minOccurs="0"/>
       <xs:element name="decayData" type="PoPs_decayData" minOccurs="0"/>
     </xs:sequence>
-    <xs:attribute name="id" type="xs:NMTOKEN"/>
+    <xs:attribute name="id" type="xs:string"/>
   </xs:complexType>
  
   <xs:complexType name="PoPs_DecayProductListType">
@@ -1351,6 +1390,7 @@
       <xs:element name="e_critical" type="valueWithUnit" minOccurs="0"/>
       <xs:element name="e_max" type="valueWithUnit"/>
       <xs:element name="boundAtomCrossSection" type="valueWithUnit"/>
+      <xs:element name="boundAtomCrossSectionByNuclide" type="BoundAtomCrossSectionByNuclideType" minOccurs="0"/>
       <xs:element name="coherentAtomCrossSection" type="valueWithUnit" minOccurs="0"/>
       <xs:element name="distinctScatteringKernel" type="TNSL_DistinctScatteringKernelType" minOccurs="0"/>
       <xs:element name="selfScatteringKernel" type="TNSL_SelfScatteringKernelType"/>
@@ -1854,20 +1894,27 @@
     </xs:complexType>
 
     <xs:complexType name="BoundAtomCrossSectionType">
+      <xs:attribute name="pid" type="xs:NCName"/>
       <xs:attribute name="value" type="xs:double" use="required"/>
       <xs:attribute name="unit" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="BoundAtomCrossSectionByNuclideType">
+      <xs:sequence>
+        <xs:element name="boundAtomCrossSection" type="BoundAtomCrossSectionType" maxOccurs="unbounded"/>
+      </xs:sequence>
     </xs:complexType>
 
    <xs:complexType name="PoPs_DoubleQuantityTypeSimple">
     <xs:sequence>
       <xs:element name="uncertainty" type="PQU_uncertainty" minOccurs="0"/>
     </xs:sequence>
-    <xs:attribute name="value" type="xs:double"/>
+    <xs:attribute name="value" type="xs:double" use="required"/>
     <xs:attribute name="unit" type="xs:string"/>
   </xs:complexType>
 
   <xs:complexType name="PoPs_DoubleQuantityTypeSimple2">
-    <xs:attribute name="value" type="xs:double"/>
+    <xs:attribute name="value" type="xs:double" use="required"/>
     <xs:attribute name="unit" type="xs:string"/>
   </xs:complexType>
  

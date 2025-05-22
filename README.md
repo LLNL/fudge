@@ -7,10 +7,6 @@ The current release of **FUDGE** focuses on supporting version 2.0 of the Genera
 The **FUDGE** package includes tools to translate other nuclear data formats to and from **GNDS**,
 plus tools for testing, visualizing, and processing **GNDS** data.
 
-
-| :exclamation: An introductory class on FUDGE, GIDIplus and GNDS will be held at the NEA databank in Paris May 21-24, 2024. For more information, please see the [registration website](https://www.oecd-nea.org/jcms/pl_87938/fudge/-mc-gidi/gnds-introductory-course). |
-| ----------------- |
-
 # Contents of this README:
 
 - Getting Started
@@ -19,7 +15,8 @@ plus tools for testing, visualizing, and processing **GNDS** data.
 
 ## Getting Started:
 
-Installing **FUDGE** only requires Python (version 3.7 or higher) and NumPy (version 1.15 or higher).
+Installing **FUDGE** requires Python (version 3.7 or higher) and NumPy (version 1.15 or higher).
+
 Optional packages matplotlib and PyQT5 are also recommended to support plotting. 
 
 ### The following installation options are currently supported:
@@ -29,38 +26,44 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
     - Create a new virtual environment if desired. For example, using Anaconda:
  
-          conda create --name fudge python=3.9 numpy matplotlib PyQT5
+          conda create --name fudge python=3.10 numpy matplotlib PyQT5
           conda activate fudge
 
+      Or, using venv:
+
+          python3 -m venv fudge
+          source fudge/bin/activate
+          pip install wheel
+          pip install setuptools
+          pip install numpy
+          pip install matplotlib
+          pip install PyQT5
+
       Some users have reported problems with installing PyQT5 with conda on Windows. It may be omitted from the
-      above `conda create` command and, if required, be installed via `pip install`.
-    
-    - Ensure that NumPy (version 1.15 or higher) and wheels are present in the Python environment.
-  
-          python
-          import numpy
-          print( numpy.__version__ )
-          import wheel
-          exit()
+      above `conda create` command and, if required, be installed via `pip install` after activating the environment.
 
     - Install FUDGE:
-     
-          pip install git+https://github.com/LLNL/fudge.git@training
+
+          # Install latest available version:
+          pip install git+https://github.com/LLNL/fudge.git
+
+      Or,
+
+          # Install a tagged release:
+          pip install git+https://github.com/LLNL/fudge.git@6.9.0
 
 
 - Installation by cloning the git repository and building with the unix `make` command: 
   This is the typical mode for active FUDGE maintenance and development.
   The following steps are recommended:
 
-    - Ensure that NumPy (version 1.15 or higher) is installed
+    - Ensure that NumPy (version 1.15 or greater) is installed
 
     - Clone FUDGE in the current directory: 
      
-        ```
         git clone https://github.com/LLNL/fudge.git
-        # or using SSH (requires creating a github account and registering an ssh key):
-        git clone git@github.com:LLNL/fudge.git
-        ```
+            # or using SSH (requires creating a github account and registering an ssh key):
+            git clone git@github.com:LLNL/fudge.git
      
     - Build FUDGE:
 
@@ -82,6 +85,19 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
       - on Windows, the environment variable should be added to the registry (see for 
           example <http://www.support.tabs3.com/main/R10463.htm>)
+
+### Notes for Windows users:
+
+FUDGE installations are now regularly tested on Github CI using Windows with the MinGW environment.
+Compiling C extensions on Windows may require an extra step: if command 'cc.exe' is not available,
+locate a C compiler and set environment variable CC to that compiler before running 'make' or 'pip install'.
+For example,
+```
+set CC=gcc
+pip install git+https://github.com/LLNL/fudge.git
+```
+
+Please let us know if you run into trouble installing or using FUDGE on Windows!
 
 ### Differences between FUDGE installed via `pip install` vs. via `make`:
 
@@ -132,7 +148,20 @@ with the *-h* option. For example, to get help on the usage of the *bin/processP
 <path_to_FUDGE>/bin/processProtare.py -h
 ```
 
-There are more scripts in the *bin* directory that a user may find useful. One can also run **FUDGE** interactively.
+There are more scripts in the *bin* directory that a user may find useful. The *fudgeScripts.py* script provides an
+overview of the other scripts included with FUDGE:
+
+```
+>fudgeScripts.py
+
+Scripts in FUDGE:
+    GNDSType.py                  - This script prints the GNDS type of each file listed.
+    ZA_Info.py                   - For each argument entered, which must be an isotope name specified by either its ZA (1000 * Z + A) or its PoPs id, this script prints that argument, its ZA and PoPs
+                                   id.
+    ...
+```
+
+One can also run **FUDGE** interactively from the Python command prompt.
 The following Python commands show how to read in the *n-001_H_001.xml* generated by the example above, print a list
 of its reactions and plot each reaction's cross section on a single plot:
 ```

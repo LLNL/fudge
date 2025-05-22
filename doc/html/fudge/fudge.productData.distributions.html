@@ -4127,6 +4127,23 @@ See function <code class="xref py py-func docutils literal notranslate"><span cl
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fudge.productData.distributions.energy.Regions2d.energySpectrumAtEnergy">
+<span class="sig-name descname"><span class="pre">energySpectrumAtEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energyIn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/distributions/energy.html#Regions2d.energySpectrumAtEnergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.productData.distributions.energy.Regions2d.energySpectrumAtEnergy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the outgoing particle’s energy spectrum at projectile energy <em>energyIn</em>,</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energyIn</strong> – Energy of the projectile.</p></li>
+<li><p><strong>discreteGammaResolution</strong> – Relative width of triangle presenting the energy spectrum.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>XYs1d instance for the energy spectrum.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fudge.productData.distributions.energy.Regions2d.toPointwise_withLinearXYs">
 <span class="sig-name descname"><span class="pre">toPointwise_withLinearXYs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/distributions/energy.html#Regions2d.toPointwise_withLinearXYs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.productData.distributions.energy.Regions2d.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a pointwise represent of <em>self</em>.</p>
@@ -6199,6 +6216,23 @@ Average means over all outgoing angle and energy.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fudge.productData.distributions.photonScattering.CoherentPhotonScattering.Form.moniker">
 <span class="sig-name descname"><span class="pre">moniker</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'coherentPhotonScattering'</span></em><a class="headerlink" href="#fudge.productData.distributions.photonScattering.CoherentPhotonScattering.Form.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fudge.productData.distributions.photonScattering.IncoherentBoundToFreePhotonScattering">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.productData.distributions.photonScattering.</span></span><span class="sig-name descname"><span class="pre">IncoherentBoundToFreePhotonScattering</span></span><a class="reference internal" href="../_modules/fudge/productData/distributions/photonScattering.html#IncoherentBoundToFreePhotonScattering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.productData.distributions.photonScattering.IncoherentBoundToFreePhotonScattering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="fudge.productData.distributions.photonScattering.IncoherentBoundToFreePhotonScattering.Form">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Form</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">link</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/productData/distributions/photonScattering.html#IncoherentBoundToFreePhotonScattering.Form"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.productData.distributions.photonScattering.IncoherentBoundToFreePhotonScattering.Form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.productData.distributions.photonScattering.BaseForm" title="fudge.productData.distributions.photonScattering.BaseForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForm</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fudge.productData.distributions.photonScattering.IncoherentBoundToFreePhotonScattering.Form.moniker">
+<span class="sig-name descname"><span class="pre">moniker</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'incoherentBoundToFreePhotonScattering'</span></em><a class="headerlink" href="#fudge.productData.distributions.photonScattering.IncoherentBoundToFreePhotonScattering.Form.moniker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

@@ -13,7 +13,7 @@ import shutil
 
 from xData import XYs1d as XYs1dModule
 
-summaryDocStringxData = '''Reads 1d data from each file listed into an XYs1d instance and plots all using XYs1d.multiPlot.'''
+summaryDocString__xData = '''Reads 1d data from each file listed into an XYs1d instance and plots all using XYs1d.multiPlot.'''
 
 description = '''
 Reads 1d data from each file listed into an XYs1d instance and plots all on a single plot using XYs1d.multiPlot.

@@ -11,7 +11,7 @@ import argparse
 
 from fudge import map as mapModule
 
-summaryDocStringFUDGE = """This script reads the specified map file, and prints all protares matching the specified projectile, target and evaluation."""
+summaryDocString__FUDGE = """This script reads the specified map file, and prints all protares matching the specified projectile, target and evaluation."""
 
 description = '''
 This script reads the specified map file, and prints all protares matching the specified projectile, 

@@ -22,7 +22,8 @@ This module contains the following classes:
 from .. import suite as suiteModule
 from .. import text as textModule
 
-class Acknowledgement( textModule.Text ) :
+
+class Acknowledgement(textModule.Text):
     """
     This class represents a GNDS documentation/acknowledgements/acknowledgement node.
 
@@ -38,32 +39,31 @@ class Acknowledgement( textModule.Text ) :
     moniker = 'acknowledgement'
     keyName = 'label'
 
-    def __init__( self, _label ) :
+    def __init__(self, _label):
+        textModule.Text.__init__(self)
 
-        textModule.Text.__init__( self )
-
-        self.__label = textModule.raiseIfNotString( _label, 'label' )
+        self.__label = textModule.raiseIfNotString(_label, 'label')
 
     @property
-    def label( self ) :
+    def label(self):
         """
         This method returns the label.
 
         :returns:   A python str.
         """
 
-        return( self.__label )
+        return self.__label
 
-    def XML_extraAttributes( self, **kwargs ) :
+    def XML_extraAttributes(self, **kwargs):
         """
-        This methods returns the XML attributes for *self* as a single python str.
+        This method returns the XML attributes for *self* as a single python str.
 
         :kwargs:        This argument is not used.
 
         :returns:       A python str.
         """
 
-        if( self.__label == '' ) : return ''
+        if self.__label == '': return ''
 
         return ' label="%s"' % self.__label
 
@@ -72,20 +72,21 @@ class Acknowledgement( textModule.Text ) :
         """
         Parse *node* into an instance of *cls*.
 
-        :param cls:         Form class to return.
-        :param node:        Node to parse.
-        :param xPath:       List containing xPath to current node, useful mostly for debugging.
-        :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param cls:        Form class to return.
+        :param node:       Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :returns:           An instance of *cls* representing *node*.
+        :returns:          An instance of *cls* representing *node*.
         """
 
-        label = node.get( 'label', '' )
+        label = node.get('label', '')
 
         return cls(label)
 
-class Acknowledgements( suiteModule.Suite ) :
+
+class Acknowledgements(suiteModule.Suite):
     """
     This is the suite class for the GNDS documentation/acknowledgements node.
     """
@@ -93,6 +94,5 @@ class Acknowledgements( suiteModule.Suite ) :
     moniker = 'acknowledgements'
     suiteName = 'label'
 
-    def __init__( self ) :
-
-        suiteModule.Suite.__init__( self, [ Acknowledgement ] )
+    def __init__(self):
+        suiteModule.Suite.__init__(self, [Acknowledgement])

@@ -22,6 +22,7 @@ This module contains the following classes:
 from .. import suite as suiteModule
 from . import abstractClasses as abstractClassesModule
 
+
 class Author(abstractClassesModule.AuthorAbstract):
     """
     This class represents a GNDS documentation/authors/author node.
@@ -35,13 +36,13 @@ class Author(abstractClassesModule.AuthorAbstract):
         """
         Parse *node* into an instance of *cls*.
 
-        :param cls:         Form class to return.
-        :param node:        Node to parse.
-        :param xPath:       List containing xPath to current node, useful mostly for debugging.
-        :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param cls:        Form class to return.
+        :param node:       Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :returns:           An instance of *cls* representing *node*.
+        :returns:          An instance of *cls* representing *node*.
         """
 
         name = node.get('name')
@@ -49,6 +50,7 @@ class Author(abstractClassesModule.AuthorAbstract):
         email = node.get('email', '')
 
         return cls(name, orcid, email)
+
 
 class Authors(suiteModule.Suite):
     """
@@ -59,5 +61,4 @@ class Authors(suiteModule.Suite):
     suiteName = 'name'
 
     def __init__(self):
-
-        suiteModule.Suite.__init__(self, [ Author ])
+        suiteModule.Suite.__init__(self, [Author])

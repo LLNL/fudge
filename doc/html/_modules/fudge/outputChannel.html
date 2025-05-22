@@ -260,10 +260,10 @@
                 <span class="n">mP</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">getFinalProductList</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">mP</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="OutputChannel.getProductsWithName"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.getProductsWithName">[docs]</a>    <span class="k">def</span> <span class="nf">getProductsWithName</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of all the channel&#39;s products with given name (&#39;gamma&#39;,&#39;n&#39;, etc).&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OutputChannel.getProductsWithName"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.getProductsWithName">[docs]</a>    <span class="k">def</span> <span class="nf">getProductsWithName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">final</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">delayedNeutrons</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of all the channel&#39;s products with given name (&#39;photon&#39;,&#39;n&#39;, etc).&quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="p">[</span> <span class="n">prod</span> <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">prod</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">name</span> <span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">product</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterateProducts</span><span class="p">(</span><span class="n">final</span><span class="o">=</span><span class="n">final</span><span class="p">,</span> <span class="n">delayedNeutrons</span><span class="o">=</span><span class="n">delayedNeutrons</span><span class="p">)</span> <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">name</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="OutputChannel.getProductWithName"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.getProductWithName">[docs]</a>    <span class="k">def</span> <span class="nf">getProductWithName</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -290,6 +290,28 @@
         <span class="n">numberOfFixes</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">fixDomains</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">numberOfFixes</span></div>
+
+<div class="viewcode-block" id="OutputChannel.iterateProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.iterateProducts">[docs]</a>    <span class="k">def</span> <span class="nf">iterateProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">final</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">delayedNeutrons</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is an iterator that returns each product of *self*. If *final* is **True**, products with an</span>
+<span class="sd">        output channel are not returned but, instead, their nested products are. Ergo, only final products are returned</span>
+<span class="sd">        if *final* is **True**.</span>
+
+<span class="sd">        :param final:               If **True**, only final products are returned; otherwise, only the products directly within *self* are returned.</span>
+<span class="sd">        :param delayedNeutrons:     If **True**, delayed neutrons are also iterated over if present.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">final</span><span class="p">:</span>
+                    <span class="k">yield from</span> <span class="n">product</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">iterateProducts</span><span class="p">(</span><span class="n">final</span><span class="o">=</span><span class="n">final</span><span class="p">,</span> <span class="n">delayedNeutrons</span><span class="o">=</span><span class="n">delayedNeutrons</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">product</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">product</span>
+
+        <span class="k">if</span> <span class="n">delayedNeutrons</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fissionFragmentData</span><span class="o">.</span><span class="n">iterateProducts</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="OutputChannel.listOfProducts"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.outputChannel.OutputChannel.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">finalOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>

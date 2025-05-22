@@ -15,7 +15,8 @@ from xData import link as linkModule
 from . import base, shortRangeSelfScalingVariance
 from . import enums as covarianceEnumsModule
 
-class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
+
+class MixedForm(ancestryModule.AncestryIO, base.Covariance):
     """
     Covariance for a single quantity, stored as several separate matrices that must be summed together.
     In general, the energy bounds for these matrices can overlap (unlike Regions1d cross section data). 
@@ -24,12 +25,12 @@ class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
     moniker = 'mixed'
     keyName = 'label'
 
-    def __init__(self, label = None, components=None):
+    def __init__(self, label=None, components=None):
 
-        ancestryModule.AncestryIO.__init__( self )
+        ancestryModule.AncestryIO.__init__(self)
 
         self.__label = label
-        self.components = components or [] #: a Python list containing instances of ``mixedForm``, ``summedCovariance``, and ``covarianceMatrix``
+        self.components = components or []  #: a Python list containing instances of ``mixedForm``, ``summedCovariance``, and ``covarianceMatrix``
         for c in self.components:
             c.setAncestor(self)
 
@@ -40,19 +41,19 @@ class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
         return len(self.components)
 
     @property
-    def label( self ) :
+    def label(self):
 
-        return( self.__label )
+        return (self.__label)
 
     @label.setter
-    def label( self, label ) :
+    def label(self, label):
 
-        if( label is not None ) :
-            if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
+        if label is not None:
+            if not isinstance(label, str): raise TypeError('label must be a string')
         self.__label = label
 
     @property
-    def domainUnit( self ):
+    def domainUnit(self):
         return self[0].domainUnit
 
     def isSymmetric(self):
@@ -67,52 +68,52 @@ class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
         Otherwise, take unit from first sub-matrix.
         """
         if unit is None: unit = self.domainUnit
-        allbounds = [ c.rowBounds(unit) for c in self.components ]
-        return (min([x[0] for x in allbounds]),max([x[1] for x in allbounds]))
-    
+        allbounds = [c.rowBounds(unit) for c in self.components]
+        return min([x[0] for x in allbounds]), max([x[1] for x in allbounds])
+
     def columnBounds(self, unit=None):
         """
         Get the bounds of the column.  If unit is specified, return the bounds in that unit.
         Otherwise, take unit from the first sub-matrix.
         """
         if unit is None: unit = self.domainUnit
-        allbounds = [ c.columnBounds(unit) for c in self.components ]
-        return (min([x[0] for x in allbounds]),max([x[1] for x in allbounds]))
+        allbounds = [c.columnBounds(unit) for c in self.components]
+        return min([x[0] for x in allbounds]), max([x[1] for x in allbounds])
 
-    def check( self, info ): 
+    def check(self, info):
         from fudge import warning
         warnings = []
 
         for component in self.components:
-            componentWarnings = component.check( info )
+            componentWarnings = component.check(info)
             if componentWarnings:
-                warnings.append( warning.Context('Component %s' % component.label, componentWarnings) )
-        
-        #if warnings:
+                warnings.append(warning.Context('Component %s' % component.label, componentWarnings))
+
+        # if warnings:
         #    warnings = [warning.Context('Section "%s": %s' % (self.id, form), warnings)]
         return warnings
 
-    def convertUnits( self, unitMap ):
+    def convertUnits(self, unitMap):
 
-        for component in self: component.convertUnits( unitMap )
-        
-    def fix( self, **kw ): 
+        for component in self: component.convertUnits(unitMap)
+
+    def fix(self, **kw):
         warnings = []
-        for comp in self.components: warnings += comp.fix( **kw )
+        for comp in self.components: warnings += comp.fix(**kw)
         return warnings
 
-    def group( self, groupBoundaries = ( None, None ), groupUnit = ( None, None ) ):
-        return self.toCovarianceMatrix().group( groupBoundaries=groupBoundaries, groupUnit=groupUnit )
+    def group(self, groupBoundaries=(None, None), groupUnit=(None, None)):
+        return self.toCovarianceMatrix().group(groupBoundaries=groupBoundaries, groupUnit=groupUnit)
 
-    def plot( self, title = None, scalelabel = None, xlim=None, ylim=None, xlog=False, ylog=False ):
-        self.toCovarianceMatrix().plot( title=title, scalelabel=scalelabel, xlim=xlim, ylim=ylim, xlog=xlog, ylog=ylog )
+    def plot(self, title=None, scalelabel=None, xlim=None, ylim=None, xlog=False, ylog=False):
+        self.toCovarianceMatrix().plot(title=title, scalelabel=scalelabel, xlim=xlim, ylim=ylim, xlog=xlog, ylog=ylog)
 
     def addComponent(self, covariance):
         """:param covariance: an instance of covariance (or inherited class)"""
         covariance.setAncestor(self)
         self.components.append(covariance)
-        
-    def getMatchingComponent(self,rowBounds=None,columnBounds=None):
+
+    def getMatchingComponent(self, rowBounds=None, columnBounds=None):
         """
 
         :param rowBounds:
@@ -124,8 +125,8 @@ class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
             if comp.rowBounds() == rowBounds:
                 gotRow = True
                 if comp.columnBounds() == columnBounds: return comp
-        if not gotRow: raise ValueError( "No component with row bounds matching %s found" % str(rowBounds) )
-        raise ValueError( "No component with column bounds matching %s found" % str(columnBounds) )
+        if not gotRow: raise ValueError("No component with row bounds matching %s found" % str(rowBounds))
+        raise ValueError("No component with column bounds matching %s found" % str(columnBounds))
 
     def makeSafeBounds(self):
         """
@@ -133,44 +134,44 @@ class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
         """
         from fudge.covariances import covarianceMatrix
         itWorked = True
-        for ic in range(len(self)-1):
+        for ic in range(len(self) - 1):
             c0 = self.components[ic]
             if c0.rowBounds() != c0.columnBounds():
-                raise ValueError( "All components must have their row and column covarianceAxes matching.")
-            c1 = self.components[ic+1]
+                raise ValueError("All components must have their row and column covarianceAxes matching.")
+            c1 = self.components[ic + 1]
             if c1.rowBounds() != c1.columnBounds():
-                raise ValueError( "All components must have their row and column covarianceAxes matching.")
+                raise ValueError("All components must have their row and column covarianceAxes matching.")
             itWorked = c0.rowBounds()[1] <= c1.rowBounds()[0]
-            if not itWorked: # uh oh
+            if not itWorked:  # uh oh
                 # Try to fix c0
-                if isinstance(c0,covarianceMatrix.CovarianceMatrix):
+                if isinstance(c0, covarianceMatrix.CovarianceMatrix):
                     c0.removeExtraZeros()
                     itWorked = c0.rowBounds()[1] <= c1.rowBounds()[0]
-            if not itWorked: # double uh oh
+            if not itWorked:  # double uh oh
                 # Try to fix c1
-                if isinstance(c1,covarianceMatrix.CovarianceMatrix):
+                if isinstance(c1, covarianceMatrix.CovarianceMatrix):
                     c1.removeExtraZeros()
                     itWorked = c0.rowBounds()[1] <= c1.rowBounds()[0]
         if not itWorked:
             raise ValueError("Bounds between components %i and %i overlap: %s" %
-                             (ic,ic+1, str( [c.rowBounds() for c in self.components])))
+                             (ic, ic + 1, str([c.rowBounds() for c in self.components])))
 
-    def getUncertaintyVector( self, theData=None, relative=True ):
+    def getUncertaintyVector(self, theData=None, relative=True):
         """
         Combines all subsections into single uncertainty vector, converting to relative if requested.
 
         :returns: an XYs1d instance
         """
-        return self.toCovarianceMatrix().getUncertaintyVector(theData=theData,relative=relative)
+        return self.toCovarianceMatrix().getUncertaintyVector(theData=theData, relative=relative)
 
     def getCorrelationMatrix(self):
         return self.toCovarianceMatrix().getCorrelationMatrix()
 
-    def toCovarianceMatrix( self, label="composed" ):
+    def toCovarianceMatrix(self, label="composed"):
         """
         Sum all parts together to build a single matrix.
         """
-        if len( self.components ) == 1: return self.components[0].toCovarianceMatrix()
+        if len(self.components) == 1: return self.components[0].toCovarianceMatrix()
         from .covarianceMatrix import CovarianceMatrix
         from .shortRangeSelfScalingVariance import ShortRangeSelfScalingVariance
         import numpy
@@ -180,26 +181,26 @@ class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
         # Set up common data using first component
         summands = [term for term in self.components if not isinstance(term, ShortRangeSelfScalingVariance)]
         firstCovMtx = summands[0].toCovarianceMatrix()
-        commonRowAxis = firstCovMtx.matrix.axes[2].copy()#FIXME: unresolvedLinks are still unresolved!
+        commonRowAxis = firstCovMtx.matrix.axes[2].copy()  # FIXME: unresolvedLinks are still unresolved!
         if isinstance(firstCovMtx.matrix.axes[1].values, linkModule.Link):
-            commonColAxis = firstCovMtx.matrix.axes[2].copy()#FIXME: unresolvedLinks are still unresolved!
+            commonColAxis = firstCovMtx.matrix.axes[2].copy()  # FIXME: unresolvedLinks are still unresolved!
         else:
-            commonColAxis = firstCovMtx.matrix.axes[1].copy()#FIXME: unresolvedLinks are still unresolved!
-        commonMatrixAxis = firstCovMtx.matrix.axes[0] .copy()#FIXME: unresolvedLinks are still unresolved!
+            commonColAxis = firstCovMtx.matrix.axes[1].copy()  # FIXME: unresolvedLinks are still unresolved!
+        commonMatrixAxis = firstCovMtx.matrix.axes[0].copy()  # FIXME: unresolvedLinks are still unresolved!
         commonType = firstCovMtx.type
 
         # We need all the covariances to be either absolute or relative
         def make_common_type(cm):
             cm2 = cm.toCovarianceMatrix()
-            cm2.setAncestor(cm.ancestor)    # ensure cm2 has access to rowData, etc.
+            cm2.setAncestor(cm.ancestor)  # ensure cm2 has access to rowData, etc.
             if commonType == covarianceEnumsModule.Type.relative:
                 return cm.toRelative()
             else:
                 return cm.toAbsolute()
 
         # We're going to have to merge grids, so we'll need this function to do the dirty work
-        def add_values(v1,v2):
-            v=set()
+        def add_values(v1, v2):
+            v = set()
             v.update(v1.values)
             v.update(v2.values)
             return valuesModule.Values(sorted(v))
@@ -208,11 +209,12 @@ class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
         for c in summands[1:]:
             cc = make_common_type(c)
             if cc.type != commonType:
-                raise ValueError( "Incompatible types in %s: %s vs. %s" % (self.__class__, commonType, cc.type) )
-            if cc.matrix.axes[0].unit !=  commonMatrixAxis.unit:
+                raise ValueError("Incompatible types in %s: %s vs. %s" % (self.__class__, commonType, cc.type))
+            if cc.matrix.axes[0].unit != commonMatrixAxis.unit:
                 raise ValueError("covariance matrix components with different units?!? %s vs. %s" %
                                  (cc.matrix.axes[0].unit, commonMatrixAxis.unit))
-            if not isinstance(cc.matrix.axes[1].values, linkModule.Link): cc.matrix.axes[1].convertToUnit(commonColAxis.unit)
+            if not isinstance(cc.matrix.axes[1].values, linkModule.Link): cc.matrix.axes[1].convertToUnit(
+                commonColAxis.unit)
             cc.matrix.axes[2].convertToUnit(commonRowAxis.unit)
             commonRowAxis.values.values = add_values(commonRowAxis.values, cc.matrix.axes[2].values)
             if isinstance(cc.matrix.axes[1].values, linkModule.Link):
@@ -221,31 +223,35 @@ class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
                 commonColAxis.values.values = add_values(commonColAxis.values, cc.matrix.axes[1].values)
 
         # Now sum up the components
-        commonMatrix = numpy.mat( firstCovMtx.group( ( commonRowAxis.values.values, commonColAxis.values.values ),
-            ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray() )
+        commonMatrix = numpy.asmatrix(firstCovMtx.group((commonRowAxis.values.values, commonColAxis.values.values),
+                                                   (commonRowAxis.unit,
+                                                    commonColAxis.unit)).matrix.array.constructArray())
         for c in summands[1:]:
             cc = make_common_type(c)
-            commonMatrix += numpy.mat( cc.group( ( commonRowAxis.values.values, commonColAxis.values.values ),
-                ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray() )
+            commonMatrix += numpy.asmatrix(cc.group((commonRowAxis.values.values, commonColAxis.values.values),
+                                               (commonRowAxis.unit, commonColAxis.unit)).matrix.array.constructArray())
 
         # Now create the instance of the resulting CovarianceMatrix
-        if all( [isinstance(component.toCovarianceMatrix().matrix.axes[1].values, linkModule.Link) for component in summands ] ):
-            commonColAxis = summands[0].toCovarianceMatrix().matrix.axes[1].copy()#FIXME: unresolvedLinks are still unresolved!
-        newAxes=axesModule.Axes(
-                labelsUnits={0 : (commonMatrixAxis.label, commonMatrixAxis.unit),
-                             1 : (commonColAxis.label, commonColAxis.unit),
-                             2 : (commonRowAxis.label, commonRowAxis.unit)} )
+        if all([isinstance(component.toCovarianceMatrix().matrix.axes[1].values, linkModule.Link) for component in
+                summands]):
+            commonColAxis = summands[0].toCovarianceMatrix().matrix.axes[
+                1].copy()  # FIXME: unresolvedLinks are still unresolved!
+        newAxes = axesModule.Axes(
+            labelsUnits={0: (commonMatrixAxis.label, commonMatrixAxis.unit),
+                         1: (commonColAxis.label, commonColAxis.unit),
+                         2: (commonRowAxis.label, commonRowAxis.unit)})
         newAxes[2] = axesModule.Grid(commonRowAxis.label, commonRowAxis.index, commonRowAxis.unit,
-                                  style=xDataEnumsModule.GridStyle.boundaries,
-                                  values=commonRowAxis.values)
+                                     style=xDataEnumsModule.GridStyle.boundaries,
+                                     values=commonRowAxis.values)
         newAxes[1] = axesModule.Grid(commonColAxis.label, commonColAxis.index, commonColAxis.unit,
-                              style=xDataEnumsModule.GridStyle.boundaries,
-                              values=linkModule.Link(link=commonRowAxis.values, relative=True))
+                                     style=xDataEnumsModule.GridStyle.boundaries,
+                                     values=linkModule.Link(link=commonRowAxis.values, relative=True))
         newAxes[0] = axesModule.Axis(commonMatrixAxis.label, commonMatrixAxis.index, commonMatrixAxis.unit)
-        trigdata = commonMatrix[numpy.tri(commonMatrix.shape[0])==1.0].tolist()[0]
-        gridded = griddedModule.Gridded2d( axes=newAxes, array=arrayModule.Full(shape=commonMatrix.shape,
-            data=trigdata, symmetry=arrayModule.Symmetry.lower))
-        newCov = CovarianceMatrix( label=label, type=commonType, matrix=gridded )
+        trigdata = commonMatrix[numpy.tri(commonMatrix.shape[0]) == 1.0].tolist()[0]
+        gridded = griddedModule.Gridded2d(axes=newAxes, array=arrayModule.Full(shape=commonMatrix.shape,
+                                                                               data=trigdata,
+                                                                               symmetry=arrayModule.Symmetry.lower))
+        newCov = CovarianceMatrix(label=label, type=commonType, matrix=gridded)
         newCov.setAncestor(self.ancestor)
         return newCov
 
@@ -337,13 +343,13 @@ class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
             colData = self.findAttributeInAncestry('columnData').link.toPointwise_withLinearXYs(lowerEps=1e-8)
         return self.toCovarianceMatrix().toRelative(rowData=rowData, colData=colData)
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        xmlString = [ '%s<%s label="%s">' % ( indent, self.moniker, self.label ) ]
+        xmlString = ['%s<%s label="%s">' % (indent, self.moniker, self.label)]
         for covariance in self.components:
-            xmlString += covariance.toXML_strList( indent2, **kwargs )
+            xmlString += covariance.toXML_strList(indent2, **kwargs)
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
@@ -352,20 +358,20 @@ class MixedForm( ancestryModule.AncestryIO, base.Covariance ):
         """Translate <mixed> element from xml."""
         from fudge.covariances import covarianceMatrix, summed
 
-        xPath.append( element.tag )
+        xPath.append(element.tag)
 
-        mixed_ = cls( label = element.get( "label" ) )
+        mixed_ = cls(label=element.get("label"))
         for child in element:
             formClass = {
-                    covarianceMatrix.CovarianceMatrix.moniker: covarianceMatrix.CovarianceMatrix,
-                    summed.SummedCovariance.moniker: summed.SummedCovariance,
-                    shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance.moniker:
-                        shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance,
-                    }.get( child.tag )
+                covarianceMatrix.CovarianceMatrix.moniker: covarianceMatrix.CovarianceMatrix,
+                summed.SummedCovariance.moniker: summed.SummedCovariance,
+                shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance.moniker:
+                    shortRangeSelfScalingVariance.ShortRangeSelfScalingVariance,
+            }.get(child.tag)
             if formClass is None:
                 raise Exception("encountered unknown covariance matrix form '%s'" % child.tag)
             mixed_.addComponent(formClass.parseNodeUsingClass(child, xPath, linkData, **kwargs))
-        for i,form in enumerate( mixed_.components ): form.index = i
+        for i, form in enumerate(mixed_.components): form.index = i
 
         xPath.pop()
 

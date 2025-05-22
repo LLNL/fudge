@@ -113,6 +113,28 @@ class Group( ancestryModule.AncestryIO ) :
 
         self.__boundaries.convertUnits( unitMap )
 
+    def subGroupIndices(self, other, epsilon=1e-5):
+
+        if not isinstance(other, Group):
+            raise TypeError('Other must be an instance of Group: not %s.' % type(other))
+
+        fineBoundaries = self.boundaries.values.values
+        coarseBoundaries = other.boundaries.values.values
+        collapseIndices = []
+        indexFine = 0
+        for indexCoarse, boundary in enumerate(coarseBoundaries):
+            for indexFine in range(indexFine, len(fineBoundaries)):
+                fineBoundary = fineBoundaries[indexFine]
+                if abs(boundary - fineBoundary) < epsilon * boundary:
+                    collapseIndices.append(indexFine)
+                    break
+            indexFine += 1
+
+        if len(collapseIndices) != len(coarseBoundaries):
+            raise Exception('Other (%s) not a sub-group of self (%s).' % (other.label, self.label))
+
+        return collapseIndices
+
     def toXML_strList( self, indent = '', **kwargs ) :
         """
         Returns a python list of str instances representing the XML lines of *self*.

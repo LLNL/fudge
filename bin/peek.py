@@ -18,6 +18,7 @@ from fudge.reactions import base as reactionBaseModule
 from fudge import outputChannel as outputChannelModule
 from fudge import product as productModule
 from fudge import sums as sumsModule
+from fudge import institution as institutionModule
 from fudge.reactionData import crossSection as crossSectionModule
 from fudge.productData import multiplicity as multiplicityModule
 from fudge.productData.distributions import unspecified as unspecifiedModule
@@ -28,7 +29,7 @@ from fudge.outputChannelData.fissionFragmentData import delayedNeutron as delaye
 
 indentIncrement = '  '
 
-summaryDocStringFUDGE = '''Prints an outlines of the reactions, and their energy domain and products for a GNDS reactionSuite file.'''
+summaryDocString__FUDGE = '''Prints an outlines of the reactions, and their energy domain and products for a GNDS reactionSuite file.'''
 
 description = '''
 Prints each reaction and brief information about each reaction's products. Product information include its id, label, and distribution type and frame.
@@ -45,6 +46,7 @@ parser.add_argument('--unspecified', action='store_true',                   help
 parser.add_argument('--doNotShowProducts', action='store_true',             help='If present, no product data are displayed.')
 parser.add_argument('--skipProductions', action='store_true',               help='If present, skips the "productions" node.')
 parser.add_argument('--skipIncompleteReactions', action='store_true',       help='If present, skips the "incompleteReactions" node.')
+parser.add_argument('--skipPhotoAtomicIncoherentDoppler', action='store_true',      help='If present, skips the photo-atomic incoherent Doppler reactions.')
 parser.add_argument('--products', action='append', default=[],              help='Only show reactions with these products in their list. If empty, all reactions are shown.')
 parser.add_argument('--MT', action='append', type=int, default=[],          help='Only show reactions with these MTs. If empty, all reactions are shown.')
 parser.add_argument('--crossSectionSums', action='store_true',              help='If present, also show crossSectionSum information.')
@@ -176,8 +178,8 @@ def reactionPeek(self, prefix, index, indent, reactionIndex):
         QStr = 'Q_threshold = %11s' % self.outputChannel.Q[0].evaluate(self.domainMin)
     except:
         QStr = '"Q_threshold issue, please report to FUDGE developers"'
-    print('%s%-36s (%4d): %s domainMin = %11s domainMax = %10s %s%s' %
-            (indent, prefix % str(self), index, QStr, self.domainMin, self.domainMax, self.domainUnit, crossSectionStr))
+    print('%s%-36s (%4d): %s domainMin = %11.6g domainMax = %10.6g %s MT = %s%s' %
+            (indent, prefix % str(self), index, QStr, self.domainMin, self.domainMax, self.domainUnit, self.ENDF_MT, crossSectionStr))
     productPath = [str(index)]
     if not args.doNotShowProducts:
         self.outputChannel.__peek(indent + indentIncrement, [str(reactionIndex)])
@@ -202,12 +204,14 @@ def crossSectionSum(self, index, indent):
     print('%s%-32s (%4d): domainMin = %s, domainMax = %s %s%s' % (indent, str(self), index, crossSection.domainMin, 
             crossSection.domainMax, crossSection.domainUnit, crossSectionStr))
 
-def showChildren(node, skip):
+def showChildren(node, skip, label=None):
 
     if skip:
         return
     if len(node) > 0:
-        print('%s%s:' % (indent, node.moniker))
+        if label is None:
+            label = node.moniker
+        print('%s%s:' % (indent, label))
         for reactionIndex, reaction in enumerate(node):
             reaction.__peek('%s', reactionIndex, 2 * indentIncrement, reactionIndex)
 
@@ -236,3 +240,10 @@ if __name__ == '__main__':
         print('%sCross section sums:' % indent)
         for crossSectionSumIndex, crossSectionSum in enumerate(protare.sums.crossSectionSums):
             crossSectionSum.__peek(crossSectionSumIndex, 2 * indentIncrement)
+
+    try:
+        photoAtomicIncoherentDoppler = protare.applicationData[institutionModule.photoAtomicIncoherentDoppler]
+        showChildren(photoAtomicIncoherentDoppler.data[0], args.skipPhotoAtomicIncoherentDoppler,
+                label='Photo-atomic incoherent doppler reactions')
+    except:
+        pass

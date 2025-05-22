@@ -10,7 +10,7 @@
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 #include <Python.h>
-#include <arrayobject.h>    /* for numpy c interface */
+#include <numpy/arrayobject.h>    /* for numpy c interface */
 #include <math.h>
 #include <stdarg.h>
 

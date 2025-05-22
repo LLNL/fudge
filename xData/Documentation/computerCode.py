@@ -43,7 +43,8 @@ from .. import suite as suiteModule
 from .. import text as textModule
 from .. import date as dateModule
 
-class Version( textModule.Text ) :
+
+class Version(textModule.Text):
     """
     This is the class for the GNDS computerCode version attribute.
 
@@ -58,63 +59,64 @@ class Version( textModule.Text ) :
 
     moniker = 'version'
 
-    def __init__( self, date=None ) :
+    def __init__(self, date=None):
         """
         :param date:        An instance of :py:class:`dateModule.Date`.
         """
 
-        textModule.Text.__init__( self, markup = textModule.Markup.none )
+        textModule.Text.__init__(self, markup=textModule.Markup.none)
 
         self.__date = dateModule.Date(date)
 
     @property
-    def date( self ) :
+    def date(self):
         """
         This method returns the *date* member of *self*.
 
         :returns:       An instance of :py:class:`dateModule.Date`.
         """
 
-        return( self.__date )
+        return self.__date
 
     @date.setter
-    def date( self, date ) :
+    def date(self, date):
         """
         This method sets the *date* member of *self* to *date*.
 
         :param date:   An instance of :py:class:`dateModule.Date`.
         """
 
-        self.__date = dateModule.raiseIfNotDate( date )
+        self.__date = dateModule.raiseIfNotDate(date)
 
-    def XML_extraAttributes( self, **kwargs ) :
+    def XML_extraAttributes(self, **kwargs):
         """
-        This methods returns the XML attributes for *self* as a python str.
+        This method returns the XML attributes for *self* as a python str.
 
-        :kwargs:        A python dict which key 'addExtraAttributes' is used to determine if the *date* attribute is added.
+        :kwargs:        A python dict with key 'addExtraAttributes', used to determine if the *date* attribute is added.
 
         :returns:       A python str.
         """
 
-        if not kwargs['addExtraAttributes'] : return ''
+        if not kwargs['addExtraAttributes']: return ''
         return ' date="%s"' % self.date
 
     def parseNode(self, node, xPath, linkData, **kwargs):
         """
         This method fills *self* by parsing the data in *node*.
 
-        :param node:        Node to parse.
-        :param xPath:       List containing xPath to current node, useful mostly for debugging.
-        :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param node:       Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
         """
 
         textModule.Text.parseNode(self, node, xPath, linkData, **kwargs)
-        xPath.append( node.tag )
+        xPath.append(node.tag)
 
-        self.date = datetime.datetime.strptime( node.get( 'date' ), '%Y-%m-%d' )
+        self.date = datetime.datetime.strptime(node.get('date'), '%Y-%m-%d')
 
-        xPath.pop( )
+        xPath.pop()
+
 
 class CodeRepo(ancestryModule.AncestryIO_bare):
     """
@@ -138,97 +140,103 @@ class CodeRepo(ancestryModule.AncestryIO_bare):
     def __init__(self, _revisionSystem, _href, _revisionID):
         """
         :param _revisionSystem:     The name of the repo system used (e.g., git, subversion). 
-        :param _href:               A url to the repo.
+        :param _href:               URL to the repo.
         :param _revisionID:         A unique identifier of the checkout version of the code.
         """
 
         ancestryModule.AncestryIO_bare.__init__(self)
 
-        self.__revisionSystem = textModule.raiseIfNotString( _revisionSystem, 'revisionSystem' )
-        self.__href = textModule.raiseIfNotString( _href, 'href' )
-        self.__revisionID = textModule.raiseIfNotString( _revisionID, 'revisionID' )
+        self.__revisionSystem = textModule.raiseIfNotString(_revisionSystem, 'revisionSystem')
+        self.__href = textModule.raiseIfNotString(_href, 'href')
+        self.__revisionID = textModule.raiseIfNotString(_revisionID, 'revisionID')
 
     @property
-    def revisionSystem( self ) :
+    def revisionSystem(self):
         """
         This method returns the *revisionSystem* member of *self*.
 
         :returns:       A python str.
         """
 
-        return( self.__revisionSystem )
+        return self.__revisionSystem
 
     @property
-    def href( self ) :
+    def href(self):
         """
         This method returns the *href* member of *self*.
 
         :returns:       A python str.
         """
 
-        return( self.__href )
+        return self.__href
 
     @property
-    def revisionID( self ) :
+    def revisionID(self):
         """
         This method returns the *revisionID* member of *self*.
 
         :returns:       A python str.
         """
 
-        return( self.__revisionID )
+        return self.__revisionID
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
         """
         Returns a list of str instances representing the XML lines of *self*.
 
-        :param indent:          The minimum amount of indentation.
-        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param indent:     The minimum amount of indentation.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:           List of str instances representing the XML lines of self.
         """
 
-        if( len( self.__revisionSystem + self.__href + self.__revisionID ) == 0 ) : return( [] )
+        if len(self.__revisionSystem + self.__href + self.__revisionID) == 0:
+            if kwargs.get('showEmpty', False):
+                return ['%s<!-- code repo -->' % indent]
+            return []
 
-        return( [ '%s<%s revisionSystem="%s" href="%s" revisionID="%s"/>' % ( indent, self.moniker, self.__revisionSystem, self.__href, self.__revisionID ) ] )
+        return ['%s<%s revisionSystem="%s" href="%s" revisionID="%s"/>' % (
+            indent, self.moniker, self.__revisionSystem, self.__href, self.__revisionID)]
 
     def parseNode(self, node, xPath, linkData, **kwargs):
         """
         This method fills *self* by parsing the data in *node*.
 
-        :param node:        Node to parse.
-        :param xPath:       List containing xPath to current node, useful mostly for debugging.
-        :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param node:       Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
         """
 
-        xPath.append( node.tag )
+        xPath.append(node.tag)
 
-        self.__revisionSystem = textModule.raiseIfNotString( node.get( 'revisionSystem' ), 'revisionSystem' )
-        self.__href = textModule.raiseIfNotString( node.get( 'href' ), 'href' )
-        self.__revisionID = textModule.raiseIfNotString( node.get( 'revisionID' ), 'revisionID' )
+        self.__revisionSystem = textModule.raiseIfNotString(node.get('revisionSystem'), 'revisionSystem')
+        self.__href = textModule.raiseIfNotString(node.get('href'), 'href')
+        self.__revisionID = textModule.raiseIfNotString(node.get('revisionID'), 'revisionID')
 
-        xPath.pop( )
+        xPath.pop()
 
-class ExecutionArguments( textModule.Text ) :
+
+class ExecutionArguments(textModule.Text):
     """
     This is the class for the GNDS computerCode/executionArguments node.
     """
 
     moniker = 'executionArguments'
 
-    def __init__( self ) :
+    def __init__(self):
+        textModule.Text.__init__(self, markup=textModule.Markup.none)
 
-        textModule.Text.__init__( self, markup = textModule.Markup.none )
 
-class Note( textModule.Text ) :
+class Note(textModule.Text):
     """
     This is the class for the GNDS computerCode/note node.
     """
 
     moniker = 'note'
 
-class InputDeck( textModule.Text ) :
+
+class InputDeck(textModule.Text):
     """
     This is the class for the GNDS computerCode/inputDecks/inputDeck node.
 
@@ -248,37 +256,37 @@ class InputDeck( textModule.Text ) :
     moniker = 'inputDeck'
     keyName = 'label'
 
-    def __init__( self, label, filename, text = None ) :
+    def __init__(self, label, filename, text=None):
         """
         :param label:       A unique label for an instance within a inputDecks suite.
         :param filename:    The path of the output file.
         :param text:        Optional text to describe the contents of the output file.
         """
 
-        textModule.Text.__init__( self, text, markup = textModule.Markup.none, label = label )
+        textModule.Text.__init__(self, text, markup=textModule.Markup.none, label=label)
 
-        self.__filename = textModule.raiseIfNotString( filename, 'filename' )
+        self.__filename = textModule.raiseIfNotString(filename, 'filename')
 
     @property
-    def filename( self ) :
+    def filename(self):
         """
         This method returns the *filename* member of *self*.
 
         :returns:       An instance of :py:class:`textModule.Tex`.
         """
 
-        return( self.__filename )
+        return self.__filename
 
-    def XML_extraAttributes( self, **kwargs ) :
+    def XML_extraAttributes(self, **kwargs):
         """
-        This methods returns the XML attributes for *self* as a single python str.
+        This method returns the XML attributes for *self* as a single python str.
 
         :kwargs:        This argument is not used.
 
         :returns:       A python str.
         """
 
-        if( self.filename == '' ) : return ''
+        if self.filename == '': return ''
 
         return ' filename="%s"' % self.filename
 
@@ -287,16 +295,16 @@ class InputDeck( textModule.Text ) :
         """
         Parse *node* into an instance of *cls*.
 
-        :param cls:         Form class to return.
-        :param node:        Node to parse.
-        :param xPath:       List containing xPath to current node, useful mostly for debugging.
-        :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param cls:        Form class to return.
+        :param node:       Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :returns:           An instance of *cls* representing *node*.
+        :returns:          An instance of *cls* representing *node*.
         """
 
-        _label = node.get( 'label' )
+        _label = node.get('label')
         _filename = node.get('filename', '')
 
         inputDeck = cls(_label, _filename)
@@ -304,7 +312,8 @@ class InputDeck( textModule.Text ) :
 
         return inputDeck
 
-class InputDecks( suiteModule.Suite ) :
+
+class InputDecks(suiteModule.Suite):
     """
     This is the suite class for the GNDS computerCode/inputDecks node.
     """
@@ -312,11 +321,11 @@ class InputDecks( suiteModule.Suite ) :
     moniker = 'inputDecks'
     suiteName = 'label'
 
-    def __init__( self ) :
+    def __init__(self):
+        suiteModule.Suite.__init__(self, [InputDeck])
 
-        suiteModule.Suite.__init__( self, [ InputDeck ] )
 
-class OutputDeck( textModule.Text ) :
+class OutputDeck(textModule.Text):
     """
     This is the class for the GNDS computerCode/outputDecks/outputDeck node.
 
@@ -334,37 +343,36 @@ class OutputDeck( textModule.Text ) :
     moniker = 'outputDeck'
     keyName = 'label'
 
-    def __init__( self, filename, text = None ) :
+    def __init__(self, filename, text=None):
         """
-        :param label:       A unique label for an instance within a inputDecks suite. Why is this not in the argument list like it is for InputDeck.
         :param filename:    The path of the output file.
         :param text:        Optional text to describe the contents of the output file.
         """
 
-        textModule.Text.__init__( self, text, markup = textModule.Markup.none )
+        textModule.Text.__init__(self, text, markup=textModule.Markup.none)
 
-        self.__filename = textModule.raiseIfNotString( filename, 'filename' )
+        self.__filename = textModule.raiseIfNotString(filename, 'filename')
 
     @property
-    def filename( self ) :
+    def filename(self):
         """
         This method returns the *filename* member of *self*.
 
         :returns:       An instance of :py:class:`textModule.Tex`.
         """
 
-        return( self.__filename )
+        return self.__filename
 
-    def XML_extraAttributes( self, **kwargs ) :
+    def XML_extraAttributes(self, **kwargs):
         """
-        This methods returns the XML attributes for *self* as a single python str.
+        This method returns the XML attributes for *self* as a single python str.
 
         :kwargs:        This argument is not used.
 
         :returns:       A python str.
         """
 
-        if( self.filename == '' ) : return ''
+        if self.filename == '': return ''
 
         return ' filename="%s"' % self.filename
 
@@ -373,20 +381,21 @@ class OutputDeck( textModule.Text ) :
         """
         Parse *node* into an instance of *cls*.
 
-        :param cls:         Form class to return.
-        :param node:        Node to parse.
-        :param xPath:       List containing xPath to current node, useful mostly for debugging.
-        :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param cls:        Form class to return.
+        :param node:       Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :returns:           An instance of *cls* representing *node*.
+        :returns:          An instance of *cls* representing *node*.
         """
 
         _filename = node.get('filename', '')
 
-        return cls( _filename)
+        return cls(_filename)
 
-class OutputDecks( suiteModule.Suite ) :
+
+class OutputDecks(suiteModule.Suite):
     """
     This is the suite class for the GNDS computerCode/outputDecks node.
     """
@@ -394,9 +403,9 @@ class OutputDecks( suiteModule.Suite ) :
     moniker = 'outputDecks'
     suiteName = 'label'
 
-    def __init__( self ) :
+    def __init__(self):
+        suiteModule.Suite.__init__(self, [OutputDeck])
 
-        suiteModule.Suite.__init__( self, [ OutputDeck ] )
 
 class ComputerCode(ancestryModule.AncestryIO):
     """
@@ -425,13 +434,13 @@ class ComputerCode(ancestryModule.AncestryIO):
     +-----------------------+---------------------------------------------------------------------------+
     """
 
-# Also need buildParameters as a text node.
+    # Also need buildParameters as a text node.
 
     moniker = 'computerCode'
     keyName = 'label'
-    ancestryMembers = ( 'codeRepo', 'executionArguments', 'note', 'inputDecks', 'outputDecks' )
+    ancestryMembers = ('codeRepo', 'executionArguments', 'note', 'inputDecks', 'outputDecks')
 
-    def __init__( self, label, name, version ) :
+    def __init__(self, label, name, version):
         """
         :param label:       A unique label for an instance within a computerCodes suite.
         :param name:        The name of the code.
@@ -440,164 +449,166 @@ class ComputerCode(ancestryModule.AncestryIO):
 
         ancestryModule.AncestryIO.__init__(self)
 
-        self.__label = textModule.raiseIfNotString( label, 'label' )
-        self.__name = textModule.raiseIfNotString( name, 'name' )
-        self.__version = textModule.raiseIfNotString( version, 'version' )
+        self.__label = textModule.raiseIfNotString(label, 'label')
+        self.__name = textModule.raiseIfNotString(name, 'name')
+        self.__version = textModule.raiseIfNotString(version, 'version')
 
-        self.codeRepo = CodeRepo( '', '', '' )
+        self.codeRepo = CodeRepo('', '', '')
 
-        self.__executionArguments = ExecutionArguments( )
-        self.__executionArguments.setAncestor( self )
+        self.__executionArguments = ExecutionArguments()
+        self.__executionArguments.setAncestor(self)
 
-        self.__note = Note( )
-        self.__note.setAncestor( self )
+        self.__note = Note()
+        self.__note.setAncestor(self)
 
-        self.__inputDecks = InputDecks( )
-        self.__inputDecks.setAncestor( self )
+        self.__inputDecks = InputDecks()
+        self.__inputDecks.setAncestor(self)
 
-        self.__outputDecks = OutputDecks( )
-        self.__outputDecks.setAncestor( self )
+        self.__outputDecks = OutputDecks()
+        self.__outputDecks.setAncestor(self)
 
     @property
-    def label( self ) :
+    def label(self):
         """
         This method returns a reference to the *label* member of *self*.
 
         :returns:       A python str.
         """
 
-        return( self.__label )
+        return self.__label
 
     @property
-    def name( self ) :
+    def name(self):
         """
         This method returns a reference to the *name* member of *self*.
 
         :returns:       A python str.
         """
 
-        return( self.__name )
+        return self.__name
 
     @property
-    def version( self ) :
+    def version(self):
         """
         This method returns a reference to the *version* member of *self*.
 
         :returns:       A python str.
         """
 
-        return( self.__version )
+        return self.__version
 
     @property
-    def codeRepo( self ) :
+    def codeRepo(self):
         """
         This method returns a reference to the *codeRepo* member of *self*.
 
         :returns:       An instance of :py:class:`CodeRepo`.
         """
 
-        return( self.__codeRepo )
+        return self.__codeRepo
 
     @codeRepo.setter
-    def codeRepo( self, _codeRepo ) :
+    def codeRepo(self, _codeRepo):
         """
         This method sets the *codeRepo* member of *self* to *_codeRepo*.
 
         :param _codeRepo:   An instance of :py:class:`CodeRepo`.
         """
 
-        if( not( isinstance( _codeRepo, CodeRepo ) ) ) : raise TypeError( 'Invalid codeRepo instance.' )
+        if not (isinstance(_codeRepo, CodeRepo)): raise TypeError('Invalid codeRepo instance.')
         self.__codeRepo = _codeRepo
-        self.__codeRepo.setAncestor( self )
+        self.__codeRepo.setAncestor(self)
 
     @property
-    def executionArguments( self ) :
+    def executionArguments(self):
         """
         This method returns a reference to the *executionArguments* member of *self*.
 
         :returns:       An instance of :py:class:`ExecutionArguments`.
         """
 
-        return( self.__executionArguments )
+        return self.__executionArguments
 
     @property
-    def note( self ) :
+    def note(self):
         """
         This method returns a reference to the *note* member of *self*.
 
         :returns:       An instance of :py:class:`Note`.
         """
 
-        return( self.__note )
+        return self.__note
 
     @property
-    def inputDecks( self ) :
+    def inputDecks(self):
         """
         This method returns a reference to the *inputDecks* member of *self*.
 
         :returns:       An instance of :py:class:`InputDecks`.
         """
 
-        return( self.__inputDecks )
+        return self.__inputDecks
 
     @property
-    def outputDecks( self ) :
+    def outputDecks(self):
         """
         This method returns a reference to the *outputDecks* member of *self*.
 
         :returns:       An instance of :py:class:`OutputDecks`.
         """
 
-        return( self.__outputDecks )
+        return self.__outputDecks
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
         """
         Returns a list of str instances representing the XML lines of *self*.
 
-        :param indent:          The minimum amount of indentation.
-        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param indent:     The minimum amount of indentation.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:           List of str instances representing the XML lines of self.
         """
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        XMLList = [ '%s<%s label="%s" name="%s" version="%s">' % ( indent, self.moniker, self.__label, self.__name, self.__version ) ]
-        XMLList += self.__codeRepo.toXML_strList( indent2, **kwargs )
+        XMLList = ['%s<%s label="%s" name="%s" version="%s">' % (
+            indent, self.moniker, self.__label, self.__name, self.__version)]
+        XMLList += self.__codeRepo.toXML_strList(indent2, **kwargs)
 
-        XMLList += self.__executionArguments.toXML_strList( indent2, **kwargs )
-        XMLList += self.__note.toXML_strList( indent2, **kwargs )
-        XMLList += self.__inputDecks.toXML_strList( indent2, **kwargs )
-        XMLList += self.__outputDecks.toXML_strList( indent2, **kwargs )
+        XMLList += self.__executionArguments.toXML_strList(indent2, **kwargs)
+        XMLList += self.__note.toXML_strList(indent2, **kwargs)
+        XMLList += self.__inputDecks.toXML_strList(indent2, **kwargs)
+        XMLList += self.__outputDecks.toXML_strList(indent2, **kwargs)
 
         XMLList[-1] += '</%s>' % self.moniker
 
-        return( XMLList )
+        return XMLList
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
         Parse *node* into an instance of *cls*.
 
-        :param cls:         Form class to return.
-        :param node:        Node to parse.
-        :param xPath:       List containing xPath to current node, useful mostly for debugging.
-        :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param cls:        Form class to return.
+        :param node:       Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :returns:           An instance of *cls* representing *node*.
+        :returns:          An instance of *cls* representing *node*.
         """
 
-        label = node.get( 'label' )
-        name = node.get( 'name' )
-        version = node.get( 'version', '' )
+        label = node.get('label')
+        name = node.get('name')
+        version = node.get('version', '')
 
         computerCode = cls(label, name, version)
         computerCode.parseAncestryMembers(node, xPath, linkData, **kwargs)
 
         return computerCode
 
-class ComputerCodes( suiteModule.Suite ) :
+
+class ComputerCodes(suiteModule.Suite):
     """
     This is the suite class for the GNDS documentation/computerCodes node.
     """
@@ -605,6 +616,5 @@ class ComputerCodes( suiteModule.Suite ) :
     moniker = 'computerCodes'
     suiteName = 'label'
 
-    def __init__( self ) :
-
-        suiteModule.Suite.__init__( self, [ ComputerCode ] )
+    def __init__(self):
+        suiteModule.Suite.__init__(self, [ComputerCode])

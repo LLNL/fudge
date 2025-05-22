@@ -22,13 +22,15 @@ This module contains the following classes:
     | AuthorAbstract            | TThis is an abstract class for GNDS/documentation author nodes.               |
     +---------------------------+-------------------------------------------------------------------------------+
 """
+from abc import ABC
 
 from LUPY import ancestry as ancestryModule
 
 from .. import suite as suiteModule
 from .. import text as textModule
 
-class Affiliation( textModule.Text ) :
+
+class Affiliation(textModule.Text):
     """
     This class represents a GNDS author/affiliations/affiliation node.
 
@@ -46,42 +48,42 @@ class Affiliation( textModule.Text ) :
     moniker = 'affiliation'
     keyName = 'label'
 
-    def __init__( self, name = '', href = '' ) :
+    def __init__(self, name='', href=''):
         """
         :param name:    The name of the institution.
         :param href:    The url for the institution.
         """
 
-        textModule.Text.__init__( self )
+        textModule.Text.__init__(self)
 
         self.name = name
         self.href = href
 
     @property
-    def name( self ) :
+    def name(self):
         """Returns self's name instance."""
 
-        return( self.__name )
+        return self.__name
 
     @name.setter
-    def name( self, value ) :
+    def name(self, value):
 
-        self.__name = textModule.raiseIfNotString( value, 'name' )
+        self.__name = textModule.raiseIfNotString(value, 'name')
 
     @property
-    def href( self ) :
+    def href(self):
         """Returns self's href instance."""
 
-        return( self.__href )
+        return self.__href
 
     @href.setter
-    def href( self, value ) :
+    def href(self, value):
 
-        self.__href = textModule.raiseIfNotString( value, 'href' )
+        self.__href = textModule.raiseIfNotString(value, 'href')
 
-    def XML_extraAttributes( self, **kwargs ) :
+    def XML_extraAttributes(self, **kwargs):
         """
-        This methods returns the XML attributes for *self* as a single python str.
+        This method returns the XML attributes for *self* as a single python str.
 
         :kwargs:        This argument is not used.
 
@@ -89,20 +91,21 @@ class Affiliation( textModule.Text ) :
         """
 
         attributes = ''
-        if( len( self.__name ) > 0 ) : attributes += ' name="%s"' % self.__name
-        if( len( self.__href ) > 0 ) : attributes += ' href="%s"' % self.__href
+        if len(self.__name) > 0: attributes += ' name="%s"' % self.__name
+        if len(self.__href) > 0: attributes += ' href="%s"' % self.__href
 
         return attributes
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
 
-        name = node.get( 'name' )
-        href = node.get( 'href' )
+        name = node.get('name')
+        href = node.get('href')
 
         return cls(name, href)
 
-class Affiliations( suiteModule.Suite ) :
+
+class Affiliations(suiteModule.Suite):
     """
     This is the suite class for the GNDS/documentation/authors affiliations node.
     """
@@ -110,18 +113,19 @@ class Affiliations( suiteModule.Suite ) :
     moniker = 'affiliations'
     suiteName = 'label'
 
-    def __init__( self ) :
+    def __init__(self):
+        suiteModule.Suite.__init__(self, [Affiliation])
 
-        suiteModule.Suite.__init__( self, [ Affiliation ] )
 
-class Note( textModule.Text ) :
+class Note(textModule.Text):
     """
     This is a class representing a GNDS authors/author/note node.
     """
 
     moniker = 'note'
 
-class AuthorAbstract(ancestryModule.AncestryIO):
+
+class AuthorAbstract(ancestryModule.AncestryIO, ABC):
     """
     This is an abstract class for GNDS/documentation author nodes.
 
@@ -136,15 +140,15 @@ class AuthorAbstract(ancestryModule.AncestryIO):
     +---------------+---------------------------------------------------------------+
     | email         | The email address of the author.                              |
     +---------------+---------------------------------------------------------------+
-    | affiliations  | A suiite of auther affiliations.                              |
+    | affiliations  | A suite of auther affiliations.                               |
     +---------------+---------------------------------------------------------------+
     | note          | Notes about the author.                                       |
     +---------------+---------------------------------------------------------------+
     """
 
-    ancestryMembers = ( 'affiliations', 'note' )
+    ancestryMembers = ('affiliations', 'note')
 
-    def __init__( self, name, orcid, email ) :
+    def __init__(self, name, orcid, email):
         """
         :param name:    The author's name.
         :param orcid:   The orcid of the author.
@@ -153,25 +157,25 @@ class AuthorAbstract(ancestryModule.AncestryIO):
 
         ancestryModule.AncestryIO.__init__(self)
 
-        self.__name = textModule.raiseIfNotString( name, 'name' )
-        self.__orcid = textModule.raiseIfNotString( orcid, 'orcid' )
-        self.__email = textModule.raiseIfNotString( email, 'email' )
+        self.__name = textModule.raiseIfNotString(name, 'name')
+        self.__orcid = textModule.raiseIfNotString(orcid, 'orcid')
+        self.__email = textModule.raiseIfNotString(email, 'email')
 
-        self.__affiliations = Affiliations( )
-        self.__affiliations.setAncestor( self )
+        self.__affiliations = Affiliations()
+        self.__affiliations.setAncestor(self)
 
-        self.__note = Note( )
-        self.__note.setAncestor( self )
+        self.__note = Note()
+        self.__note.setAncestor(self)
 
     @property
-    def name( self ) :
+    def name(self):
         """
         This method returns that name of the author.
 
         :returns:   A python str.
         """
 
-        return( self.__name )
+        return self.__name
 
     @property
     def orcid(self):
@@ -184,38 +188,38 @@ class AuthorAbstract(ancestryModule.AncestryIO):
         return self.__orcid
 
     @property
-    def email( self ) :
+    def email(self):
         """
         This method returns that email of the author.
 
         :returns:   A python str.
         """
 
-        return( self.__email )
+        return self.__email
 
     @property
-    def affiliations( self ) :
+    def affiliations(self):
         """
-        This method returns a reference to the affiliations suite.
+        This method returns a reference to the 'affiliations' suite.
 
-        :returns:       A instance of :py:class:`Affiliations`.
+        :returns:       An instance of :py:class:`Affiliations`.
         """
 
-        return( self.__affiliations )
+        return self.__affiliations
 
     @property
-    def note( self ) :
+    def note(self):
         """
         This method returns a reference to the note member.
 
-        :returns:       A instance of :py:class:`Note`.
+        :returns:       An instance of :py:class:`Note`.
         """
 
-        return( self.__note )
+        return self.__note
 
-    def XML_extraAttributes( self, **kwargs ) :
+    def XML_extraAttributes(self, **kwargs):
         """
-        This methods returns the XML attributes for *self* as a single python str.
+        This method returns the XML attributes for *self* as a single python str.
 
         :kwargs:        This argument is not used.
 
@@ -228,21 +232,21 @@ class AuthorAbstract(ancestryModule.AncestryIO):
 
         return attributes
 
-    def toXML_strList(self, indent = '', **kwargs):
+    def toXML_strList(self, indent='', **kwargs):
         """
         Returns a list of str instances representing the XML lines of *self*.
 
-        :param indent:          The minimum amount of indentation.
-        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param indent:     The minimum amount of indentation.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:           List of str instances representing the XML lines of self.
         """
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, self.XML_extraAttributes(**kwargs) ) ]
-        XMLList += self.__affiliations.toXML_strList( indent = indent2, **kwargs )
-        XMLList += self.__note.toXML_strList( indent = indent2, **kwargs )
+        XMLList = ['%s<%s%s>' % (indent, self.moniker, self.XML_extraAttributes(**kwargs))]
+        XMLList += self.__affiliations.toXML_strList(indent=indent2, **kwargs)
+        XMLList += self.__note.toXML_strList(indent=indent2, **kwargs)
         XMLList[-1] += '</%s>' % self.moniker
 
-        return( XMLList )
+        return XMLList

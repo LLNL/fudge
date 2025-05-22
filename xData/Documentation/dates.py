@@ -26,7 +26,7 @@ from LUPY import ancestry as ancestryModule
 
 from .. import suite as suiteModule
 from .. import date as dateModule
-from . import abstractClasses as abstractClassesModule
+
 
 class DateType(enumsModule.Enum):
     """
@@ -43,6 +43,7 @@ class DateType(enumsModule.Enum):
     updated = enumsModule.auto()
     valid = enumsModule.auto()
     withdraw = enumsModule.auto()
+
 
 class Date(ancestryModule.AncestryIO):
     """
@@ -65,7 +66,7 @@ class Date(ancestryModule.AncestryIO):
     def __init__(self, start, dateType):
         """
         :param start:           TBD.
-        :param dateType:        An instnace of :py:class:`DateType`.
+        :param dateType:        An instance of :py:class:`DateType`.
         """
 
         ancestryModule.AncestryIO.__init__(self)
@@ -88,35 +89,35 @@ class Date(ancestryModule.AncestryIO):
         """
         This method returns the data type.
 
-        :returns:       A instance of :py:class:`DateType`.
+        :returns:       instance of :py:class:`DateType`.
         """
 
         return self.__dateType
 
-    def XML_extraAttributes( self, **kwargs ) :
+    def XML_extraAttributes(self, **kwargs):
         """
-        This methods returns the XML attributes for *self* as a single python str.
+        This method returns the XML attributes for *self* as a single python str.
 
         :kwargs:        This argument is not used.
 
         :returns:       A python str.
         """
 
-        return ' %s dateType="%s"' % ( self.start.asXML_attribute(name = 'value'), self.dateType )
+        return ' %s dateType="%s"' % (self.start.asXML_attribute(name='value'), self.dateType)
 
     def toXML_strList(self, **kwargs):
         """
         Returns a list of str instances representing the XML lines of *self*.
 
-        :param indent:          The minimum amount of indentation.
-        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param kwargs:       dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:             List of str instances representing the XML lines of self.
         """
 
         indent = kwargs.get('indent', '')
 
-        return [ '%s<%s%s dateType="%s"/>' % ( indent, self.moniker, self.start.asXML_attribute(name = 'value'), self.dateType ) ]
+        return [
+            '%s<%s%s dateType="%s"/>' % (indent, self.moniker, self.start.asXML_attribute(name='value'), self.dateType)]
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
@@ -127,15 +128,16 @@ class Date(ancestryModule.AncestryIO):
         :param node:        Node to parse.
         :param xPath:       List containing xPath to current node, useful mostly for debugging.
         :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
         :returns:           An instance of *cls* representing *node*.
         """
 
-        start = dateModule.Date.parse(node.get('value'))        # FIXME2, what is this? How is Date to have a date?
+        start = dateModule.Date.parse(node.get('value'))  # FIXME2, what is this? How is Date to have a date?
         dateType = node.get('dateType')
 
         return cls(start, dateType)
+
 
 class Dates(suiteModule.Suite):
     """
@@ -146,9 +148,7 @@ class Dates(suiteModule.Suite):
     suiteName = 'dateType'
 
     def __init__(self):
+        suiteModule.Suite.__init__(self, [Date])
 
-        suiteModule.Suite.__init__(self, [ Date ])
-
-    def toXML(self, indent = '', **kwargs):
-
+    def toXML(self, indent='', **kwargs):
         return '\n'.join(self.toXML_strList(**kwargs))

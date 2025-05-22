@@ -29,7 +29,7 @@ def toENDF6(self, flags, targetInfo, verbosityIndent=''):
     endf = []
     AP = self.getScatteringRadius()
     if AP.isEnergyDependent():
-        scatRadius = AP.form
+        scatRadius = AP.evaluated
         NR, NP = 1, len(scatRadius)
         endf.append(endfFormatsModule.endfHeadLine(0, 0, 0, 0, NR, NP))
         endf += endfFormatsModule.endfInterpolationList(
@@ -279,7 +279,7 @@ def writeAsLRF3(RMatrix, flags, targetInfo, verbosityIndent=''):
                 reac.link.link == targetInfo['reactionSuite'].getReaction('capture')]
     AP = elastic.getScatteringRadius()
     if AP.isEnergyDependent():
-        scatRadius = AP.form
+        scatRadius = AP.evaluated
         NR, NP = 1, len(scatRadius)
         endf.append(endfFormatsModule.endfHeadLine(0, 0, 0, 0, NR, NP))
         endf += endfFormatsModule.endfInterpolationList((NP,

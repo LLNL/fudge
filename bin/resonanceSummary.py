@@ -14,7 +14,7 @@ from pqu import PQU as PQUModule
 from fudge import reactionSuite as reactionSuiteModule
 from fudge.reactionData import crossSection as crossSectionModule
 
-summaryDocStringFUDGE = '''Prints summary information about resonances for a GNDS reactionSuite file.'''
+summaryDocString__FUDGE = '''Prints summary information about resonances for a GNDS reactionSuite file.'''
 
 description = '''
 Prints summary information about the resolved and unresolved resonance regions, and each reaction that has resonance data.

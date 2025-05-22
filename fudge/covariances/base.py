@@ -13,28 +13,29 @@ numeric matrix, etc.
 
 import abc
 
+
 class Covariance(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def label( self ): pass
+    def label(self): pass
 
     @abc.abstractmethod
-    def rowBounds( self, unit=None ): pass
+    def rowBounds(self, unit=None): pass
 
     @abc.abstractmethod
-    def columnBounds( self, unit=None ): pass
-
-    @property
-    @abc.abstractmethod
-    def domainUnit( self ): pass
+    def columnBounds(self, unit=None): pass
 
     @property
     @abc.abstractmethod
-    def isSymmetric( self ): pass
+    def domainUnit(self): pass
+
+    @property
+    @abc.abstractmethod
+    def isSymmetric(self): pass
 
     @abc.abstractmethod
-    def toCovarianceMatrix( self, domain=None ): pass
+    def toCovarianceMatrix(self, domain=None): pass
 
     @abc.abstractmethod
-    def getUncertaintyVector( self, theData=None, relative=True ): pass
+    def getUncertaintyVector(self, theData=None, relative=True): pass

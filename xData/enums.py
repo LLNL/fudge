@@ -114,3 +114,18 @@ class GridStyle(enumsModule.Enum):
     points = enumsModule.auto()
     boundaries= enumsModule.auto()
     parameters= enumsModule.auto()
+
+class BorderAddition(enumsModule.Enum):
+    '''
+    This enum specifies how to treat the y-value at the border between two 1d curves is to be added.
+    Options are:
+        lower - use the y-value from the lower curve.
+        upper - use the y-value from the upper curve.
+        average - use the average of the lower and upper curve's y-values.
+        sum - use the sum of the lower and upper curve's y-values.
+    '''
+
+    average = enumsModule.auto()
+    lower = enumsModule.auto()
+    upper = enumsModule.auto()
+    sum = enumsModule.auto()

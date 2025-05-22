@@ -63,8 +63,8 @@
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">enums</span> <span class="k">as</span> <span class="n">enumsModule</span>
 
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">text</span> <span class="k">as</span> <span class="n">textModule</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">abstractClasses</span> <span class="k">as</span> <span class="n">abstractClassesModule</span>
+
 
 <div class="viewcode-block" id="ContributorType"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.contributor.ContributorType">[docs]</a><span class="k">class</span> <span class="nc">ContributorType</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -83,7 +83,7 @@
     <span class="n">projectManager</span> <span class="o">=</span> <span class="s1">&#39;ProjectManager&#39;</span>
     <span class="n">projectMember</span> <span class="o">=</span> <span class="s1">&#39;ProjectMember&#39;</span>
     <span class="n">registrationAgency</span> <span class="o">=</span> <span class="s1">&#39;RegistrationAgency&#39;</span>
-    <span class="n">registrationAuthoriy</span> <span class="o">=</span> <span class="s1">&#39;RegistrationAuthoriy&#39;</span>
+    <span class="n">registrationAuthority</span> <span class="o">=</span> <span class="s1">&#39;RegistrationAuthority&#39;</span>
     <span class="n">relatedPerson</span> <span class="o">=</span> <span class="s1">&#39;RelatedPerson&#39;</span>
     <span class="n">researcher</span> <span class="o">=</span> <span class="s1">&#39;Researcher&#39;</span>
     <span class="n">researchGroup</span> <span class="o">=</span> <span class="s1">&#39;ResearchGroup&#39;</span>
@@ -91,7 +91,8 @@
     <span class="n">sponsor</span> <span class="o">=</span> <span class="s1">&#39;Sponsor&#39;</span>
     <span class="n">supervisor</span> <span class="o">=</span> <span class="s1">&#39;Supervisor&#39;</span>
     <span class="n">workPackageLeader</span> <span class="o">=</span> <span class="s1">&#39;WorkPackageLeader&#39;</span>
-    <span class="n">other</span>  <span class="o">=</span> <span class="s1">&#39;Other&#39;</span></div>
+    <span class="n">other</span> <span class="o">=</span> <span class="s1">&#39;Other&#39;</span></div>
+
 
 <div class="viewcode-block" id="Contributor"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.contributor.Contributor">[docs]</a><span class="k">class</span> <span class="nc">Contributor</span><span class="p">(</span><span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">AuthorAbstract</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -130,7 +131,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">contributorType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Thie method returns the contributorType.</span>
+<span class="sd">        This method returns the contributorType.</span>
 
 <span class="sd">        :returns:       An instance of :py:class:`ContributorType`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -139,7 +140,7 @@
 
 <div class="viewcode-block" id="Contributor.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.contributor.Contributor.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This methods returns the XML attributes for *self* as a single python str.</span>
+<span class="sd">        This method returns the XML attributes for *self* as a single python str.</span>
 
 <span class="sd">        :kwargs:        This argument is not used.</span>
 
@@ -159,7 +160,7 @@
 <span class="sd">        :param node:        Node to parse.</span>
 <span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
 <span class="sd">        :param linkData:    dict that collects unresolved links.</span>
-<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+<span class="sd">        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
 
 <span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -171,6 +172,7 @@
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">orcid</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">contributorType</span><span class="p">)</span></div></div>
 
+
 <div class="viewcode-block" id="Contributors"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.contributor.Contributors">[docs]</a><span class="k">class</span> <span class="nc">Contributors</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is the suite class for the GNDS documentation/contributors node.</span>
@@ -180,11 +182,9 @@
     <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;name&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">Contributor</span><span class="p">])</span>
 
-        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">Contributor</span> <span class="p">])</span>
-
-<div class="viewcode-block" id="Contributors.toXML"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.contributor.Contributors.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
+<div class="viewcode-block" id="Contributors.toXML"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.contributor.Contributors.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div></div>
 </pre></div>
 

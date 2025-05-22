@@ -6,7 +6,7 @@
 # <<END-copyright>>
 
 """
-This module contains the GNDS documentation child nodes keywords and keywork classes.
+This module contains the GNDS documentation child nodes keywords and keyword classes.
 
 This module contains the following classes:
 
@@ -19,12 +19,13 @@ This module contains the following classes:
     +---------------------------+-----------------------------------------------------------------------------------+
 """
 
-from LUPY import ancestry as ancestryModule
-
 from .. import suite as suiteModule
 from .. import text as textModule
 
-class Keyword( textModule.Text ) :
+# TODO enumerate allowed keyword types
+
+
+class Keyword(textModule.Text):
     """
     A class representing a GNDS documentation/keywords/keyword node.
 
@@ -44,35 +45,35 @@ class Keyword( textModule.Text ) :
     moniker = 'keyword'
     keyName = 'type'
 
-    def __init__( self, label, type, text ) :
+    def __init__(self, label, type, text):
         """
         :param label:   The unique label for the keyword.
         :param type:    TBD.
         :param text:    TBD.
         """
 
-        textModule.Text.__init__( self, text, label = label )
+        textModule.Text.__init__(self, text, label=label)
 
         self.__type = type
 
     @property
-    def type( self ) :
+    def type(self):
         """
         This method returns the type of self.
         """
 
-        return( self.__type )
+        return self.__type
 
-    def XML_extraAttributes( self, **kwargs ) :
+    def XML_extraAttributes(self, **kwargs):
         """
-        This methods returns the XML attributes for *self* as a single python str.
+        This method returns the XML attributes for *self* as a single python str.
 
         :kwargs:        This argument is not used.
 
         :returns:       A python str.
         """
 
-        if( self.__type == '' ) : return ''
+        if self.__type == '': return ''
 
         return ' type="%s"' % self.__type
 
@@ -85,17 +86,18 @@ class Keyword( textModule.Text ) :
         :param node:        Node to parse.
         :param xPath:       List containing xPath to current node, useful mostly for debugging.
         :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
         :returns:           An instance of *cls* representing *node*.
         """
 
-        label = node.get( 'label' )
-        type = node.get( 'type' )
+        label = node.get('label')
+        type = node.get('type')
 
         return cls(label, type, None)
 
-class Keywords( suiteModule.Suite ) :
+
+class Keywords(suiteModule.Suite):
     """
     This is the suite class for the GNDS documentation/keywords node.
     """
@@ -103,6 +105,5 @@ class Keywords( suiteModule.Suite ) :
     moniker = 'keywords'
     suiteName = 'type'
 
-    def __init__( self ) :
-
-        suiteModule.Suite.__init__( self, [ Keyword ] )
+    def __init__(self):
+        suiteModule.Suite.__init__(self, [Keyword])

@@ -6,7 +6,7 @@
 # <<END-copyright>>
 
 """
-This module containes all the classes for handling GNDS text container.
+This module contains all the classes for handling GNDS text container.
 
 This module contains the following classes:
 
@@ -25,20 +25,20 @@ This module contains the following functions:
     +-----------------------------------+---------------------------------------------------------------------------+
     | Class                             | Description                                                               |
     +===================================+===========================================================================+
-    | isString                          | This function test if a object is a valid python string.                  |
+    | isString                          | This function test if an object is a valid python string.                 |
     +-----------------------------------+---------------------------------------------------------------------------+
     | raiseIfNotString                  | This function does a raise if its argument is not a valid python string.  |
     +-----------------------------------+---------------------------------------------------------------------------+
 """
 
-import sys
-
 from LUPY import enums as enumsModule
 from LUPY import ancestry as ancestryModule
 
-def isString( string ) :
+
+def isString(string):
     """
-    This function executes a TypeError raise if *string* is not a valid python2 str or unicode instance, or if is not a valid python3 str instance.
+    This function executes a TypeError raise if *string* is not a valid python2 str or unicode instance,
+    or if is not a valid python3 str instance.
     This function returns the *string* argument unchanged.
 
     :param string:  The python instance to check.
@@ -46,12 +46,10 @@ def isString( string ) :
     :returns:       The argument *string*.
     """
 
-    if( sys.version_info.major == 2 ) :
-        if( not( isinstance( string, ( str, unicode ) ) ) ) : raise TypeError( 'Text must be a str or unicode.' )
-    else :
-        if( not( isinstance( string, str ) ) ) : raise TypeError( 'Text must be a str' )
+    if not isinstance(string, str): raise TypeError('Text must be a str')
 
-    return( string )
+    return string
+
 
 class Encoding(enumsModule.Enum):
     """
@@ -60,6 +58,7 @@ class Encoding(enumsModule.Enum):
 
     ascii = enumsModule.auto()
     utf8 = enumsModule.auto()
+
 
 class Markup(enumsModule.Enum):
     """
@@ -70,6 +69,7 @@ class Markup(enumsModule.Enum):
     xml = enumsModule.auto()
     html = enumsModule.auto()
     latex = enumsModule.auto()
+
 
 class Text(ancestryModule.AncestryIO):
     """
@@ -95,9 +95,11 @@ class Text(ancestryModule.AncestryIO):
     """
 
     moniker = 'text'
-    # FIX-ME Should add allowed encodings as an argument with default of all. Like encodings = Encoding.allowed. Also should check in body setter.
 
-    def __init__( self, text = None, encoding = Encoding.ascii, markup = Markup.none, label = None ) :
+    # FIXME Should add allowed encodings as an argument with default of all. Like encodings = Encoding.allowed.
+    #  Also should check in body setter.
+
+    def __init__(self, text=None, encoding=Encoding.ascii, markup=Markup.none, label=None):
         """
         :param text:        The characters representing the text.
         :param encoding:    The type of encoding for the text.
@@ -110,48 +112,48 @@ class Text(ancestryModule.AncestryIO):
         self.encoding = Encoding.checkEnumOrString(encoding)
         self.markup = Markup.checkEnumOrString(markup)
 
-        if( label is not None ) :
-            if( not( isinstance( label, str ) ) ) : raise TypeError( 'Invalid label instance.' )
+        if label is not None:
+            if not isinstance(label, str): raise TypeError('Invalid label instance.')
         self.__label = label
 
         self.body = text
 
-    def __len__( self ) :
+    def __len__(self):
         """
         This method returns the number of characters in the body of *self*.
         """
 
-        return( len( self.__body ) )
+        return len(self.__body)
 
-    def __getitem__( self, index ) :
+    def __getitem__(self, index):
         """
         This method returns the character at index in the body of *self*.
 
         :param index:   This index of the character to return with the body of *self*.
         """
 
-        return( self.__body[index] )
+        return self.__body[index]
 
     @property
-    def label( self ) :
+    def label(self):
         """
         This method returns *self*'s label.
         """
 
-        return( self.__label )
+        return self.__label
 
     @property
-    def encoding( self ) :
+    def encoding(self):
         """
         This method returns *self*'s encoding.
 
         :returns:       An instance of :py:class:`Encoding`.
         """
 
-        return( self.__encoding )
+        return self.__encoding
 
     @encoding.setter
-    def encoding( self, value ) :
+    def encoding(self, value):
         """
         This method set the encoding of *self* to *value*.
 
@@ -161,17 +163,17 @@ class Text(ancestryModule.AncestryIO):
         self.__encoding = Encoding.checkEnumOrString(value)
 
     @property
-    def markup( self ) :
+    def markup(self):
         """
         This method returns *self*'s markup.
 
         :returns:       An instance of :py:class:`Markup`.
         """
 
-        return( self.__markup )
+        return self.__markup
 
     @markup.setter
-    def markup( self, value ) :
+    def markup(self, value):
         """
         This method set the markup of *self* to *value*.
 
@@ -181,19 +183,19 @@ class Text(ancestryModule.AncestryIO):
         self.__markup = Markup.checkEnumOrString(value)
 
     @property
-    def body( self ) :
+    def body(self):
         """
         This method returns *self*'s body.
 
         :returns:       A python str.
         """
 
-        return( self.__body )
+        return self.__body
 
     @body.setter
     def body(self, text):
         """
-        This method set the bocy of *self* to *text*, over riding the current text.
+        This method set the body of *self* to *text*, overriding the current text.
         If *text* is None, *self* is considered to be empty.
 
         :param text:    A python str instance.
@@ -207,75 +209,75 @@ class Text(ancestryModule.AncestryIO):
 
         isString(text2)
 
-        if self.encoding == Encoding.ascii:                                 # If encoding is ascii verify text is.
+        if self.encoding == Encoding.ascii:  # If encoding is ascii verify text is.
             try:
                 text2.encode('ascii')
             except UnicodeEncodeError as ex:
                 print("    ERROR: encountered non-ascii character '%s' at index %d of text" %
                       (ex.object[ex.start], ex.start))
-                print("    Bad character in context:\n", ex.object[ex.start-20:ex.end+20], "\n")
+                print("    Bad character in context:\n", ex.object[ex.start - 20:ex.end + 20], "\n")
                 raise ex
 
         if text is not None: self.__filled = True
         self.__body = text2
 
     @property
-    def filled( self ) :
+    def filled(self):
         """
         This method returns False if *self* is empty and True otherwise.
         """
 
-        return( self.__filled )
+        return self.__filled
 
-    def copy( self ) :
+    def copy(self):
         """
         This method returns a copy of *self*.
 
         :returns:           An instance of :py:class:`Text`.
         """
 
-            # No need to copy text has it is immutable.
-        return( Text( self.body, self.encoding, self.markup ) )
+        # No need to copy text has it is immutable.
+        return Text(self.body, self.encoding, self.markup)
 
     __copy__ = copy
 
-    def numberOfLines( self ) :
+    def numberOfLines(self):
         """
         This method returns the number of line-feeds in the body of *self*.
         """
 
-        _numberOfLines = self.__body.count( '\n' )
-        if( len( self.__body ) > 0 ) :
-            if( self.__body[-1] != '\n' ) : _numberOfLines += 1
+        _numberOfLines = self.__body.count('\n')
+        if len(self.__body) > 0:
+            if self.__body[-1] != '\n': _numberOfLines += 1
 
-        return( _numberOfLines )
+        return _numberOfLines
 
-    def XML_extraAttributes( self, **kwargs ) :
+    def XML_extraAttributes(self, **kwargs):
         """
         This method returns an empty python str.
-        Thie method is designed to be over-loaded by derived classes which add additional attributes not in the :py:class:`Text` class.
+        Method is designed to be over-ridden by derived classes which add attributes not in the :py:class:`Text` class.
 
         :returns:       An empty python str instance.
         """
 
-        return( '' )
+        return ''
 
-    def bodyToXML_CDATA( self, **kwargs ) :
+    def bodyToXML_CDATA(self, **kwargs):
         """
         This method wraps the body of self into an XML "<![CDATA[" and "]]>" tag.
         """
 
-        return( '<![CDATA[%s]]>' % self.__body )
+        return '<![CDATA[%s]]>' % self.__body
 
-    def toXML_strList(self, indent = '', **kwargs):
+    def toXML_strList(self, indent='', **kwargs):
         """
         Returns a list of str instances representing the XML lines of *self*.
         If *self* is empty and kwargs.get('showEmptyText') is False, this method returns an empty list.
 
-        :param indent:          The minimum amount of indentation.
-        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param indent:     The minimum amount of indentation.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:           List of str instances representing the XML lines of self.
         """
 
         kwargs['addExtraAttributes'] = self.__filled
@@ -283,13 +285,12 @@ class Text(ancestryModule.AncestryIO):
 
         if not self.__filled:
             showEmptyText = kwargs.get('showEmpty', False) or kwargs.get('showEmptyText', False)
-            comment = ''
             if extraAttributes == '' and not showEmptyText:
                 return []
             XML_string = '<%s%s/>' % (self.moniker, extraAttributes)
             if extraAttributes == '':
                 XML_string = '%-24s <!-- text -->' % XML_string
-            return [ indent + XML_string]
+            return [indent + XML_string]
 
         attributeStr = ''
         if self.__label is not None: attributeStr += ' label="%s"' % self.__label
@@ -297,16 +298,16 @@ class Text(ancestryModule.AncestryIO):
         if self.__markup != Markup.none: attributeStr += ' markup="%s"' % self.__markup
         attributeStr += extraAttributes
 
-        return [ '%s<%s%s>%s</%s>' % ( indent, self.moniker, attributeStr, self.bodyToXML_CDATA(**kwargs), self.moniker ) ]
+        return ['%s<%s%s>%s</%s>' % (indent, self.moniker, attributeStr, self.bodyToXML_CDATA(**kwargs), self.moniker)]
 
     def parseNode(self, node, xPath, linkData, **kwargs):
         """
         This method sets data in *self* using the contents of *node*.
 
-        :param node:        Node to parse.
-        :param xPath:       List containing xPath to current node, useful mostly for debugging.
-        :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param node:       Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
         """
 
         xPath.append(node.tag)
@@ -315,14 +316,14 @@ class Text(ancestryModule.AncestryIO):
         self.markup = node.get('markup', Markup.none)
 
         text = node.find('text')
-        if text is None:                                # Format >= '2.0.LLNL_4' parsing.
+        if text is None:  # Format >= '2.0.LLNL_4' parsing.
             if node.text is None:
                 self.body = None
             elif len(node.text) == 0:
                 self.body = None
             else:
                 self.body = node.text
-        else:                                           # Pre format '2.0.LLNL_4' parsing where the actual text node is a child node named 'text'.
+        else:  # Pre format '2.0.LLNL_4' parsing where the actual text node is a child node named 'text'.
             self.parseNode(text, xPath, linkData, **kwargs)
 
         xPath.pop()
@@ -332,13 +333,13 @@ class Text(ancestryModule.AncestryIO):
         """
         Parse *node* into an instance of *cls*.
 
-        :param cls:         Form class to return.
-        :param node :       Node to parse.
-        :param xPath:       List containing xPath to current node, useful mostly for debugging.
-        :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param cls:        Form class to return.
+        :param node :      Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :returns:           An instance of *cls* representing *node*.
+        :returns:          An instance of *cls* representing *node*.
         """
 
         instance = cls()
@@ -346,7 +347,8 @@ class Text(ancestryModule.AncestryIO):
 
         return instance
 
-def raiseIfNotString( string, name ) :
+
+def raiseIfNotString(string, name):
     """
     This function does a raise if *string* is not a valid python string.
 
@@ -354,5 +356,5 @@ def raiseIfNotString( string, name ) :
     :param name:    The name of the variable representing *string*.
     """
 
-    if( not( isinstance( string, str ) ) ) : TypeError( 'Invalid %s instance.' % name )
-    return( string )
+    if not isinstance(string, str): raise TypeError('Invalid %s instance.' % name)
+    return string

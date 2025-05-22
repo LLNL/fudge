@@ -24,8 +24,8 @@ This module contains the following classes:
 from LUPY import enums as enumsModule
 
 from .. import suite as suiteModule
-from .. import text as textModule
 from . import abstractClasses as abstractClassesModule
+
 
 class ContributorType(enumsModule.Enum):
     """
@@ -44,7 +44,7 @@ class ContributorType(enumsModule.Enum):
     projectManager = 'ProjectManager'
     projectMember = 'ProjectMember'
     registrationAgency = 'RegistrationAgency'
-    registrationAuthoriy = 'RegistrationAuthoriy'
+    registrationAuthority = 'RegistrationAuthority'
     relatedPerson = 'RelatedPerson'
     researcher = 'Researcher'
     researchGroup = 'ResearchGroup'
@@ -52,7 +52,8 @@ class ContributorType(enumsModule.Enum):
     sponsor = 'Sponsor'
     supervisor = 'Supervisor'
     workPackageLeader = 'WorkPackageLeader'
-    other  = 'Other'
+    other = 'Other'
+
 
 class Contributor(abstractClassesModule.AuthorAbstract):
     """
@@ -91,7 +92,7 @@ class Contributor(abstractClassesModule.AuthorAbstract):
     @property
     def contributorType(self):
         """
-        Thie method returns the contributorType.
+        This method returns the contributorType.
 
         :returns:       An instance of :py:class:`ContributorType`.
         """
@@ -100,7 +101,7 @@ class Contributor(abstractClassesModule.AuthorAbstract):
 
     def XML_extraAttributes(self, **kwargs):
         """
-        This methods returns the XML attributes for *self* as a single python str.
+        This method returns the XML attributes for *self* as a single python str.
 
         :kwargs:        This argument is not used.
 
@@ -120,7 +121,7 @@ class Contributor(abstractClassesModule.AuthorAbstract):
         :param node:        Node to parse.
         :param xPath:       List containing xPath to current node, useful mostly for debugging.
         :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
         :returns:           An instance of *cls* representing *node*.
         """
@@ -132,6 +133,7 @@ class Contributor(abstractClassesModule.AuthorAbstract):
 
         return cls(name, orcid, email, contributorType)
 
+
 class Contributors(suiteModule.Suite):
     """
     This is the suite class for the GNDS documentation/contributors node.
@@ -141,9 +143,7 @@ class Contributors(suiteModule.Suite):
     suiteName = 'name'
 
     def __init__(self):
+        suiteModule.Suite.__init__(self, [Contributor])
 
-        suiteModule.Suite.__init__(self, [ Contributor ])
-
-    def toXML(self, indent = '', **kwargs):
-
+    def toXML(self, indent='', **kwargs):
         return '\n'.join(self.toXML_strList(**kwargs))

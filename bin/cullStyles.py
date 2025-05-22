@@ -11,7 +11,7 @@ import argparse
 
 from fudge import reactionSuite as reactionSuiteModule, GNDS_file as GNDS_fileModule
 
-summaryDocStringFUDGE = """This module reads a GNDS file and removes (culls) all styles from each component but for a selected style."""
+summaryDocString__FUDGE = """This module reads a GNDS file and removes (culls) all styles from each component but for a selected style."""
 
 description1 = """This module reads a GNDS file and removes (culls) all styles from each component but for a selected style.
 If the selected style is not present for a component, the nearest derived style for the selected style is kept.

@@ -13,3 +13,4 @@ of a reactionSuite.
 multiGroupReactions = 'LLNL::multiGroupReactions'
 multiGroupIncompleteProducts = 'LLNL::multiGroupIncompleteProducts'
 multiGroupDelayedNeutrons = 'LLNL::multiGroupDelayedNeutrons'
+pointwiseAverageProductEnergies = 'LLNL::pointwiseAverageProductEnergies'

@@ -16,7 +16,8 @@ from fudge.resonances import scatteringRadius as scatteringRadiusModule
 from . import enums as covarianceEnumsModule
 from . import covarianceSection as sectionModule
 
-class ParameterLink( linkModule.Link ):
+
+class ParameterLink(linkModule.Link):
     """
     Establishes a link between one or more rows of a parameterCovariance and corresponding parameter(s).
     Supports linking to specific parameters inside a table or list.
@@ -35,7 +36,8 @@ class ParameterLink( linkModule.Link ):
 
     moniker = 'parameterLink'
 
-    def __init__( self, label, link, nParameters=1, matrixStartIndex=0, parameterStartIndex=0, parameterStride=1, **kwargs ):
+    def __init__(self, label, link, nParameters=1, matrixStartIndex=0, parameterStartIndex=0, parameterStride=1,
+                 **kwargs):
         """
         :param label:               unique label for this parameter link
         :param link:                reference to parameter, table or list
@@ -45,36 +47,35 @@ class ParameterLink( linkModule.Link ):
         :param parameterStride:     for stepping over parameters. Stride must be an integer
         :return:
         """
-        linkModule.Link.__init__( self, link=link, **kwargs )
+        linkModule.Link.__init__(self, link=link, **kwargs)
         self.label = label
         self.nParameters = int(nParameters)
         self.matrixStartIndex = int(matrixStartIndex)
         self.parameterStartIndex = int(parameterStartIndex)
         self.parameterStride = int(parameterStride)
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
         attrString = ' label="%s" href="%s"' % (self.label, self.build_href(**kwargs))
         if self.nParameters != 1: attrString += ' nParameters="%d"' % self.nParameters
         if self.matrixStartIndex != 0: attrString += ' matrixStartIndex="%d"' % self.matrixStartIndex
         if self.parameterStartIndex != 0: attrString += ' parameterStartIndex="%d"' % self.parameterStartIndex
         if self.parameterStride != 1: attrString += ' parameterStride="%d"' % self.parameterStride
-        return [ '%s<%s%s/>' % ( indent, self.moniker, attrString ) ]
+        return ['%s<%s%s/>' % (indent, self.moniker, attrString)]
 
 
-class Parameters( suitesModule.Suite ):
-
+class Parameters(suitesModule.Suite):
     moniker = 'parameters'
 
-    def __init__( self ):
-        suitesModule.Suite.__init__( self, allowedClasses = (ParameterLink,) )
+    def __init__(self):
+        suitesModule.Suite.__init__(self, allowedClasses=(ParameterLink,))
 
     @property
     def nParameters(self):
-        return sum( [link.nParameters for link in self] )
+        return sum([link.nParameters for link in self])
 
 
-class ParameterCovariance( suitesModule.Suite ):
+class ParameterCovariance(suitesModule.Suite):
     """
     For storing unresolved resonance parameter covariances. Very similar to covariances for cross section, nubar, etc.:
     they require an energy grid + matrix.
@@ -87,13 +88,13 @@ class ParameterCovariance( suitesModule.Suite ):
 
     def __init__(self, label, rowData=None, columnData=None):
 
-        suitesModule.Suite.__init__( self, [ParameterCovarianceMatrix] )
+        suitesModule.Suite.__init__(self, [ParameterCovarianceMatrix])
         self.label = label
         self.rowData = rowData
         self.columnData = columnData
 
     @property
-    def crossTerm( self ):
+    def crossTerm(self):
         return self.columnData is not None and self.columnData.link != self.rowData.link
 
     @property
@@ -112,7 +113,7 @@ class ParameterCovariance( suitesModule.Suite ):
         except IndexError:
             return self[0]
 
-    def check( self, info ):
+    def check(self, info):
         """ check each section """
 
         from fudge import warning
@@ -124,7 +125,7 @@ class ParameterCovariance( suitesModule.Suite ):
 
         return warnings
 
-    def toXML_strList( self, indent='', **kwargs ):
+    def toXML_strList(self, indent='', **kwargs):
 
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
@@ -166,7 +167,7 @@ class ParameterCovariance( suitesModule.Suite ):
         return section_
 
 
-class ParameterCovarianceMatrix( abstractClassesModule.Form ):
+class ParameterCovarianceMatrix(abstractClassesModule.Form):
     """
     Store covariances (or correlations, depending on 'type') between model parameters
     """
@@ -184,15 +185,15 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
         :return:
         """
 
-        abstractClassesModule.Form.__init__( self )
+        abstractClassesModule.Form.__init__(self)
         self.label = label
         self.type = covarianceEnumsModule.Type.checkEnumOrString(type)
         if parameters_ is not None:
             self.parameters = parameters_
         else:
             self.parameters = Parameters()
-        self.parameters.setAncestor( self )
-        matrix.setAncestor( self )
+        self.parameters.setAncestor(self)
+        matrix.setAncestor(self)
         self.matrix = matrix
 
     def check(self, info):
@@ -215,7 +216,7 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
                         params += row
                 elif isinstance(parameterLink.link,
                                 (scatteringRadiusModule.ScatteringRadius, scatteringRadiusModule.HardSphereRadius)):
-                    params.append(parameterLink.link.form.value)
+                    params.append(parameterLink.link.evaluated.value)
                 else:
                     raise NotImplementedError("Model parameter covariance linking to %s" % type(parameterLink.link))
             params = numpy.array(params)
@@ -246,7 +247,7 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
             rel_uncert2 = rel_uncertainty[:]
             rel_uncert2[rel_uncert2 == 0] = 1
             corr_matrix = relative_matrix / rel_uncert2 / rel_uncert2[:, numpy.newaxis]
-            epsilon = 1e-14     # allow for round-off error when converting to correlation matrix
+            epsilon = 1e-14  # allow for round-off error when converting to correlation matrix
             badCount = (corr_matrix > 1 + epsilon).sum() + (corr_matrix < -1 - epsilon).sum()
             if badCount:
                 worstCase = numpy.max(corr_matrix)
@@ -259,28 +260,28 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
                 matrixWarnings.append(warning.NegativeEigenvalues(len(vals[vals < 0]), min(vals), self))
             minpos, maxpos = min(vals[vals >= 0]), max(vals[vals >= 0])
             # Check that the condition number of the matrix is reasonable
-            if minpos/maxpos < info['eigenvalueRatioTolerance'] and matrix.size != 1:
-                matrixWarnings.append(warning.BadEigenvalueRatio(minpos/maxpos, self))
+            if minpos / maxpos < info['eigenvalueRatioTolerance'] and matrix.size != 1:
+                matrixWarnings.append(warning.BadEigenvalueRatio(minpos / maxpos, self))
 
             if matrixWarnings:
                 warnings.append(warning.Context("Model parameter covariances", matrixWarnings))
 
         return warnings
 
-    def convertUnits( self, unitMap ):
+    def convertUnits(self, unitMap):
 
-        #raise NotImplementedError()
+        # raise NotImplementedError()
         pass
 
-    def fix( self, **kw ):
+    def fix(self, **kw):
         '''assemble some useful info, to be handed down to children's fix() functions'''
         info = {}
         info['rowENDF_MFMT'] = None
         info['columnENDF_MFMT'] = None
-        info.update( kw )
-        return self.matrix.fix( **info )
+        info.update(kw)
+        return self.matrix.fix(**info)
 
-    def plot( self, title = None, scalelabel = None, xlim=None, ylim=None, xlog=False, ylog=False ):
+    def plot(self, title=None, scalelabel=None, xlim=None, ylim=None, xlog=False, ylog=False):
         """
 
         :param title:
@@ -311,27 +312,28 @@ class ParameterCovarianceMatrix( abstractClassesModule.Form ):
 
         from fudge.vis.matplotlib import plot_matrix
         plot_matrix.plot_matrix(_array, title=title, xyTitle=('row index', 'column index'),
-                                zRange=(-1,1), colorMap=plot_matrix.generateColorMap())
+                                zRange=(-1, 1), colorMap=plot_matrix.generateColorMap())
         plt.show()
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        xmllist = [ '%s<%s label="%s" type="%s">' % (indent, self.moniker, self.label, self.type) ]
-        xmllist += self.parameters.toXML_strList( indent2, **kwargs )
-        xmllist += self.matrix.toXML_strList( indent2, **kwargs )
+        xmllist = ['%s<%s label="%s" type="%s">' % (indent, self.moniker, self.label, self.type)]
+        xmllist += self.parameters.toXML_strList(indent2, **kwargs)
+        xmllist += self.matrix.toXML_strList(indent2, **kwargs)
         xmllist[-1] += ('</%s>' % self.moniker)
         return xmllist
 
     @classmethod
     def parseNodeUsingClass(cls, element, xPath, linkData, **kwargs):
 
-        xPath.append( element.tag )
+        xPath.append(element.tag)
 
-        matrix_ = arrayModule.ArrayBase.parseNodeUsingClass(element.find( arrayModule.Full.moniker ), xPath, linkData, **kwargs)
+        matrix_ = arrayModule.ArrayBase.parseNodeUsingClass(element.find(arrayModule.Full.moniker), xPath, linkData,
+                                                            **kwargs)
         PC = cls(element.get('label'), matrix_, type=element.get('type'))
-        PC.parameters.parseNode(element.find( Parameters.moniker ), xPath, linkData, **kwargs)
+        PC.parameters.parseNode(element.find(Parameters.moniker), xPath, linkData, **kwargs)
 
         xPath.pop()
 

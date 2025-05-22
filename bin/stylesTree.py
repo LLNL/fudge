@@ -14,7 +14,7 @@ from fudge import GNDS_file as GNDS_fileModule
 from fudge import styles as stylesModule
 from fudge import reactionSuite as reactionSuiteModule
 
-summaryDocStringFUDGE = """Prints a tree representation of the styles in each specified GNDS reactionSuite."""
+summaryDocString__FUDGE = """Prints a tree representation of the styles in each specified GNDS reactionSuite."""
 
 description = """
 Prints a tree representation of the styles in each specified GNDS reactionSuite.

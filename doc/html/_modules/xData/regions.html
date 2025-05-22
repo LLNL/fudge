@@ -585,15 +585,24 @@
         <span class="k">return</span> <span class="n">regions1d</span>
 
     <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method multiplies *self* by *other* and returns the product. Here, *other* can be an int for a float.</span>
+
+<span class="sd">        :param other:       Instance to multiply *self* by.</span>
+
+<span class="sd">        :return:            A :py:class:`Regions1d` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">_self</span><span class="p">,</span> <span class="n">_other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copyToCommonRegions</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
-        <span class="n">_regions1d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">_regions1d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">region1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">_self</span> <span class="p">)</span> <span class="p">:</span>
             <span class="n">region2</span> <span class="o">=</span> <span class="n">_other</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
             <span class="n">region</span> <span class="o">=</span> <span class="n">region1</span> <span class="o">*</span> <span class="n">region2</span>
             <span class="n">_regions1d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">region</span> <span class="p">)</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">_regions1d</span> <span class="p">)</span>
+
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
 
 <div class="viewcode-block" id="Regions1d.copyToCommonRegions"><a class="viewcode-back" href="../../xData/index.html#xData.regions.Regions1d.copyToCommonRegions">[docs]</a>    <span class="k">def</span> <span class="nf">copyToCommonRegions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="n">domainEpsilon</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -607,11 +616,13 @@
 <span class="sd">        :returns:           Two :py:class:`Regions1d` instances.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;self.dimension = </span><span class="si">%s</span><span class="s1"> not equal to other.dimension = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">dimension</span><span class="p">))</span>
-
         <span class="n">self2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">other2</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="n">other2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toLinearXYsClass</span><span class="p">()(</span><span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">other</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="n">other</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;self.dimension = </span><span class="si">%s</span><span class="s1"> not equal to other.dimension = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">dimension</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">other2</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">self2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>

@@ -156,19 +156,22 @@ class Base_reaction(ancestryModule.AncestryIO):
         warnings = []
 
         reactionSuite = self.rootAncestor
+        energyUnit = reactionSuite.domainUnit
 
         def particleZA(particleID):
 
-            particle = reactionSuite.PoPs[particleID]
-            if hasattr(particle, 'id') and particle.id in reactionSuite.PoPs.aliases:
-                particle = reactionSuite.PoPs[ particle.pid ]
+            particle = reactionSuite.PoPs.final(particleID)
             return chemicalElementMiscPoPsModule.ZA(particle)
 
+
+        info['crossSectionDomain'] = self.crossSection.domainMin, self.crossSection.domainMax
+        info['isTwoBody'] = self.__outputChannel.genre == enumsModule.Genre.twoBody
         try:
-# BRB6 hardwired
-            info['Q'] = self.getQ('eV', final=False)
+            info['Q'] = self.getQ(energyUnit, final=False)
         except ValueError:
-            pass
+            # Q is energy-dependent. Compute Q at threshold
+            info['Q'] = self.outputChannel.Q.evaluated.evaluate(self.crossSection.domainMin)
+
         cpcount = sum([(particleZA(prod.pid) // 1000) > 0 for prod in self.__outputChannel])
         info['CoulombOutputChannel'] = cpcount > 1
         info['ContinuumOutputChannel'] = self.outputChannel.process == outputChannelModule.Processes.continuum
@@ -182,7 +185,6 @@ class Base_reaction(ancestryModule.AncestryIO):
         if crossSectionWarnings:
             warnings.append(warning.Context("Cross section:", crossSectionWarnings))
 
-        if 'Q' in info: del info['Q']
         del info['CoulombOutputChannel']
         del info['ContinuumOutputChannel']
 
@@ -191,14 +193,14 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         # compare calculated and listed Q-values:
         if not isinstance(self, (productionModule.Production, fissionComponentModule.FissionComponent,
-                                 incompleteReactionModule.IncompleteReaction)):
+                                 incompleteReactionModule.IncompleteReaction, orphanProductModule.OrphanProduct)):
             try:
-                Q = self.getQ('eV', final=False)
-                Qcalc = info['availableEnergy_eV']
+                Q = info['Q']
+                Qcalc = info['availableEnergy']
                 if Qcalc is None: raise ValueError  # caught below. Skips Q-value check for elemental targets
                 for prod in self.__outputChannel:
                     try:
-                        productMass = prod.getMass('eV/c**2')
+                        productMass = prod.getMass(f'{energyUnit}/c**2')
                     except Exception:
                         warnings.append(warning.UnknownMass(prod.pid))
                         raise ValueError("Unknown mass")
@@ -211,10 +213,10 @@ class Base_reaction(ancestryModule.AncestryIO):
 
                     Qcalc -= productMass * productMultiplicity
 
-                if abs(Q-Qcalc) > PQUModule.PQU(info['dQ']).getValueAs('eV'):
+                if abs(Q-Qcalc) > PQUModule.PQU(info['dQ']).getValueAs(energyUnit):
                     if self.__outputChannel.process != outputChannelModule.Processes.continuum:
                         warnings.append(
-                            warning.Q_mismatch(PQUModule.PQU(Qcalc,'eV'), PQUModule.PQU(Q,'eV'), self))
+                            warning.Q_mismatch(PQUModule.PQU(Qcalc, energyUnit), PQUModule.PQU(Q, energyUnit), self))
             except ValueError:
                 pass    # this test only works if multiplicity and Q are both constant for all non-gamma products
 
@@ -237,9 +239,6 @@ class Base_reaction(ancestryModule.AncestryIO):
             if ZAsum != info['compoundZA']:
                 warnings.append( warning.ZAbalanceWarning( self ) )
 
-        info['crossSectionDomain'] = self.crossSection.domainMin, self.crossSection.domainMax
-        info['isTwoBody'] = self.__outputChannel.genre == enumsModule.Genre.twoBody
-
         if not isinstance(self, productionModule.Production):
             for product in self.__outputChannel:
                 productWarnings = product.check(info)
@@ -252,6 +251,7 @@ class Base_reaction(ancestryModule.AncestryIO):
 
         del info['crossSectionDomain']
         del info['isTwoBody']
+        del info['Q']
 
         if (info['checkEnergyBalance']
                 and not isinstance(self, productionModule.Production)

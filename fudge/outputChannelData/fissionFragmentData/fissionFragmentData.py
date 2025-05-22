@@ -80,11 +80,18 @@ class FissionFragmentData(ancestryModule.AncestryIO_base):
         from fudge import warning
         warnings = []
 
-        for term in ('productYields', 'delayedNeutrons', 'fissionEnergyReleases'):
+        for term in ('productYields', 'delayedNeutrons'):
             for data in getattr(self, term):
                 dwarnings = data.check( info )
                 if dwarnings:
                     warnings.append( warning.Context('%s: %s' % (term, data.label), dwarnings) )
+
+        if self.fissionEnergyReleases:
+            energyReleaseForm = self.fissionEnergyReleases.evaluated
+            fer_warnings = energyReleaseForm.check(info)
+            if fer_warnings:
+                warnings.append( warning.Context(
+                    '%s: %s' % (self.fissionEnergyReleases.moniker, energyReleaseForm.label), fer_warnings) )
         return warnings
 
     def convertUnits( self, unitMap ) :
@@ -107,6 +114,13 @@ class FissionFragmentData(ancestryModule.AncestryIO_base):
         """
 
         return self.__delayedNeutrons.fixDomains(labels, energyMin, energyMax)
+
+    def iterateProducts(self):
+        """
+        This is an iterator that returns each delayed neutron.
+        """
+
+        yield from self.__delayedNeutrons.iterateProducts()
 
     def listOfProducts(self, finalOnly=False, includeQualifier=True):
         '''

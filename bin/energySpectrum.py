@@ -39,7 +39,7 @@ outputLog = None
 accuracy = 1e-3
 lowerUpperEpsilon = -1e-7
 
-summaryDocStringFUDGE = '''For the specified projectile energy and product, outputs energy spectra by reaction and also summed spectra.'''
+summaryDocString__FUDGE = '''For the specified projectile energy and product, outputs energy spectra by reaction and also summed spectra.'''
 
 description = '''
     Outputs the energy spectrum for the specified outgoing particle at the specified incident energy from 
@@ -130,10 +130,11 @@ if( args.energyUnit != protare.domainUnit ) :
     protare.convertUnits( { protare.domainUnit : args.energyUnit } )
     unitConversionTime = unitConversionTime.toString( current = False )
 
+styleLabel = protare.styles.preProcessingChainHead( ).label
 crossSectionUnit = 'b'
 for reaction in protare.reactions:
-    if hasattr(reaction.crossSection[-1], 'axes'):
-        crossSectionUnit = reaction.crossSection[-1].axes[0].unit
+    if hasattr(reaction.crossSection[styleLabel], 'axes'):
+        crossSectionUnit = reaction.crossSection[styleLabel].axes[0].unit
         break
 
 energyAxes = energyModule.defaultAxes( args.energyUnit )
@@ -145,8 +146,6 @@ for MT, indices in [(4, (50, 91)), (103, (600, 649)), (104, (650, 699)), (105, (
     sums[indices] = [ 0.0, XYs1dModule.XYs1d( axes = spectrumAxes ), MT ]
 
 reactionTiming = []
-
-styleLabel = protare.styles.preProcessingChainHead( ).label
 
 temperatures = {}
 for style in protare.styles :

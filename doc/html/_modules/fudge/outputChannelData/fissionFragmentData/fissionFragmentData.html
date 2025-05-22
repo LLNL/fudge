@@ -119,11 +119,18 @@
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
         <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;productYields&#39;</span><span class="p">,</span> <span class="s1">&#39;delayedNeutrons&#39;</span><span class="p">,</span> <span class="s1">&#39;fissionEnergyReleases&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;productYields&#39;</span><span class="p">,</span> <span class="s1">&#39;delayedNeutrons&#39;</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">term</span><span class="p">):</span>
                 <span class="n">dwarnings</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
                 <span class="k">if</span> <span class="n">dwarnings</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">label</span><span class="p">),</span> <span class="n">dwarnings</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionEnergyReleases</span><span class="p">:</span>
+            <span class="n">energyReleaseForm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionEnergyReleases</span><span class="o">.</span><span class="n">evaluated</span>
+            <span class="n">fer_warnings</span> <span class="o">=</span> <span class="n">energyReleaseForm</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fer_warnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fissionEnergyReleases</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">energyReleaseForm</span><span class="o">.</span><span class="n">label</span><span class="p">),</span> <span class="n">fer_warnings</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span> <span class="n">warnings</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
@@ -146,6 +153,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delayedNeutrons</span><span class="o">.</span><span class="n">fixDomains</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">energyMin</span><span class="p">,</span> <span class="n">energyMax</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FissionFragmentData.iterateProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.iterateProducts">[docs]</a>    <span class="k">def</span> <span class="nf">iterateProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is an iterator that returns each delayed neutron.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delayedNeutrons</span><span class="o">.</span><span class="n">iterateProducts</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="FissionFragmentData.listOfProducts"><a class="viewcode-back" href="../../../../fudge/fudge.outputChannelData.html#fudge.outputChannelData.fissionFragmentData.fissionFragmentData.FissionFragmentData.listOfProducts">[docs]</a>    <span class="k">def</span> <span class="nf">listOfProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">finalOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">includeQualifier</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>

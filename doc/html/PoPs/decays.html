@@ -1044,6 +1044,29 @@ The overrwritten method must fill in <em>self</em> with data in <em>node</em>.</
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="PoPs.decays.misc.angleBiasingPhotonBranchingData">
+<span class="sig-prename descclassname"><span class="pre">PoPs.decays.misc.</span></span><span class="sig-name descname"><span class="pre">angleBiasingPhotonBranchingData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initialState</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branchingData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angleBiasingData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photonDecayChain</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/misc.html#angleBiasingPhotonBranchingData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.misc.angleBiasingPhotonBranchingData" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculations transition probabilities for each decay transition and the data needed to calculate
+the photon multiplicity for each transition. The results are stored in <em>angleBiasingData</em>. For decay transition <em>trans</em>
+the following:</p>
+<p>photonDecayChain[trans][0] is the probabiltity for emitting this photon. The sum of the this for all transistions (i.e., photons) is 1.
+photonDecayChain[trans][1] is the probability for emitting this photon for one decay path.
+photonDecayChain[trans][2] is the probability weighted multiplicity for emitting this photon for one decay path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initialState</strong> – The current state (nuclide) the decaying isotope is in.</p></li>
+<li><p><strong>branchingData</strong> – Branching data calculated by the function <strong>photonBranchingData</strong>.</p></li>
+<li><p><strong>probability</strong> – The probability of reaching level <em>initialState</em>.</p></li>
+<li><p><strong>angleBiasingData</strong> – A python dict of all emitted photon data by transition.</p></li>
+<li><p><strong>photonDecayChain</strong> – A list of length two. The first item is the photon multiplicity and the second
+is the list of decay transitions.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="PoPs.decays.misc.completePhotonBranchingData">
 <span class="sig-prename descclassname"><span class="pre">PoPs.decays.misc.</span></span><span class="sig-name descname"><span class="pre">completePhotonBranchingData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initialState</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branchingData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completePhotons</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PoPs/decays/misc.html#completePhotonBranchingData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PoPs.decays.misc.completePhotonBranchingData" title="Permalink to this definition">¶</a></dt>
 <dd><p>For <em>initialState</em>, determines the multiplicity (i.e., total probability) that a photon from

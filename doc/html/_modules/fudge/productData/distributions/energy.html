@@ -849,6 +849,22 @@
                 <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Region </span><span class="si">%d</span><span class="s2">:&quot;</span> <span class="o">%</span> <span class="n">idx</span><span class="p">,</span> <span class="n">regionWarnings</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span> <span class="n">warnings</span></div>
 
+<div class="viewcode-block" id="Regions2d.energySpectrumAtEnergy"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Regions2d.energySpectrumAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">energySpectrumAtEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energyIn</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the outgoing particle&#39;s energy spectrum at projectile energy *energyIn*,</span>
+
+<span class="sd">        :param energyIn:                    Energy of the projectile.</span>
+<span class="sd">        :param discreteGammaResolution:     Relative width of triangle presenting the energy spectrum.</span>
+
+<span class="sd">        :return:                    XYs1d instance for the energy spectrum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">energyIn</span> <span class="o">&lt;</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMax</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">region</span><span class="o">.</span><span class="n">energySpectrumAtEnergy</span><span class="p">(</span><span class="n">energyIn</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">XYs1d</span><span class="p">([],</span> <span class="n">axes</span><span class="o">=</span><span class="n">defaultAxes</span><span class="p">(</span><span class="n">energyUnit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span><span class="p">))</span></div>
+
 <div class="viewcode-block" id="Regions2d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.productData.distributions.html#fudge.productData.distributions.energy.Regions2d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a pointwise represent of *self*.</span>

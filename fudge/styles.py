@@ -19,6 +19,7 @@ from xData import axes as axesModule
 from xData.Documentation import documentation as documentationModule
 
 from fudge import physicalQuantity as physicalQuantityModule
+from fudge import targetInfo as targetInfoModule
 
 from fudge.processing import flux as fluxModule
 from fudge.processing import transportables as transportablesModule
@@ -165,23 +166,26 @@ class Styles(ancestryModule.AncestryIO_base):
                 if( style.label == label ) : return( chain )
         raise ValueError( 'No style with label = "%s" found.' % label )
 
-    def preProcessingHeadInChainWithLabel( self, label ) :
+    def preProcessingHeadInChainWithLabel(self, label, include_reconstructed=True):
         """
         Returns the pre-processing head of the chain containing the label *label*.
         """
 
         chain = self.chainWithLabel( label )
-        preProcessingStyles = self.preProcessingStyles( )
+        preProcessingStyles = self.preProcessingStyles(include_reconstructed)
         for style in chain :
             if( style.__class__ in preProcessingStyles ) : return( style )
         raise ValueError( 'No pre-processing style in chain with label = "%s" found.' % label )
 
-    def preProcessingOnly( self ) :
+    def preProcessingOnly(self, include_reconstructed=True) :
         """
         Returns True if self only contains pre-processed styles and False otherwise.
+
+        @param include_reconstructed: whether to count reconstructed resonances as pre-processed styles
+        @type include_reconstructed: bool
         """
 
-        preProcessingStyles = self.preProcessingStyles( )
+        preProcessingStyles = self.preProcessingStyles(include_reconstructed)
         clean = True                            # True means no processed data.
         for style in self :
             if( not( isinstance( style, preProcessingStyles ) ) ) :
@@ -218,23 +222,18 @@ class Styles(ancestryModule.AncestryIO_base):
                         return chain[0]
             raise Exception('No pre-processing chain containing label "%s" found.' % label)
 
-    def preProcessingChains( self, ends = True ) :
+    def preProcessingChains(self, ends=True):
         """
         Returns chains for each style that can be processed (i.e., Evaluated, CrossSectionReconstructed, 
         AngularDistributionReconstructed and Realization).
         """
 
-        preProcessingStyles = self.preProcessingStyles( )
+        preProcessingStyles = self.preProcessingStyles(include_reconstructed=True)
         preProcessingStyleInstances = []
         for style in self :
-            if( isinstance( style, preProcessingStyles ) ) : preProcessingStyleInstances.append( style )
+            if isinstance(style, preProcessingStyles): preProcessingStyleInstances.append(style)
 
-        return( self.chains( ends = ends, _styles = preProcessingStyleInstances ) )
-
-    def preProcessingStyles( self ) :
-        """Returns the list of style classes that can be processed. These are known as pre-processed styles."""
-
-        return( Evaluated, CrossSectionReconstructed, AngularDistributionReconstructed, Realization )
+        return self.chains(ends=ends, _styles=preProcessingStyleInstances)
 
     def projectileEnergyDomain(self):
         """
@@ -332,7 +331,7 @@ class Styles(ancestryModule.AncestryIO_base):
         _evaluateds = self.getStylesOfClass( Evaluated )
         _styles = self.chains( ends = True, _styles = _evaluateds )
         if( len( _styles ) == 0 ) : raise Exception( '''No evaluated style found.''' )
-        if( len( _styles ) > 1 ) : raise Exception( '''Multiple (%d) evaluated styles.''' % ( len( styleList ) ) )
+        if( len( _styles ) > 1 ) : raise Exception( '''Multiple (%d) evaluated styles.''' % ( len( _styles ) ) )
 
         return( self[_styles[0][0].label] )
 
@@ -439,15 +438,23 @@ class Styles(ancestryModule.AncestryIO_base):
         xPath.pop()
 
     @staticmethod
-    def preProcessingStyles( ) :
-        """Returns the list of style classes that can be processed. These are known as pre-processed styles."""
+    def preProcessingStyles(include_reconstructed):
+        """
+        Returns the list of style classes that can be processed. These are known as pre-processed styles.
 
-        return( Evaluated, CrossSectionReconstructed, AngularDistributionReconstructed, Realization )
+        @param include_reconstructed: whether to include CrossSectionReconstructed and AngularDistributionReconstructed
+        @type include_reconstructed: bool
+        """
+
+        preprocessed_styles = [Evaluated, Realization]
+        if include_reconstructed:
+            preprocessed_styles += [CrossSectionReconstructed, AngularDistributionReconstructed]
+        return tuple(preprocessed_styles)
 
     @staticmethod
-    def heatedProcessedStyles( ) :
+    def heatedProcessedStyles():
 
-        return( Heated, GriddedCrossSection, URR_probabilityTables, HeatedMultiGroup, SnElasticUpScatter )
+        return (Heated, GriddedCrossSection, URR_probabilityTables, HeatedMultiGroup, SnElasticUpScatter)
 
 class Style(ancestryModule.AncestryIO, abc.ABC):
     """
@@ -706,7 +713,8 @@ class Evaluated( StyleWithTemperature ) :
     moniker = 'evaluated'
     sortOrderIndex = 0
 
-    def __init__( self, label, derivedFrom, temperature, projectileEnergyDomain, library, version, date = None ) :
+    def __init__( self, label, derivedFrom, temperature, projectileEnergyDomain, library, version,
+                  date = None, targetInfo = None ) :
 
         StyleWithTemperature.__init__( self, label, derivedFrom, temperature, date = date )
 
@@ -717,6 +725,8 @@ class Evaluated( StyleWithTemperature ) :
         self.__version = version
 
         self.projectileEnergyDomain = projectileEnergyDomain
+
+        self.targetInfo = targetInfo
 
     @property
     def library( self ) :
@@ -755,6 +765,27 @@ class Evaluated( StyleWithTemperature ) :
         self.__projectileEnergyDomain = value
 
     @property
+    def targetInfo(self):
+        """
+        Target info property (stores isotopic abundances for TNSL evaluations).
+        """
+
+        if self.__targetInfo is None and self.derivedFromStyle is not None:
+            return self.derivedFromStyle.targetInfo
+        return self.__targetInfo
+
+    @targetInfo.setter
+    def targetInfo(self, value):
+        """
+        Setter for target info property
+        """
+
+        if not isinstance(value, (targetInfoModule.TargetInfo, type(None))):
+            raise TypeError("Expected TargetInfo instance, got '%s' instead" % type(value))
+        if value is not None: value.setAncestor(self)
+        self.__targetInfo = value
+
+    @property
     def version( self ) :
         """
         Version property, i.e. the version of this library's release.
@@ -788,14 +819,23 @@ class Evaluated( StyleWithTemperature ) :
 
         return 0
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
         """Return styles XML node and its child nodes as a list"""
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
 
-        xmlStringList = ['%s<%s %s library="%s" version="%s">' % (indent, self.moniker, self.XMLCommonAttributes(), self.library, self.version)]
+        xmlStringList = ['%s<%s %s library="%s" version="%s">' %
+                         (indent, self.moniker, self.XMLCommonAttributes(), self.library, self.version)]
         xmlStringList += self.toXML_strListCommon(indent2, **kwargs)
-        if( self.__projectileEnergyDomain is not None ) : xmlStringList += self.projectileEnergyDomain.toXML_strList( indent2, **kwargs )
+        if self.__projectileEnergyDomain is not None:
+            xmlStringList += self.projectileEnergyDomain.toXML_strList(indent2, **kwargs)
+        if self.targetInfo is not None:
+            # targetInfo was introduced in GNDS-2.1
+            formatVersion = kwargs.get('formatVersion', GNDS_formatVersionModule.default)
+            versionTuple = GNDS_formatVersionModule.versionComponents(formatVersion)
+            if versionTuple[:2] >= (2, 1):
+                xmlStringList += self.targetInfo.toXML_strList(indent2, **kwargs)
+
         xmlStringList[-1] += '</%s>' % self.moniker
 
         return xmlStringList
@@ -806,17 +846,26 @@ class Evaluated( StyleWithTemperature ) :
 
         label, derivedFrom, date, temperature = StyleWithTemperature.parseNodeBase(node, xPath, linkData, **kwargs)
 
-        library = node.get( 'library' )
-        version = node.get( 'version' )
-        _projectileEnergyDomain = node.find( ProjectileEnergyDomain.moniker )
-        if( _projectileEnergyDomain is not None ) : _projectileEnergyDomain = ProjectileEnergyDomain.parseNodeUsingClass(_projectileEnergyDomain, xPath, linkData, **kwargs)
+        library = node.get('library')
+        version = node.get('version')
+        _projectileEnergyDomain = node.find(ProjectileEnergyDomain.moniker)
+        if _projectileEnergyDomain is not None:
+            _projectileEnergyDomain = ProjectileEnergyDomain.parseNodeUsingClass(
+                _projectileEnergyDomain, xPath, linkData, **kwargs)
 
         evaluated = cls(label, derivedFrom, temperature, _projectileEnergyDomain, library, version, date=date)
         evaluated.parseCommonChildNodes(node, xPath, linkData, **kwargs)
 
+        _targetInfo = node.find(targetInfoModule.TargetInfo.moniker)
+        if _targetInfo is not None:
+            _targetInfo = targetInfoModule.TargetInfo.parseNodeUsingClass(
+                _targetInfo, xPath, linkData, **kwargs)
+            evaluated.targetInfo = _targetInfo
+
         xPath.pop()
 
         return evaluated
+
 
 class ProjectileEnergyDomain( ancestryModule.AncestryIO ) :
     """
@@ -871,6 +920,7 @@ class ProjectileEnergyDomain( ancestryModule.AncestryIO ) :
         xPath.pop()
 
         return PED
+
 
 class CrossSectionReconstructed(StyleWithTemperature):
     """

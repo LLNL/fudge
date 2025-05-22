@@ -445,82 +445,86 @@
 <span class="c1">#</span>
 <span class="c1"># multiplicity component</span>
 <span class="c1">#</span>
-<div class="viewcode-block" id="Component"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component">[docs]</a><span class="k">class</span> <span class="nc">Component</span><span class="p">(</span> <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Component</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Component"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component">[docs]</a><span class="k">class</span> <span class="nc">Component</span><span class="p">(</span><span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Component</span><span class="p">):</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;multiplicity&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Component</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span> <span class="n">Unspecified</span><span class="p">,</span> <span class="n">Constant1d</span><span class="p">,</span> <span class="n">XYs1d</span><span class="p">,</span> <span class="n">Regions1d</span><span class="p">,</span> <span class="n">Reference</span><span class="p">,</span> <span class="n">Polynomial1d</span><span class="p">,</span>
-                <span class="n">PartialProduction</span><span class="p">,</span> <span class="n">Gridded1d</span><span class="p">,</span> <span class="n">Branching1d</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">Component</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">Unspecified</span><span class="p">,</span> <span class="n">Constant1d</span><span class="p">,</span> <span class="n">XYs1d</span><span class="p">,</span> <span class="n">Regions1d</span><span class="p">,</span> <span class="n">Reference</span><span class="p">,</span> <span class="n">Polynomial1d</span><span class="p">,</span>
+                   <span class="n">PartialProduction</span><span class="p">,</span> <span class="n">Gridded1d</span><span class="p">,</span> <span class="n">Branching1d</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Component.isConstant"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.isConstant">[docs]</a>    <span class="k">def</span> <span class="nf">isConstant</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Component.isConstant"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.isConstant">[docs]</a>    <span class="k">def</span> <span class="nf">isConstant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="p">,</span> <span class="n">Constant1d</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="p">,</span> <span class="n">Constant1d</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Component.getConstant"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.getConstant">[docs]</a>    <span class="k">def</span> <span class="nf">getConstant</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Component.getConstant"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.getConstant">[docs]</a>    <span class="k">def</span> <span class="nf">getConstant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isConstant</span><span class="p">()</span>  <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;multiplicity type = &quot;</span><span class="si">%s</span><span class="s1">&quot; is not single valued&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isConstant</span><span class="p">():</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;multiplicity type = &quot;</span><span class="si">%s</span><span class="s1">&quot; is not single valued&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainMin</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainMax</span>
 
-<div class="viewcode-block" id="Component.getEnergyLimits"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.getEnergyLimits">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyLimits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">getEnergyLimits</span><span class="p">(</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainUnit</span>
+
+<div class="viewcode-block" id="Component.getEnergyLimits"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.getEnergyLimits">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyLimits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">getEnergyLimits</span><span class="p">(</span><span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="Component.evaluate"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Component.evaluate"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the evaluated multiplicity at incident energy E.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">E</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">E</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Component.isSpecified"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.isSpecified">[docs]</a>    <span class="k">def</span> <span class="nf">isSpecified</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns **True** if *self* has data and if the first is not **Unspecified**.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns **True** if *self* has data and if the evaluated form is not **Unspecified**.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Unspecified</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="p">,</span> <span class="n">Unspecified</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="Component.check"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+<div class="viewcode-block" id="Component.check"><a class="viewcode-back" href="../../../fudge/fudge.productData.html#fudge.productData.multiplicity.Component.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
 
         <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">warning</span>
         <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isConstant</span><span class="p">():</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">NegativeMultiplicity</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConstant</span><span class="p">(),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">NegativeMultiplicity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getConstant</span><span class="p">(),</span> <span class="bp">self</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>   <span class="c1"># energy-dependent mult.</span>
-            <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="n">domain</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="s1">&#39;domain&#39;</span><span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="s1">&#39;domain&#39;</span><span class="p">):</span>
                     <span class="n">domain</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">domainMax</span>
-                <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">domain</span> <span class="o">!=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-                    <span class="c1"># photon multiplicities can start above cross section domainMin, but domainMax should agree:</span>
-                    <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span> <span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">domain</span> <span class="o">!=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]:</span>
+                    <span class="c1"># photon multiplicities can start above cross section domainMin for threshold reactions, but domainMax should agree:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="n">startRatio</span> <span class="o">=</span> <span class="n">domain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                         <span class="n">endRatio</span> <span class="o">=</span> <span class="n">domain</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                         <span class="k">if</span> <span class="p">(</span><span class="n">startRatio</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">Floats</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">or</span> <span class="n">endRatio</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">Floats</span><span class="o">.</span><span class="n">epsilon</span>
                             <span class="ow">or</span> <span class="n">endRatio</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">Floats</span><span class="o">.</span><span class="n">epsilon</span><span class="p">):</span>
                             <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">Domain_mismatch</span><span class="p">(</span>
                                 <span class="o">*</span><span class="p">(</span><span class="n">domain</span> <span class="o">+</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]),</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
-                    <span class="c1"># For all other products, both domainMin and domainMax should agree within epsilon</span>
+                    <span class="c1"># For all other products (including photons for non-threshold reactions) both domainMin and domainMax should agree within epsilon</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">])):</span>
                             <span class="n">ratio</span> <span class="o">=</span> <span class="n">e1</span> <span class="o">/</span> <span class="n">e2</span>
@@ -531,7 +535,7 @@
                                 <span class="k">break</span>
 
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="s1">&#39;rangeMin&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">form</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">NegativeMultiplicity</span><span class="p">(</span> <span class="n">form</span><span class="o">.</span><span class="n">rangeMin</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">form</span> <span class="p">)</span> <span class="p">)</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">NegativeMultiplicity</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">rangeMin</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">form</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">warnings</span></div></div>
 </pre></div>

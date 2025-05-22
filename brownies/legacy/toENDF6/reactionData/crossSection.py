@@ -32,6 +32,8 @@ def toENDF6(self, MT, endfMFList, targetInfo, level, LR):
 
     reactionSuite = targetInfo['reactionSuite']
     ZA, mass, QI, QM = targetInfo['ZA'], targetInfo['mass'], targetInfo['Q'], targetInfo['QM']
+    if targetInfo['crossSectionMF'] == 23 and QI != 0:
+        QI = -QI    # MF23 stores binding energy instead of Q-value
     if 'EFL' in targetInfo:
         QM = QI
         QI = targetInfo['EFL']

@@ -1435,16 +1435,18 @@ class PQU :
         other = self._getOtherAsPQU( other )
 
         selfValue, otherValue = float( self ), float( other )
-        uncertaintySelf, uncertaintyOther = self.getUncertaintyValueAs( ), other.getUncertaintyValueAs( )
-        uncertaintySelf2, uncertaintyOther2 = uncertaintySelf * otherValue, uncertaintyOther * selfValue
-        extraFactor = uncertaintySelf * uncertaintyOther
-        if( ( self is other ) and ( selfValue != 0 ) ) : extraFactor = 2 * selfValue * otherValue
-        uncertainty = math.sqrt( uncertaintySelf2 * uncertaintySelf2 + uncertaintyOther2 * uncertaintyOther2 + 
-            extraFactor * uncertaintySelf * uncertaintyOther )
-        significantDigits = min( self.uncertainty.value.getSignificantDigits( ), other.uncertainty.value.getSignificantDigits( ) )
-        uncertainty = PQU_uncertainty( PQU_uncertainty.pqu_uncertaintyStylePlusMinus, uncertainty, significantDigits )
 
-        return( PQU( self.value * other.value, unit = self.unit * other.unit, uncertainty = uncertainty ) )
+        uncertaintySelf, uncertaintyOther = self.getUncertaintyValueAs( ), other.getUncertaintyValueAs( )
+        if self is other:       # Correlated uncertainties.
+            uncertainty = 2 * uncertaintySelf
+        else:                   # Assume uncorrelated uncertainties.
+            uncertaintySelf2, uncertaintyOther2 = uncertaintySelf * otherValue, uncertaintyOther * selfValue
+            uncertainty = math.sqrt(uncertaintySelf2 * uncertaintySelf2 + uncertaintyOther2 * uncertaintyOther2)
+
+        significantDigits = min(self.uncertainty.value.getSignificantDigits(), other.uncertainty.value.getSignificantDigits())
+        uncertainty = PQU_uncertainty(PQU_uncertainty.pqu_uncertaintyStylePlusMinus, uncertainty, significantDigits)
+
+        return PQU(self.value * other.value, unit=self.unit * other.unit, uncertainty=uncertainty)
 
     __rmul__ = __mul__
 

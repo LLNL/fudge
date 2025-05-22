@@ -123,7 +123,7 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns True if *self* is equal to *other* and False otherwise.</span>
-<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
 <span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns</span>
 <span class="sd">        0 and False otherwise.</span>
 
@@ -139,7 +139,7 @@
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns True if *self* is not equal to *other* and False otherwise.</span>
-<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
 <span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns False if :py:func:`compare` with epsilonFactor = 5 returns</span>
 <span class="sd">        0 and True otherwise.</span>
 
@@ -155,7 +155,7 @@
     <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns True if *self* is less than *other* and False otherwise.</span>
-<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
 <span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns</span>
 <span class="sd">        a negative number and False otherwise.</span>
 
@@ -170,7 +170,7 @@
     <span class="k">def</span> <span class="fm">__le__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns True if *self* is less than or equal to *other*, and False otherwise.</span>
-<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
 <span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns</span>
 <span class="sd">        a negative number or 0, and False otherwise.</span>
 
@@ -184,7 +184,7 @@
     <span class="k">def</span> <span class="fm">__gt__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns True if *self* is greater than *other* and False otherwise.</span>
-<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
 <span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns</span>
 <span class="sd">        a positive number, and False otherwise.</span>
 
@@ -198,7 +198,7 @@
     <span class="k">def</span> <span class="fm">__ge__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns True if *self* is greater than or equal to *other* and False otherwise.</span>
-<span class="sd">        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
+<span class="sd">        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*&#39;s unit is not compatible</span>
 <span class="sd">        with *other*&#39;s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns</span>
 <span class="sd">        a positive number or 0, and False otherwise.</span>
 
@@ -364,15 +364,22 @@
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
         <span class="n">moniker</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;moniker&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
 
-        <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39; label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+        <span class="n">keyNameValue</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>                                       <span class="c1"># The next few lines are a kludge until keyName is properly supported.</span>
+        <span class="n">keyName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyName</span>
+        <span class="k">if</span> <span class="n">keyName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
+            <span class="n">keyValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">keyValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyValue</span>
+        <span class="k">if</span> <span class="n">keyValue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keyNameValue</span> <span class="o">=</span> <span class="s1">&#39; </span><span class="si">%s</span><span class="s1">=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">keyName</span><span class="p">,</span> <span class="n">keyValue</span><span class="p">)</span>
 
         <span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">isDimensionless</span><span class="p">():</span> <span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39; unit=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span>
 
         <span class="n">ending</span> <span class="o">=</span> <span class="s1">&#39;&gt;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">ending</span> <span class="o">=</span> <span class="s1">&#39;/&gt;&#39;</span>
-        <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1"> value=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="n">moniker</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">floatToShortestString</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">unit</span><span class="p">,</span> <span class="n">ending</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1"> value=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="n">moniker</span><span class="p">,</span> <span class="n">keyNameValue</span><span class="p">,</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">floatToShortestString</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">unit</span><span class="p">,</span> <span class="n">ending</span> <span class="p">)</span> <span class="p">]</span>
 
         <span class="k">if</span> <span class="n">ending</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">XML_strList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uncertainty</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent</span> <span class="o">=</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -398,8 +405,11 @@
 
         <span class="n">value</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">)</span>
-        <span class="n">label</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">keyName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keyValue</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">keyValue</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">keyName</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">keyValue</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">uncertaintyModule</span><span class="o">.</span><span class="n">Uncertainty</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>

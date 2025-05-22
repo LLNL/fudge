@@ -389,7 +389,7 @@ If we have lots of incident energies, this splits up a calculation using the mul
 May need to tweak the 'NEmax' and 'numTasks' variables for best performance.
 """
 def blockwise(function):
-    NEmax = 1000
+    NEmax = 50000
     def wrapped(self,E,**kwargs):
         if numpy.isscalar(E):
             NE = 1
@@ -2149,6 +2149,7 @@ def invertMatrices( R, S ):
 
         def vectorInv(arr):
             # invert all MxM matrices in Nx(MxM) array
+            # FIXME are special cases for 2x2 and 3x3 matrices still useful? numpy.linalg.inv may end up faster
             dim = arr.shape[1]
             if dim==2:
                 arrinv = numpy.zeros(arr.shape)
@@ -2174,11 +2175,7 @@ def invertMatrices( R, S ):
                 arrinv[:,2,2] = (arr[:,0,0]*arr[:,1,1]-arr[:,0,1]*arr[:,1,0])/det
                 return arrinv
             else:
-                result = numpy.zeros( arr.shape )
-                NE = arr.shape[0]
-                for i in range(NE):
-                    result[i] = numpy.linalg.inv(arr[i])
-                return result
+                return numpy.linalg.inv(arr)
 
         identity = numpy.zeros( (NE, dim, dim) )
         for i in range(dim):

@@ -65,7 +65,7 @@
 
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">date</span> <span class="k">as</span> <span class="n">dateModule</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">abstractClasses</span> <span class="k">as</span> <span class="n">abstractClassesModule</span>
+
 
 <div class="viewcode-block" id="DateType"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.dates.DateType">[docs]</a><span class="k">class</span> <span class="nc">DateType</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -82,6 +82,7 @@
     <span class="n">updated</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">valid</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">withdraw</span> <span class="o">=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="Date"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.dates.Date">[docs]</a><span class="k">class</span> <span class="nc">Date</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -104,7 +105,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">dateType</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param start:           TBD.</span>
-<span class="sd">        :param dateType:        An instnace of :py:class:`DateType`.</span>
+<span class="sd">        :param dateType:        An instance of :py:class:`DateType`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -127,35 +128,35 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns the data type.</span>
 
-<span class="sd">        :returns:       A instance of :py:class:`DateType`.</span>
+<span class="sd">        :returns:       instance of :py:class:`DateType`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dateType</span>
 
-<div class="viewcode-block" id="Date.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.dates.Date.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Date.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.dates.Date.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This methods returns the XML attributes for *self* as a single python str.</span>
+<span class="sd">        This method returns the XML attributes for *self* as a single python str.</span>
 
 <span class="sd">        :kwargs:        This argument is not used.</span>
 
 <span class="sd">        :returns:       A python str.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="s1">&#39; </span><span class="si">%s</span><span class="s1"> dateType=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">asXML_attribute</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dateType</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="s1">&#39; </span><span class="si">%s</span><span class="s1"> dateType=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">asXML_attribute</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dateType</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Date.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.dates.Date.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
 
-<span class="sd">        :param indent:          The minimum amount of indentation.</span>
-<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+<span class="sd">        :param kwargs:       dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
 
-<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        :return:             List of str instances representing the XML lines of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;indent&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1"> dateType=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">asXML_attribute</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dateType</span> <span class="p">)</span> <span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1"> dateType=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">asXML_attribute</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dateType</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="Date.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.dates.Date.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -166,15 +167,16 @@
 <span class="sd">        :param node:        Node to parse.</span>
 <span class="sd">        :param xPath:       List containing xPath to current node, useful mostly for debugging.</span>
 <span class="sd">        :param linkData:    dict that collects unresolved links.</span>
-<span class="sd">        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+<span class="sd">        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
 
 <span class="sd">        :returns:           An instance of *cls* representing *node*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">start</span> <span class="o">=</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">Date</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>        <span class="c1"># FIXME2, what is this? How is Date to have a date?</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">dateModule</span><span class="o">.</span><span class="n">Date</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>  <span class="c1"># FIXME2, what is this? How is Date to have a date?</span>
         <span class="n">dateType</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dateType&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">dateType</span><span class="p">)</span></div></div>
+
 
 <div class="viewcode-block" id="Dates"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.dates.Dates">[docs]</a><span class="k">class</span> <span class="nc">Dates</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -185,11 +187,9 @@
     <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;dateType&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">Date</span><span class="p">])</span>
 
-        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">Date</span> <span class="p">])</span>
-
-<div class="viewcode-block" id="Dates.toXML"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.dates.Dates.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
+<div class="viewcode-block" id="Dates.toXML"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.dates.Dates.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div></div>
 </pre></div>
 

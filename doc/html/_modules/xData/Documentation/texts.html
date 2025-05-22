@@ -45,41 +45,45 @@
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module contains the GNDS documentation child node that a instances of :py:class:`textModule.Text`.</span>
+<span class="sd">This module contains the GNDS documentation child nodes that are instances of :py:class:`textModule.Text`.</span>
 
 <span class="sd">This module contains the following classes:</span>
 
 <span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
 <span class="sd">    | Class                             | Description                                                           |</span>
 <span class="sd">    +===================================+=======================================================================+</span>
-<span class="sd">    | Abstract                          | This class represents a GNDS documentaion/abstract node.              |</span>
+<span class="sd">    | Abstract                          | This class represents a GNDS documentation/abstract node.             |</span>
 <span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
-<span class="sd">    | Body                              | This class represents a GNDS documentaion/body node.                  |</span>
+<span class="sd">    | Body                              | This class represents a GNDS documentation/body node.                 |</span>
 <span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
-<span class="sd">    | EndfCompatible                    | This class represents a GNDS documentaion/endfCompatible node.        |</span>
+<span class="sd">    | EndfCompatible                    | This class represents a GNDS documentation/endfCompatible node.       |</span>
 <span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
-<span class="sd">    | Title                             | This class represents a GNDS documentaion/title node.                 |</span>
+<span class="sd">    | Title                             | This class represents a GNDS documentation/title node.                |</span>
 <span class="sd">    +-----------------------------------+-----------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">text</span> <span class="k">as</span> <span class="n">textModule</span>
 
-<div class="viewcode-block" id="Abstract"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.texts.Abstract">[docs]</a><span class="k">class</span> <span class="nc">Abstract</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="Abstract"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.texts.Abstract">[docs]</a><span class="k">class</span> <span class="nc">Abstract</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS documentation/abstract node.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;abstract&#39;</span></div>
 
-<div class="viewcode-block" id="Body"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.texts.Body">[docs]</a><span class="k">class</span> <span class="nc">Body</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="Body"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.texts.Body">[docs]</a><span class="k">class</span> <span class="nc">Body</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS documentation/body node.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;body&#39;</span></div>
 
-<div class="viewcode-block" id="EndfCompatible"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.texts.EndfCompatible">[docs]</a><span class="k">class</span> <span class="nc">EndfCompatible</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="EndfCompatible"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.texts.EndfCompatible">[docs]</a><span class="k">class</span> <span class="nc">EndfCompatible</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS documentation/endfCompatible node.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;endfCompatible&#39;</span></div>
 
-<div class="viewcode-block" id="Title"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.texts.Title">[docs]</a><span class="k">class</span> <span class="nc">Title</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="Title"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.texts.Title">[docs]</a><span class="k">class</span> <span class="nc">Title</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a GNDS documentation/title node.&quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;title&#39;</span></div>

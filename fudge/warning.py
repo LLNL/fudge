@@ -344,7 +344,19 @@ class WrongExternalFileChecksum(Warning):
         return s
 
 
+class EvaluationDomainMinTooHigh(Warning):
+
+    def __init__(self, expected, obj):
+        Warning.__init__(self, Level.Severe, obj)
+        self.expected = expected
+
+    def __str__(self):
+        s = f"Evaluation starts at incident energy {self.obj.domainMin} {self.obj.domainUnit}, expected {self.expected}"
+        return s
+
+
 # resonance region:
+
 
 class BadScatteringRadius(Warning):
 
@@ -837,7 +849,10 @@ class NonConstantMultiplicity(Warning):
 
 class Domain_mismatch(Warning):
     def __init__(self, lowBound, highBound, xscLowBound, xscHighBound, obj=None):
-        Warning.__init__(self, Level.Severe, obj)
+        level = Level.Severe
+        if lowBound <= xscLowBound and highBound >= xscHighBound:
+            level = Level.Moderate
+        Warning.__init__(self, level, obj)
         self.lowBound, self.highBound = lowBound, highBound
         self.xscLowBound, self.xscHighBound = xscLowBound, xscHighBound
 
@@ -966,6 +981,16 @@ class PrimaryGammaEnergyTooLarge(Warning):
     def __eq__(self, other):
         return (self.xpath == other.xpath and self.energy == other.energy
                 and self.fraction == other.fraction)
+
+
+class UnphysicalDiscreteOrPrimaryPhotonMultiplicity(Warning):
+    """Max multiplicity for discrete or primary photons should be 1"""
+
+    def __init__(self, obj=None):
+        Warning.__init__(self, Level.Severe, obj)
+
+    def __str__(self):
+        return ("Multiplicity > 1 for primary or discrete photon")
 
 
 class MadlandNixBadParameters(Warning):

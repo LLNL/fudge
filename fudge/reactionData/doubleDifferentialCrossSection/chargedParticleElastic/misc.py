@@ -146,7 +146,7 @@ class ChargedParticleElasticTerm(ancestryModule.AncestryIO, abc.ABC):
         return term_
 
 def fixMuRange(data, epsilon=1e-6):
-    """
+    r"""
     This function ensures that the range of mu in *data* is [-1, 1] by adding 0.0's to the missing ranges. Note, *data* is modified.
 
     :param data:        A python list of :math:`P(\mu)`.

@@ -84,7 +84,7 @@ class PhysicalQuantity( ancestryModule.AncestryIO ) :
     def __eq__( self, other ) :
         """
         This method returns True if *self* is equal to *other* and False otherwise.
-        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*'s unit is not compatible
+        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*'s unit is not compatible
         with *other*'s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns
         0 and False otherwise.
 
@@ -100,7 +100,7 @@ class PhysicalQuantity( ancestryModule.AncestryIO ) :
     def __ne__( self, other ) :
         """
         This method returns True if *self* is not equal to *other* and False otherwise.
-        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*'s unit is not compatible
+        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*'s unit is not compatible
         with *other*'s unit, False is returned. Otherwise, returns False if :py:func:`compare` with epsilonFactor = 5 returns
         0 and True otherwise.
 
@@ -116,7 +116,7 @@ class PhysicalQuantity( ancestryModule.AncestryIO ) :
     def __lt__( self, other ) :
         """
         This method returns True if *self* is less than *other* and False otherwise.
-        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*'s unit is not compatible
+        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*'s unit is not compatible
         with *other*'s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns
         a negative number and False otherwise.
 
@@ -131,7 +131,7 @@ class PhysicalQuantity( ancestryModule.AncestryIO ) :
     def __le__( self, other ) :
         """
         This method returns True if *self* is less than or equal to *other*, and False otherwise.
-        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*'s unit is not compatible
+        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*'s unit is not compatible
         with *other*'s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns
         a negative number or 0, and False otherwise.
 
@@ -145,7 +145,7 @@ class PhysicalQuantity( ancestryModule.AncestryIO ) :
     def __gt__( self, other ) :
         """
         This method returns True if *self* is greater than *other* and False otherwise.
-        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*'s unit is not compatible
+        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*'s unit is not compatible
         with *other*'s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns
         a positive number, and False otherwise.
 
@@ -159,7 +159,7 @@ class PhysicalQuantity( ancestryModule.AncestryIO ) :
     def __ge__( self, other ) :
         """
         This method returns True if *self* is greater than or equal to *other* and False otherwise.
-        If *other* is not an instance of :py:class:`PPhysicalQuantity`, False is returned. If *self*'s unit is not compatible
+        If *other* is not an instance of :py:class:`PhysicalQuantity`, False is returned. If *self*'s unit is not compatible
         with *other*'s unit, False is returned. Otherwise, returns True if :py:func:`compare` with epsilonFactor = 5 returns
         a positive number or 0, and False otherwise.
 
@@ -325,15 +325,22 @@ class PhysicalQuantity( ancestryModule.AncestryIO ) :
         indent2 = indent + kwargs.get('incrementalIndent', '  ')
         moniker = kwargs.get('moniker', self.moniker)
 
-        label = ''
-        if self.label is not None: label = ' label="%s"' % self.label
+        keyNameValue = ''                                       # The next few lines are a kludge until keyName is properly supported.
+        keyName = self.keyName
+        if keyName is None:
+            keyName = 'label'
+            keyValue = self.label
+        else:
+            keyValue = self.keyValue
+        if keyValue is not None:
+            keyNameValue = ' %s="%s"' % (keyName, keyValue)
 
         unit = ''
         if not self.unit.isDimensionless(): unit = ' unit="%s"' % self.unit
 
         ending = '>'
         if self.__uncertainty is None: ending = '/>'
-        XML_strList = [ '%s<%s%s value="%s"%s%s' % ( indent, moniker, label, PQUModule.floatToShortestString(self.value, 12), unit, ending ) ]
+        XML_strList = [ '%s<%s%s value="%s"%s%s' % ( indent, moniker, keyNameValue, PQUModule.floatToShortestString(self.value, 12), unit, ending ) ]
 
         if ending == '>':
             if self.__uncertainty is not None: XML_strList += self.__uncertainty.toXML_strList(indent = indent2, **kwargs)
@@ -359,8 +366,11 @@ class PhysicalQuantity( ancestryModule.AncestryIO ) :
 
         value = node.get('value')
         unit = node.get('unit')
-        label = node.get('label', None)
-        instance = cls(value, unit, label)
+        if cls.keyName is None:
+            keyValue = node.get('label', None)
+        else:
+            keyValue = node.get(cls.keyName, None)
+        instance = cls(value, unit, keyValue)
 
         for child in node:
             if child.tag == uncertaintyModule.Uncertainty.moniker:

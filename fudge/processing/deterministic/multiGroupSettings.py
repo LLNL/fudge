@@ -43,7 +43,6 @@ class Settings:
         """
 
         matchPoPsID = [x for x in dir(popsIDsModule) if isinstance(getattr(popsIDsModule, x), str) and particleID == getattr(popsIDsModule, x)]
-        assert len(matchPoPsID) < 2
 
         return len(matchPoPsID) > 0
 

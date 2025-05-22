@@ -58,7 +58,7 @@ class Component( abstractClassesModule.Component ) :
                 LLNL_angularEnergyModule.LLNLAngularEnergyForm,
                 uncorrelatedModule.Form, LegendreModule.Form, referenceModule.Form,
                 referenceModule.CoulombPlusNuclearElastic, referenceModule.ThermalNeutronScatteringLaw,
-                photonScatteringModule.CoherentPhotonScattering.Form, photonScatteringModule.IncoherentPhotonScattering.Form, 
+                photonScatteringModule.CoherentPhotonScattering.Form, photonScatteringModule.IncoherentPhotonScattering.Form, photonScatteringModule.IncoherentBoundToFreePhotonScattering.Form,
                 multiGroupModule.Form, unspecifiedModule.Form, branching3dModule.Form ) )
 
     def energySpectrumAtEnergy(self, energyIn, frame, **kwargs):
@@ -120,14 +120,23 @@ class Component( abstractClassesModule.Component ) :
         :param info:        A dictionary with parameters used for determining if a difference is relevant.
         """
 
-        from fudge import warning
+        from fudge import warning, enums
         warnings = []
 
         for form in self:
             if not isinstance(self.rootAncestor.styles[form.label], stylesModule.Evaluated):
                 continue
 
-            if info['isTwoBody']:
+            if info['interaction'] is enums.Interaction.atomic:
+                if form.moniker not in (
+                        photonScatteringModule.CoherentPhotonScattering.Form.moniker,
+                        photonScatteringModule.IncoherentPhotonScattering.Form.moniker,
+                        angularModule.TwoBody.moniker,
+                        uncorrelatedModule.Form.moniker,
+                        unspecifiedModule.Form.moniker):
+                    warnings.append(warning.WrongDistributionComponent(form.moniker, '2-body'))
+
+            elif info['isTwoBody']:
                 if form.productFrame != xDataEnumsModule.Frame.centerOfMass:
                     warnings.append( warning.Wrong2BodyFrame( form ) )
 
@@ -142,12 +151,12 @@ class Component( abstractClassesModule.Component ) :
                                     energyModule.Form.moniker):
                     warnings.append( warning.WrongDistributionComponent( form.moniker, 'N-body' ) )
 
-            def checkSubform( subform, contextMessage ):
+            def checkSubform(subform, contextMessage):
                 distributionErrors = []
                 if hasattr(subform, 'domainMin') and (subform.domainMin, subform.domainMax) != info['crossSectionDomain']:
                     domain = (subform.domainMin, subform.domainMax)
-                    # For gamma products, domainMin should be >= cross section start, upper bounds should match.
-                    if( self.ancestor.pid == IDsPoPsModule.photon ) :
+                    # For gamma products, domainMin should be >= cross-section start, upper bounds should match.
+                    if self.ancestor.pid == IDsPoPsModule.photon:
                         startRatio = subform.domainMin / info['crossSectionDomain'][0]
                         endRatio = subform.domainMax / info['crossSectionDomain'][1]
                         if (startRatio < 1-standardsModule.Floats.epsilon or endRatio < 1-standardsModule.Floats.epsilon
@@ -158,9 +167,9 @@ class Component( abstractClassesModule.Component ) :
                     else:
                         for e1,e2 in zip(domain, info['crossSectionDomain']):
                             ratio = e1 / e2
-                            if (ratio < 1-standardsModule.Floats.epsilon or ratio > 1+standardsModule.Floats.epsilon):
-                                distributionErrors.append( warning.Domain_mismatch(
-                                        *(domain + info['crossSectionDomain']), obj=subform ) )
+                            if ratio < 1-standardsModule.Floats.epsilon or ratio > 1+standardsModule.Floats.epsilon:
+                                distributionErrors.append(warning.Domain_mismatch(
+                                        *(domain + info['crossSectionDomain']), obj=subform))
                                 break
                 if not hasattr(subform, 'check'):
                     distributionErrors.append(warning.NotImplemented(subform.moniker, subform))

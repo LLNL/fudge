@@ -23,6 +23,7 @@ This module contains the following classes:
 
 from LUPY import ancestry as ancestryModule
 
+
 class Collaboration(ancestryModule.AncestryIO):
     """
     This class represent a GNDS documentation/collaborations/collaboration node.
@@ -43,7 +44,7 @@ class Collaboration(ancestryModule.AncestryIO):
 
     def __init__(self, name, href=''):
         """
-        :param name:    The nanme of the collaboration.
+        :param name:    The name of the collaboration.
         :param href:    TBD.
         """
 
@@ -53,60 +54,61 @@ class Collaboration(ancestryModule.AncestryIO):
         self.__href = href
 
     @property
-    def name( self ) :
+    def name(self):
         """
         This method returns self's label.
 
         :returns:       A python str.
         """
 
-        return( self.__name )
+        return self.__name
 
     @property
-    def href( self ) :
+    def href(self):
         """
         This method returns self's href.
 
         :returns:       A python str.
         """
 
-        return( self.__href )
+        return self.__href
 
-    def toXML_strList( self, indent = '', **kwargs ) :
+    def toXML_strList(self, indent='', **kwargs):
         """
         Returns a list of str instances representing the XML lines of *self*.
 
-        :param indent:          The minimum amount of indentation.
-        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param indent:     The minimum amount of indentation.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:           List of str instances representing the XML lines of self.
         """
 
         href = ''
-        if( len( self.__href ) > 0 ) : href = ' href="%s"' % self.__href
+        if len(self.__href) > 0: href = ' href="%s"' % self.__href
 
-        return( [ '%s<%s name="%s"%s/>' % ( indent, self.moniker, self.__name, href ) ] )
+        return ['%s<%s name="%s"%s/>' % (indent, self.moniker, self.__name, href)]
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
         """
         Parse *node* into an instance of *cls*.
 
-        :param cls:         Form class to return.
-        :param node:        Node to parse.
-        :param xPath:       List containing xPath to current node, useful mostly for debugging.
-        :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param cls:        Form class to return.
+        :param node:       Node to parse.
+        :param xPath:      List containing xPath to current node, useful mostly for debugging.
+        :param linkData:   dict that collects unresolved links.
+        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :returns:           An instance of *cls* representing *node*.
+        :returns:          An instance of *cls* representing *node*.
         """
 
-        name = node.get( 'name' )
-        href = node.get( 'href' )
+        name = node.get('name')
+        href = node.get('href')
 
-        return cls( name, href)
+        return cls(name, href)
 
-class Collaborations( suiteModule.Suite ) :
+
+class Collaborations(suiteModule.Suite):
     """
     This is the suite class for the GNDS documentation/collaborations node.
     """
@@ -114,6 +116,5 @@ class Collaborations( suiteModule.Suite ) :
     moniker = 'collaborations'
     suiteName = 'label'
 
-    def __init__( self ) :
-
-        suiteModule.Suite.__init__( self, [ Collaboration ] )
+    def __init__(self):
+        suiteModule.Suite.__init__(self, [Collaboration])

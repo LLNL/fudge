@@ -133,7 +133,7 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
             if not found: raise TypeError( 'Invalid class "%s" for suite "%s"' % ( newItem.__class__, self.moniker ) )
 
         for i1, item in enumerate( self.__items ) :
-            if( item.label == newItem.label ) : raise KeyError( 'item with label = "%s" already present in suite' % item.label )
+            if( item.label == newItem.label ) : raise KeyError( 'item with label = "%s" already present in suite: %s.' % (item.label, self.toXLink()))
 
         if( setAncestor ) : newItem.setAncestor(self)
         self.__items.append( newItem )
@@ -261,6 +261,18 @@ class Suite(ancestryModule.AncestryIO_bare, abc.ABC):
         if( hrefInstance is not None ) : return( hrefInstance.labels( ) )
 
         return( [ item.label for item in self.__items ] )
+
+    def printAllowedChildren(self):
+        """
+        This method prints all the allowed classes that can be a added as a child of *self*.
+        """
+
+        for cls in self.allowedClasses:
+            try:
+                location = str(cls).split("'")[1]
+            except:
+                location = str(cls)
+            print('    %s' % location)
 
     def remove( self, label ) :
         """

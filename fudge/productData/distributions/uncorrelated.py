@@ -413,6 +413,8 @@ class Form( baseModule.Form ) :
 
         _angularSubform = self.angularSubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
         _energySubform = self.energySubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        if isinstance(self.energySubform.data, energyModule.SimpleMaxwellianFission) and tempInfo.get('viaReference',  False):
+            _energySubform = self.energySubform.copy()
         if( ( _angularSubform is not None ) or ( _energySubform is not None ) ) :
             if( _angularSubform is None ) : _angularSubform = self.angularSubform.copy( )
             if( _energySubform is None ) : _energySubform = self.energySubform.copy( )
@@ -625,7 +627,7 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
         Es.sort( )
         while( Es[0] < EMin ) : del Es[0]
         while( Es[-1] > EMax ) : del Es[-1]
-        return( valuesModule.Values.sortAndThin( Es, 1e-6 ) )
+        return( valuesModule.Values.sortAndThin( Es, 1e-12 ) )
 
     def calculateAverageEnergy( self, Ein ) :
 

@@ -26,7 +26,7 @@ from LUPY import ancestry as ancestryModule
 
 from .. import suite as suiteModule
 from .. import text as textModule
-from . import abstractClasses as abstractClassesModule
+
 
 class RelationType(enumsModule.Enum):
     """
@@ -69,6 +69,7 @@ class RelationType(enumsModule.Enum):
     obsoletes = 'Obsoletes'
     isObsoletedBy = 'IsObsoletedBy'
 
+
 class RelatedItem(ancestryModule.AncestryIO):
     """
     TBD.
@@ -107,7 +108,7 @@ class RelatedItem(ancestryModule.AncestryIO):
         """
         This method returns the *name* member.
 
-        :returns:       A ininstance of :py:class:`textModule.Text`.
+        :returns:       instance of :py:class:`textModule.Text`.
         """
 
         return self.__name
@@ -117,7 +118,7 @@ class RelatedItem(ancestryModule.AncestryIO):
         """
         This method returns the *href* member.
 
-        :returns:       A ininstance of :py:class:`textModule.Text`.
+        :returns:       instance of :py:class:`textModule.Text`.
         """
 
         return self.__href
@@ -127,7 +128,7 @@ class RelatedItem(ancestryModule.AncestryIO):
         """
         This method returns the *relationType* member.
 
-        :returns:       A ininstance of :py:class:`RelationType`.
+        :returns:       instance of :py:class:`RelationType`.
         """
 
         return self.__relationType
@@ -136,10 +137,9 @@ class RelatedItem(ancestryModule.AncestryIO):
         """
         Returns a list of str instances representing the XML lines of *self*.
 
-        :param indent:          The minimum amount of indentation.
-        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param kwargs:       dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:             List of str instances representing the XML lines of self.
         """
 
         indent = kwargs.get('indent', '')
@@ -148,7 +148,7 @@ class RelatedItem(ancestryModule.AncestryIO):
         if len(self.__href) > 0: attributes += ' href="%s"' % self.__href
         if len(self.__relationType) > 0: attributes += ' relationType="%s"' % self.__relationType
 
-        return [ '%s<%s%s/>' % ( indent, self.moniker, attributes ) ]
+        return ['%s<%s%s/>' % (indent, self.moniker, attributes)]
 
     @classmethod
     def parseNodeUsingClass(cls, node, xPath, linkData, **kwargs):
@@ -159,7 +159,7 @@ class RelatedItem(ancestryModule.AncestryIO):
         :param node:        Node to parse.
         :param xPath:       List containing xPath to current node, useful mostly for debugging.
         :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
         :returns:           An instance of *cls* representing *node*.
         """
@@ -170,6 +170,7 @@ class RelatedItem(ancestryModule.AncestryIO):
 
         return cls(name, href, relationType)
 
+
 class RelatedItems(suiteModule.Suite):
     """
     This is the suite class for the GNDS TBD.
@@ -179,9 +180,7 @@ class RelatedItems(suiteModule.Suite):
     suiteName = 'name'
 
     def __init__(self):
+        suiteModule.Suite.__init__(self, [RelatedItem])
 
-        suiteModule.Suite.__init__(self, [ RelatedItem ])
-
-    def toXML(self, indent = '', **kwargs):
-
+    def toXML(self, indent='', **kwargs):
         return '\n'.join(self.toXML_strList(**kwargs))

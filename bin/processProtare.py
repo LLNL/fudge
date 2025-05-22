@@ -32,10 +32,14 @@ from LUPY import argumentsForScripts as argumentsForScriptsModule
 from fudge import enums as enumsModule
 from fudge import physicalQuantity as physicalQuantityModule
 from fudge import styles as stylesModule
+from fudge import institution as institutionModule
+
+from fudge.productData import averageProductEnergy as averageProductEnergyModule
 
 from fudge.processing import flux as fluxModule
 from fudge.processing import transportables as transportablesModule
 from fudge.processing import group as groupModule
+from fudge.processing.deterministic import tokens as deterministicTokensModule
 
 timer = timesModule.Times( )
 
@@ -57,7 +61,7 @@ MGprefixDefault = 'MultiGroup'
 MCprefixDefault = 'MonteCarlo'
 UPprefixDefault = 'UpScatter'
 
-summaryDocStringFUDGE = '''Processes a GNDS reactionSuite file for Monte Carlo and/or deterministic transport at various temperatures.'''
+summaryDocString__FUDGE = '''Processes a GNDS reactionSuite file for Monte Carlo and/or deterministic transport at various temperatures.'''
 
 description = """This script processes all data in a GNDS file as requested by input arguments. In addition to entering arguments on the comannd
 line, arguments can also be read from an input file by specifying an input file on the command line. The character '@' must prefix
@@ -134,6 +138,7 @@ parser.add_argument('--threads',type = int, default = 1,                        
 parser.add_argument('-v', '--verbose', action = 'count', default = 0,                                  help = 'Enable verbose output.')
 parser.add_argument('--reconAccuracy', type = float, default = reconAccuracyDefault,                   help = 'Accuracy for reconstructing resonances. Default is "%.1e".' % reconAccuracyDefault)
 parser.add_argument('--restart', action = 'store_true',                                                help = 'Continue previous incomplete processProtare run. If enabled, code checks for Merced output files from previous \nruns and if found reads them instead of rerunning Merced. Only impacts "-mg" option processing.')
+parser.add_argument('--skipMercedTar', action = 'store_true',                                          help = 'If present, the merced files are not tar-ed.')
 
 parser.add_argument('--preProcessLabel', type = str, default = None,                                   help = 'Label for style to process. If None, proc will pick the latest from the evaluated, and Realization styles.')
 
@@ -211,24 +216,10 @@ if args.temperatures is None:
         args.temperatures = [PQUModule.PQU(temperature, unit ).getValueAs(args.temperatureUnit) for temperature in temperatures]
 args.temperatures.sort()
 
-preProcessedStyles = reactionSuite.styles.preProcessingStyles()
-
 if args.cullProcessedData:
-    stylesToRemove = []
-    for style in reactionSuite.styles:
-        if not isinstance(style, preProcessedStyles):
-            stylesToRemove.append(style.label)
-    reactionSuite.removeStyles(stylesToRemove)
+    reactionSuite.cullProcessedData(include_reconstructed_data=True)
 
-    # applicationData requires special handling:
-    from fudge.processing.deterministic import tokens as deterministicTokensModule
-    from fudge.resonances import probabilityTables as probabilityTablesModule
-    for label in (deterministicTokensModule.multiGroupReactions,
-                  deterministicTokensModule.multiGroupDelayedNeutrons,
-                  deterministicTokensModule.multiGroupIncompleteProducts,
-                  probabilityTablesModule.LLNLProbabilityTablesToken):
-        if label in reactionSuite.applicationData:
-            reactionSuite.applicationData.pop(label)
+preProcessedStyles = reactionSuite.styles.preProcessingStyles(include_reconstructed=True)
 
 for style in reactionSuite.styles:                 # Fail on detection of existing processed data.
     if not isinstance(style, preProcessedStyles): 
@@ -297,6 +288,7 @@ logFile.write('Initial work (before temperatures loop):\n%s\n\n' % timer)
 
 logFile.write('Pre heating loop style label "%s".\n' % preLoopStyle.label)
 transportables_href = None
+averageProductEnergyModelB = averageProductEnergyModule.Component()
 for temperatureIndex, temperatureValue in enumerate(args.temperatures):  # Heat the cross sections and AEPs with a style for each temperature.
 
     if args.verbose > 0:
@@ -375,19 +367,49 @@ for temperatureIndex, temperatureValue in enumerate(args.temperatures):  # Heat 
         reactionSuite.processMultiGroup(heatedMultiGroupStyle, args.legendreMax, verbosity=args.verbose - 2, logFile=logFile, indent='    ', 
             additionalReactions=additionalReactions, workDir=str(workDir), restart=args.restart)
 
-        with tarfile.open(str(workDirTarFile), 'w:gz') as tar:
-            tar.add(workDir)
-        shutil.rmtree(str(workDir))
+        if not args.skipMercedTar:
+            with tarfile.open(str(workDirTarFile), 'w:gz') as tar:
+                tar.add(workDir)
+            shutil.rmtree(str(workDir))
 
-        if args.UpScatter:
+        if args.UpScatter and reactionSuite.target != IDsPoPsModule.neutron:
             if args.verbose > 1:
                 print('  Processing multi group upscattering')
+
+            workDir = pathlib.Path('upscatter.work' ) / reactionSuite.projectile / reactionSuite.target / \
+                        ('T_%s_%s' % (temperatureValue, args.temperatureUnit.replace(' ', '').replace(os.sep, '_')))
+            workDirTarFile = pathlib.Path(str(workDir) + '.tar')
+            if workDirTarFile.exists():
+                if args.restart:
+                    tar = tarfile.open(str(workDirTarFile))
+                    tar.extractall()
+                else:
+                    workDirTarFile.unlink()
+            if workDir.exists() and not args.restart:
+                shutil.rmtree(str(workDir))
+            if not workDir.exists():
+                workDir.mkdir(parents=True)
+
             timerUp = timesModule.Times()
             heatUpscatterStyle = stylesModule.SnElasticUpScatter(args.prefixUpScatter + suffix, heatedMultiGroupStyle.label, date = dateTimeStr)
             reactionSuite.styles.add(heatUpscatterStyle)
             if temperatureValue > 0.0:
-                reactionSuite.processSnElasticUpScatter(heatUpscatterStyle, args.legendreMax, verbosity=args.verbose - 2)  # FIXME need logfile arguments in this process call
+                averageProductEnergy = reactionSuite.processSnElasticUpScatter(
+                    heatUpscatterStyle, args.legendreMax, verbosity=args.verbose - 2,
+                    workDir = str(workDir), restart = args.restart)  # FIXME need logfile arguments in this process call
+                averageProductEnergyModelB.add(averageProductEnergy)
             logFile.write('  Upscatter correction\n    %s\n' % timerUp)
+
+            with tarfile.open(str(workDirTarFile), 'w:gz') as tar:
+                tar.add(workDir)
+            shutil.rmtree(str(workDir))
+
+if len(averageProductEnergyModelB) > 0:
+    institution = institutionModule.Institution(deterministicTokensModule.pointwiseAverageProductEnergies)
+    institution.append(averageProductEnergyModelB)
+#
+# The following is currently disabled until more testing is completed.
+#    reactionSuite.applicationData.add(institution)
 
 if args.MultiGroup and not args.skipMultiGroupSums and reactionSuite.interaction != enumsModule.Interaction.atomic:
     reactionSuite.addMultiGroupSums(replace=True)

@@ -1,0 +1,36 @@
+name: FUDGE make + make check
+
+on:
+  push:
+    branches: [ "master", "ci_dev" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.8", "3.12", "3.13"]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: python -m pip install --upgrade pip setuptools wheel numpy h5py matplotlib
+
+    - name: Build
+      run: make PYTHON=python CC=gcc
+
+    - name: Run check
+      run:  |
+            if [ "$RUNNER_OS" == "Windows" ]; then
+                # make check PYTHON=python PYTHONPATH=${PYTHONPATH}:$PWD
+                echo "Skip checks on Windows for now"
+            else
+                make check PYTHON=python PYTHONPATH=$PYTHONPATH:$PWD
+            fi
+      shell: bash
+

@@ -11,7 +11,7 @@ import argparse
 
 from fudge import GNDS_file as GNDS_fileModule
 
-summaryDocStringFUDGE = """This script prints the GNDS type of each file listed."""
+summaryDocString__FUDGE = """This script prints the GNDS type of each file listed."""
 
 description = """
 This script imports fudge/GNDS_file.py and calls it for each file in the argument list with

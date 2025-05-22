@@ -118,14 +118,14 @@ class Form( baseModule.Form ):
 
     @property
     def etaCoefficient( self ) :
-        """This function returns the parameter :math:`\eta \, \sqrt{E} = Z_1 \, Z_2 \, sqrt{\alpha^2 \mu m_1 / 2}`."""
+        r"""This function returns the parameter :math:`\eta \, \sqrt{E} = Z_1 \, Z_2 \, sqrt{\alpha^2 \mu m_1 / 2}`."""
 
         self.initialize( )
         return( self.__etaCoefficient  )
 
     @property
     def kCoefficient( self ) :
-        """This function returns the coefficient for the particle wave number (i.e., :math:`k(E) / \sqrt{E}`)."""
+        r"""This function returns the coefficient for the particle wave number (i.e., :math:`k(E) / \sqrt{E}`)."""
 
         self.initialize( )
         return( self.__kCoefficient )
@@ -219,7 +219,7 @@ class Form( baseModule.Form ):
         self.__kCoefficient = (A / (A + 1)) * math.sqrt( 2 * mass1 ) / hbar_c * 1e-14        # 1e-14 = sqrt( barn )
 
     def dSigma_dMu(self, energy, muCutoff, accuracy=1e-3, epsilon=1e-6, excludeRutherfordScattering=False, probability=False):
-        """
+        r"""
         This function returns :math:`d\sigma / d\mu` at the specified incident energy if *probability* is False and :math:`P(\mu)` otherwise
         if True..  The :math:`\mu` domain goes from muMin to *muCutoff*. For identical particles, muMin is set to -*muCutoff* otherwise it is -1.
 
@@ -289,7 +289,7 @@ class Form( baseModule.Form ):
         raise CoulombDepositionNotSupported( "Cannot compute average product data for %s distribution" % self.moniker )
 
     def processCoulombPlusNuclearMuCutoff( self, style, energyMin = None, accuracy = 1e-3, epsilon = 1e-6, excludeRutherfordScattering = False ) :
-        """
+        r"""
         This function returns the cross section and angular distribution for :math:`\mu` from muMin to muMax.
         For identical particles, muMin is set to -muMax otherwise it is -1. The value of muMax is the *muCufoff* 
         member of *style*.
@@ -305,16 +305,17 @@ class Form( baseModule.Form ):
 
         class Tester :
 
-            def __init__( self, dSigma_dMu, muCutoff, relativeTolerance, absoluteTolerance ) :
+            def __init__( self, dSigma_dMu, muCutoff, mu_accuracy, relativeTolerance, absoluteTolerance ) :
 
                 self.dSigma_dMu = dSigma_dMu
                 self.muCutoff = muCutoff
+                self.mu_accuracy = mu_accuracy
                 self.relativeTolerance = relativeTolerance
                 self.absoluteTolerance = absoluteTolerance
 
             def evaluateAtX( self, energy ) :
 
-                dSigma_dMu = self.dSigma_dMu( energy, muCutoff, accuracy = self.relativeTolerance, excludeRutherfordScattering = excludeRutherfordScattering )
+                dSigma_dMu = self.dSigma_dMu( energy, muCutoff, accuracy = self.mu_accuracy, excludeRutherfordScattering = excludeRutherfordScattering )
                 return dSigma_dMu.integrate()
 
         nuclearPlusInterferenceCrossSection = None
@@ -354,11 +355,12 @@ class Form( baseModule.Form ):
             energies = RutherfordEnergies
 
         muCutoff = style.muCutoff
+        mu_accuracy = 1e-5
         crossSection = []
         for energy in energies :
-            dSigma_dMu = self.dSigma_dMu( energy, muCutoff, accuracy = accuracy, excludeRutherfordScattering = excludeRutherfordScattering )
+            dSigma_dMu = self.dSigma_dMu( energy, muCutoff, accuracy = mu_accuracy, excludeRutherfordScattering = excludeRutherfordScattering )
             crossSection.append([ energy, dSigma_dMu.integrate() ])
-        _tester = Tester( self.dSigma_dMu, muCutoff, accuracy, accuracy * crossSection[-1][1] )
+        _tester = Tester( self.dSigma_dMu, muCutoff, mu_accuracy, accuracy, accuracy * crossSection[-1][1] )
         crossSection = fudgemathModule.thickenXYList( crossSection, _tester, biSectionMax = 16 )
 
         crossSectionAxes = crossSectionModule.defaultAxes( self.domainUnit )
@@ -369,7 +371,7 @@ class Form( baseModule.Form ):
         crossSectionData = []
         probability = nuclearPlusInterferenceCrossSection is not None
         for energy in energies :
-            data = self.dSigma_dMu(energy, muCutoff, accuracy=accuracy, excludeRutherfordScattering=excludeRutherfordScattering, probability=probability)
+            data = self.dSigma_dMu(energy, muCutoff, accuracy=mu_accuracy, excludeRutherfordScattering=excludeRutherfordScattering, probability=probability)
             if( excludeRutherfordScattering ) : data = data.clip( rangeMin = 0.0 )
 
             xSec = data.integrate()

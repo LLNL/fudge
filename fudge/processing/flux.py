@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-"""
+r"""
 This module contains classes for storing the data in a fluxes node.
 
 This module contains the following classes:
@@ -17,7 +17,7 @@ This module contains the following classes:
     +---------------------------------------+-----------------------------------------------------------------------------------+
     | XYs2d                                 | This class represents the product energy and angular part of the flux.            |
     +---------------------------------------+-----------------------------------------------------------------------------------+
-    | Gridded2d                             | This class represents a multi-group repreentation of the flux :math:`f(E,\mu)`.   |
+    | Gridded2d                             | This class represents a multi-group representation of the flux :math:`f(E,\mu)`.  |
     +---------------------------------------+-----------------------------------------------------------------------------------+
     | XYs3d                                 | This class represents the flux :math:`f(T,E,\mu)`.                                |
     +---------------------------------------+-----------------------------------------------------------------------------------+
@@ -84,7 +84,7 @@ class XYs2d( multiD_XYsModule.XYs2d ) :
         axes[0] = self.axes[0].copy()
         for LS in self :
             if( len( LS ) > 1 ) : raise Exception( 'FIXME -- next line is wrong.' )
-        return( XYs1dModule.XYs1d( [ [ LS.outerDomainValue, LS[0] ] for LS in self ], axes = axes ) )
+        return( XYs1dModule.XYs1d( [ [ LS.outerDomainValue, LS[0] ] for LS in self ], axes = axes, interpolation=self.interpolation ) )
 
     def processMultiGroup( self, style, tempInfo, indent ) :
         """
@@ -122,7 +122,7 @@ class Gridded2d( griddedModule.Gridded2d ) :
     pass
 
 class XYs3d( multiD_XYsModule.XYs3d ) :
-    """
+    r"""
     This class represents the flux :math:`f(T,E,\mu)` where :math:`T` is temperature, :math:`E` is the projectile energy
     and :math:`\mu` is the cosine an angle.
     """

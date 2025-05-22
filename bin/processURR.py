@@ -25,7 +25,7 @@ from xData import table as tableModule
 
 from LUPY import times as timesModule
 
-summaryDocStringFUDGE = """This script process unresolved resonances to create probability tables."""
+summaryDocString__FUDGE = """This script process unresolved resonances to create probability tables."""
 
 parser = argparse.ArgumentParser(
     "Process unresolved resonances to create probability tables and optional cross section PDFs")

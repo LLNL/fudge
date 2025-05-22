@@ -18,7 +18,7 @@ from fudge.productData.distributions import unspecified as unspecifiedModule
 
 indentIncrement = '  '
 
-summaryDocStringFUDGE = '''Reads in all protares in a map file and prints all products which have missing/unspecified multiplicity/distribution data.'''
+summaryDocString__FUDGE = '''Reads in all protares in a map file and prints all products which have missing/unspecified multiplicity/distribution data.'''
 
 description = '''
 This script iterates over all protares in the specified map file. For each protare, it loops over each product (i.e., outgoing particle)

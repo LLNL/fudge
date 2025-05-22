@@ -383,7 +383,19 @@
         <span class="k">return</span> <span class="n">s</span></div>
 
 
+<div class="viewcode-block" id="EvaluationDomainMinTooHigh"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.EvaluationDomainMinTooHigh">[docs]</a><span class="k">class</span> <span class="nc">EvaluationDomainMinTooHigh</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expected</span> <span class="o">=</span> <span class="n">expected</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Evaluation starts at incident energy </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">domainMin</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">domainUnit</span><span class="si">}</span><span class="s2">, expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">expected</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+
 <span class="c1"># resonance region:</span>
+
 
 <div class="viewcode-block" id="BadScatteringRadius"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.BadScatteringRadius">[docs]</a><span class="k">class</span> <span class="nc">BadScatteringRadius</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
 
@@ -876,7 +888,10 @@
 
 <div class="viewcode-block" id="Domain_mismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.Domain_mismatch">[docs]</a><span class="k">class</span> <span class="nc">Domain_mismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lowBound</span><span class="p">,</span> <span class="n">highBound</span><span class="p">,</span> <span class="n">xscLowBound</span><span class="p">,</span> <span class="n">xscHighBound</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span>
+        <span class="k">if</span> <span class="n">lowBound</span> <span class="o">&lt;=</span> <span class="n">xscLowBound</span> <span class="ow">and</span> <span class="n">highBound</span> <span class="o">&gt;=</span> <span class="n">xscHighBound</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">Moderate</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lowBound</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">highBound</span> <span class="o">=</span> <span class="n">lowBound</span><span class="p">,</span> <span class="n">highBound</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xscLowBound</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xscHighBound</span> <span class="o">=</span> <span class="n">xscLowBound</span><span class="p">,</span> <span class="n">xscHighBound</span>
 
@@ -1005,6 +1020,16 @@
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">energy</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">fraction</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">fraction</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UnphysicalDiscreteOrPrimaryPhotonMultiplicity"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.UnphysicalDiscreteOrPrimaryPhotonMultiplicity">[docs]</a><span class="k">class</span> <span class="nc">UnphysicalDiscreteOrPrimaryPhotonMultiplicity</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Max multiplicity for discrete or primary photons should be 1&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Multiplicity &gt; 1 for primary or discrete photon&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="MadlandNixBadParameters"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MadlandNixBadParameters">[docs]</a><span class="k">class</span> <span class="nc">MadlandNixBadParameters</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>

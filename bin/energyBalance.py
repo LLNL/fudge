@@ -25,7 +25,7 @@ from fudge import enums as enumsModule
 from fudge.reactionData import crossSection as crossSectionModule
 from fudge.productData import averageProductEnergy as averageProductEnergyModule
 
-summaryDocStringFUDGE = '''For each reaction of a protare, writes available energy, each product's outgoing energy, energy balance, etc. to files.'''
+summaryDocString__FUDGE = '''For each reaction of a protare, writes available energy, each product's outgoing energy, energy balance, etc. to files.'''
 
 description = '''
 This script calculates, for each reaction, the available energy, the energy to each product and the energy balance. The results are
@@ -131,6 +131,8 @@ def output(reactionOutputDir, fileName, curve, crossSection=None):
                 priorEnergy = energy
             if priorEnergy is not None:                     # Add a point at the last zero cross section point.
                 curve.setValue(priorEnergy, curve.evaluate(priorEnergy))
+        elif fileName == 'Q.dat':
+            curve = curve * crossSection.domainSlice(domainMin=curve.domainMin)
 
         weighted = []
         for index, (xValue, yValue) in enumerate(curve):
@@ -216,14 +218,17 @@ def process(reaction, isReaction):
     crossSection = reaction.crossSection.toPointwise_withLinearXYs(lowerEps=1e-6)
     output(reactionOutputDir, 'crossSection.dat', crossSection)
 
+    outputChannel = reaction.outputChannel
     if isReaction:
+        Q = outputChannel.Q[0].toPointwise_withLinearXYs(accuracy=1e-5, lowerEps=1e-6)
+        output(reactionOutputDir, 'Q.dat', Q, crossSection)
         availableEnergy = reaction.availableEnergy[apdLabel]
         output(reactionOutputDir, 'availableEnergy.dat', availableEnergy, crossSection)
 
-        checkTwoBody(reactionOutputDir, crossSection, reaction.outputChannel)
+        checkTwoBody(reactionOutputDir, crossSection, outputChannel)
 
     productSums = {}
-    outputProductData(reactionOutputDir, crossSection, reaction.outputChannel, productSums, 0)
+    outputProductData(reactionOutputDir, crossSection, outputChannel, productSums, 0)
 
     totalProductEnergy = XYs1dModule.XYs1d(axes=averageProductEnergyAxes)
     for pid in productSums:

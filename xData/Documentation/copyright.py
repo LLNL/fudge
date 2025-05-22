@@ -19,7 +19,8 @@ This module contains the following classes:
 
 from .. import text as textModule
 
-class Copyright( textModule.Text ) :
+
+class Copyright(textModule.Text):
     """
     A class representing a GNDS documentation/copyright node.
 
@@ -34,46 +35,46 @@ class Copyright( textModule.Text ) :
 
     moniker = 'copyright'
 
-    def __init__( self, href = '' ) :
+    def __init__(self, href=''):
         """
-        :param href:    A url to the copyright.
+        :param href:    URL to the copyright.
         """
 
-        textModule.Text.__init__( self )
+        textModule.Text.__init__(self)
 
         self.href = href
 
     @property
-    def href( self ) :
+    def href(self):
         """
-        Thie method returns self's href instance.
+        This method returns self's href instance.
 
         :returns:       A python str.
         """
 
-        return( self.__href )
+        return self.__href
 
     @href.setter
-    def href( self, value ) :
+    def href(self, value):
         """
         This method sets the href member of *self* to *value*.
 
         :param value:       The new href value for *self*.
         """
 
-        if( not( isinstance( value, str ) ) ) : raise TypeError( 'href must be a str instance.' )
+        if not isinstance(value, str): raise TypeError('href must be a str instance.')
         self.__href = value
 
-    def XML_extraAttributes( self, **kwargs ) :
+    def XML_extraAttributes(self, **kwargs):
         """
-        This methods returns the XML attributes for *self* as a single python str.
+        This method returns the XML attributes for *self* as a single python str.
 
         :kwargs:        This argument is not used.
 
         :returns:       A python str.
         """
 
-        if( self.href == '' ) : return ''
+        if self.href == '': return ''
 
         return ' href="%s"' % self.href
 
@@ -84,12 +85,12 @@ class Copyright( textModule.Text ) :
         :param node:        Node to parse.
         :param xPath:       List containing xPath to current node, useful mostly for debugging.
         :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
         """
 
         textModule.Text.parseNode(self, node, xPath, linkData, **kwargs)
-        xPath.append( node.tag )
+        xPath.append(node.tag)
 
-        self.__href = node.get( 'href', '' )
+        self.__href = node.get('href', '')
 
-        xPath.pop( )
+        xPath.pop()

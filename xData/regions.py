@@ -546,15 +546,24 @@ class Regions1d( Regions ) :
         return regions1d
 
     def __mul__( self, other ) :
+        """
+        This method multiplies *self* by *other* and returns the product. Here, *other* can be an int for a float.
+
+        :param other:       Instance to multiply *self* by.
+
+        :return:            A :py:class:`Regions1d` instance.
+        """
 
         _self, _other = self.copyToCommonRegions( other )
-        _regions1d = self.__class__( )
+        _regions1d = self.__class__(axes=self.axes)
         for index, region1 in enumerate( _self ) :
             region2 = _other[index]
             region = region1 * region2
             _regions1d.append( region )
 
         return( _regions1d )
+
+    __rmul__ = __mul__
 
     def copyToCommonRegions(self, other, epsilon = domainEpsilon):
         """
@@ -568,11 +577,13 @@ class Regions1d( Regions ) :
         :returns:           Two :py:class:`Regions1d` instances.
         """
 
-        if self.dimension != other.dimension:
-            raise ValueError('self.dimension = %s not equal to other.dimension = %s' % (self.dimension, other.dimension))
-
         self2 = self.copy()
-        other2 = other.copy()
+        if isinstance(other, (float, int)):
+            other2 = self.toLinearXYsClass()(data=[[self.domainMin, other], [self.domainMax, other]])
+        elif self.dimension != other.dimension:
+            raise ValueError('self.dimension = %s not equal to other.dimension = %s' % (self.dimension, other.dimension))
+        else:
+            other2 = other.copy()
 
         if len(self2) == 0:
             if len(other2) == 0:

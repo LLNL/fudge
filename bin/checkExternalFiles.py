@@ -15,7 +15,7 @@ from fudge import GNDS_file as GNDS_fileModule
 from fudge import suites as suitesModule
 from fudge.covariances import covarianceSuite as covarianceSuiteModule
 
-summaryDocStringFUDGE = """Checks the externalFiles for consistency in one or more protares file."""
+summaryDocString__FUDGE = """Checks the externalFiles for consistency in one or more protares file."""
 
 description = """
 This scripts checks the externalFiles for consistency in one or more protares file. The path argument can refer to a map file,

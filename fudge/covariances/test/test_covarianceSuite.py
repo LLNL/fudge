@@ -16,40 +16,46 @@ dbrown, 12/5/2012
 import unittest, os
 
 from fudge import GNDS_formatVersion as GNDS_formatVersionModule
-from fudge.covariances import *
 from fudge import reactionSuite
 from fudge.covariances import covarianceSuite
 
 TEST_DATA_PATH, this_filename = os.path.split(__file__)
-FeEvaluation =  reactionSuite.ReactionSuite.readXML_file( TEST_DATA_PATH+os.sep+'n-026_Fe_056-endfbvii.1.endf.gnds.xml')
-FeCovariance =  covarianceSuite.CovarianceSuite.readXML_file( TEST_DATA_PATH+os.sep+'n-026_Fe_056-endfbvii.1.endf.gndsCov.xml', reactionSuite=FeEvaluation )
+FeEvaluation = reactionSuite.ReactionSuite.readXML_file(
+    TEST_DATA_PATH + os.sep + 'n-026_Fe_056-endfbvii.1.endf.gnds.xml')
+FeCovariance = covarianceSuite.CovarianceSuite.readXML_file(
+    TEST_DATA_PATH + os.sep + 'n-026_Fe_056-endfbvii.1.endf.gndsCov.xml', reactionSuite=FeEvaluation)
 
 
-class TestCaseBase( unittest.TestCase ):
+class TestCaseBase(unittest.TestCase):
 
-    def assertXMLListsEqual(self,x1,x2):
+    def assertXMLListsEqual(self, x1, x2):
 
-        listAssertEqual = getattr( self, 'assertCountEqual', None )
-        if( listAssertEqual is None ) : listAssertEqual = getattr( self, 'assertItemsEqual' )
+        listAssertEqual = getattr(self, 'assertCountEqual', None)
+        if listAssertEqual is None: listAssertEqual = getattr(self, 'assertItemsEqual')
 
         x1List = []
         for line in x1:
-            if '\n' in line: x1List += [x.strip() for x in line.split('\n')]
-            else: x1List.append(line.strip())
+            if '\n' in line:
+                x1List += [x.strip() for x in line.split('\n')]
+            else:
+                x1List.append(line.strip())
         x2List = []
         for line in x2:
-            if '\n' in line: x2List += [x.strip() for x in line.split('\n')]
-            else: x2List.append(line.strip())
-        return listAssertEqual( x1List, x2List )
+            if '\n' in line:
+                x2List += [x.strip() for x in line.split('\n')]
+            else:
+                x2List.append(line.strip())
+        return listAssertEqual(x1List, x2List)
 
-class Test_covarianceSuite( TestCaseBase ):
+
+class Test_covarianceSuite(TestCaseBase):
 
     def setUp(self):
         self.covSuite = FeCovariance
 
     def test_readXML(self):
-        '''Also tests __init__ & parseNode'''
-        self.assertIsInstance( self.covSuite, covarianceSuite.CovarianceSuite )
+        """Also tests __init__ & parseNode"""
+        self.assertIsInstance(self.covSuite, covarianceSuite.CovarianceSuite)
 
     def test__getitem__(self):
         answer = """<covarianceSection label="nonelastic">
@@ -87,12 +93,15 @@ class Test_covarianceSuite( TestCaseBase ):
               <link href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit="b**2"/></axes>
           <array shape="8,8" compression="diagonal">
-            <values>0 4.84e-10 1.357e-5 9.8057e-6 2.6915e-5 3.3173e-5 3.2769e-5 3.0954e-5</values></array></gridded2d></shortRangeSelfScalingVariance></mixed></covarianceSection>""".split('\n')
+            <values>0 4.84e-10 1.357e-5 9.8057e-6 2.6915e-5 3.3173e-5 3.2769e-5 3.0954e-5</values></array></gridded2d></shortRangeSelfScalingVariance></mixed></covarianceSection>""".split(
+            '\n')
         self.maxDiff = None
-        self.assertXMLListsEqual(self.covSuite.covarianceSections[2].toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0), answer)
+        self.assertXMLListsEqual(
+            self.covSuite.covarianceSections[2].toXML_strList(formatVersion=GNDS_formatVersionModule.version_2_0),
+            answer)
 
     def test__len__(self):
-        self.assertEqual( len(self.covSuite.covarianceSections),60)
+        self.assertEqual(len(self.covSuite.covarianceSections), 60)
 
     def test_addSection(self):
         pass
@@ -106,27 +115,28 @@ class Test_covarianceSuite( TestCaseBase ):
     def test_addExternalReaction(self):
         pass
 
-    def test_saveToOpenedFile( self):
+    def test_saveToOpenedFile(self):
         pass
 
-    def test_saveToFile( self):
+    def test_saveToFile(self):
         pass
 
-    def test_check( self ):
+    def test_check(self):
         pass
 
-    def test_fix( self ):
+    def test_fix(self):
         pass
 
     def test_removeExtraZeros(self):
         pass
 
     def test_toXML_strList(self):
-        '''Tested already in test__getitem__'''
+        """Tested already in test__getitem__"""
         pass
 
     def test_toENDF6(self):
         pass
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     unittest.main()

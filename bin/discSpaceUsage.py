@@ -16,7 +16,7 @@ from fudge import product as productModule
 
 indentIncrement = '  '
 
-summaryDocStringFUDGE = '''Prints disc usage of various nodes in a GNDS reactionSuite file.'''
+summaryDocString__FUDGE = '''Prints disc usage of various nodes in a GNDS reactionSuite file.'''
 
 description = '''
 Prints disc usage of various nodes in a GNDS file. Currently, only looks at disc usage for a file written to XML.

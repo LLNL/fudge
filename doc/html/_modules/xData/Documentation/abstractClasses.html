@@ -61,13 +61,15 @@
 <span class="sd">    | AuthorAbstract            | TThis is an abstract class for GNDS/documentation author nodes.               |</span>
 <span class="sd">    +---------------------------+-------------------------------------------------------------------------------+</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
 
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">suite</span> <span class="k">as</span> <span class="n">suiteModule</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">text</span> <span class="k">as</span> <span class="n">textModule</span>
 
-<div class="viewcode-block" id="Affiliation"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.Affiliation">[docs]</a><span class="k">class</span> <span class="nc">Affiliation</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="Affiliation"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.Affiliation">[docs]</a><span class="k">class</span> <span class="nc">Affiliation</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class represents a GNDS author/affiliations/affiliation node.</span>
 
@@ -85,42 +87,42 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;affiliation&#39;</span>
     <span class="n">keyName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">href</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param name:    The name of the institution.</span>
 <span class="sd">        :param href:    The url for the institution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">=</span> <span class="n">href</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s name instance.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
 
     <span class="nd">@name</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">href</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">href</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self&#39;s href instance.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span>
 
     <span class="nd">@href</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">href</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">href</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Affiliation.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.Affiliation.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Affiliation.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.Affiliation.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This methods returns the XML attributes for *self* as a single python str.</span>
+<span class="sd">        This method returns the XML attributes for *self* as a single python str.</span>
 
 <span class="sd">        :kwargs:        This argument is not used.</span>
 
@@ -128,20 +130,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">attributes</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; name=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
-        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; href=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; name=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__href</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">attributes</span> <span class="o">+=</span> <span class="s1">&#39; href=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__href</span>
 
         <span class="k">return</span> <span class="n">attributes</span></div>
 
 <div class="viewcode-block" id="Affiliation.parseNodeUsingClass"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.Affiliation.parseNodeUsingClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parseNodeUsingClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;name&#39;</span> <span class="p">)</span>
-        <span class="n">href</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;href&#39;</span> <span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="n">href</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">href</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="Affiliations"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.Affiliations">[docs]</a><span class="k">class</span> <span class="nc">Affiliations</span><span class="p">(</span> <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="Affiliations"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.Affiliations">[docs]</a><span class="k">class</span> <span class="nc">Affiliations</span><span class="p">(</span><span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is the suite class for the GNDS/documentation/authors affiliations node.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -149,18 +152,19 @@
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;affiliations&#39;</span>
     <span class="n">suiteName</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">Affiliation</span><span class="p">])</span></div>
 
-        <span class="n">suiteModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span> <span class="n">Affiliation</span> <span class="p">]</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Note"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.Note">[docs]</a><span class="k">class</span> <span class="nc">Note</span><span class="p">(</span> <span class="n">textModule</span><span class="o">.</span><span class="n">Text</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="Note"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.Note">[docs]</a><span class="k">class</span> <span class="nc">Note</span><span class="p">(</span><span class="n">textModule</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a class representing a GNDS authors/author/note node.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;note&#39;</span></div>
 
-<div class="viewcode-block" id="AuthorAbstract"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.AuthorAbstract">[docs]</a><span class="k">class</span> <span class="nc">AuthorAbstract</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AuthorAbstract"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.AuthorAbstract">[docs]</a><span class="k">class</span> <span class="nc">AuthorAbstract</span><span class="p">(</span><span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is an abstract class for GNDS/documentation author nodes.</span>
 
@@ -175,15 +179,15 @@
 <span class="sd">    +---------------+---------------------------------------------------------------+</span>
 <span class="sd">    | email         | The email address of the author.                              |</span>
 <span class="sd">    +---------------+---------------------------------------------------------------+</span>
-<span class="sd">    | affiliations  | A suiite of auther affiliations.                              |</span>
+<span class="sd">    | affiliations  | A suite of auther affiliations.                               |</span>
 <span class="sd">    +---------------+---------------------------------------------------------------+</span>
 <span class="sd">    | note          | Notes about the author.                                       |</span>
 <span class="sd">    +---------------+---------------------------------------------------------------+</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;affiliations&#39;</span><span class="p">,</span> <span class="s1">&#39;note&#39;</span> <span class="p">)</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;affiliations&#39;</span><span class="p">,</span> <span class="s1">&#39;note&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">orcid</span><span class="p">,</span> <span class="n">email</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">orcid</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param name:    The author&#39;s name.</span>
 <span class="sd">        :param orcid:   The orcid of the author.</span>
@@ -192,25 +196,25 @@
 
         <span class="n">ancestryModule</span><span class="o">.</span><span class="n">AncestryIO</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__orcid</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">orcid</span><span class="p">,</span> <span class="s1">&#39;orcid&#39;</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__email</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span> <span class="n">email</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__orcid</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">orcid</span><span class="p">,</span> <span class="s1">&#39;orcid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__email</span> <span class="o">=</span> <span class="n">textModule</span><span class="o">.</span><span class="n">raiseIfNotString</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__affiliations</span> <span class="o">=</span> <span class="n">Affiliations</span><span class="p">(</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__affiliations</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__affiliations</span> <span class="o">=</span> <span class="n">Affiliations</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__affiliations</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__note</span> <span class="o">=</span> <span class="n">Note</span><span class="p">(</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__note</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__note</span> <span class="o">=</span> <span class="n">Note</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__note</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns that name of the author.</span>
 
 <span class="sd">        :returns:   A python str.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">orcid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -223,38 +227,38 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__orcid</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">email</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns that email of the author.</span>
 
 <span class="sd">        :returns:   A python str.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__email</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__email</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">affiliations</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">affiliations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method returns a reference to the affiliations suite.</span>
+<span class="sd">        This method returns a reference to the &#39;affiliations&#39; suite.</span>
 
-<span class="sd">        :returns:       A instance of :py:class:`Affiliations`.</span>
+<span class="sd">        :returns:       An instance of :py:class:`Affiliations`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__affiliations</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__affiliations</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">note</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">note</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns a reference to the note member.</span>
 
-<span class="sd">        :returns:       A instance of :py:class:`Note`.</span>
+<span class="sd">        :returns:       An instance of :py:class:`Note`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__note</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__note</span>
 
-<div class="viewcode-block" id="AuthorAbstract.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.AuthorAbstract.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="AuthorAbstract.XML_extraAttributes"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.AuthorAbstract.XML_extraAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">XML_extraAttributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This methods returns the XML attributes for *self* as a single python str.</span>
+<span class="sd">        This method returns the XML attributes for *self* as a single python str.</span>
 
 <span class="sd">        :kwargs:        This argument is not used.</span>
 
@@ -267,24 +271,24 @@
 
         <span class="k">return</span> <span class="n">attributes</span></div>
 
-<div class="viewcode-block" id="AuthorAbstract.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.AuthorAbstract.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthorAbstract.toXML_strList"><a class="viewcode-back" href="../../../xData/index.html#xData.Documentation.abstractClasses.AuthorAbstract.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of str instances representing the XML lines of *self*.</span>
 
-<span class="sd">        :param indent:          The minimum amount of indentation.</span>
-<span class="sd">        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.</span>
+<span class="sd">        :param indent:     The minimum amount of indentation.</span>
+<span class="sd">        :param kwargs:     A dictionary of extra arguments controlling how *self* is converted to a list of XML strings.</span>
 
-<span class="sd">        :return:                List of str instances representing the XML lines of self.</span>
+<span class="sd">        :return:           List of str instances representing the XML lines of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
 
-        <span class="n">XMLList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">XML_extraAttributes</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">)</span> <span class="p">]</span>
-        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__affiliations</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
-        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__note</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">XML_extraAttributes</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))]</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__affiliations</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">XMLList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__note</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">XMLList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="n">XMLList</span> <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">XMLList</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

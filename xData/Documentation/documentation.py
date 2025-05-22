@@ -13,7 +13,7 @@ This module contains the following classes:
     +---------------------------+-----------------------------------------------------------------------------------+
     | Class                     | Description                                                                       |
     +===========================+===================================================================================+
-    | Documentation             | This is the class for the GNDS documentaion node.                                 |
+    | Documentation             | This is the class for the GNDS documentation node.                                 |
     +---------------------------+-----------------------------------------------------------------------------------+
 """
 
@@ -33,6 +33,7 @@ from . import bibitem as bibitemModule
 from . import exforDataSet as exforDataSetModule
 from . import texts as textsModule
 from .. import text as textParentModule
+
 
 class Documentation(ancestryModule.AncestryIO):
     """
@@ -83,8 +84,10 @@ class Documentation(ancestryModule.AncestryIO):
     """
 
     moniker = 'documentation'
-    ancestryMembers = ( 'authors', 'contributors', 'collaborations', 'dates', 'copyright', 'acknowledgements', 'keywords', 
-            'relatedItems', 'title', 'abstract', 'body', 'computerCodes', 'experimentalDataSets', 'bibliography', 'endfCompatible' )
+    ancestryMembers = (
+        'authors', 'contributors', 'collaborations', 'dates', 'copyright', 'acknowledgements', 'keywords',
+        'relatedItems', 'title', 'abstract', 'body', 'computerCodes', 'experimentalDataSets', 'bibliography',
+        'endfCompatible')
 
     def __init__(self, doi='', version='', publicationDate=None):
         """
@@ -365,8 +368,8 @@ class Documentation(ancestryModule.AncestryIO):
 
     def findEntriesWithKey(self, keyValue):
         """
-        Thie method returns the list of each entry in *self*'s authors, contributors, collaborations, acknowledgements, relatedItems and computerCodes
-        which have the key *keyValue*.
+        This method returns the list of each entry in *self*'s authors, contributors, collaborations, acknowledgements,
+        relatedItems and computerCodes which have the key *keyValue*.
 
         :param keyValue:        The value of the key.
         """
@@ -387,14 +390,14 @@ class Documentation(ancestryModule.AncestryIO):
 
         return entries
 
-    def toXML_strList(self, indent = '', **kwargs):
+    def toXML_strList(self, indent='', **kwargs):
         """
         Returns a list of str instances representing the XML lines of *self*.
 
-        :param indent:          The minimum amount of indentation.
-        :param kwargs:          A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param indent:       The minimum amount of indentation.
+        :param kwargs:       dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
-        :return:                List of str instances representing the XML lines of self.
+        :return:             List of str instances representing the XML lines of self.
         """
 
         if kwargs.get('skipDocumentation', False):
@@ -403,7 +406,7 @@ class Documentation(ancestryModule.AncestryIO):
         incrementalIndent = kwargs.get('incrementalIndent', '  ')
         indent2 = indent + incrementalIndent
 
-        XMLList  = self.__authors.toXML_strList(indent2, **kwargs)
+        XMLList = self.__authors.toXML_strList(indent2, **kwargs)
         XMLList += self.__contributors.toXML_strList(indent2, **kwargs)
         XMLList += self.__collaborations.toXML_strList(indent2, **kwargs)
         XMLList += self.__dates.toXML_strList(indent2, **kwargs)
@@ -419,9 +422,9 @@ class Documentation(ancestryModule.AncestryIO):
         XMLList += self.__bibliography.toXML_strList(indent2, **kwargs)
         XMLList += self.__endfCompatible.toXML_strList(indent2, **kwargs)
 
-        attributes  = '' if self.doi == '' else ' doi="%s"' % self.doi
+        attributes = '' if self.doi == '' else ' doi="%s"' % self.doi
         attributes += '' if self.version == '' else ' version="%s"' % self.version
-        attributes += self.__publicationDate.asXML_attribute(name = 'publicationDate')
+        attributes += self.__publicationDate.asXML_attribute(name='publicationDate')
 
         if len(XMLList) == 0 and len(attributes) == 0:
             return []
@@ -438,7 +441,7 @@ class Documentation(ancestryModule.AncestryIO):
         :param node:        Node to parse.
         :param xPath:       List containing xPath to current node, useful mostly for debugging.
         :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
         """
 
         xPath.append(node.tag)
@@ -456,7 +459,7 @@ class Documentation(ancestryModule.AncestryIO):
         :param node:        Node to parse.
         :param xPath:       List containing xPath to current node, useful mostly for debugging.
         :param linkData:    dict that collects unresolved links.
-        :param kwargs:      A dictionary of extra arguments that controls how *self* is converted to a list of XML strings.
+        :param kwargs:      dictionary of extra arguments controlling how *self* is converted to a list of XML strings.
 
         :returns:           An instance of *cls* representing *node*.
         """

@@ -24,9 +24,9 @@ from fudge import map as mapModule
 from fudge import protareProductInfo as protareProductInfoModule
 from fudge import reactionSuite as reactionSuiteModule
 
-summaryDocStringFUDGE = """Builds **ris** (reaction infomation summary) data for each protare in the specified map file and writes the results to a **ris** file."""
+summaryDocString__FUDGE = """Builds **ris** (reaction infomation summary) data for each protare in the specified map file and writes the results to a **ris** file."""
 
-description = summaryDocStringFUDGE
+description = summaryDocString__FUDGE
 
 def worker(inputQueue, outputQueue):
 

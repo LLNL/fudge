@@ -192,6 +192,48 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
         if atom.T_effective is not None:
             endf += atom.T_effective.toENDF6( flags, targetInfo, verbosityIndent = '' )
     endfMFList[7][4] = endf + [99999]
+
+    targetInfo_ = self.rootAncestor.styles.getEvaluatedStyle().targetInfo
+    if targetInfo_ is not None:
+        # write general information section:
+        NA = len(targetInfo_.isotopicAbundances.chemicalElements)
+        endf = [endfFormatsModule.endfHeadLine(ZAM, AWT, NA, 0, 0, 0)]
+        pops = self.rootAncestor.PoPs
+        numberPerMolecule = {}
+        for atom in self.scatteringAtoms:
+            try:
+                popsParticle = pops[atom.pid]
+            except:
+                print(f"Can't look up particle {atom.pid}. Assuming 1 scattering atom per molecule.")
+                continue
+
+            if hasattr(popsParticle, 'symbol'):
+                symbol = popsParticle.symbol
+            elif hasattr(popsParticle, 'chemicalElementSymbol'):
+                symbol = popsParticle.chemicalElementSymbol
+            else:
+                raise TypeError("Can't determine chemical element for particle %s" % atom.pid)
+            numberPerMolecule[symbol] = atom.numberPerMolecule
+        for chemicalElement in targetInfo_.isotopicAbundances.chemicalElements:
+            NAS = numberPerMolecule.get(chemicalElement.symbol, 1)
+            NI = len(chemicalElement.nuclides)
+            endf.append(endfFormatsModule.endfContLine(0, 0, NAS, 0, 6*NI, NI))
+            for nuclide in chemicalElement.nuclides:
+                popsParticle = pops[nuclide.pid]
+                ZAI = 1000 * popsParticle.Z + popsParticle.A
+                AFI = nuclide.atomFraction
+                mass_amu = popsParticle.mass.float('amu')
+                AWRI = mass_amu / neutronMass
+
+                boundAtomCrossSection, = [bac for bac in self.scatteringAtoms[0].boundAtomCrossSectionByNuclide
+                                          if bac.label == nuclide.pid]
+                freeAtomCrossSection = boundAtomCrossSection.value * (
+                        mass_amu / (mass_amu + neutronMass)) ** 2
+                endf.append(endfFormatsModule.endfDataLine([ZAI, 0, AFI, AWRI, freeAtomCrossSection, 0]))
+
+        endf.append(endfFormatsModule.endfSENDLineNumber())
+        endfMFList[7][451] = endf
+
 thermalScatteringModule.incoherentInelastic.Form.toENDF6 = toENDF6
 
 #
