@@ -288,7 +288,7 @@ def ITYPE_4(MTDatas, info, verbose=0):
             aliasID = "%s_m%s" % (parentAtom.isotope.symbol, LISO)
             info.PoPs.add(PoPsAliasModule.MetaStable(aliasID, parentAtom.id, LISO))
 
-        HL, dHL, dummy, dummy, NC2, dummy = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
+        HL, dHL, _, _, NC2, _ = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
             MT457MF8Data[dataIndex], intIndices=[4])
         dataIndex += printInfo(verbose, dataIndex, MT457MF8Data)
 

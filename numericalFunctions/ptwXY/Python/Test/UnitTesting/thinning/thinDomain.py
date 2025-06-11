@@ -39,7 +39,7 @@ def checkThin( ls ) :
     ls, epsilon = utilitiesModule.getDoubleValue( 'epsilon', ls )
     ls, original = utilitiesModule.getXYData( ls )
     ls, answer = utilitiesModule.getXYData( ls )
-    ls, dummy = utilitiesModule.getXYData( ls )
+    ls, _ = utilitiesModule.getXYData( ls )
     thinned = original.thinDomain( epsilon )
     if( len( answer ) != len( thinned ) ) : raise Exception( '%s: len( answer ) = %d != len( thinned ) = %d for label = "%s"' % \
         ( __file__, len( answer ), len( thinned ), label ) )

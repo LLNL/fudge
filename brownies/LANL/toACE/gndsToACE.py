@@ -474,7 +474,7 @@ def processEnergyData( massUnit, neutronMass, energyDatas, JXS, XSS, nonFissionE
     for MT, EMin, EMax, energyData in energyDatas :
         n_multiplicity = []
         if MT in nonFissionEnergyDependentNeutronMultiplicities:        # Fixup the TYR data whose abs( value ) is greater than 100.
-            TYR_index, index, multiplicity, dummy = nonFissionEnergyDependentNeutronMultiplicities[MT]
+            TYR_index, index, multiplicity, _ = nonFissionEnergyDependentNeutronMultiplicities[MT]
             JXS5 = JXS[5-1]
             if abs( XSS[JXS5+TYR_index-1] ) != index: raise Exception( 'Neutron multiplicity for index %s not found in TYR table' % index )
             n_multiplicity = multiplicity.toACE( )

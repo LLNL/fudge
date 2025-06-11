@@ -132,7 +132,7 @@ def read(fileName, reactionSuite=None, warningNoReactionSuite=True, verbosity=1,
     in the file *fileName* into **FUDGE**.  It returns the **FUDGE** instance for the type.
     """
 
-    name, dummy = type(fileName)
+    name, _ = type(fileName)
     if name == reactionSuiteModule.ReactionSuite.moniker:
         kwargs = {'verbosity': verbosity, 'lazyParsing': lazyParsing}
         return reactionSuiteModule.ReactionSuite.readXML_file(fileName, **kwargs)

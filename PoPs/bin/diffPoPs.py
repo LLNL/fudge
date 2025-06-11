@@ -56,7 +56,7 @@ def missingIds(pops, args, set1, set2, first):
     if len(diffList) > 0:
         idFormat = '%%-%ds' % max([len(pid) for pid in diffList])
         diff = sorted([[pid.lower(), pid] for pid in diffList])
-        pids = [idFormat % pid for dummy, pid in diff]
+        pids = [idFormat % pid for _, pid in diff]
         for index in range(0, len(pids), args.missingPerLine):
             print('    %s' % ' '.join(pids[index:index+args.missingPerLine]))
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     missingIds(pops2, args, set2, set1, False)
 
     intersection = sorted([[pid.lower(), pid] for pid in set1.intersection(set2)])
-    intersection = list(pid for dummy, pid in intersection)
+    intersection = list(pid for _, pid in intersection)
     if args.mass:
         print('Mass difference (%s):' % massUnit)
         header = '    %-12s %-20s %-20s  %-10s %-10s' % ('id', 'mass-1', 'mass-2', 'diff', 'rel-diff')

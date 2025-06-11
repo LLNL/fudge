@@ -1548,10 +1548,10 @@ class TwoBody( baseModule.Form ) :
                 else :
                     muLists = [ [ mu_prime_1, mu_prime_4 ] ]
             else :
-                mu_prime_1, dummy = self.productMuInCOM_fromProductMuInLab( mu_prime_min, com_speed, product_com_speed )
+                mu_prime_1, _ = self.productMuInCOM_fromProductMuInLab( mu_prime_min, com_speed, product_com_speed )
                 mu_prime_2 = None
                 if mu_prime_max is not None:
-                    mu_prime_2, dummy = self.productMuInCOM_fromProductMuInLab( mu_prime_max, com_speed, product_com_speed )
+                    mu_prime_2, _ = self.productMuInCOM_fromProductMuInLab( mu_prime_max, com_speed, product_com_speed )
                 muLists = [ [ mu_prime_1, mu_prime_2 ] ]
 
         angular_evaluate = 0.0

@@ -82,8 +82,8 @@ count = 0
 while( len( ls ) ) :
     count += 1
     if( count == 9 ) :
-        ls, dummy = getXYData( ls )
-        ls, dummy = getXYData( ls )
+        ls, _ = getXYData( ls )
+        ls, _ = getXYData( ls )
     ls, xMin = getDoubleValue( 'xMin', ls )
     ls, xMax = getDoubleValue( 'xMax', ls )
     ls, data = getXYData( ls )

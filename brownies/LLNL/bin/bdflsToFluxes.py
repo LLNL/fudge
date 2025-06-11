@@ -49,7 +49,7 @@ if( __name__ == '__main__' ) :
                 orders.append( flux )
                 grid += flux
             flux = [ ]
-            for energy, dummy in grid :
+            for energy, _ in grid :
                 energyLegendreCoefficients = '%s' % energy
                 for order in orders : energyLegendreCoefficients += ' %s' % order.evaluate( energy )
                 flux.append( energyLegendreCoefficients )
