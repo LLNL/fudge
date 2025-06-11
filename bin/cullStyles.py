@@ -33,7 +33,7 @@ if __name__ == '__main__' :
 
     args = parser.parse_args( )
 
-    name, dummy = GNDS_fileModule.type(args.gnds)
+    name, _ = GNDS_fileModule.type(args.gnds)
 
     if( name == reactionSuiteModule.ReactionSuite.moniker ) :
             gnds = GNDS_fileModule.read(args.gnds)

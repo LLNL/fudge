@@ -13,7 +13,7 @@ Translate GNDS/HDF5 to GNDS/XML
 import sys
 import os
 
-from xml.etree import cElementTree as etree
+from xml.etree import ElementTree as ET
 import numpy
 import h5py
 
@@ -33,11 +33,11 @@ def addNode( parent, node ):
     name = attrs.pop( "_xmltag" )
 
     try:
-        xmlnode = etree.Element( name )
+        xmlnode = ET.Element( name )
         for key,val in attrs.items():
             if key.startswith("_xml"): continue
             xmlnode.set( str(key), str(val) )
-        if isinstance( parent, etree.ElementTree ): parent._setroot( xmlnode )
+        if isinstance( parent, ET.ElementTree ): parent._setroot( xmlnode )
         else: parent.append( xmlnode )
         newParent = xmlnode
 
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     h5file = sys.argv[1]
     h5 = h5py.File( h5file, "r" )
 
-    xdoc = etree.ElementTree()
+    xdoc = ET.ElementTree()
 
     root = list(h5.values())[0]
     addNode( xdoc, root )

@@ -59,6 +59,6 @@ def thin( label, accuracy, original, data ) :
 while( 1 ) :
     ls, label, accuracy, original = getData( ls, True )
     if( ls is None ) : break
-    ls, label, dummy, data = getData( ls, False )
+    ls, label, _, data = getData( ls, False )
     if( ls is None ) : raise Exception( '%s: missing thinned data for label = "%s"' % ( __file__, label ) )
     thin( label, accuracy, original, data )

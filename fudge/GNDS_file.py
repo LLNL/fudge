@@ -14,7 +14,7 @@ If the file is not a *GNDS/XML* file, a raise is executed.
 
 import pathlib
 import xml.sax
-from xml.etree import cElementTree
+from xml.etree import ElementTree as ET
 
 from LUPY.hdf5 import HDF5_present, h5py
 from LUPY import xmlNode as xmlNodeModule  # wrapper around the xml parser:
@@ -132,7 +132,7 @@ def read(fileName, reactionSuite=None, warningNoReactionSuite=True, verbosity=1,
     in the file *fileName* into **FUDGE**.  It returns the **FUDGE** instance for the type.
     """
 
-    name, dummy = type(fileName)
+    name, _ = type(fileName)
     if name == reactionSuiteModule.ReactionSuite.moniker:
         kwargs = {'verbosity': verbosity, 'lazyParsing': lazyParsing}
         return reactionSuiteModule.ReactionSuite.readXML_file(fileName, **kwargs)
@@ -148,7 +148,7 @@ def read(fileName, reactionSuite=None, warningNoReactionSuite=True, verbosity=1,
     elif name == groupModule.Groups.moniker:
         return groupModule.read(fileName)
     elif name == fissionFragmentDataModule.FissionFragmentData.moniker:
-        element = cElementTree.parse(fileName).getroot()
+        element = ET.parse(fileName).getroot()
         element = xmlNodeModule.XML_node(element, xmlNodeModule.XML_node.etree)
         fissionFragmentData = fissionFragmentDataModule.FissionFragmentData()
         fissionFragmentData.parseNode(element, [], {})
@@ -233,7 +233,7 @@ def preview(fileName, haltParsingMoniker=stylesModule.Styles.moniker):
         lines.append(lines.pop(-1)[:handler.GNDS_previewColumn] + '</%s>' % handler.haltParsingMoniker)
         if handler.haltParsingMoniker != name: lines.append('</%s>' % name)
 
-        element = cElementTree.fromstring(''.join(lines))
+        element = ET.fromstring(''.join(lines))
         element = xmlNodeModule.XML_node(element, xmlNodeModule.XML_node.etree)
         linkData = {'unresolvedLinks': []}
         if name == reactionSuiteModule.ReactionSuite.moniker:

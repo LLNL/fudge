@@ -39,7 +39,7 @@ def printMissing(message, missing):
     if len(missing) > 0:
         idFormat = '%%-%ds' % max([len(pid) for pid in missing])
         diff = sorted([[pid.lower(), pid] for pid in missing])
-        pids = [idFormat % pid for dummy, pid in diff]
+        pids = [idFormat % pid for _, pid in diff]
         for index in range(0, len(pids), args.missingPerLine):
             print('    %s' % ' '.join(pids[index:index+args.missingPerLine]))
 

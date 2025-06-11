@@ -57,15 +57,15 @@ def ITYPE_6(Z, MTDatas, info, verbose=0):
     chemicalElement.atomicData = atomicData
 
     offset = 0
-    ZA, AWP, dummy, dummy, NSS, dummy = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
+    ZA, AWP, _, _, NSS, _ = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
         MF28[offset], intIndices=[4], logFile=info.logs)
     info.ZA_massLineInfo.add(ZA, AWP, MT, 28, offset)
     offset += 1
     for subshell in range(NSS):
-        SUBI, dummy, dummy, dummy, dummy, NTR = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
+        SUBI, _, _, _, _, NTR = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
             MF28[offset], intIndices=[0, 5], logFile=info.logs)
         offset += 1
-        EBI, ELN, dummy, dummy, dummy, dummy = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
+        EBI, ELN, _, _, _, _ = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
             MF28[offset], intIndices=[], logFile=info.logs)
         offset += 1
 
@@ -78,7 +78,7 @@ def ITYPE_6(Z, MTDatas, info, verbose=0):
         probabilitySum = 0.
         info.logs.write(' : %s' % MT_AtomicConfigurations[534 + SUBI - 1])
         for i1 in range(NTR):
-            SUBJ, SUBK, ETR, FTF, dummy, dummy = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
+            SUBJ, SUBK, ETR, FTF, _, _ = endfFileToGNDSMisc.sixFunkyFloatStringsToIntsAndFloats(
                 MF28[offset], intIndices=[0, 1], logFile=info.logs)
             offset += 1
 

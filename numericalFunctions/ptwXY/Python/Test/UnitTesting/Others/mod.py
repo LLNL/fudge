@@ -62,7 +62,7 @@ def checkMod( ls ) :
 
     ls, m = getDoubleValue( 'mod', ls )
     ls, data = getXYData( ls )
-    ls, dummy = getXYData( ls )
+    ls, _ = getXYData( ls )
     moded = data % m
     if( len( moded ) != len( data ) ) : raise Exception( '%s: len( moded ) = %d != len( data ) = %d' % ( __file__, len( moded ), len( data ) ) )
     for i, xy in enumerate( moded ) :

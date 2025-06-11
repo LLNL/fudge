@@ -310,7 +310,7 @@ def readMF7(info, MT, MF7):
     forms = []
     if LTHR in (1, 3):  # coherent elastic scattering
 
-        line, temps, energies, dummy, data, e_interp, t_interp = readSTable(line, MF7)
+        line, temps, energies, _, data, e_interp, t_interp = readSTable(line, MF7)
         temps, energies = map(valuesModule.Values, (temps, energies))
 
         if e_interp != xDataEnumsModule.Interpolation.flat:

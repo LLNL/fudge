@@ -385,7 +385,7 @@ class Database(ancestryModule.AncestryIO):
         except:
             pass
 
-        dummy, symbol, A, level, dummy, dummy, dummy = chemicalElementsMiscModule.chemicalElementALevelIDsAndAnti(pid)
+        _, symbol, A, level, _, _, _ = chemicalElementsMiscModule.chemicalElementALevelIDsAndAnti(pid)
         if symbol is None:
             return None
         try:

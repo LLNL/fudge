@@ -123,7 +123,7 @@ def binaryAddSubCheck( count, ls ) :
     ls, resultsC = getXYData( ls, biSectionMax, accuracy )
     results = XYs1 + XYs2
     compareXYs( resultsC, results, "binaryAddSubCheck" )
-    ls, dummy = getXYData( ls, biSectionMax, accuracy )
+    ls, _ = getXYData( ls, biSectionMax, accuracy )
     ls, resultsC = getXYData( ls, biSectionMax, accuracy )
     results = results - XYs2
     compareXYs( resultsC, results, "binaryAddSubCheck" )
@@ -136,7 +136,7 @@ def binaryMulDivCheck( count, ls ) :
     ls, resultsC = getXYData( ls, biSectionMax, accuracy )
     results = XYs1 * XYs2
     compareXYs( resultsC, results, "binaryMulDivCheck" )
-    ls, dummy = getXYData( ls, biSectionMax, accuracy )
+    ls, _ = getXYData( ls, biSectionMax, accuracy )
     ls, resultsC = getXYData( ls, biSectionMax, accuracy )
     results = results / XYs2
     compareXYs( resultsC, results, "binaryMulDivCheck" )

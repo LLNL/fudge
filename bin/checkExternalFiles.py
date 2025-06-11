@@ -87,7 +87,7 @@ def checkProtare(path):
         for externalFile in protare.externalFiles:
             realpath = externalFile.realpath()
             if pathlib.Path(realpath).exists():
-                name, dummy = GNDS_fileModule.type(realpath)
+                name, _ = GNDS_fileModule.type(realpath)
                 if name == GNDS_fileModule.HDF5_values:
                     pass
                 elif name == covarianceSuiteModule.CovarianceSuite.moniker:

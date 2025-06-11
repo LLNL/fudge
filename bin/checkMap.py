@@ -128,7 +128,7 @@ def checkProtare( protareFileName, map, entry ) :
         for externalFile in protare.externalFiles:
             realpath = externalFile.realpath()
             if os.path.exists(realpath):
-                name, dummy = GNDS_fileModule.type(realpath)
+                name, _ = GNDS_fileModule.type(realpath)
                 if name == GNDS_fileModule.HDF5_values:
                     hdf5ExternalFiles.add(realpath)
                     hdf5Directories.add(os.path.dirname(realpath))
@@ -209,7 +209,7 @@ for protareDirectory in protareDirectories :
             dirsInDirectories.add( file )
         else :
             try:
-                name, dummy = GNDS_fileModule.type(file)
+                name, _ = GNDS_fileModule.type(file)
                 if( name == mapModule.Map.moniker ) :
                     mapsInDirectories.add( file )
                 elif( name == reactionSuiteModule.ReactionSuite.moniker ) :
@@ -234,7 +234,7 @@ for hdf5Directory in hdf5Directories :
                 if( os.path.isdir( file ) ) :
                     mapsInDirectories.add( file )
                 else :
-                    name, dummy = GNDS_fileModule.type(file)
+                    name, _ = GNDS_fileModule.type(file)
                     if( name != GNDS_fileModule.HDF5_values) : unknownsInHDF5_directories.add(file)
             except :
                 unknownsInHDF5_directories.add( file )

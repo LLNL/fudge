@@ -942,7 +942,7 @@ class LLNLAngularEnergyForm( baseModule.Form ) :
         """     
 
         angular = self.angularSubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
-        dummy, angularEnergy = self.angularEnergySubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        _, angularEnergy = self.angularEnergySubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
         return( angularEnergyMCModule.Form( style.label, self.productFrame, angular, angularEnergy ) )
 
     def processMultiGroup( self, style, tempInfo, indent ) :

@@ -51,7 +51,7 @@ if __name__ == '__main__':
     fileName = args.input
 
     covariances = []
-    name, dummy = GNDS_fileModule.type(fileName)
+    name, _ = GNDS_fileModule.type(fileName)
     if name == databaseModule.Database.moniker:
         gnds = GNDS_fileModule.read(fileName, lazyParsing=False)
     else:
