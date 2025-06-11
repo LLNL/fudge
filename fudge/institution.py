@@ -13,7 +13,7 @@ Each institution has a unique label and a list of data types. The only restricti
 they be well-formed xml. Codes reading in GNDS files are free to ignore any unrecognized institution or data type.
 """
 
-from xml.etree import ElementTree
+from xml.etree import ElementTree as ET
 from xml.sax import saxutils
 
 from LUPY import ancestry as ancestryModule
@@ -205,7 +205,7 @@ class UnknownInstitutionXML_node:
     def __init__(self, XML_node):
 
         self.__label = XML_node.get( 'label' )
-        self.__stringList = ElementTree.tostring(XML_node.data, encoding='unicode').rstrip().split('\n')
+        self.__stringList = ET.tostring(XML_node.data, encoding='unicode').rstrip().split('\n')
 
     @property
     def label( self ) :
@@ -275,7 +275,7 @@ class UnknownLLNL_XML_child:
 
     def __init__(self, XML_node):
 
-        self.__stringList = saxutils.unescape(ElementTree.tostring(XML_node.data, encoding='unicode')).rstrip().split('\n')
+        self.__stringList = saxutils.unescape(ET.tostring(XML_node.data, encoding='unicode')).rstrip().split('\n')
 
     @property
     def stringList(self):

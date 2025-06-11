@@ -5,11 +5,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from xml.etree.ElementTree import ElementTree, tostring, Element
+from xml.etree import ElementTree as ET
 
 class XML2PY( object ) :
     def __init__( self ) :
-        self.etree = ElementTree( )
+        self.etree = ET.ElementTree( )
     def __repr__( self ): return repr( self.__dict__ )
     def __setattr__( self, attr, val ) :
         if attr not in ['xml', 'etree'] :
@@ -17,7 +17,7 @@ class XML2PY( object ) :
                 self.xml.set( attr, str( val ) )
         return object.__setattr__( self, attr, val )
     def newXMLElement( self, attr, val={}, index=0 ) :
-        element = Element( attr.capitalize( ), val )
+        element = ET.Element( attr.capitalize( ), val )
         element.text = None
         element.tail = '\n    '
         self.xml.insert( index, element )
@@ -35,7 +35,7 @@ class XML2PY( object ) :
             x.append( XML2PY._get_py( element ) )
         return x
     def toxml( self ) :
-        return tostring( self.xml )
+        return ET.tostring( self.xml )
     def write( self, xmlfile ) :
         self.etree.write( xmlfile )
     def fixIndentation( self ) :
@@ -98,4 +98,3 @@ if __name__=='__main__':
     print( x.toxml() )
     x.fixIndentation()
     print( x.toxml() )
-

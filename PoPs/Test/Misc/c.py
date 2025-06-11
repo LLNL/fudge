@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # <<END-copyright>>
 
-from xml.etree import cElementTree
+from xml.etree import ElementTree as ET
 
 from PoPs import database as databaseModule
 from PoPs import alias as aliasModule
@@ -16,7 +16,7 @@ from PoPs.chemicalElements import chemicalElement as chemicalElementModule
 
 pops = databaseModule.Database( 'LLNL', '0.0.1' )
 
-element = cElementTree.parse( 'pops.xml' )
+element = ET.parse( 'pops.xml' )
 element = element.getroot( )
 
 def aliases( element ) :
