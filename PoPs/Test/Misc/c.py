@@ -33,12 +33,12 @@ def gaugeBosons( element ) :
 def baryons( element ) :
 
     for child in element :
-        pops.add baryonModule.Particle.parseNodeUsingClass(child , [], [ ))
+        pops.add(baryonModule.Particle.parseNodeUsingClass(child , [], [] ))
  
 def chemicalElements( element ) :
 
     for child in element :
-        pops.add chemicalElementModule.Suite.parseNodeUsingClass(child, [], []))
+        pops.add(chemicalElementModule.Suite.parseNodeUsingClass(child, [], []))
  
 for child in element :
     if( child.tag == 'aliases' ) :
