@@ -39,7 +39,7 @@ def LIST(fOut, label, lineIndex, MFData):
     '''Writes to *fOut* an ENDF-6 list record that starts a line *lineIndex* of *MFData*.'''
 
     priorIndex = lineIndex
-    dummy, dummy, dummy, dummy, NLP, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
+    _, _, _, _, NLP, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
     NLP = int(NLP)
     lineIndex += 1 + (NLP + 5) // 6
     printlines(fOut, label, priorIndex, lineIndex, MFData)
@@ -50,7 +50,7 @@ def TAB1(fOut, label, lineIndex, MFData):
     '''Writes to *fOut* an ENDF-6 tab1 record that starts a line *lineIndex* of *MFData*.'''
 
     priorIndex = lineIndex
-    dummy, dummy, dummy, dummy, NR, NP = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
+    _, _, _, _, NR, NP = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
     NR, NP = int(NR), int(NP)
     lineIndex += 1 + (NR + 2) // 3
     lineIndex += (NP + 2) // 3
@@ -67,7 +67,7 @@ def TAB2header(fOut, label, lineIndex, MFData):
     '''Writes the header information for an ENDF-6 tab2 record.'''
 
     priorIndex = lineIndex
-    dummy, dummy, dummy, dummy, NR, NZ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
+    _, _, _, _, NR, NZ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
     NR, NZ = int(NR), int(NZ)
     lineIndex += 1 + (NR + 2) // 3
 
@@ -126,7 +126,7 @@ def LAW5(fOut, lineIndex, MFData):
 def LAW6(fOut, lineIndex, MFData):
     '''Writes to *fOut* MF 6, law 6 data.'''
 
-    APSX, dummy, dummy, dummy, dummy, NPSX = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
+    APSX, _, _, _, _, NPSX = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
     printlines(fOut, '', lineIndex, lineIndex+1, MFData)
     return lineIndex + 1
 
@@ -134,7 +134,7 @@ def LAW7(fOut, lineIndex, MFData):
     '''Writes to *fOut* MF 6, law 7 data.'''
 
     priorIndex = lineIndex
-    dummy, dummy, dummy, dummy, NR, NE = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
+    _, _, _, _, NR, NE = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
     NR, NE = int(NR), int(NE)
     lineIndex += 1 + (NR + 2) // 3
     printlines(fOut, '', priorIndex, lineIndex, MFData)
@@ -169,8 +169,8 @@ def process(inputFile, outputDir):
                         TAB1(fOut, '', 1, MFData)
                 elif MF == 4:
                     priorIndex = lineIndex
-                    ZA,    AWR, dummy, LTT,   dummy, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
-                    dummy, AWR, LI,    dummy, dummy, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex+1])
+                    ZA,    AWR, _, LTT,   _, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
+                    _, AWR, LI,    _, _, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex+1])
                     lineIndex += 2
 
                     LTT = int(LTT)
@@ -188,7 +188,7 @@ def process(inputFile, outputDir):
                             lineIndex = TAB2withLIST(fOut, ' Energy', lineIndex, MFData)
                             lineIndex = TAB2withTAB1(fOut, '', ' Energy', lineIndex, MFData)
                 elif MF in [6, 26]:
-                    ZA, AWR, JP, LCT, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
+                    ZA, AWR, JP, LCT, NK, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
                     NK = int(NK)
                     lineIndex += 1
                     for productIndex in range(NK):
@@ -223,7 +223,7 @@ def process(inputFile, outputDir):
                             break
                 elif MF in [12, 13]:
                     fileName = filePrefix
-                    ZA, AWR, LO, LG, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
+                    ZA, AWR, LO, LG, NK, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(MFData[lineIndex])
                     LO = int(LO)
                     LG = int(LG)
                     NK = int(NK)

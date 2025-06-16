@@ -65,7 +65,7 @@ class endlI0(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -150,7 +150,7 @@ class endlI7(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -195,7 +195,7 @@ class endlI9(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -246,7 +246,7 @@ class endlI10(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -291,7 +291,7 @@ class endlI11(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -336,7 +336,7 @@ class endlI12(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -381,7 +381,7 @@ class endlI13(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -425,7 +425,7 @@ class endlI80(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -449,7 +449,7 @@ class endlI89(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -473,7 +473,7 @@ class endlI90(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -497,7 +497,7 @@ class endlI91(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -521,7 +521,7 @@ class endlI92(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -546,7 +546,7 @@ class endlI941(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -583,7 +583,7 @@ class endlI942(endlNd.endlNd, endl2dmathClasses.endl2dmath) :
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )
@@ -619,7 +619,7 @@ class endlI951(endlNd.endlNd, endl2dmathClasses.endl2dmath) : # Special I = 951 
         See endl2dmathmisc.check2dData for meaning of printWarning and printErrors."""
 
         ErrMsgs = []
-        n, dummy, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+        n, _, messages2d = endl2dmathmisc.check2dData(self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
                                                           printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue)
         if( len( messages2d ) > 0 ) : ErrMsgs.append(endlmisc.endlCheckerObject(data = self, message = messages2d))
         return( ErrMsgs )

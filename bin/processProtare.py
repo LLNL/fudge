@@ -83,7 +83,7 @@ an example of a valid input file:
 
 parserPreview = argparse.ArgumentParser(fromfile_prefix_chars='@', add_help=False)
 parserPreview.add_argument('-mg', '--MultiGroup', action='store_true')
-argsPreview, dummy = parserPreview.parse_known_args()
+argsPreview, _ = parserPreview.parse_known_args()
 multigroupPresent = argsPreview.MultiGroup
 
 class ProcessProtareArgumentParser(argparse.ArgumentParser):

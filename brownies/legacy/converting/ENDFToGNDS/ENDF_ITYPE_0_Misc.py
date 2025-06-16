@@ -265,7 +265,7 @@ def getMultiplicityPointwiseOrPieceWise(info, data, warningList):
 def getTotalOrPromptFission(info, MT, MTDatas, totalOrPrompt, warningList):
 
     MT456Data = MTDatas[MT][1]
-    ZA, AWR, dummy, LNU, dummy, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(
+    ZA, AWR, _, LNU, _, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(
         MT456Data[0], logFile=info.logs)
     ZA = int(ZA)
     info.ZA_massLineInfo.add(ZA, AWR, MT, 1, 0)
@@ -290,7 +290,7 @@ def getDelayedFission(info, MT, MTDatas, warningList):
     info.logs.write('     Delayed fission neutron data (MT=455)')
     MT455Data = MTDatas[MT]
     MT455DataMF1 = MT455Data[1]
-    ZA, AWR, LDG, LNU, dummy, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(
+    ZA, AWR, LDG, LNU, _, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(
         MT455DataMF1[0], logFile=info.logs)
     ZA = int(ZA)
     info.addMassAWR(ZA, AWR)
@@ -405,14 +405,14 @@ def getFissionEnergies(info, domainMin, domainMax, warningList):
 
     MF1Data = info.fissionEnergyReleaseData[1]
     dataLine = 0
-    ZA, AWR, dummy, LFC, dummy, NFC = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
+    ZA, AWR, _, LFC, _, NFC = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
         MF1Data[dataLine], intIndices=[0, 5], logFile=info.logs)
     info.ZA_massLineInfo.add(ZA, AWR, 458, 1, 0)
     ZA = int(ZA)
     info.addMassAWR(ZA, AWR)
 
     dataLine += 1
-    dummy, dummy, dummy, NPLY, N1, N2 = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(
+    _, _, _, NPLY, N1, N2 = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats(
         MF1Data[dataLine], logFile=info.logs)
     if (N2 != (NPLY+1) * 9) or (N1 != N2 * 2): warningList.append("Inconsistent N1/N2/NPLY in section MF=1 MT=458!")
     nCoeffs = int(N2)  # total number of coefficients for all energy release components (each also has an uncertainty)
@@ -1540,14 +1540,14 @@ def readMF3( info, MT, MF3Data, warningList ) :
 def readMF4(info, product, MT, MF4Data, formClass, warningList):
 
     if MT not in MTWithOnlyNeutronProducts: info.MF4ForNonNeutrons.append(MT)
-    ZA, AWR, LVT, LTT, dummy, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF4Data[0], logFile = info.logs )
+    ZA, AWR, LVT, LTT, _, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF4Data[0], logFile = info.logs )
     ZA = int( ZA )
     printAWR_mode(info, MT, 4, 0, ZA, AWR)
     info.addMassAWR( ZA, AWR )
     LVT = int( LVT )                # 1: transformation matrix given. Must be 0 for endf/b6 format but not older formats.
     LTT = int( LTT )                # 0: isotropic, 1: Legendre, 2: table, 3: Legendre for low E and table for high E.
 
-    dummy, AWR_, LI, LCT, NK, NM = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF4Data[1], logFile = info.logs )
+    _, AWR_, LI, LCT, NK, NM = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF4Data[1], logFile = info.logs )
     if AWR != AWR_:
         printAWR_mode(info, MT, 4, 1, ZA, AWR)
     else:
@@ -1589,7 +1589,7 @@ def readMF4(info, product, MT, MF4Data, formClass, warningList):
 
 def readMF5(info, MT, MF5Data, warningList, delayNeutrons=False, product=None):
 
-    ZA, AWR, dummy, dummy, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF5Data[0], logFile = info.logs )
+    ZA, AWR, _, _, NK, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF5Data[0], logFile = info.logs )
     ZA = int( ZA )
     printAWR_mode( info, MT, 5, 0, ZA, AWR )
     info.addMassAWR( ZA, AWR )
@@ -1688,7 +1688,7 @@ def readMF5(info, MT, MF5Data, warningList, delayNeutrons=False, product=None):
 def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isTwoBody, crossSection, LR, compoundZA=None):
 
     twoBodyIndex = 0
-    ZA, AWR, JP, LCT, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[0], logFile = info.logs )
+    ZA, AWR, JP, LCT, NK, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[0], logFile = info.logs )
     ZA = int( ZA )
     doInfo = not (ZA == 0 and AWR != 0)
     printAWR_mode(info, MT, 6, 0, ZA, AWR, doInfo)
@@ -1746,7 +1746,7 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
         if( LAW == 0 ) :
             form = unspecifiedModule.Form( info.style, frame )
         elif( LAW == 1 ) :              # Continuum Energy-Angle distributions
-            dummy, dummy, LANG, LEP, NR, NE = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[ dataLine ], logFile = info.logs )
+            _, _, LANG, LEP, NR, NE = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[ dataLine ], logFile = info.logs )
             LANG = int( LANG )          # identifies the type of data
             info.logs.write( ', LANG=%s' % LANG )
             LEP = int( LEP )            # interpolation type for outgoing energy
@@ -1765,7 +1765,7 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
                 maxLegendre = 0
                 EEpClsData = []
                 for EinCount in range( NE ) :
-                    dummy, Ein, ND, NA, NW, NEP = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[dataLine], logFile = info.logs )
+                    _, Ein, ND, NA, NW, NEP = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[dataLine], logFile = info.logs )
                     ND = int( ND )          # number of discrete gammas (nonzero only for gammas)
                     NA = int( NA )          # number of angular parameters (i.e., lMax).
                     NW = int( NW )          # number of data values for this incident energy
@@ -2040,7 +2040,7 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
 
                 muInterpolationQualifier, muInterpolation = endfFileToGNDSMiscModule.ENDFInterpolationToGNDS2plusd( LANG - 10 )
                 for EinCount in range( NE ) :
-                    dummy, Ein, ND, NA, NW, NEP = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[dataLine], logFile = info.logs )
+                    _, Ein, ND, NA, NW, NEP = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[dataLine], logFile = info.logs )
                     ND = int( ND )          # number of discrete gammas (nonzero only for gammas)
                     NA = int( NA )          # number of angular parameters (i.e., the number of mu values).
                     NW = int( NW )          # number of data values for this incident energy
@@ -2139,7 +2139,7 @@ def readMF6(MT, info, MF6Data, productList, warningList, undefinedLevelInfo, isT
             # also make a link from 'normal' distribution to differential part:
             form = referenceModule.CoulombPlusNuclearElastic( link=dSigma_form, label=info.style, relative=True )
         elif( LAW == 6 ) :
-            APSX, dummy, dummy, dummy, dummy, NPSX = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[ dataLine ], logFile = info.logs )
+            APSX, _, _, _, _, NPSX = endfFileToGNDSMiscModule.sixFunkyFloatStringsToFloats( MF6Data[ dataLine ], logFile = info.logs )
             dataLine += 1
             APSX *= info.massTracker.neutronMass
             angularSubform = angularModule.Isotropic2d( )
@@ -2426,7 +2426,7 @@ def readMF8(info, MT, MTData, warningList):
         MF10Data = readMF9or10( info, MT, MTData, 10, LIS, warningList )
         metastables = {}
         for idx in range( NS ) :
-            ZAP, ELFS, LMF, LFS, ND6, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
+            ZAP, ELFS, LMF, LFS, ND6, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
                 MF8Data[dataLine], intIndices = [ 0, 2, 3, 4 ], logFile = info.logs )
 
             if LMF in (9, 10):
@@ -2532,7 +2532,7 @@ def readMF9or10(info, MT, MTData, MF, targetLIS, warningList):
 
     if MF not in MTData.keys(): return None
     dataLine, MFData, MF9or10 = 1, MTData[MF], []
-    ZA, AWR, LIS, dummy, NS, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
+    ZA, AWR, LIS, _, NS, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
         MFData[0], intIndices=[0, 2, 4], logFile=info.logs)
     ZA = int(ZA)
     printAWR_mode(info, MT, MF, 0, ZA, AWR, LIS=LIS)
@@ -2611,7 +2611,7 @@ def readMF12_13(info, MT, MTData, productList, warningList, crossSection, _dummy
     if MF6gammas:
         warningList.append(f'MT{MT} photons are likely double-counted, in MF6 and MF{MF}')
         info.doRaise.append(warningList[-1])
-    ZA, AWR, LO, LG, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
+    ZA, AWR, LO, LG, NK, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
         MF12_13Data[0], intIndices=[0, 2, 3, 4], logFile=info.logs)
     printAWR_mode(info, MT, MF, 0, ZA, AWR)
     info.addMassAWR(ZA, AWR)
@@ -2749,7 +2749,7 @@ def readMF15(info, MT, MTData, continuousGamma, warningList):
         warningList.append('MF=15 data and no continous gamma MF=12,13 data: MT=%s' % MT)
         info.doRaise.append(warningList[-1])
     MF15Data = MTData[15]
-    ZA, AWR, dummy, dummy, NC, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
+    ZA, AWR, _, _, NC, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
         MF15Data[0], intIndices=[0, 4], logFile=info.logs)
     printAWR_mode(info, MT, 15, 0, ZA, AWR)
     info.addMassAWR(ZA, AWR)
@@ -3953,7 +3953,7 @@ def parseMF6FissionData(info, MT, MF6Data, fissionNeutronsAndGammasDataFromMF6, 
 
     print("    WARNING: parseMF6FissionData function not complete.")
     dataLine = 0
-    ZA, AWR, JP, LCT, NK, dummy = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
+    ZA, AWR, JP, LCT, NK, _ = endfFileToGNDSMiscModule.sixFunkyFloatStringsToIntsAndFloats(
         MF6Data[dataLine], intIndices=[0, 2, 3, 4], logFile=info.logs)
     info.ZA_massLineInfo.add(ZA, AWR, MT, 6, 0)
     dataLine += 1

@@ -49,7 +49,7 @@ def compoundZandA(pops, particleList):
 
     for particleId in particleIds:
         particle = pops[particleId]
-        Zp, Ap, dummy, dummy = chemicalElementsMiscModule.ZAInfo(particle)
+        Zp, Ap, _, _ = chemicalElementsMiscModule.ZAInfo(particle)
         Z += Zp
         A += Ap
 

@@ -20,7 +20,7 @@ gamma: name is simply given as 'photon'.
 
 import os
 import numpy
-from xml.etree import cElementTree
+from xml.etree import ElementTree as ET
 
 from pqu import PQU as PQUModule
 
@@ -140,7 +140,7 @@ def parse_endl_covariance(covFile):
     Returns a list of (energy bins,  covariance matrix, covariance_type, [enminmax]) tuples.
     The list may be empty (some ENDL cov.xml files are empty).
     """
-    xdoc = cElementTree.parse(covFile)
+    xdoc = ET.parse(covFile)
     root = xdoc.getroot()
     ebins, covariances, covariance_types, enminmax = [],[],[],[]
     # should I just set the I# here and return it?

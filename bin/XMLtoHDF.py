@@ -16,7 +16,7 @@ import argparse
 import numpy
 from collections import Counter
 
-from xml.etree import cElementTree
+from xml.etree import ElementTree as ET
 import h5py
 
 parser = argparse.ArgumentParser()
@@ -121,7 +121,7 @@ def addDocumentation( parent, node, index, suffix=None ):
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    xdoc = cElementTree.parse( args.xml )
+    xdoc = ET.parse( args.xml )
 
     if args.output is not None:
         h5file = args.output
@@ -140,4 +140,3 @@ if __name__ == '__main__':
 
     root = xdoc.getroot()
     addNode( h5, root, index=0 )
-

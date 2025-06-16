@@ -352,7 +352,7 @@ if outputDir is not None:
 
 totalSpectraTime = timesModule.Times( )
 reactionSpectrumNonDiscrete, discreteGammaData, totalCrossSection = getSpectrum(protare.reactions, '')
-orphanSpectrum, dummy, dummy = getSpectrum(protare.orphanProducts, ' (orphan product)')
+orphanSpectrum, _, _ = getSpectrum(protare.orphanProducts, ' (orphan product)')
 totalSpectraTime = totalSpectraTime.toString( current = False )
 
 discreteGammaSpectrum = discreteGammaSpectrumToPDF( discreteGammaData )

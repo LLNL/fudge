@@ -80,6 +80,6 @@ count = 0
 while( len( ls ) ) :
     count += 1
     if( count == 6 ) :
-        ls, dummy = getXYData( ls )
-        ls, dummy = getXYData( ls )
+        ls, _ = getXYData( ls )
+        ls, _ = getXYData( ls )
     ls = checkClipping( count, ls )

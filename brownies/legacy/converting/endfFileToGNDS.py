@@ -92,7 +92,7 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
     isNaturalTarget = (targetZA % 1000) == 0
 
     # Line #2
-    targetExcitationEnergy, STA, LIS, LISO, dummy, NFOR = \
+    targetExcitationEnergy, STA, LIS, LISO, _, NFOR = \
         endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][1], logFile=logFile)
     STA = int(STA)  # Is nucleus unstable
     LIS = int(LIS)  # Excitation number
@@ -109,7 +109,7 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
     info.ZA_massLineInfo.targetLIS = LIS
     info.ZA_massLineInfo.add(targetZA, targetMass, 451, 1, 0)
     # Line #3
-    projectileMass, EMAX, LREL, dummy, NSUB, NVER = \
+    projectileMass, EMAX, LREL, _, NSUB, NVER = \
         endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][2], logFile=logFile)
     NSUB = int(NSUB)  # 10 * ZA + iType for projectile
     NVER = int(NVER)  # Evaluation version number
@@ -120,7 +120,7 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
     info.ZA_massLineInfo.add(projectileZA, projectileMass, 451, 1, 2)
 
     # Line #4
-    targetTemperature, dummy, LDRZ, dummy, NWD, NXC = \
+    targetTemperature, _, LDRZ, _, NWD, NXC = \
         endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(_MTDatas[451][1][3], logFile=logFile)
     LDRZ = int(LDRZ)  # Primary or special evaluation of this material
     NWD = int(NWD)  #

@@ -570,7 +570,7 @@ def gammasToENDF6_MF12_13(MT, MF, endfMFList, flags, targetInfo, gammas):
         elif isinstance(angularSubform, angularModule.XYs2d):
             isNotIsotropic = 1
             targetInfo['doProductionGamma'] = True
-            dummy, dummy, MF14 = angularSubform.toENDF6(flags, targetInfo)
+            _, _, MF14 = angularSubform.toENDF6(flags, targetInfo)
             del targetInfo['doProductionGamma']
             del MF14[-1]
             MF14[0] = endfFormatsModule.floatToFunky(gammaEnergy) + endfFormatsModule.floatToFunky(originationLevel) + MF14[0][22:]

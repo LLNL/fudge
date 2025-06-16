@@ -26,7 +26,7 @@ for file in args.paths :
         MTData = MTDatas[MT]
         if( 3 in MTData ) :
             MF3 = MTData[3]
-            dummy, dummy, dummy, LR, dummy, dummy = endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(MF3[1])
+            _, _, _, LR, _, _ = endfFileToGNDSMisc.sixFunkyFloatStringsToFloats(MF3[1])
             if( LR != 0 ) :
                 counter += 1
                 if( args.verbose ) : 

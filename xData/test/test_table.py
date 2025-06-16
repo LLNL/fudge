@@ -6,7 +6,7 @@
 # <<END-copyright>>
 
 import unittest
-from xml.etree import cElementTree as parser
+from xml.etree import ElementTree as ET
 
 from xData import table as tableModule
 
@@ -21,7 +21,7 @@ class TestTable(unittest.TestCase):
         for dat in ([-1.7, tableModule.Blank(), 3.2, 0.089], [3.4, 0.5, 4.2, 0.072], [5.6, 1.5, 2.76, 0.064]):
             self.tt.addRow( dat )
         self.xmlstring = '\n'.join( self.tt.toXML_strList() )
-        element = parser.fromstring( self.xmlstring )
+        element = ET.fromstring( self.xmlstring )
         self.tt2 = tableModule.Table.parseNodeUsingClass(element, xPath = [],
                 linkData = {'conversionTable' : {'index':int} })
         self.xmlstring2 = '\n'.join( self.tt2.toXML_strList() )
