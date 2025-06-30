@@ -242,7 +242,7 @@ static nfu_status ptwXY_applyFunctionZeroCrossing( statusMessageReporting *smr, 
 
     int i;
     double y, x1 = p1->x, x2 = p2->x, nY1 = p1->y, nY2 = p2->y, refY = 0.5 * ( fabs( p1->y ) + fabs( p2->y ) );
-    ptwXYPoint p;
+    ptwXYPoint p = { 0.5 * ( p1->x + p2->x ), 0.0 };
     nfu_status status;
 
     for( i = 0; i < 6; i++ ) {

@@ -616,7 +616,10 @@ char *smr_vallocateFormatMessage( char const *fmt, va_list *args ) {
         if( ( message = (char *) malloc( n + 1 ) ) == NULL ) return( NULL );
         strcpy( message, buffer ); }
     else {
-        if( ( message = (char *) realloc( message, n + 1 ) ) == NULL ) return( NULL );
+        char *old = message;
+        if( ( message = (char *) realloc( message, n + 1 ) ) == NULL ) {
+            if( old != NULL ) free( old );
+        }
     }
     return( message );
 }
