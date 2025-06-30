@@ -838,6 +838,12 @@ def ITYPE_0(MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSect
     else:
         covarianceSuite = None
 
+    for sgTable in info.extraFissionWidths:
+        # remove 2nd fission width from resonance parameters. Must be done after processing MF32 covariances
+        channels = sgTable.findAttributeInAncestry('channels')
+        channels.pop(channels.labels()[-1])
+        sgTable.removeColumn('fission width_2')
+
     def overridePoPsIfNecessary(AWRI, spinParity=None):
         """
         Resonance regions may use different particle properties than the rest of the evaluation.

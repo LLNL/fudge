@@ -237,7 +237,7 @@
                 <span class="n">Q</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
                 <span class="n">Qcalc</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;availableEnergy&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">Qcalc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span>  <span class="c1"># caught below. Skips Q-value check for elemental targets</span>
-                <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">productMass</span> <span class="o">=</span> <span class="n">prod</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">energyUnit</span><span class="si">}</span><span class="s1">/c**2&#39;</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
@@ -264,7 +264,7 @@
                                   <span class="n">incompleteReactionModule</span><span class="o">.</span><span class="n">IncompleteReaction</span><span class="p">))):</span>
             <span class="c1"># check that ZA balances:</span>
             <span class="n">ZAsum</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span><span class="p">:</span> <span class="k">continue</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">mult</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
@@ -279,7 +279,7 @@
                 <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">ZAbalanceWarning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">productionModule</span><span class="o">.</span><span class="n">Production</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">:</span>
                 <span class="n">productWarnings</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">productWarnings</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="s2">&quot;Product: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">product</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">productWarnings</span><span class="p">))</span>

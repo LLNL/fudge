@@ -1309,6 +1309,33 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cycle</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">cycle</span></div>
 
 
+<div class="viewcode-block" id="NonMonotonicGrid"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NonMonotonicGrid">[docs]</a><span class="k">class</span> <span class="nc">NonMonotonicGrid</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Fatal</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>  <span class="c1"># &#39;row&#39; or &#39;column&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Covariance matrix </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> grid is not monotonic&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">label</span></div>
+
+
+<div class="viewcode-block" id="MatrixDimensionMismatch"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.MatrixDimensionMismatch">[docs]</a><span class="k">class</span> <span class="nc">MatrixDimensionMismatch</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrixShape</span><span class="p">,</span> <span class="n">gridShape</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Fatal</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrixShape</span> <span class="o">=</span> <span class="n">matrixShape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridShape</span> <span class="o">=</span> <span class="n">gridShape</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Matrix shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">matrixShape</span><span class="si">}</span><span class="s2"> doesn&#39;t match grid shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gridShape</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">matrixShape</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">matrixShape</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gridShape</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">gridShape</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="NegativeVariance"><a class="viewcode-back" href="../../fudge/fudge.html#fudge.warning.NegativeVariance">[docs]</a><span class="k">class</span> <span class="nc">NegativeVariance</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="ne">Warning</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Level</span><span class="o">.</span><span class="n">Severe</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>

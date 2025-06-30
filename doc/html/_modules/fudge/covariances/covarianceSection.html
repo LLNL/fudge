@@ -157,6 +157,15 @@
         <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span> <span class="n">warnings</span> <span class="o">+=</span> <span class="n">form</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">warnings</span></div>
 
+<div class="viewcode-block" id="CovarianceSection.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.CovarianceSection.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param unitMap:     A dictionary where each key is a unit that will be replaced by its value. Units must be compatible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestryMembers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">member</span><span class="p">):</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span>
+        <span class="n">suitesModule</span><span class="o">.</span><span class="n">Suite</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="CovarianceSection.toXML_strList"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.CovarianceSection.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">)</span>
@@ -207,6 +216,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for RowData and ColumnData. Both are links but with some additional attributes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;slices&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ENDF_MFMT</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">linkModule</span><span class="o">.</span><span class="n">Link</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="o">=</span><span class="n">link</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="n">relative</span><span class="p">)</span>
@@ -227,6 +237,10 @@
             <span class="k">if</span> <span class="n">s1</span> <span class="o">!=</span> <span class="n">s2</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="DataLink.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.DataLink.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
+        <span class="k">for</span> <span class="nb">slice</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices</span><span class="p">:</span>
+            <span class="nb">slice</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span><span class="n">unitMap</span><span class="p">)</span></div>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; # not sure we need this anymore...</span>
 <span class="sd">    def __deepcopy__( self, memodict={} ):</span>
@@ -314,8 +328,8 @@
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s2">&quot;slice&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">domainUnit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">domainValue</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">domainUnit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domainMin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domainMax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">domainValue</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">domainValue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">domainMin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">domainMax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;domainValue must not be supplied along with domainMin/Max&quot;</span>
@@ -355,6 +369,20 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">domainValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainValue</span>
+
+<div class="viewcode-block" id="Slice.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.Slice.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainUnit</span> <span class="ow">in</span> <span class="n">unitMap</span><span class="p">:</span>
+            <span class="n">newUnit</span> <span class="o">=</span> <span class="n">unitMap</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__domainUnit</span><span class="p">]</span>
+            <span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainUnit</span><span class="p">)</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="n">newUnit</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__domainMin</span> <span class="o">*=</span> <span class="n">factor</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__domainMax</span> <span class="o">*=</span> <span class="n">factor</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domainValue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__domainValue</span> <span class="o">*=</span> <span class="n">factor</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__domainUnit</span> <span class="o">=</span> <span class="n">newUnit</span></div>
 
 <div class="viewcode-block" id="Slice.toXML_strList"><a class="viewcode-back" href="../../../fudge/fudge.covariances.html#fudge.covariances.covarianceSection.Slice.toXML_strList">[docs]</a>    <span class="k">def</span> <span class="nf">toXML_strList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 

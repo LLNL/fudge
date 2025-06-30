@@ -3792,6 +3792,27 @@ a function that is embedded in a high dimensional functions.</p></td>
 <dd><p>Bases: <a class="reference internal" href="#xData.constant.Constant" title="xData.constant.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a></p>
 <p>This class represents a 1d-function that has a constant value over its domain.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="xData.constant.Constant1d.asXYs1d">
+<span class="sig-name descname"><span class="pre">asXYs1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asLinLin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upperEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biSectionMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/constant.html#Constant1d.asXYs1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.constant.Constant1d.asXYs1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a representation of the data in <em>self</em> as an <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asLinLin</strong> – If <strong>True</strong>, the data have lin-lin interpolation.</p></li>
+<li><p><strong>accuracy</strong> – Used to determine the accuracy if converting data to lin-lin interpolated data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param lowerEps     Used to dull the lower point for “flat” interpolation.
+:param upperEps     Used to dull the upper point for “flat” interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="xData.constant.Constant1d.convertAxisToUnit">
 <span class="sig-name descname"><span class="pre">convertAxisToUnit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indexOrName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newUnit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/constant.html#Constant1d.convertAxisToUnit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.constant.Constant1d.convertAxisToUnit" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method converts the axis at <em>indexOrName</em> to unit <em>newUnit</em> and returns a <a class="reference internal" href="#xData.constant.Constant1d" title="xData.constant.Constant1d"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant1d</span></code></a> instance with 
@@ -4029,8 +4050,30 @@ and returns a float.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="xData.XYs1d.XYs1d.asXYs1d">
+<span class="sig-name descname"><span class="pre">asXYs1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asLinLin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upperEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biSectionMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/XYs1d.html#XYs1d.asXYs1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.XYs1d.XYs1d.asXYs1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a representation of the data in <em>self</em> as an <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance. 
+Beware, this method returns <em>self</em> if data have lin-lin interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asLinLin</strong> – If <strong>True</strong>, the data have lin-lin interpolation.</p></li>
+<li><p><strong>accuracy</strong> – Used to determine the accuracy if converting data to lin-lin interpolated data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param lowerEps     Used to dull the lower point for “flat” interpolation.
+:param upperEps     Used to dull the upper point for “flat” interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="xData.XYs1d.XYs1d.changeInterpolation">
-<span class="sig-name descname"><span class="pre">changeInterpolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interpolation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerEps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upperEps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/XYs1d.html#XYs1d.changeInterpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.XYs1d.XYs1d.changeInterpolation" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">changeInterpolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interpolation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerEps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upperEps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/XYs1d.html#XYs1d.changeInterpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.XYs1d.XYs1d.changeInterpolation" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods returns <a class="reference internal" href="#xData.XYs1d.XYs1d" title="xData.XYs1d.XYs1d"><code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1d</span></code></a> instance that is <em>self</em> converted to a new interpolation. Points are added as needed to
 maintain the accuracy of the returned instance to <em>self</em>. Generally, <em>interpolation</em> can only be “lin-lin”.
 If the interpolation of <em>self</em> is “flat”, a point of <em>self</em> is converted into two points around the point in <em>self</em> to ensure that
@@ -5861,6 +5904,27 @@ are the same. It returns False otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="xData.series1d.Series1d.asXYs1d">
+<span class="sig-name descname"><span class="pre">asXYs1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asLinLin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upperEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biSectionMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/series1d.html#Series1d.asXYs1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.series1d.Series1d.asXYs1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a representation of the data in <em>self</em> as an <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asLinLin</strong> – If <strong>True</strong>, the data have lin-lin interpolation.</p></li>
+<li><p><strong>accuracy</strong> – Used to determine the accuracy if converting data to lin-lin interpolated data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param lowerEps     Used to dull the lower point for “flat” interpolation.
+:param upperEps     Used to dull the upper point for “flat” interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="xData.series1d.Series1d.checkSameSeriesType">
 <span class="sig-name descname"><span class="pre">checkSameSeriesType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/series1d.html#Series1d.checkSameSeriesType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.series1d.Series1d.checkSameSeriesType" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method executes a raise if <em>self</em> and <em>other</em> not the same type of series.</p>
@@ -7151,6 +7215,27 @@ for each region in curve.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="xData.regions.Regions1d.asXYs1d">
+<span class="sig-name descname"><span class="pre">asXYs1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asLinLin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upperEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biSectionMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/regions.html#Regions1d.asXYs1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.regions.Regions1d.asXYs1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a representation of the data in <em>self</em> as an <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asLinLin</strong> – If <strong>True</strong>, the data have lin-lin interpolation.</p></li>
+<li><p><strong>accuracy</strong> – Used to determine the accuracy if converting data to lin-lin interpolated data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param lowerEps     Used to dull the lower point between two regions.
+:param upperEps     Used to dull the upper point between two regions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="xData.regions.Regions1d.copyDataToXsAndYs">
 <span class="sig-name descname"><span class="pre">copyDataToXsAndYs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/regions.html#Regions1d.copyDataToXsAndYs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.regions.Regions1d.copyDataToXsAndYs" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method copies data in <em>self</em> to a list of xs and ys. Only works if each region instance has a “copyDataToXsAndYs” method.</p>
@@ -7562,6 +7647,27 @@ a function that is embedded in a high dimensional functions.</p></td>
 <dd><p>Bases: <a class="reference internal" href="#xData.gridded.Gridded" title="xData.gridded.Gridded"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gridded</span></code></a></p>
 <p>This class stores a 1-d gridded function.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="xData.gridded.Gridded1d.asXYs1d">
+<span class="sig-name descname"><span class="pre">asXYs1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asLinLin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upperEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biSectionMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/gridded.html#Gridded1d.asXYs1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.gridded.Gridded1d.asXYs1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a representation of the data in <em>self</em> as an <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asLinLin</strong> – If <strong>True</strong>, the returned data will have lin-lin interpolation.</p></li>
+<li><p><strong>accuracy</strong> – Used to determine the accuracy if converting data to lin-lin interpolated data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param lowerEps     Used to dull the lower point for “flat” interpolation.
+:param upperEps     Used to dull the upper point for “flat” interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="xData.gridded.Gridded1d.constructVector">
 <span class="sig-name descname"><span class="pre">constructVector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/gridded.html#Gridded1d.constructVector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.gridded.Gridded1d.constructVector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate an xData.vector.Vector object from an xData.gridded.gridded1d instance.</p>
@@ -7700,6 +7806,27 @@ x-values.</p></td>
 <dt class="sig sig-object py" id="xData.Ys1d.Ys1d.ancestryMembers">
 <span class="sig-name descname"><span class="pre">ancestryMembers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('Ys',)</span></em><a class="headerlink" href="#xData.Ys1d.Ys1d.ancestryMembers" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xData.Ys1d.Ys1d.asXYs1d">
+<span class="sig-name descname"><span class="pre">asXYs1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asLinLin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upperEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biSectionMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/Ys1d.html#Ys1d.asXYs1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.Ys1d.Ys1d.asXYs1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a representation of the data in <em>self</em> as an <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asLinLin</strong> – If <strong>True</strong>, the data have lin-lin interpolation.</p></li>
+<li><p><strong>accuracy</strong> – Used to determine the accuracy if converting data to lin-lin interpolated data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param lowerEps     Used to dull the lower point for “flat” interpolation.
+:param upperEps     Used to dull the upper point for “flat” interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="xData.Ys1d.Ys1d.convertUnits">
@@ -8102,6 +8229,27 @@ a function that is embedded in a high dimensional functions.</p></td>
 <dt class="sig sig-object py" id="xData.xs_pdf_cdf.Xs_pdf_cdf1d.ancestryMembers">
 <span class="sig-name descname"><span class="pre">ancestryMembers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('xs',</span> <span class="pre">'pdf',</span> <span class="pre">'cdf')</span></em><a class="headerlink" href="#xData.xs_pdf_cdf.Xs_pdf_cdf1d.ancestryMembers" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xData.xs_pdf_cdf.Xs_pdf_cdf1d.asXYs1d">
+<span class="sig-name descname"><span class="pre">asXYs1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asLinLin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upperEps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biSectionMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xData/xs_pdf_cdf.html#Xs_pdf_cdf1d.asXYs1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xData.xs_pdf_cdf.Xs_pdf_cdf1d.asXYs1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a representation of the data in <em>self</em> as an <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asLinLin</strong> – If <strong>True</strong>, the data have lin-lin interpolation.</p></li>
+<li><p><strong>accuracy</strong> – Used to determine the accuracy if converting data to lin-lin interpolated data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param lowerEps     Used to dull the lower point for “flat” interpolation.
+:param upperEps     Used to dull the upper point for “flat” interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">XYs1dModule.XYs1d</span></code> instance.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="xData.xs_pdf_cdf.Xs_pdf_cdf1d.cdf">

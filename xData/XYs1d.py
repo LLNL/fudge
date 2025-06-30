@@ -611,7 +611,26 @@ class XYs1d(baseModule.XDataFunctional):
 
         return( self.returnAsClass( self, self.nf_pointwiseXY.applyFunction( f, parameters, accuracy = accuracy, biSectionMax = biSectionMax, checkForRoots = checkForRoots ) ) )
 
-    def changeInterpolation( self, interpolation, accuracy, lowerEps = 0, upperEps = 0, cls = None ) :
+    def asXYs1d(self, asLinLin, accuracy, lowerEps, upperEps, biSectionMax=16):
+        """
+        This method returns a representation of the data in *self* as an :py:class:`XYs1dModule.XYs1d` instance. 
+        Beware, this method returns *self* if data have lin-lin interpolation.
+
+        :param asLinLin:    If **True**, the data have lin-lin interpolation.
+        :param accuracy:    Used to determine the accuracy if converting data to lin-lin interpolated data.
+        :param lowerEps     Used to dull the lower point for "flat" interpolation.
+        :param upperEps     Used to dull the upper point for "flat" interpolation.
+
+        :returns:           A :py:class:`XYs1dModule.XYs1d` instance.
+        """
+
+        xys1d = self
+        if asLinLin and xys1d.interpolation != enumsModule.Interpolation.linlin:
+            xys1d = xys1d.changeInterpolation(enumsModule.Interpolation.linlin, accuracy=accuracy, lowerEps=lowerEps, upperEps=upperEps)
+
+        return xys1d
+
+    def changeInterpolation( self, interpolation, accuracy, lowerEps = 0., upperEps = 0., cls = None ) :
         """
         This methods returns :py:class:`XYs1d` instance that is *self* converted to a new interpolation. Points are added as needed to
         maintain the accuracy of the returned instance to *self*. Generally, *interpolation* can only be "lin-lin".
@@ -1933,9 +1952,8 @@ class XYs1d(baseModule.XDataFunctional):
 
         XML_strList = []
         xys = []
-        for x, y in self.nf_pointwiseXY.copyDataToXYs():
-            xys.append(x)
-            xys.append(y)
+        for xy in self:
+            xys += xy
         XML_strList += valuesModule.Values(xys, valueType = self.valueType).toXML_strList(indent2, **kwargs)
 
         XML_strList = self.buildXML_strList(indent2, startTag, XML_strList, **kwargs)

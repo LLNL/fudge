@@ -13,6 +13,7 @@ from fudge.resonances import resonances as resonancesModule, \
 from pqu import PQU as PQUModule
 
 from fudge.covariances import covarianceSuite as covarianceSuiteModule
+from fudge.covariances import enums as covarianceEnumsModule
 from fudge.covariances import modelParameters as modelParametersModule
 
 from .. import endfFormats as endfFormatsModule
@@ -24,7 +25,6 @@ from ..resonances import resolved as resonancesRewriteModule
 # helper methods:
 #
 def writeLCOMP2(matrix, NDIGIT, NNN):
-    import numpy
     nints = 56 // (NDIGIT + 1)  # how many numbers fit on each line?
     if NDIGIT == 3: nints = 13  # special case
     rsd = numpy.sqrt(matrix.diagonal())
@@ -99,7 +99,6 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
     """
     Translate resolved resonance covariance back to ENDF-6
     """
-    import numpy
 
     def swaprows(matrix, i1, i2, nrows):
         # may need to rearrange parameters: ENDF often sorts first by L rather than by energy
@@ -153,9 +152,10 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         MLS = 0
         if ISR:
             MLS = 1     # currently don't handle energy-dependent DAP
-            DAP = PQUModule.PQU(
-                numpy.sqrt(self.matrix.constructArray()[0, 0]),
-                self.parameters[0].link.evaluated.axes[0].unit).getValueAs('10*fm')
+            DAP = numpy.sqrt(self.matrix.constructArray()[0, 0])
+            if self.type is covarianceEnumsModule.Type.relative:
+                DAP *= self.parameters[0].link.evaluated.value
+            DAP = PQUModule.PQU(DAP, self.parameters[0].link.evaluated.axes[0].unit).getValueAs('10*fm')
             endf.append(endfFormatsModule.endfContLine(0, DAP, 0, 0, 0, 0))
 
         # MF32 repeats the resonance parameter information.
@@ -171,6 +171,13 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             table[2] = Js
         table = list(zip(*table))
         matrix = self.matrix.constructArray()[MLS:, MLS:]
+        if self.type is covarianceEnumsModule.Type.relative:
+            parameters = []
+            for row in RPs.data:
+                parameters += row
+            matrix *= numpy.outer(parameters, parameters)
+            matrix[matrix == numpy.NZERO] = 0
+
         # toss out extra rows/columns of zeros (for column 'L')
         MPAR2 = len(matrix) // len(table)
         index = []
@@ -288,8 +295,11 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             assert len(DAP_default) <= 1
             if len(DAP_default) == 1:
                 index = DAP_default[0].matrixStartIndex
-                DAP.append(PQUModule.PQU(
-                    numpy.sqrt(matrix[index, index]), DAP_default[0].link.evaluated.axes[0].unit).getValueAs('10*fm'))
+                dap_now = numpy.sqrt(matrix[0, 0])
+                if self.type is covarianceEnumsModule.Type.relative:
+                    dap_now *= self.parameters[0].link.evaluated.value
+                dap_now = PQUModule.PQU(dap_now, DAP_default[0].link.evaluated.axes[0].unit).getValueAs('10*fm')
+                DAP.append(dap_now)
             else:
                 DAP.append(0)
 
@@ -300,9 +310,11 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
                     while L+1 > len(uncertaintyPerL):
                         uncertaintyPerL.append([])
                     index = radius.matrixStartIndex
-                    DAP_now = PQUModule.PQU(
-                        numpy.sqrt(matrix[index, index]), radius.link.evaluated.axes[0].unit).getValueAs('10*fm')
-                    uncertaintyPerL[L].append(DAP_now)
+                    dap_now = numpy.sqrt(matrix[index, index])
+                    if self.type is covarianceEnumsModule.Type.relative:
+                        dap_now *= self.parameters[index].link.evaluated.value
+                    dap_now = PQUModule.PQU(dap_now, DAP_default[0].link.evaluated.axes[0].unit).getValueAs('10*fm')
+                    uncertaintyPerL[L].append(dap_now)
                 for Lvals in uncertaintyPerL:
                     if not Lvals:
                         DAP.append(0)
@@ -316,6 +328,14 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
 
         index = self.parameters[len(radii)].matrixStartIndex
         matrix = matrix[index:, index:]
+        if self.type is covarianceEnumsModule.Type.relative:
+            parameters = []
+            for parameterLink in self.parameters[len(radii):]:
+                for row in parameterLink.link.data:
+                    parameters += row
+            matrix *= numpy.outer(parameters, parameters)
+            matrix[matrix == numpy.NZERO] = 0
+
         MPAR = len(matrix) // NRes
 
         if not sortByL:
@@ -404,8 +424,15 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             endf += writeLCOMP2(matrix, NDIGIT, NRes*MPAR)
 
     else:   # LRF = 7
-        import numpy
         matrix = self.matrix.constructArray()
+        if self.type is covarianceEnumsModule.Type.relative:
+            parameters = []
+            for parameterLink in self.parameters:
+                for row in parameterLink.link.data:
+                    parameters += row
+            matrix *= numpy.outer(parameters, parameters)
+            matrix[matrix==-0] = 0
+
         RML = res.resolved.evaluated
 
         IFG = int(RML.reducedWidthAmplitudes)

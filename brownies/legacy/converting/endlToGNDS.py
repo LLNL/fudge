@@ -20,7 +20,7 @@ gamma: name is simply given as 'photon'.
 
 import os
 import numpy
-from xml.etree import cElementTree
+from xml.etree import ElementTree
 
 from pqu import PQU as PQUModule
 
@@ -140,7 +140,7 @@ def parse_endl_covariance(covFile):
     Returns a list of (energy bins,  covariance matrix, covariance_type, [enminmax]) tuples.
     The list may be empty (some ENDL cov.xml files are empty).
     """
-    xdoc = cElementTree.parse(covFile)
+    xdoc = ElementTree.parse(covFile)
     root = xdoc.getroot()
     ebins, covariances, covariance_types, enminmax = [],[],[],[]
     # should I just set the I# here and return it?
@@ -1491,7 +1491,7 @@ def toGNDS(self, evaluationLibrary, evaluationVersion, formatVersion=GNDS_format
             newSumXsc.label = newSumXsc.style = info.style
             newSum.crossSection.add( newSumXsc )
             newQ = max([reac.getQ('MeV', final=True) for reac in reacs])
-            newSum.Q.add( returnConstantQ( info.style, newQ, crossSection ) )
+            newSum.Q.add( returnConstantQ( info.style, newQ, newSumXsc ) )
             reactionSuite.sums.crossSectionSums.add( newSum )
 
     covarianceFileCS = covarianceDict(self.source)   #  Dictionary covariance filenames from the user-input directory, key: (C,S)

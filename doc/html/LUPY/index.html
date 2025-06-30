@@ -348,8 +348,8 @@ This method uses Ancestry.findEntity to find each part of the xpath.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.printNewMembers">
-<span class="sig-name descname"><span class="pre">printNewMembers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.printNewMembers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.printNewMembers" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.printMembers">
+<span class="sig-name descname"><span class="pre">printMembers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.printMembers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.printMembers" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method prints the type of <em>self</em> and then prints all the member added since the base class <em>cls2</em>. That is, 
 those members which are not defined in by base class <em>cls2</em>.</p>
 <dl class="field-list simple">
@@ -364,18 +364,15 @@ those members which are not defined in by base class <em>cls2</em>.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.printNewMembers">
+<span class="sig-name descname"><span class="pre">printNewMembers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.printNewMembers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.printNewMembers" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is deprecated, please use the method <strong>printMembers</strong> instead.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="LUPY.ancestry.Ancestry.printNonAncestryMembers">
 <span class="sig-name descname"><span class="pre">printNonAncestryMembers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LUPY/ancestry.html#Ancestry.printNonAncestryMembers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LUPY.ancestry.Ancestry.printNonAncestryMembers" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method prints the type of <em>self</em> and then prints all the member added by the derived class. That is, 
-those members which are not defined by the <a class="reference internal" href="#LUPY.ancestry.Ancestry" title="LUPY.ancestry.Ancestry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ancestry</span></code></a> class.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>exclude</strong> – If True, any member starting with an underscore (i.e., ‘_’) is also not printed.</p></li>
-<li><p><strong>width</strong> – The number of members printed per line.</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>This method is deprecated, please use the method <strong>printMembers</strong> instead.</p>
 </dd></dl>
 
 <dl class="py property">

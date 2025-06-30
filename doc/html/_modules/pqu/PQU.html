@@ -935,10 +935,15 @@
     <span class="n">__rdiv__</span> <span class="o">=</span> <span class="fm">__rtruediv__</span>
     <span class="n">__idiv__</span> <span class="o">=</span> <span class="fm">__itruediv__</span>
 
-    <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 
-        <span class="n">power</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">PQU_float</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">**</span><span class="n">power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">significantDigits</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PQU_float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">**</span><span class="n">power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">significantDigits</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+
+        <span class="n">base</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PQU_float</span><span class="p">(</span><span class="n">base</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">significantDigits</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__float__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -1515,23 +1520,41 @@
     <span class="n">__rdiv__</span> <span class="o">=</span> <span class="fm">__rtruediv__</span>
     <span class="n">__idiv__</span> <span class="o">=</span> <span class="fm">__itruediv__</span>
 
-    <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Does not include uncertainty of other in calculation. Other must be an object convertible to a float. If it</span>
 <span class="sd">        is a :py:class:`PQU` instance, it must be dimensionless.&quot;&quot;&quot;</span>
 
-        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getOtherAsPQU</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">isDimensionless</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Power must be dimensionless. It has dimension &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span>
-        <span class="n">power</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getOtherAsPQU</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">other</span><span class="o">.</span><span class="n">isDimensionless</span><span class="p">():</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Power must be dimensionless. It has dimension &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
-        <span class="n">valueToPower</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">power</span> <span class="p">)</span>
-        <span class="n">value</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span> <span class="p">),</span> <span class="kc">None</span>
+        <span class="n">valueToPower</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span>
+        <span class="n">value</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="kc">None</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="n">value</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>  <span class="c1"># This is not the correct answer when value is small compared to uncertainty. Needs work?</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># This is not the correct answer when value is small compared to uncertainty. Needs work?</span>
             <span class="n">uncertainty</span> <span class="o">=</span> <span class="p">(</span> <span class="n">power</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span> <span class="n">valueToPower</span> <span class="p">)</span> <span class="o">/</span> <span class="n">value</span> <span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span>
             <span class="k">if</span><span class="p">(</span> <span class="n">uncertainty</span><span class="o">.</span><span class="n">getStyle</span><span class="p">(</span> <span class="p">)</span> <span class="o">==</span> <span class="n">PQU_uncertainty</span><span class="o">.</span><span class="n">pqu_uncertaintyStyleParenthesis</span> <span class="p">)</span> <span class="p">:</span> 
                 <span class="n">uncertainty</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">PQU_uncertainty</span><span class="o">.</span><span class="n">pqu_uncertaintyStylePlusMinus</span>
         <span class="n">valueToPower</span> <span class="o">=</span> <span class="n">PQU_float</span><span class="p">(</span> <span class="n">valueToPower</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getSignificantDigits</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">PQU</span><span class="p">(</span> <span class="n">valueToPower</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">power</span> <span class="p">),</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">uncertainty</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Does not include uncertainty of other in calculation. Other must be an object convertible to a float. If it</span>
+<span class="sd">        is a :py:class:`PQU` instance, it must be dimensionless.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isDimensionless</span><span class="p">(</span> <span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Power must be dimensionless. It has dimension &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getOtherAsPQU</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+        <span class="n">newValue</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">value</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># This is not the correct answer when value is small compared to uncertainty. Needs work?</span>
+            <span class="n">uncertainty</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">newValue</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span>
+            <span class="k">if</span> <span class="n">uncertainty</span><span class="o">.</span><span class="n">getStyle</span><span class="p">()</span> <span class="o">==</span> <span class="n">PQU_uncertainty</span><span class="o">.</span><span class="n">pqu_uncertaintyStyleParenthesis</span><span class="p">:</span>
+                <span class="n">uncertainty</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">PQU_uncertainty</span><span class="o">.</span><span class="n">pqu_uncertaintyStylePlusMinus</span>
+        <span class="n">newValue</span> <span class="o">=</span> <span class="n">PQU_float</span><span class="p">(</span><span class="n">newValue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getSignificantDigits</span><span class="p">(</span> <span class="p">))</span>
+        <span class="k">return</span> <span class="n">PQU</span><span class="p">(</span><span class="n">newValue</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">uncertainty</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__float__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -2422,6 +2445,9 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Cannot exponentiate units with non-zero offset.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isDimensionless</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span>
 
         <span class="n">power</span> <span class="o">=</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="n">limit_denominator</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">power</span><span class="o">.</span><span class="n">denominator</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>

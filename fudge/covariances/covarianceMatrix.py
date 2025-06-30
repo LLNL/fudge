@@ -7,7 +7,8 @@
 
 """Base classes for covariances: matrix, axes."""
 
-import copy, numpy
+import copy
+import numpy
 
 from . import enums as covarianceEnumsModule
 from . import base
@@ -20,6 +21,7 @@ from xData import gridded as griddedModule
 from xData import xDataArray as arrayModule
 from xData import XYs1d as XYs1dModule
 from xData import link as linkModule
+from xData import values as valuesModule
 
 from pqu import PQU
 
@@ -156,8 +158,6 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
         :return: CovarianceMatrix
         """
         import bisect
-        from xData import values as valuesModule
-        from xData import link as linkModule
 
         if columnDomainBounds is None:
             columnDomainBounds = rowDomainBounds
@@ -319,8 +319,7 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
             colData = rowData
             gColData = gRowData
 
-        from numpy import outer
-        new_data = self.matrix.array.constructArray() * outer(gRowData, gColData)
+        new_data = self.matrix.array.constructArray() * numpy.outer(gRowData, gColData)
         if self.matrix.array.symmetry == arrayModule.Symmetry.lower:
             new_data = new_data[numpy.tril_indices(len(new_data))]
         elif self.matrix.array.symmetry == arrayModule.Symmetry.upper:
@@ -392,8 +391,7 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
         else:
             gColData = gRowData
 
-        from numpy import outer
-        denom = outer(gRowData, gColData)
+        denom = numpy.outer(gRowData, gColData)
         denom[denom == 0] = lowerEps  # remove zeros
         new_data = self.matrix.array.constructArray() / denom
         if self.matrix.array.symmetry == arrayModule.Symmetry.lower:
@@ -450,7 +448,7 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
             warnings.append(warning.MatrixDimensionMismatch(
                 A.shape, (len(rowGrid), len(columnGrid)), obj=self))
 
-        if columnData is not None or not info['checkUncLimits']:
+        if self.findAttributeInAncestry('crossTerm') or not info['checkUncLimits']:
             # remaining checks don't apply to cross-terms yet
             # FIXME also test FULL matrix including cross-terms
             return warnings
@@ -646,16 +644,20 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
             axis1index = 1
 
         # setup the old axes in a form we can (ab)use in the XYs1d class
-        axes2_ = axesModule.Axes(2, labelsUnits={1: (self.matrix.axes[2].label, self.matrix.axes[2].unit),
-                                                 0: ('dummy', '')})
+        axes2_ = axesModule.Axes(2, labelsUnits={
+            1: (self.matrix.axes[2].label, self.matrix.axes[2].unit),
+            0: ('dummy', '')})
         axes1_ = axesModule.Axes(2, labelsUnits={
-            1: (self.matrix.axes[axis1index].label, self.matrix.axes[axis1index].unit), 0: ('dummy', '')})
+            1: (self.matrix.axes[axis1index].label, self.matrix.axes[axis1index].unit),
+            0: ('dummy', '')})
 
         # define basis functions for the rows and columns
         basis2 = XYs1dModule.XYs1d(axes=axes2_,
-                                   data=[(x, 0.0) for x in self.matrix.axes[2].values], interpolation='flat')
+                                   data=[(x, 0.0) for x in self.matrix.axes[2].values],
+                                   interpolation=xDataEnumsModule.Interpolation.flat)
         basis1 = XYs1dModule.XYs1d(axes=axes1_,
-                                   data=[(x, 0.0) for x in self.matrix.axes[axis1index].values], interpolation='flat')
+                                   data=[(x, 0.0) for x in self.matrix.axes[axis1index].values],
+                                   interpolation=xDataEnumsModule.Interpolation.flat)
         basis2 = basis2.convertAxisToUnit(1, groupUnit[0])
         basis1 = basis1.convertAxisToUnit(1, groupUnit[1])
 
@@ -675,8 +677,9 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
 
         # set up the regrouped covariance matrix
         grouped = self.copy()
-        grouped.matrix.axes[2].data = groupBoundaries[0]
-        grouped.matrix.axes[1].data = groupBoundaries[1]
+        grouped.matrix.axes[2].values.values = groupBoundaries[0]
+        if groupBoundaries[1] != groupBoundaries[0]:
+            grouped.matrix.axes[1].values.values = groupBoundaries[1]
         grouped.matrix.axes[2].unit = groupUnit[0]
         grouped.matrix.axes[1].unit = groupUnit[1]
         odata = self.matrix.array.constructArray()
@@ -749,27 +752,31 @@ class CovarianceMatrix(ancestryModule.AncestryIO, base.Covariance):
         if yunit != '':  # get square root of the unit
             yunit = PQU.PQU(1, yunit).sqrt().getUnitSymbol()
         axes_ = axesModule.Axes(2, labelsUnits={1: ('energy_in', self.matrix.axes[2].unit), 0: ('uncertainty', yunit)})
-        uncert = XYs1dModule.XYs1d(list(zip(energies, copy.deepcopy(diag))), axes=axes_, interpolation='flat')
-        uncert = uncert.changeInterpolation(xDataEnumsModule.Interpolation.linlin, accuracy=1e-3, lowerEps=1e-8,
-                                            upperEps=1e-8)
+        uncert = XYs1dModule.XYs1d(list(zip(energies, copy.deepcopy(diag))), axes=axes_,
+                                   interpolation=xDataEnumsModule.Interpolation.flat)
+        uncert = uncert.changeInterpolation(xDataEnumsModule.Interpolation.linlin,
+                                            accuracy=1e-3, lowerEps=1e-8, upperEps=1e-8)
 
         # do we need to convert absolute->relative or vice versa?
         if (relative and self.type == covarianceEnumsModule.Type.absolute) or (
                 not relative and self.type == covarianceEnumsModule.Type.relative):
             if theData is None:
-                theData = self.findAttributeInAncestry('rowData').link.toPointwise_withLinearXYs(lowerEps=1e-8,
-                                                                                                 upperEps=1e-8)
+                theData = self.findAttributeInAncestry('rowData').link.toPointwise_withLinearXYs(
+                    lowerEps=1e-8, upperEps=1e-8)
             try:
+                if theData.domainUnit != uncert.domainUnit:
+                    theData = theData.copy()
+                    theData.convertUnits({theData.domainUnit: uncert.domainUnit})
                 theData = theData.toPointwise_withLinearXYs(lowerEps=1e-8, upperEps=1e-8)
                 uncert, theData = uncert.mutualify(1e-8, 1e-8, False, theData, 1e-8, 1e-8, False)
                 if relative:  # convert absolute to relative
-                    uncert /= theData
+                    uncert = uncert / theData
                 else:  # relative to absolute
-                    uncert *= theData
+                    uncert = uncert * theData
             except Exception as err:
                 print(len(uncert), uncert.copyDataToXYs()[0], uncert.copyDataToXYs()[-1])
                 print(len(theData), theData.copyDataToXYs()[0], theData.copyDataToXYs()[-1])
-                raise Exception(err.message)
+                raise err
         return uncert
 
     def plot(self, title=None, scalelabel=None, xlim=None, ylim=None, xlog=False, ylog=False):

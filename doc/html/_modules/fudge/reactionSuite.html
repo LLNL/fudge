@@ -2248,6 +2248,8 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">covariances</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Currently, only one covariance file is supported.&#39;</span><span class="p">)</span>
                 <span class="n">covarianceSuite</span> <span class="o">=</span> <span class="n">covariances</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">covarianceSuite</span><span class="o">.</span><span class="n">domainUnit</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span><span class="p">:</span>
+                    <span class="n">covarianceSuite</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">({</span><span class="n">covarianceSuite</span><span class="o">.</span><span class="n">domainUnit</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span><span class="p">})</span>
 
                 <span class="n">selfsExternalFile4Covariance</span> <span class="o">=</span> <span class="kc">None</span>                                     <span class="c1"># Self&#39;s ExternalFile that points to the covariance file.</span>
                 <span class="k">for</span> <span class="n">externalFile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">externalFiles</span><span class="p">:</span>

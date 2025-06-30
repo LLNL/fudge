@@ -2209,6 +2209,8 @@ class ReactionSuite(ancestryModule.AncestryIO):
                 if len(covariances) > 1:
                     raise Exception('Currently, only one covariance file is supported.')
                 covarianceSuite = covariances[0]
+                if covarianceSuite.domainUnit != self.domainUnit:
+                    covarianceSuite.convertUnits({covarianceSuite.domainUnit: self.domainUnit})
 
                 selfsExternalFile4Covariance = None                                     # Self's ExternalFile that points to the covariance file.
                 for externalFile in self.externalFiles:

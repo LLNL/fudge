@@ -68,6 +68,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">axes</span> <span class="k">as</span> <span class="n">axesModule</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">xDataArray</span> <span class="k">as</span> <span class="n">arrayModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">XYs1d</span> <span class="k">as</span> <span class="n">XYs1dModule</span>
 
 <div class="viewcode-block" id="Gridded"><a class="viewcode-back" href="../../xData/index.html#xData.gridded.Gridded">[docs]</a><span class="k">class</span> <span class="nc">Gridded</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">XDataFunctional</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -232,6 +233,26 @@
 
     <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;gridded1d&#39;</span>
     <span class="n">dimension</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="Gridded1d.asXYs1d"><a class="viewcode-back" href="../../xData/index.html#xData.gridded.Gridded1d.asXYs1d">[docs]</a>    <span class="k">def</span> <span class="nf">asXYs1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asLinLin</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span><span class="p">,</span> <span class="n">biSectionMax</span><span class="o">=</span><span class="mi">16</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a representation of the data in *self* as an :py:class:`XYs1dModule.XYs1d` instance.</span>
+
+<span class="sd">        :param asLinLin:    If **True**, the returned data will have lin-lin interpolation.</span>
+<span class="sd">        :param accuracy:    Used to determine the accuracy if converting data to lin-lin interpolated data.</span>
+<span class="sd">        :param lowerEps     Used to dull the lower point for &quot;flat&quot; interpolation.</span>
+<span class="sd">        :param upperEps     Used to dull the upper point for &quot;flat&quot; interpolation.</span>
+
+<span class="sd">        :returns:           A :py:class:`XYs1dModule.XYs1d` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copyDataToXsAndYs</span><span class="p">()</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toLinearXYsClass</span><span class="p">()</span>
+        <span class="n">xys1d</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">],</span> <span class="n">dataForm</span><span class="o">=</span><span class="s1">&#39;xsandys&#39;</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">asLinLin</span><span class="p">:</span>
+            <span class="n">xys1d</span> <span class="o">=</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">changeInterpolation</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">,</span> <span class="n">accuracy</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span><span class="o">=</span><span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="n">upperEps</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">xys1d</span></div>
 
 <div class="viewcode-block" id="Gridded1d.constructVector"><a class="viewcode-back" href="../../xData/index.html#xData.gridded.Gridded1d.constructVector">[docs]</a>    <span class="k">def</span> <span class="nf">constructVector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

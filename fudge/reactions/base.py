@@ -198,7 +198,7 @@ class Base_reaction(ancestryModule.AncestryIO):
                 Q = info['Q']
                 Qcalc = info['availableEnergy']
                 if Qcalc is None: raise ValueError  # caught below. Skips Q-value check for elemental targets
-                for prod in self.__outputChannel:
+                for prod in self.__outputChannel.products:
                     try:
                         productMass = prod.getMass(f'{energyUnit}/c**2')
                     except Exception:
@@ -225,7 +225,7 @@ class Base_reaction(ancestryModule.AncestryIO):
                                   incompleteReactionModule.IncompleteReaction))):
             # check that ZA balances:
             ZAsum = 0
-            for product in self.__outputChannel:
+            for product in self.__outputChannel.products:
                 if product.pid == IDsPoPsModule.photon: continue
                 try:
                     mult = product.multiplicity.getConstant()
@@ -240,7 +240,7 @@ class Base_reaction(ancestryModule.AncestryIO):
                 warnings.append( warning.ZAbalanceWarning( self ) )
 
         if not isinstance(self, productionModule.Production):
-            for product in self.__outputChannel:
+            for product in self.__outputChannel.products:
                 productWarnings = product.check(info)
                 if productWarnings:
                     warnings.append(warning.Context("Product: %s" % product.label, productWarnings))

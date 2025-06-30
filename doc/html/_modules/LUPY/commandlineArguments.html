@@ -50,7 +50,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
 <span class="kn">import</span> <span class="nn">socket</span>
 
 <span class="kn">import</span> <span class="nn">fudge</span>
@@ -161,7 +161,7 @@
     <span class="n">computerCode</span> <span class="o">=</span> <span class="n">computerCodeModule</span><span class="o">.</span><span class="n">ComputerCode</span><span class="p">(</span><span class="n">codeName</span><span class="p">,</span> <span class="n">codeName</span><span class="p">,</span> <span class="n">fudge</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
     <span class="n">computerCode</span><span class="o">.</span><span class="n">executionArguments</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">commandLineArguments</span><span class="p">)</span>
 
-    <span class="n">computerCode</span><span class="o">.</span><span class="n">note</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Code </span><span class="si">{</span><span class="n">codeName</span><span class="si">}</span><span class="s1"> executed by </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getlogin</span><span class="p">()</span><span class="si">}</span><span class="s1"> on platform </span><span class="si">{</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span><span class="si">}</span><span class="s1">.&#39;</span>
+    <span class="n">computerCode</span><span class="o">.</span><span class="n">note</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Code </span><span class="si">{</span><span class="n">codeName</span><span class="si">}</span><span class="s1"> executed by </span><span class="si">{</span><span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span><span class="si">}</span><span class="s1"> on platform </span><span class="si">{</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span><span class="si">}</span><span class="s1">.&#39;</span>
 
     <span class="n">documentation</span><span class="o">.</span><span class="n">computerCodes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">computerCode</span><span class="p">)</span></div>
 

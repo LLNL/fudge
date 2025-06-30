@@ -1,9 +1,6 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "numpy>=1.15"]
+requires = ["setuptools", "versioningit", "wheel", "numpy>=1.15"]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools.dynamic]
-version = {attr = "fudge.__version__"}
 
 [project]
 name = "fudge"
@@ -15,6 +12,12 @@ description = "FUDGE (For Updating Data and Generating Evaluations) is a Python 
 readme = "README.md"
 requires-python = ">=3.7"
 license = {file = "LICENSE"}
+
+[tool.versioningit.tag2version]
+regex = "^(?P<prefix>fudge)(?P<version>[vV]?\\d+(?:\\.\\d+){0,2}[^\\+]*)?$"
+
+[tool.versioningit.write]
+file = "fudge/fudgeVersion.py"
 
 [tool.setuptools]
 packages = [

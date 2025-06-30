@@ -80,6 +80,7 @@ def readMF1MT451(_MAT, _MTDatas, formatVersion, specialNuclearParticleID, styleN
     info.verboseWarnings = verboseWarnings
     info.ENDFconversionFlags = ENDFconversionFlagsModule.ENDFconversionFlags()
     info.specialNuclearParticleID = specialNuclearParticleID
+    info.extraFissionWidths = []
 
     # Line #1
     targetZA, targetMass, LRP, LFI, NLIB, NMOD = \

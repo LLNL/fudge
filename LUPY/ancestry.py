@@ -40,7 +40,7 @@ import numpy
 import pathlib
 import inspect
 
-from xml.etree import cElementTree
+from xml.etree import ElementTree
 
 from LUPY import xmlNode as xmlNodeMode        # Wrapper around the xml parser.
 from LUPY import checksums as checksumsModule
@@ -651,7 +651,7 @@ class AncestryIO_base(Ancestry):
 
         if not isinstance(string, str): raise TypeError('Invalid string.')
 
-        node = cElementTree.fromstring(string)
+        node = ElementTree.fromstring(string)
         node = xmlNodeMode.XML_node(node, xmlNodeMode.XML_node.etree)
 
         instance = cls.parseNodeUsingClass(node, [], {}, **kwargs)
@@ -675,7 +675,7 @@ class AncestryIO_base(Ancestry):
             fileName = str(fileName)
         if not isinstance(fileName, str): raise TypeError('Invalid file name.')
 
-        node = cElementTree.parse(fileName).getroot()
+        node = ElementTree.parse(fileName).getroot()
         node = xmlNodeMode.XML_node(node, xmlNodeMode.XML_node.etree)
 
         if node.tag != cls.moniker:

@@ -13,7 +13,7 @@ Translate GNDS/HDF5 to GNDS/XML
 import sys
 import os
 
-from xml.etree import cElementTree as etree
+from xml.etree import ElementTree as etree
 import numpy
 import h5py
 

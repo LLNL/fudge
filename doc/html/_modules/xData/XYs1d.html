@@ -650,7 +650,26 @@
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnAsClass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">applyFunction</span><span class="p">(</span> <span class="n">f</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">biSectionMax</span> <span class="o">=</span> <span class="n">biSectionMax</span><span class="p">,</span> <span class="n">checkForRoots</span> <span class="o">=</span> <span class="n">checkForRoots</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="XYs1d.changeInterpolation"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.changeInterpolation">[docs]</a>    <span class="k">def</span> <span class="nf">changeInterpolation</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">cls</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="XYs1d.asXYs1d"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.asXYs1d">[docs]</a>    <span class="k">def</span> <span class="nf">asXYs1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asLinLin</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span><span class="p">,</span> <span class="n">biSectionMax</span><span class="o">=</span><span class="mi">16</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a representation of the data in *self* as an :py:class:`XYs1dModule.XYs1d` instance. </span>
+<span class="sd">        Beware, this method returns *self* if data have lin-lin interpolation.</span>
+
+<span class="sd">        :param asLinLin:    If **True**, the data have lin-lin interpolation.</span>
+<span class="sd">        :param accuracy:    Used to determine the accuracy if converting data to lin-lin interpolated data.</span>
+<span class="sd">        :param lowerEps     Used to dull the lower point for &quot;flat&quot; interpolation.</span>
+<span class="sd">        :param upperEps     Used to dull the upper point for &quot;flat&quot; interpolation.</span>
+
+<span class="sd">        :returns:           A :py:class:`XYs1dModule.XYs1d` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xys1d</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="n">asLinLin</span> <span class="ow">and</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">!=</span> <span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">:</span>
+            <span class="n">xys1d</span> <span class="o">=</span> <span class="n">xys1d</span><span class="o">.</span><span class="n">changeInterpolation</span><span class="p">(</span><span class="n">enumsModule</span><span class="o">.</span><span class="n">Interpolation</span><span class="o">.</span><span class="n">linlin</span><span class="p">,</span> <span class="n">accuracy</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span><span class="o">=</span><span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="n">upperEps</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">xys1d</span></div>
+
+<div class="viewcode-block" id="XYs1d.changeInterpolation"><a class="viewcode-back" href="../../xData/index.html#xData.XYs1d.XYs1d.changeInterpolation">[docs]</a>    <span class="k">def</span> <span class="nf">changeInterpolation</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="bp">cls</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This methods returns :py:class:`XYs1d` instance that is *self* converted to a new interpolation. Points are added as needed to</span>
 <span class="sd">        maintain the accuracy of the returned instance to *self*. Generally, *interpolation* can only be &quot;lin-lin&quot;.</span>
@@ -1972,9 +1991,8 @@
 
         <span class="n">XML_strList</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">xys</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf_pointwiseXY</span><span class="o">.</span><span class="n">copyDataToXYs</span><span class="p">():</span>
-            <span class="n">xys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="n">xys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">xys</span> <span class="o">+=</span> <span class="n">xy</span>
         <span class="n">XML_strList</span> <span class="o">+=</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">Values</span><span class="p">(</span><span class="n">xys</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valueType</span><span class="p">)</span><span class="o">.</span><span class="n">toXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">XML_strList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildXML_strList</span><span class="p">(</span><span class="n">indent2</span><span class="p">,</span> <span class="n">startTag</span><span class="p">,</span> <span class="n">XML_strList</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

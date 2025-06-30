@@ -43,12 +43,11 @@
   <h1>Source code for numericalFunctions.setup</h1><div class="highlight"><pre>
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+<span class="c1"># This file is required for the C extensions</span>
+<span class="c1"># The main configuration is in pyproject.toml, but setuptools still uses this for extensions</span>
 
 <span class="kn">import</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">os</span>
-
-<span class="kn">import</span> <span class="nn">setuptools</span>
 <span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
-
 
 <div class="viewcode-block" id="setup_package"><a class="viewcode-back" href="../../numericalFunctions/numericalFunctions.html#numericalFunctions.setup.setup_package">[docs]</a><span class="k">def</span> <span class="nf">setup_package</span><span class="p">():</span>
     <span class="n">statusMessageReporting_c</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;statusMessageReporting&#39;</span><span class="p">,</span> <span class="s1">&#39;Src&#39;</span><span class="p">,</span> <span class="s1">&#39;*.c&#39;</span><span class="p">))</span>
@@ -89,51 +88,45 @@
 
     <span class="n">extra_compile_args</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="n">listOfDoubles_C</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span> <span class="s1">&#39;numericalFunctions.listOfDoubles_C&#39;</span><span class="p">,</span>
+    <span class="n">listOfDoubles_C</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;numericalFunctions.listOfDoubles_C&#39;</span><span class="p">,</span>
         <span class="n">extra_compile_args</span> <span class="o">=</span> <span class="n">extra_compile_args</span><span class="p">,</span>
         <span class="n">sources</span> <span class="o">=</span> <span class="n">statusMessageReporting_c</span> <span class="o">+</span> <span class="n">ptwC_c</span> <span class="o">+</span> <span class="n">ptwX_c</span> <span class="o">+</span> <span class="n">ptwX_Py_c</span><span class="p">,</span>
-        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">ptwX_hDir</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">ptwX_hDir</span><span class="p">])</span>
     
-    <span class="n">pointwiseXY_C</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span> <span class="s1">&#39;numericalFunctions.pointwiseXY_C&#39;</span><span class="p">,</span>
+    <span class="n">pointwiseXY_C</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;numericalFunctions.pointwiseXY_C&#39;</span><span class="p">,</span>
         <span class="n">extra_compile_args</span> <span class="o">=</span> <span class="n">extra_compile_args</span><span class="p">,</span>
         <span class="n">sources</span> <span class="o">=</span> <span class="n">statusMessageReporting_c</span> <span class="o">+</span> <span class="n">ptwC_c</span> <span class="o">+</span> <span class="n">ptwX_c</span> <span class="o">+</span> <span class="n">nf_Legendre_c</span> <span class="o">+</span> <span class="n">nf_integration_c</span> <span class="o">+</span> <span class="n">ptwXY_c</span> <span class="o">+</span> <span class="n">ptwXY_Py_c</span><span class="p">,</span>
-        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">ptwX_hDir</span><span class="p">,</span> <span class="n">nf_Legendre_hDir</span><span class="p">,</span> <span class="n">nf_integration_hDir</span><span class="p">,</span> 
-                <span class="n">ptwXY_hDir</span><span class="p">,</span> <span class="n">ptwXY_Py_hDir</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">ptwX_hDir</span><span class="p">,</span> <span class="n">nf_Legendre_hDir</span><span class="p">,</span> <span class="n">nf_integration_hDir</span><span class="p">,</span> 
+                <span class="n">ptwXY_hDir</span><span class="p">,</span> <span class="n">ptwXY_Py_hDir</span><span class="p">])</span>
 
-    <span class="n">Legendre</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span> <span class="s1">&#39;numericalFunctions.Legendre&#39;</span><span class="p">,</span>
+    <span class="n">Legendre</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;numericalFunctions.Legendre&#39;</span><span class="p">,</span>
         <span class="n">extra_compile_args</span> <span class="o">=</span> <span class="n">extra_compile_args</span><span class="p">,</span>
         <span class="n">sources</span> <span class="o">=</span> <span class="n">statusMessageReporting_c</span> <span class="o">+</span> <span class="n">ptwC_c</span> <span class="o">+</span> <span class="n">ptwX_c</span> <span class="o">+</span> <span class="n">ptwXY_c</span> <span class="o">+</span> <span class="n">nf_integration_c</span> <span class="o">+</span> <span class="n">nf_Legendre_c</span> <span class="o">+</span> <span class="n">nf_Legendre_Py_c</span><span class="p">,</span>
-        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">ptwX_hDir</span><span class="p">,</span> <span class="n">ptwXY_hDir</span><span class="p">,</span> <span class="n">ptwXY_Py_hDir</span><span class="p">,</span> 
-                <span class="n">nf_integration_hDir</span><span class="p">,</span> <span class="n">nf_Legendre_hDir</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">ptwX_hDir</span><span class="p">,</span> <span class="n">ptwXY_hDir</span><span class="p">,</span> <span class="n">ptwXY_Py_hDir</span><span class="p">,</span> 
+                <span class="n">nf_integration_hDir</span><span class="p">,</span> <span class="n">nf_Legendre_hDir</span><span class="p">])</span>
     
-    <span class="n">specialFunctions</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span> <span class="s1">&#39;numericalFunctions.specialFunctions&#39;</span><span class="p">,</span>
+    <span class="n">specialFunctions</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;numericalFunctions.specialFunctions&#39;</span><span class="p">,</span>
         <span class="n">extra_compile_args</span> <span class="o">=</span> <span class="n">extra_compile_args</span><span class="p">,</span>
         <span class="n">sources</span> <span class="o">=</span> <span class="n">statusMessageReporting_c</span> <span class="o">+</span> <span class="n">ptwC_c</span> <span class="o">+</span> <span class="n">nf_specialFunctions_c</span> <span class="o">+</span> <span class="n">nf_specialFunctions_Py_c</span><span class="p">,</span>
-        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">nf_specialFunctions_hDir</span><span class="p">,</span> <span class="n">nf_specialFunctions_Py_hDir</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">nf_specialFunctions_hDir</span><span class="p">,</span> <span class="n">nf_specialFunctions_Py_hDir</span><span class="p">])</span>
     
-    <span class="n">angularMomentumCoupling</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span> <span class="s1">&#39;numericalFunctions.angularMomentumCoupling&#39;</span><span class="p">,</span>
+    <span class="n">angularMomentumCoupling</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;numericalFunctions.angularMomentumCoupling&#39;</span><span class="p">,</span>
         <span class="n">extra_compile_args</span> <span class="o">=</span> <span class="n">extra_compile_args</span><span class="p">,</span>
-        <span class="n">sources</span> <span class="o">=</span> <span class="n">statusMessageReporting_c</span> <span class="o">+</span> <span class="n">ptwC_c</span> <span class="o">+</span> <span class="n">nf_angularMomentumCoupling_c</span> <span class="o">+</span> <span class="n">nf_angularMomentumCoupling_Py_c</span> <span class="p">,</span>
-        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">nf_specialFunctions_hDir</span><span class="p">,</span> <span class="n">nf_specialFunctions_Py_hDir</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">sources</span> <span class="o">=</span> <span class="n">statusMessageReporting_c</span> <span class="o">+</span> <span class="n">ptwC_c</span> <span class="o">+</span> <span class="n">nf_angularMomentumCoupling_c</span> <span class="o">+</span> <span class="n">nf_angularMomentumCoupling_Py_c</span><span class="p">,</span>
+        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">nf_specialFunctions_hDir</span><span class="p">,</span> <span class="n">nf_specialFunctions_Py_hDir</span><span class="p">])</span>
     
-    <span class="n">integration</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span> <span class="s1">&#39;numericalFunctions.integration&#39;</span><span class="p">,</span>
+    <span class="n">integration</span> <span class="o">=</span> <span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;numericalFunctions.integration&#39;</span><span class="p">,</span>
         <span class="n">extra_compile_args</span> <span class="o">=</span> <span class="n">extra_compile_args</span><span class="p">,</span>
         <span class="n">sources</span> <span class="o">=</span> <span class="n">statusMessageReporting_c</span> <span class="o">+</span> <span class="n">ptwC_c</span> <span class="o">+</span> <span class="n">ptwX_c</span> <span class="o">+</span> <span class="n">ptwXY_c</span> <span class="o">+</span> <span class="n">nf_Legendre_c</span> <span class="o">+</span> <span class="n">nf_integration_c</span> <span class="o">+</span> <span class="n">nf_integration_Py_c</span><span class="p">,</span>
-        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">ptwX_hDir</span><span class="p">,</span> <span class="n">ptwXY_hDir</span><span class="p">,</span> <span class="n">nf_Legendre_hDir</span><span class="p">,</span> <span class="n">nf_integration_hDir</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">statusMessageReporting_hDir</span><span class="p">,</span> <span class="n">ptwC_hDir</span><span class="p">,</span> <span class="n">ptwX_hDir</span><span class="p">,</span> <span class="n">ptwXY_hDir</span><span class="p">,</span> <span class="n">nf_Legendre_hDir</span><span class="p">,</span> <span class="n">nf_integration_hDir</span><span class="p">])</span>
 
+    <span class="c1"># This setup() is called by setuptools from pyproject.toml</span>
     <span class="n">setup</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;numericalFunctions&#39;</span><span class="p">,</span>
-        <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span>
-        <span class="n">maintainer</span><span class="o">=</span><span class="s1">&#39;mattoon1@llnl.gov&#39;</span><span class="p">,</span>
-        <span class="n">packages</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;numericalFunctions&#39;</span><span class="p">],</span>
-        <span class="n">package_dir</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;numericalFunctions&#39;</span><span class="p">:</span> <span class="s1">&#39;.&#39;</span><span class="p">},</span>
         <span class="n">ext_modules</span><span class="o">=</span><span class="p">[</span><span class="n">listOfDoubles_C</span><span class="p">,</span> <span class="n">pointwiseXY_C</span><span class="p">,</span> <span class="n">Legendre</span><span class="p">,</span> <span class="n">specialFunctions</span><span class="p">,</span> <span class="n">angularMomentumCoupling</span><span class="p">,</span> <span class="n">integration</span><span class="p">],</span>
-        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-        <span class="n">license</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
-        <span class="p">)</span></div>
+    <span class="p">)</span></div>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">setup_package</span><span class="p">()</span>    
+    <span class="n">setup_package</span><span class="p">()</span>
 </pre></div>
 
             <div class="clearer"></div>

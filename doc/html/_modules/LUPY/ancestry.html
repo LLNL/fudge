@@ -79,7 +79,7 @@
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 
-<span class="kn">from</span> <span class="nn">xml.etree</span> <span class="kn">import</span> <span class="n">cElementTree</span>
+<span class="kn">from</span> <span class="nn">xml.etree</span> <span class="kn">import</span> <span class="n">ElementTree</span>
 
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">xmlNode</span> <span class="k">as</span> <span class="n">xmlNodeMode</span>        <span class="c1"># Wrapper around the xml parser.</span>
 <span class="kn">from</span> <span class="nn">LUPY</span> <span class="kn">import</span> <span class="n">checksums</span> <span class="k">as</span> <span class="n">checksumsModule</span>
@@ -455,7 +455,7 @@
         <span class="k">except</span> <span class="n">XPathNotFound</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">XPathNotFound</span><span class="p">(</span><span class="s2">&quot;Cannot locate path &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">xPath</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ancestry.printNewMembers"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.printNewMembers">[docs]</a>    <span class="k">def</span> <span class="nf">printNewMembers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<div class="viewcode-block" id="Ancestry.printMembers"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.printMembers">[docs]</a>    <span class="k">def</span> <span class="nf">printMembers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method prints the type of *self* and then prints all the member added since the base class *cls2*. That is, </span>
 <span class="sd">        those members which are not defined in by base class *cls2*.</span>
@@ -498,16 +498,19 @@
         <span class="k">if</span> <span class="n">counter</span> <span class="o">%</span> <span class="n">width</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Ancestry.printNonAncestryMembers"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.printNonAncestryMembers">[docs]</a>    <span class="k">def</span> <span class="nf">printNonAncestryMembers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<div class="viewcode-block" id="Ancestry.printNewMembers"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.printNewMembers">[docs]</a>    <span class="k">def</span> <span class="nf">printNewMembers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method prints the type of *self* and then prints all the member added by the derived class. That is, </span>
-<span class="sd">        those members which are not defined by the :py:class:`Ancestry` class.</span>
-
-<span class="sd">        :param exclude:     If True, any member starting with an underscore (i.e., &#39;_&#39;) is also not printed.</span>
-<span class="sd">        :param width:       The number of members printed per line.</span>
+<span class="sd">        This method is deprecated, please use the method **printMembers** instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">printNewMembers</span><span class="p">(</span><span class="n">Ancestry</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">printMembers</span><span class="p">(</span><span class="n">Ancestry</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ancestry.printNonAncestryMembers"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.Ancestry.printNonAncestryMembers">[docs]</a>    <span class="k">def</span> <span class="nf">printNonAncestryMembers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is deprecated, please use the method **printMembers** instead.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">printMembers</span><span class="p">(</span><span class="n">Ancestry</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="AncestryIO_base"><a class="viewcode-back" href="../../LUPY/index.html#LUPY.ancestry.AncestryIO_base">[docs]</a><span class="k">class</span> <span class="nc">AncestryIO_base</span><span class="p">(</span><span class="n">Ancestry</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class adds methods to read and write *self* to a file. Currently, its supports reading and writing to an XML file.&quot;&quot;&quot;</span>
@@ -687,7 +690,7 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid string.&#39;</span><span class="p">)</span>
 
-        <span class="n">node</span> <span class="o">=</span> <span class="n">cElementTree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
         <span class="n">node</span> <span class="o">=</span> <span class="n">xmlNodeMode</span><span class="o">.</span><span class="n">XML_node</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xmlNodeMode</span><span class="o">.</span><span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">)</span>
 
         <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">parseNodeUsingClass</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -711,7 +714,7 @@
             <span class="n">fileName</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid file name.&#39;</span><span class="p">)</span>
 
-        <span class="n">node</span> <span class="o">=</span> <span class="n">cElementTree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="n">node</span> <span class="o">=</span> <span class="n">xmlNodeMode</span><span class="o">.</span><span class="n">XML_node</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xmlNodeMode</span><span class="o">.</span><span class="n">XML_node</span><span class="o">.</span><span class="n">etree</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span>

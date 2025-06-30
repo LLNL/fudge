@@ -50,7 +50,7 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
       Or,
 
           # Install a tagged release:
-          pip install git+https://github.com/LLNL/fudge.git@6.9.0
+          pip install git+https://github.com/LLNL/fudge.git@6.10.0
 
 
 - Installation by cloning the git repository and building with the unix `make` command: 
@@ -83,19 +83,22 @@ Optional packages matplotlib and PyQT5 are also recommended to support plotting.
 
             setenv PYTHONPATH $PYTHONPATH:<path_to_FUDGE>
 
-      - on Windows, the environment variable should be added to the registry (see for 
-          example <http://www.support.tabs3.com/main/R10463.htm>)
-
 ### Notes for Windows users:
 
-FUDGE installations are now regularly tested on Github CI using Windows with the MinGW environment.
-Compiling C extensions on Windows may require an extra step: if command 'cc.exe' is not available,
-locate a C compiler and set environment variable CC to that compiler before running 'make' or 'pip install'.
-For example,
+We recommend installing and using FUDGE with Windows Subsystem for Linux (WSL).
+When using WSL, be sure to install in a Linux-managed directory, e.g. /home/* instead of /mnt/c/*.
+
+FUDGE can also be installed using the MinGW environment, but some portions of the code are optimized for
+unix-style process management and perform best on WSL.
+Compiling C extensions on MinGW may require an extra step:
+if command 'cc.exe' is not available, locate a C compiler and set environment variable CC to that compiler
+before running 'make' or 'pip install'. For example,
 ```
 set CC=gcc
-pip install git+https://github.com/LLNL/fudge.git
+pip install ...
 ```
+
+When installing with MinGW, the PYTHONPATH should be amended in the registry (see for example <http://www.support.tabs3.com/main/R10463.htm>)
 
 Please let us know if you run into trouble installing or using FUDGE on Windows!
 

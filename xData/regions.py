@@ -565,6 +565,22 @@ class Regions1d( Regions ) :
 
     __rmul__ = __mul__
 
+    def asXYs1d(self, asLinLin, accuracy, lowerEps, upperEps, biSectionMax=16):
+        """
+        This method returns a representation of the data in *self* as an :py:class:`XYs1dModule.XYs1d` instance.
+
+        :param asLinLin:    If **True**, the data have lin-lin interpolation.
+        :param accuracy:    Used to determine the accuracy if converting data to lin-lin interpolated data.
+        :param lowerEps     Used to dull the lower point between two regions.
+        :param upperEps     Used to dull the upper point between two regions.
+
+        :returns:           A :py:class:`XYs1dModule.XYs1d` instance.
+        """
+
+        xys1d = self.toPointwiseLinear(accuracy=accuracy, lowerEps=lowerEps, upperEps=upperEps)
+
+        return xys1d
+
     def copyToCommonRegions(self, other, epsilon = domainEpsilon):
         """
         This method returns two :py:class:`Regions1d` instances that yield the same function as *self* and *other*,

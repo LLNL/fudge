@@ -831,7 +831,8 @@ def readMF2(info, MF2, warningList):
                                 if 'ignoreChannelSpin' not in ENDFconversionFlags:
                                     ENDFconversionFlags.append('ignoreChannelSpin')
                             else:
-                                raise ValueError("Can't couple L=%s and S=%s to J=%s!" % (L, channelSpin, j))
+                                raise ValueError("Can't couple L=%s and S=%s to J=%s! Allowed J values: %s" %
+                                                 (L, channelSpin, J, getAllowedTotalSpins(L, channelSpin, False)))
 
                     for newChannelSpin, channelSpin in newChannelSpins:
                         resDict[L][J][newChannelSpin] = resDict[L][J][channelSpin]
@@ -919,12 +920,12 @@ def readMF2(info, MF2, warningList):
                             channels.add(resolvedResonanceModule.Channel(
                                 "2", resonanceReactions[2].label, columnIndex=3, L=0,
                                 channelSpin=commonResonanceModule.Spin(0)))
-                            if any(table.getColumn('fission width_2')):
+                            if len(table) > 0:
                                 channels.add(resolvedResonanceModule.Channel(
                                     "3", resonanceReactions[2].label, columnIndex=4, L=0,
                                     channelSpin=commonResonanceModule.Spin(0)))
-                            else:
-                                table.removeColumn('fission width_2')
+                                if not any(table.getColumn('fission width_2')):
+                                    info.extraFissionWidths.append(table)
                         else:
                             table.removeColumn('fission width_2')
                             table.removeColumn('fission width_1')
@@ -3254,7 +3255,7 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
 
                     mf32_elist = [(lis[0], lis[3], lis[4]) for lis in mf32_resonances]
                     nResonances = len(mf32_elist)
-                    Type=covarianceEnumsModule.Type.absolute
+                    _type = covarianceEnumsModule.Type.absolute
                     matrixClass = arrayModule.Flattened
 
                 elif LCOMP == 1:
@@ -3275,7 +3276,7 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                         mf32_elist = [(lis[0], lis[2], lis[3]) for lis in mf32_resonances]
                     matrix = read_LCOMP1(dim, matrixSize, dat)
                     nResonances = len(mf32_elist)
-                    Type = covarianceEnumsModule.Type.absolute
+                    _type = covarianceEnumsModule.Type.absolute
                     matrixClass = arrayModule.Full
 
                 elif LCOMP == 2:
@@ -3314,7 +3315,7 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                     # convert correlation -> absolute covariance matrix
                     matrix = matrix * numpy.outer(diagonal, diagonal)
                     nResonances = NRSA
-                    Type = covarianceEnumsModule.Type.absolute
+                    _type = covarianceEnumsModule.Type.absolute
                     matrixClass = arrayModule.Flattened
 
                 if LRF in (1, 2):
@@ -3383,6 +3384,7 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                         swaprows(matrix, MPAR * i1 + 1, MPAR * i1 + 2, 1)
 
                 parameters = covarianceModelParametersModule.Parameters()
+                parameter_values = []
                 startIndex = 0
                 if DAP:     # scattering radius uncertainty was specified. Expand matrix to include it:
                     if LRF in (1, 2):
@@ -3392,6 +3394,7 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                     parameters.add(covarianceModelParametersModule.ParameterLink(
                         label="scatteringRadius", root="$reactions", link=scatteringRadius,
                         matrixStartIndex=startIndex, nParameters=1))
+                    parameter_values.append(scatteringRadius.evaluated.value)
                     startIndex += 1
                     if len(DAP) == 1:
                         DAP_matrix = numpy.array([[DAP[0]**2]])
@@ -3416,10 +3419,12 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                                             label=f"scatteringRadius_{uniqueId}", root="$reactions",
                                             link=channel.scatteringRadius, matrixStartIndex=startIndex,
                                             nParameters=1))
+                                        parameter_values.append(channel.scatteringRadius.evaluated.value)
                                         parameters.add(covarianceModelParametersModule.ParameterLink(
                                             label=f"hardSphereRadius_{uniqueId}", root="$reactions",
                                             link=channel.hardSphereRadius, matrixStartIndex=startIndex+1,
                                             nParameters=1))
+                                        parameter_values.append(channel.hardSphereRadius.evaluated.value)
                                         DAPS_per_L[-1] += [DAPnow, DAPnow]
                                         uniqueId += 1
                                         startIndex += 2
@@ -3443,6 +3448,58 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                     new_matrix[len(DAP_matrix):, len(DAP_matrix):] = matrix
                     matrix = new_matrix
 
+                # store into GNDS:
+                if LRF in (1, 2):
+                    resData = resonances.resolved.evaluated.resonanceParameters.table
+                    nParams = resData.nColumns * resData.nRows
+                    for row in resData.data:
+                        parameter_values += row
+                    parameters.add(covarianceModelParametersModule.ParameterLink(
+                        label="resonanceParameters", root="$reactions", link=resData,
+                        matrixStartIndex=startIndex, nParameters=nParams))
+                else:
+                    # for RMatrix need links to each spinGroup
+                    excess_rows = []
+                    for spinGroup in resonances.resolved.evaluated:
+                        sgTable = spinGroup.resonanceParameters.table
+                        if sgTable in info.extraFissionWidths:
+                            # 2nd fission width is all 0 for this spin group.
+                            # We can drop that column unless we have non-zero covariance data
+                            cIndex = sgTable.nColumns - 1
+                            assert sgTable.columns[cIndex].name == 'fission width_2'
+                            width2_rows = numpy.array(range(startIndex, startIndex+len(sgTable), cIndex))
+                            if MPAR < 5 or (MPAR == 5 and not numpy.any(matrix[width2_rows])):
+                                sgTable.removeColumn('fission width_2')
+                                spinGroup.channels.pop(spinGroup.channels.labels()[-1])
+                                if MPAR == 5:
+                                    # mark corresponding rows / columns of the matrix for deletion
+                                    excess_rows += list(width2_rows)
+                            info.extraFissionWidths.remove(sgTable)
+                        nParams = sgTable.nColumns * sgTable.nRows
+                        for row in sgTable.data:
+                            parameter_values += row
+                        if nParams == 0: continue
+                        parameters.add(covarianceModelParametersModule.ParameterLink(
+                            label=spinGroup.label, link=sgTable, root="$reactions",
+                            matrixStartIndex=startIndex, nParameters=nParams
+                        ))
+                        startIndex += nParams
+
+                    if excess_rows:
+                        # remove extra covariance matrix rows corresponding to 2nd fission width:
+                        tmp = numpy.delete(matrix, excess_rows, axis=0)
+                        matrix = numpy.delete(tmp, excess_rows, axis=1)
+
+                assert len(matrix) == len(parameter_values)
+
+                if _type is covarianceEnumsModule.Type.absolute:
+                    parameter_values = numpy.array(parameter_values)
+                    if not numpy.any(matrix[parameter_values == 0]):
+                        # convert to relative matrix
+                        parameter_values[parameter_values == 0] = 1
+                        matrix = matrix / parameter_values / parameter_values[:,None]
+                        _type = covarianceEnumsModule.Type.relative
+
                 # switch to diagonal matrix if possible (much more compact):
                 if numpy.all(matrix == (numpy.identity(len(matrix)) * matrix.diagonal())):
                     GNDSmatrix = arrayModule.Diagonal(shape=matrix.shape, data=matrix.diagonal())
@@ -3452,27 +3509,8 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                     GNDSmatrix = arrayModule.Full(shape=matrix.shape, data=matrix[numpy.tril_indices(len(matrix))],
                                                   symmetry=arrayModule.Symmetry.lower)
 
-                # store into GNDS:
-                if LRF in (1, 2):
-                    resData = resonances.resolved.evaluated.resonanceParameters.table
-                    nParams = resData.nColumns * resData.nRows
-                    parameters.add(covarianceModelParametersModule.ParameterLink(
-                        label="resonanceParameters", root="$reactions", link=resData,
-                        matrixStartIndex=startIndex, nParameters=nParams))
-                else:
-                    # for RMatrix need links to each spinGroup
-                    for spinGroup in resonances.resolved.evaluated:
-                        sgTable = spinGroup.resonanceParameters.table
-                        nParams = sgTable.nColumns * sgTable.nRows
-                        if nParams == 0: continue
-                        parameters.add(covarianceModelParametersModule.ParameterLink(
-                            label=spinGroup.label, link=sgTable, root="$reactions",
-                            matrixStartIndex=startIndex, nParameters=nParams
-                        ))
-                        startIndex += nParams
-
                 covmatrix = covarianceModelParametersModule.ParameterCovarianceMatrix(
-                    info.style, GNDSmatrix, parameters, type=Type)
+                    info.style, GNDSmatrix, parameters, type=_type)
                 if ENDFconversionFlags:
                     info.ENDFconversionFlags.add(covmatrix, ','.join(ENDFconversionFlags))
 
@@ -3508,7 +3546,7 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                     dum, dum, dum, dum, N, NPARB = funkyFI(dat.next(), logFile=info.logs)
                     assert N == (NPARB*(NPARB+1))/2
                     matrix = read_LCOMP1(NPARB, N, dat)
-                    Type = covarianceEnumsModule.Type.absolute
+                    _type = covarianceEnumsModule.Type.absolute
                     ENDFconversionFlags.append("LCOMP=1")
 
                 elif LCOMP == 2:
@@ -3564,23 +3602,20 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                     # or convert to covariance matrix. For now do the latter
                     rsd = numpy.array(allUncerts)
                     matrix = matrix * numpy.outer(rsd, rsd)
-                    Type = covarianceEnumsModule.Type.absolute
+                    _type = covarianceEnumsModule.Type.absolute
                     ENDFconversionFlags.append("LCOMP=2")
                     ENDFconversionFlags.append("NDIGIT=%d" % NDIGIT)
                 else:
                     raise NotImplementedError("MF32 LRF=7 LCOMP=%d" % LCOMP)
 
-                # switch to diagonal matrix if possible (much more compact):
-                if numpy.all(matrix == (numpy.identity(len(matrix)) * matrix.diagonal())):
-                    GNDSmatrix = arrayModule.Diagonal(shape=matrix.shape, data=matrix.diagonal())
-                else:
-                    GNDSmatrix = arrayModule.Flattened.fromNumpyArray(matrix, symmetry=arrayModule.Symmetry.lower)
-
                 # store into GNDS (need links to each spinGroup)
                 parameters = covarianceModelParametersModule.Parameters()
+                parameter_values = []
                 startIndex = 0
                 for spinGroup in resonances.resolved.evaluated:
                     nParams = spinGroup.resonanceParameters.table.nColumns * spinGroup.resonanceParameters.table.nRows
+                    for row in spinGroup.resonanceParameters.table.data:
+                        parameter_values += row
                     if nParams == 0: continue
                     parameters.add(covarianceModelParametersModule.ParameterLink(
                         label=spinGroup.label, link=spinGroup.resonanceParameters.table, root="$reactions",
@@ -3588,8 +3623,22 @@ def readMF32(info, dat, mf, mt, cov_info, warningList):
                     ))
                     startIndex += nParams
 
+                if _type is covarianceEnumsModule.Type.absolute:
+                    parameter_values = numpy.array(parameter_values)
+                    if not numpy.any(matrix[parameter_values == 0]):
+                        # convert to relative matrix
+                        parameter_values[parameter_values == 0] = 1
+                        matrix /= numpy.outer(parameter_values, parameter_values)
+                        _type = covarianceEnumsModule.Type.relative
+
+                # switch to diagonal matrix if possible (much more compact):
+                if numpy.all(matrix == (numpy.identity(len(matrix)) * matrix.diagonal())):
+                    GNDSmatrix = arrayModule.Diagonal(shape=matrix.shape, data=matrix.diagonal())
+                else:
+                    GNDSmatrix = arrayModule.Flattened.fromNumpyArray(matrix, symmetry=arrayModule.Symmetry.lower)
+
                 covmatrix = covarianceModelParametersModule.ParameterCovarianceMatrix(
-                    info.style, GNDSmatrix, parameters, type=Type)
+                    info.style, GNDSmatrix, parameters, type=_type)
                 if ENDFconversionFlags:
                     info.ENDFconversionFlags.add(covmatrix, ','.join(ENDFconversionFlags))
 
@@ -3821,7 +3870,6 @@ def readMF35(info, dat, mf, mt, cov_info, warningList):
         LS, LB = 1, 5
 
         matrix = readMatrix(info, mf, mt, LS, LB, NT, NE, dat, warningList)
-        matrix.axes[0].unit = '1/eV**2'
         form = covarianceMatrixModule.CovarianceMatrix(
             label=info.style, type=covarianceEnumsModule.Type.absolute, matrix=matrix)
 

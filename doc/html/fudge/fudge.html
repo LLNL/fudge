@@ -563,6 +563,12 @@ The overrwritten method must construct a class of instance <em>cls</em> using <e
 <dt class="sig sig-object py" id="fudge.institution.UnknownInstitution">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.institution.</span></span><span class="sig-name descname"><span class="pre">UnknownInstitution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#UnknownInstitution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.UnknownInstitution" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../LUPY/index.html#LUPY.ancestry.AncestryIO" title="LUPY.ancestry.AncestryIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">AncestryIO</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fudge.institution.UnknownInstitution.convertUnits">
+<span class="sig-name descname"><span class="pre">convertUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unitMap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/institution.html#UnknownInstitution.convertUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.institution.UnknownInstitution.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints a warning that convertUnits is not implemented for this institution.</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fudge.institution.UnknownInstitution.keyName">
 <span class="sig-name descname"><span class="pre">keyName</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'label'</span></em><a class="headerlink" href="#fudge.institution.UnknownInstitution.keyName" title="Permalink to this definition">¶</a></dt>
@@ -5388,6 +5394,12 @@ proper unitbase/correspondingPoints treatment is unclear. Distribution should en
 </dd></dl>
 
 <dl class="py exception">
+<dt class="sig sig-object py" id="fudge.warning.MatrixDimensionMismatch">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">MatrixDimensionMismatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrixShape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridShape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#MatrixDimensionMismatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.MatrixDimensionMismatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
 <dt class="sig sig-object py" id="fudge.warning.MissingCoulombIdenticalParticlesFlag">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">MissingCoulombIdenticalParticlesFlag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#MissingCoulombIdenticalParticlesFlag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.MissingCoulombIdenticalParticlesFlag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
@@ -5468,6 +5480,12 @@ proper unitbase/correspondingPoints treatment is unclear. Distribution should en
 <dl class="py exception">
 <dt class="sig sig-object py" id="fudge.warning.NonConstantMultiplicity">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">NonConstantMultiplicity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#NonConstantMultiplicity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.NonConstantMultiplicity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="fudge.warning.NonMonotonicGrid">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fudge.warning.</span></span><span class="sig-name descname"><span class="pre">NonMonotonicGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/warning.html#NonMonotonicGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fudge.warning.NonMonotonicGrid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.warning.Warning" title="fudge.warning.Warning"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
 </dd></dl>
 

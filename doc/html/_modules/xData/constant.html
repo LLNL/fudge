@@ -361,6 +361,22 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multiplying Constant1d by </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+<div class="viewcode-block" id="Constant1d.asXYs1d"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.asXYs1d">[docs]</a>    <span class="k">def</span> <span class="nf">asXYs1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asLinLin</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span><span class="p">,</span> <span class="n">biSectionMax</span><span class="o">=</span><span class="mi">16</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a representation of the data in *self* as an :py:class:`XYs1dModule.XYs1d` instance. </span>
+
+<span class="sd">        :param asLinLin:    If **True**, the data have lin-lin interpolation.</span>
+<span class="sd">        :param accuracy:    Used to determine the accuracy if converting data to lin-lin interpolated data.</span>
+<span class="sd">        :param lowerEps     Used to dull the lower point for &quot;flat&quot; interpolation.</span>
+<span class="sd">        :param upperEps     Used to dull the upper point for &quot;flat&quot; interpolation.</span>
+
+<span class="sd">        :returns:           A :py:class:`XYs1dModule.XYs1d` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xys1d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span><span class="n">accuracy</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span><span class="o">=</span><span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span><span class="o">=</span><span class="n">upperEps</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">xys1d</span></div>
+
 <div class="viewcode-block" id="Constant1d.convertUnits"><a class="viewcode-back" href="../../xData/index.html#xData.constant.Constant1d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts all data in *self* per *unitMap*.</span>

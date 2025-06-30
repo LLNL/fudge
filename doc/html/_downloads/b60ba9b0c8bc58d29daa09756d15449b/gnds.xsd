@@ -508,6 +508,7 @@
     <xs:attribute name="library" type="xs:string" use="required"/>
     <xs:attribute name="version" use="required"/>
     <xs:attribute name="date" type="DateAttribute" use="required"/>
+    <xs:attribute name="derivedFrom" type="xs:string"/>
   </xs:complexType>
  
   <xs:complexType name="PoPs_AliasesType">
@@ -557,8 +558,8 @@
   <xs:complexType name="PoPs_basicParticle">
     <xs:sequence>
       <xs:element name="mass" type="PoPs_quantity"/>
-      <xs:element name="spin" type="PoPs_quantity"/>
-      <xs:element name="parity" type="PoPs_quantity"/>
+      <xs:element name="spin" type="PoPs_spin"/>
+      <xs:element name="parity" type="PoPs_parity"/>
       <xs:element name="charge" type="PoPs_quantity"/>
       <xs:element name="halflife" type="PoPs_quantity"/>
       <xs:element name="decayData" type="PoPs_decayData" minOccurs="0"/>
@@ -572,6 +573,18 @@
       <xs:element name="integer" type="PQU_integer"/>
       <xs:element name="fraction" type="PQU_fraction"/>
       <xs:element name="string" type="PQU_string"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="PoPs_spin">
+    <xs:choice>
+      <xs:element name="fraction" type="PQU_fraction" maxOccurs="unbounded"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="PoPs_parity">
+    <xs:choice>
+      <xs:element name="integer" type="PQU_integer" maxOccurs="unbounded"/>
     </xs:choice>
   </xs:complexType>
 
@@ -629,7 +642,7 @@
   <xs:complexType name="PoPs_NuclideType">
     <xs:sequence>
       <xs:element name="mass" type="PoPs_quantity" minOccurs="0"/>
-      <xs:element name="spin" type="PoPs_quantity" minOccurs="0"/>
+      <xs:element name="spin" type="PoPs_spin" minOccurs="0"/>
       <xs:element name="charge" type="PoPs_quantity" minOccurs="0"/>
       <xs:element name="decayData" type="PoPs_decayData" minOccurs="0"/>
       <xs:element name="nucleus" type="PoPs_NucleusType"/>
@@ -647,9 +660,9 @@
   <xs:complexType name="PoPs_NucleusType">
     <xs:sequence>
       <xs:element name="mass" type="PoPs_quantity" minOccurs="0"/>
-      <xs:element name="spin" type="PoPs_quantity" minOccurs="0"/>
-      <xs:element name="parity" type="PoPs_quantity" minOccurs="0"/>
-      <xs:element name="charge" type="PoPs_quantity"/>
+      <xs:element name="spin" type="PoPs_spin" minOccurs="0"/>
+      <xs:element name="parity" type="PoPs_parity" minOccurs="0"/>
+      <xs:element name="charge" type="PoPs_quantity" minOccurs="0"/>
       <xs:element name="halflife" type="PoPs_quantity" minOccurs="0"/>
       <xs:element name="decayData" type="PoPs_decayData" minOccurs="0"/>
       <xs:element name="energy" type="PoPs_quantity" minOccurs="0"/>
@@ -1956,6 +1969,18 @@
     <xs:attribute name="unit" type="xs:string"/>
   </xs:complexType>
 
+  <xs:complexType name="PQU_confidenceIntervals">
+    <xs:sequence>
+      <xs:element name="interval" type="PQU_confidenceInterval" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PQU_confidenceInterval">
+    <xs:attribute name="confidence" type="xs:double" use="required"/>
+    <xs:attribute name="lower" type="xs:double" use="required"/>
+    <xs:attribute name="upper" type="xs:double" use="required"/>
+  </xs:complexType>
+
   <xs:complexType name="PQU_uncertainty">
     <xs:choice>
       <xs:element name="standard">
@@ -1965,6 +1990,7 @@
           </xs:choice>
         </xs:complexType>
       </xs:element>
+      <xs:element name="confidenceIntervals" type="PQU_confidenceIntervals"/>
     </xs:choice>
   </xs:complexType>
 
